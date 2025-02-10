@@ -6,7 +6,7 @@ import chalk from "chalk";
 import { createProject } from "./create-project";
 
 const createCommand = command({
-  name: "create",
+  name: "init",
   desc: "Create a new Better-T Stack project",
   options: {
     projectDir: string()
