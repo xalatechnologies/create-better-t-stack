@@ -1,8 +1,10 @@
-export interface ProjectOptions {
+export type ProjectFeature = "docker" | "github-actions" | "SEO";
+export type ProjectDatabase = "libsql" | "postgres";
+
+export type ProjectOptions = {
   projectName: string;
-  typescript: boolean;
   git: boolean;
-  database: "libsql" | "postgres";
+  database: ProjectDatabase;
   auth: boolean;
-  features: string[];
-}
+  features: ProjectFeature[];
+};

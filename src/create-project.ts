@@ -2,15 +2,7 @@ import { execa } from "execa";
 import fs from "fs-extra";
 import ora from "ora";
 import path from "node:path";
-
-interface ProjectOptions {
-  projectName: string;
-  typescript: boolean;
-  git: boolean;
-  database: "libsql" | "postgres";
-  auth: boolean;
-  features: string[];
-}
+import type { ProjectOptions } from "./types";
 
 export async function createProject(options: ProjectOptions) {
   const spinner = ora("Creating project directory...").start();

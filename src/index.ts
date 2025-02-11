@@ -3,7 +3,11 @@ import chalk from "chalk";
 import { Command } from "commander";
 import { createProject } from "./create-project.js";
 import { renderTitle } from "./render-title.js";
-import type { ProjectOptions } from "./types.js";
+import type {
+  ProjectFeature,
+  ProjectDatabase,
+  ProjectOptions,
+} from "./types.js";
 
 const program = new Command();
 
@@ -17,7 +21,7 @@ async function main() {
     default: "my-better-t-app",
   });
 
-  const database = await select({
+  const database = await select<ProjectDatabase>({
     message: chalk.cyan("Select database:"),
     choices: [
       {
@@ -40,7 +44,7 @@ async function main() {
     default: true,
   });
 
-  const features = await checkbox({
+  const features = await checkbox<ProjectFeature>({
     message: chalk.cyan("Select additional features:"),
     choices: [
       {
@@ -69,7 +73,7 @@ async function main() {
     features,
   };
 
-  await createProject(projectOptions as ProjectOptions);
+  await createProject(projectOptions);
 }
 
 program
