@@ -2,6 +2,7 @@ import path from "node:path";
 import { execa } from "execa";
 import fs from "fs-extra";
 import ora from "ora";
+import { setupTurso } from "./helpers/db-setup";
 import type { ProjectOptions } from "./types";
 
 export async function createProject(options: ProjectOptions) {
@@ -35,12 +36,9 @@ export async function createProject(options: ProjectOptions) {
 		await execa("bun", ["install"], { cwd: projectDir });
 		spinner.succeed();
 
-		spinner.start("Setting up database...");
 		if (options.database === "libsql") {
-			await execa("bun", ["run", "db:local"], { cwd: projectDir });
-			await execa("bun", ["run", "db:push"], { cwd: projectDir });
+			await setupTurso(projectDir);
 		}
-		spinner.succeed();
 
 		console.log("\n✨ Project created successfully!\n");
 		console.log("Next steps:");
