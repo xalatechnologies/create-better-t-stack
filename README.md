@@ -1,4 +1,4 @@
-# Create Better-T
+# Create Better-T-Stack
 
 A CLI tool to scaffold Better-T Stack projects with best practices and modern tooling.
 
@@ -69,4 +69,4 @@ MIT
 
 ## Credits
 
-Developed by Nitish Singh – Built on top of the Better-T Stack by [Aman Varshney](https://github.com/AmanVarshney01/Better-T-Stack)
+Developed by Nitish Singh & Aman Varshney – Built on top of the Better-T Stack by [Aman Varshney](https://github.com/AmanVarshney01/Better-T-Stack)
