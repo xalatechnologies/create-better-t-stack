@@ -1,66 +1,81 @@
-#!/usr/bin/env node
-
-import { boolean, command, run, string } from "@drizzle-team/brocli";
-import { confirm, input, select } from "@inquirer/prompts";
+import { checkbox, confirm, input, select } from "@inquirer/prompts";
 import chalk from "chalk";
-import { createProject } from "./create-project";
+import { Command } from "commander";
+import { createProject } from "./create-project.js";
+import { renderTitle } from "./render-title.js";
+import type { ProjectOptions } from "./types.js";
 
-const createCommand = command({
-  name: "init",
-  desc: "Create a new Better-T Stack project",
-  options: {
-    projectDir: string()
-      .desc("Project directory name")
-      .default("my-better-t-app"),
-    git: boolean().desc("Initialize git repository").default(true),
-  },
-  handler: async (opts) => {
-    console.log(chalk.bold("\n🚀 Creating a new Better-T Stack project...\n"));
+const program = new Command();
 
-    const projectName =
-      opts.projectDir ||
-      (await input({
-        message: "Project name:",
-        default: "my-better-t-app",
-      }));
+async function main() {
+  renderTitle();
 
-    const database = await select({
-      message: "Select database:",
-      choices: [
-        { value: "libsql", label: "libSQL (recommended)" },
-        { value: "postgres", label: "PostgreSQL" },
-      ],
-    });
+  console.log(chalk.bold("\n🚀 Creating a new Better-T Stack project...\n"));
 
-    const auth = await confirm({
-      message: "Add authentication with Better-Auth?",
-      default: true,
-    });
+  const projectName = await input({
+    message: "Project name:",
+    default: "my-better-t-app",
+  });
 
-    const features = await select({
-      message: "Select additional features:",
-      choices: [
-        { value: "docker", label: "Docker setup" },
-        { value: "github-actions", label: "GitHub Actions" },
-        { value: "SEO", label: "Basic SEO setup" },
-      ],
-      multiselect: true,
-    });
+  const database = await select({
+    message: chalk.cyan("Select database:"),
+    choices: [
+      {
+        value: "libsql",
+        name: "libSQL",
+        description: chalk.dim(
+          "(Recommended) - Turso's embedded SQLite database",
+        ),
+      },
+      {
+        value: "postgres",
+        name: "PostgreSQL",
+        description: chalk.dim("Traditional relational database"),
+      },
+    ],
+  });
 
-    const projectOptions = {
-      projectName,
-      git: opts.git,
-      database,
-      auth,
-      features,
-    };
+  const auth = await confirm({
+    message: "Add authentication with Better-Auth?",
+    default: true,
+  });
 
-    await createProject(projectOptions);
-  },
-});
+  const features = await checkbox({
+    message: chalk.cyan("Select additional features:"),
+    choices: [
+      {
+        value: "docker",
+        name: "Docker setup",
+        description: chalk.dim("Containerize your application"),
+      },
+      {
+        value: "github-actions",
+        name: "GitHub Actions",
+        description: chalk.dim("CI/CD workflows"),
+      },
+      {
+        value: "SEO",
+        name: "Basic SEO setup",
+        description: chalk.dim("Search engine optimization configuration"),
+      },
+    ],
+  });
 
-run([createCommand], {
-  name: "create-better-t",
-  description: "Create a new Better-T Stack project",
-  version: "1.0.0",
-});
+  const projectOptions = {
+    projectName,
+    git: true,
+    database,
+    auth,
+    features,
+  };
+
+  await createProject(projectOptions as ProjectOptions);
+}
+
+program
+  .name("create-better-t-stack")
+  .description("Create a new Better-T Stack project")
+  .version("1.0.0")
+  .action(main);
+
+program.parse();

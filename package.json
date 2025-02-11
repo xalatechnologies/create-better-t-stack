@@ -1,15 +1,16 @@
 {
-  "name": "create-better-t",
+  "name": "create-better-t-stack",
   "version": "1.0.0",
   "description": "CLI tool to scaffold Better-T Stack projects",
   "type": "module",
   "bin": {
-    "create-better-t": "./dist/index.js"
+    "create-better-t-stack": "./dist/index.js"
   },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
+    "check": "biome check --write .",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
@@ -18,11 +19,12 @@
     "templates"
   ],
   "dependencies": {
-    "@drizzle-team/brocli": "^0.11.0",
     "@inquirer/prompts": "^7.3.1",
     "chalk": "^5.3.0",
+    "commander": "^13.1.0",
     "execa": "^8.0.1",
     "fs-extra": "^11.2.0",
+    "gradient-string": "^3.0.0",
     "ora": "^7.0.1"
   },
   "devDependencies": {
