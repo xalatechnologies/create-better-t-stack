@@ -1,9 +1,9 @@
 import { checkbox, confirm, input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
-import { createProject } from "./create-project.js";
-import { renderTitle } from "./render-title.js";
-import type { ProjectDatabase, ProjectFeature } from "./types.js";
+import { createProject } from "./create-project";
+import { renderTitle } from "./render-title";
+import type { ProjectDatabase, ProjectFeature } from "./types";
 
 const program = new Command();
 
