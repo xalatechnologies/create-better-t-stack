@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.2.1
+
+### Patch Changes
+
+- a0cef2b: bump version to 0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
