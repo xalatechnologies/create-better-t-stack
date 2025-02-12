@@ -8,60 +8,84 @@ import { logger } from "./utils/logger";
 
 const program = new Command();
 
-async function main() {
+type CliOptions = {
+	yes: boolean;
+};
+
+async function main(options: CliOptions) {
 	try {
 		renderTitle();
-
 		console.log(chalk.bold("\n🚀 Creating a new Better-T Stack project...\n"));
 
-		const projectName = await input({
-			message: "Project name:",
-			default: "my-better-t-app",
-		});
+		const defaults = {
+			projectName: "my-better-t-app",
+			database: "libsql" as ProjectDatabase,
+			auth: true,
+			features: [] as ProjectFeature[],
+		};
 
-		const database = await select<ProjectDatabase>({
-			message: chalk.cyan("Select database:"),
-			choices: [
-				{
-					value: "libsql",
-					name: "libSQL",
-					description: chalk.dim(
-						"(Recommended) - Turso's embedded SQLite database",
-					),
-				},
-				{
-					value: "postgres",
-					name: "PostgreSQL",
-					description: chalk.dim("Traditional relational database"),
-				},
-			],
-		});
+		const projectName = options.yes
+			? defaults.projectName
+			: await input({
+					message: "Project name:",
+					default: defaults.projectName,
+				});
 
-		const auth = await confirm({
-			message: "Add authentication with Better-Auth?",
-			default: true,
-		});
+		const database = options.yes
+			? defaults.database
+			: await select<ProjectDatabase>({
+					message: chalk.cyan("Select database:"),
+					choices: [
+						{
+							value: "libsql",
+							name: "libSQL",
+							description: chalk.dim(
+								"(Recommended) - Turso's embedded SQLite database",
+							),
+						},
+						{
+							value: "postgres",
+							name: "PostgreSQL",
+							description: chalk.dim("Traditional relational database"),
+						},
+					],
+				});
 
-		const features = await checkbox<ProjectFeature>({
-			message: chalk.cyan("Select additional features:"),
-			choices: [
-				{
-					value: "docker",
-					name: "Docker setup",
-					description: chalk.dim("Containerize your application"),
-				},
-				{
-					value: "github-actions",
-					name: "GitHub Actions",
-					description: chalk.dim("CI/CD workflows"),
-				},
-				{
-					value: "SEO",
-					name: "Basic SEO setup",
-					description: chalk.dim("Search engine optimization configuration"),
-				},
-			],
-		});
+		const auth = options.yes
+			? defaults.auth
+			: await confirm({
+					message: "Add authentication with Better-Auth?",
+					default: defaults.auth,
+				});
+
+		const features = options.yes
+			? defaults.features
+			: await checkbox<ProjectFeature>({
+					message: chalk.cyan("Select additional features:"),
+					choices: [
+						{
+							value: "docker",
+							name: "Docker setup",
+							description: chalk.dim("Containerize your application"),
+						},
+						{
+							value: "github-actions",
+							name: "GitHub Actions",
+							description: chalk.dim("CI/CD workflows"),
+						},
+						{
+							value: "SEO",
+							name: "Basic SEO setup",
+							description: chalk.dim(
+								"Search engine optimization configuration",
+							),
+						},
+					],
+				});
+
+		if (options.yes) {
+			logger.info("Using default values due to -y flag");
+		}
 
 		const projectOptions = {
 			projectName,
@@ -93,6 +117,7 @@ program
 	.name("create-better-t-stack")
 	.description("Create a new Better-T Stack project")
 	.version("1.0.0")
-	.action(main);
+	.option("-y, --yes", "Accept all defaults")
+	.action((options) => main(options));
 
 program.parse();
