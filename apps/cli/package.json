@@ -4,7 +4,7 @@
 	"description": "CLI tool to scaffold Better-T Stack projects",
 	"type": "module",
 	"bin": {
-		"create-better-t-stack": "./dist/index.js"
+		"create-better-t-stack": "dist/index.js"
 	},
 	"scripts": {
 		"build": "tsup",
