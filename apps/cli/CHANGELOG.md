@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.1.2
+
+### Patch Changes
+
+- 5554818: auto get current package version
+
 ## 0.1.1
 
 ### Patch Changes
