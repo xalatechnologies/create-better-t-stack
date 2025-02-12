@@ -1,11 +1,13 @@
 {
 	"name": "create-better-t-stack",
-	"version": "1.0.0",
+	"version": "0.0.0",
 	"description": "CLI tool to scaffold Better-T Stack projects",
 	"type": "module",
+	"license": "MIT",
 	"bin": {
 		"create-better-t-stack": "dist/index.js"
 	},
+	"keywords": [],
 	"scripts": {
 		"build": "tsup",
 		"dev": "tsup --watch",
