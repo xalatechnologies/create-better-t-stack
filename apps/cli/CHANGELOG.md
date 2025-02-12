@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.1.3
+
+### Patch Changes
+
+- a06be85: refactor(cli): improve Turso database setup workflow
+
 ## 0.1.2
 
 ### Patch Changes
