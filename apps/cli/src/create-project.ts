@@ -36,10 +36,10 @@ export async function createProject(options: ProjectOptions) {
 			await setupTurso(projectDir);
 		}
 
-		console.log("\n✨ Project created successfully!\n");
-		console.log("Next steps:");
-		console.log(`  cd ${options.projectName}`);
-		console.log("  bun dev");
+		logger.success("\n✨ Project created successfully!\n");
+		logger.info("Next steps:");
+		logger.info(`  cd ${options.projectName}`);
+		logger.info("  bun dev");
 	} catch (error) {
 		spinner.fail("Failed to create project");
 		logger.error("Error during project creation:", error);

@@ -132,15 +132,15 @@ TURSO_AUTH_TOKEN=`;
 
 		await fs.writeFile(envPath, envContent);
 
-		console.log("\n📝 Manual Turso Setup Instructions:");
-		console.log("1. Visit https://turso.tech and create an account");
-		console.log("2. Create a new database from the dashboard");
-		console.log("3. Get your database URL and authentication token");
-		console.log(
+		logger.info("\n📝 Manual Turso Setup Instructions:");
+		logger.info("1. Visit https://turso.tech and create an account");
+		logger.info("2. Create a new database from the dashboard");
+		logger.info("3. Get your database URL and authentication token");
+		logger.info(
 			"4. Add these credentials to the .env file in your project root",
 		);
-		console.log("\nThe .env file has been created with placeholder variables:");
-		console.log("TURSO_DATABASE_URL=your_database_url");
-		console.log("TURSO_AUTH_TOKEN=your_auth_token");
+		logger.info("\nThe .env file has been created with placeholder variables:");
+		logger.info("TURSO_DATABASE_URL=your_database_url");
+		logger.info("TURSO_AUTH_TOKEN=your_auth_token");
 	}
 }
