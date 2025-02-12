@@ -14,7 +14,7 @@ export async function createProject(options: ProjectOptions) {
 		spinner.succeed();
 
 		spinner.start("Cloning template repository...");
-		await execa("git", [
+		await execa("npx", [
 			"degit",
 			"https://github.com/AmanVarshney01/Better-T-Stack.git",
 			projectDir,
