@@ -2,29 +2,26 @@ import { DEFAULT_CONFIG } from "../consts";
 import type { ProjectConfig } from "../types";
 
 export function generateReproducibleCommand(config: ProjectConfig): string {
-	const parts = ["bunx create-better-t-stack"];
-
-	if (config.projectName !== DEFAULT_CONFIG.projectName) {
-		parts.push(config.projectName);
-	}
+	const flags: string[] = [];
 
 	if (config.database !== DEFAULT_CONFIG.database) {
-		parts.push(`--database ${config.database}`);
+		flags.push(`--database ${config.database}`);
 	}
-
 	if (config.auth !== DEFAULT_CONFIG.auth) {
-		parts.push(config.auth ? "--auth" : "--no-auth");
+		flags.push("--no-auth");
+	}
+	if (
+		config.packageManager &&
+		config.packageManager !== DEFAULT_CONFIG.packageManager
+	) {
+		flags.push(`--package-manager ${config.packageManager}`);
 	}
 
-	if (config.features.includes("docker")) {
-		parts.push("--docker");
-	}
-	if (config.features.includes("github-actions")) {
-		parts.push("--github-actions");
-	}
-	if (config.features.includes("SEO")) {
-		parts.push("--seo");
+	for (const feature of config.features) {
+		flags.push(`--${feature}`);
 	}
 
-	return parts.join(" ");
+	return `npx create-better-t-stack${
+		config.projectName ? ` ${config.projectName}` : ""
+	}${flags.length > 0 ? ` ${flags.join(" ")}` : ""}`;
 }

@@ -7,5 +7,8 @@ export type ProjectConfig = {
 	git: boolean;
 	database: ProjectDatabase;
 	auth: boolean;
+	packageManager?: PackageManager;
 	features: ProjectFeature[];
 };
+
+export type PackageManager = "npm" | "yarn" | "pnpm" | "bun";

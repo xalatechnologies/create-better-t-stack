@@ -4,7 +4,12 @@ import { Command } from "commander";
 import { DEFAULT_CONFIG } from "./consts";
 import { createProject } from "./create-project";
 import { renderTitle } from "./render-title";
-import type { ProjectConfig, ProjectDatabase, ProjectFeature } from "./types";
+import type {
+	PackageManager,
+	ProjectConfig,
+	ProjectDatabase,
+	ProjectFeature,
+} from "./types";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
 import { getVersion } from "./utils/get-version";
 import { logger } from "./utils/logger";
@@ -103,6 +108,10 @@ async function main() {
 			.option("--docker", "Include Docker setup")
 			.option("--github-actions", "Include GitHub Actions")
 			.option("--seo", "Include SEO setup")
+			.option(
+				"--package-manager <type>",
+				"Package manager to use (npm, yarn, pnpm, or bun)",
+			)
 			.parse();
 
 		const options = program.opts();
@@ -112,6 +121,7 @@ async function main() {
 			projectName: projectDirectory,
 			database: options.database as ProjectDatabase,
 			auth: options.auth,
+			packageManager: options.packageManager as PackageManager,
 			features: [
 				...(options.docker ? ["docker"] : []),
 				...(options.githubActions ? ["github-actions"] : []),

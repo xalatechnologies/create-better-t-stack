@@ -34,4 +34,5 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 	auth: true,
 	features: [],
 	git: true,
+	packageManager: "npm",
 };
