@@ -3,10 +3,10 @@ import { execa } from "execa";
 import fs from "fs-extra";
 import ora from "ora";
 import { setupTurso } from "./helpers/db-setup";
-import type { ProjectOptions } from "./types";
+import type { ProjectConfig } from "./types";
 import { logger } from "./utils/logger";
 
-export async function createProject(options: ProjectOptions) {
+export async function createProject(options: ProjectConfig) {
 	const spinner = ora("Creating project directory...").start();
 	const projectDir = path.resolve(process.cwd(), options.projectName);
 
