@@ -4,6 +4,7 @@ import fs from "fs-extra";
 import ora from "ora";
 import { setupTurso } from "./helpers/db-setup";
 import type { ProjectOptions } from "./types";
+import { logger } from "./utils/logger";
 
 export async function createProject(options: ProjectOptions) {
 	const spinner = ora("Creating project directory...").start();
@@ -41,7 +42,7 @@ export async function createProject(options: ProjectOptions) {
 		console.log("  bun dev");
 	} catch (error) {
 		spinner.fail("Failed to create project");
-		console.error(error);
+		logger.error("Error during project creation:", error);
 		process.exit(1);
 	}
 }

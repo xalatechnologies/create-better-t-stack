@@ -4,73 +4,90 @@ import { Command } from "commander";
 import { createProject } from "./create-project";
 import { renderTitle } from "./render-title";
 import type { ProjectDatabase, ProjectFeature } from "./types";
+import { logger } from "./utils/logger";
 
 const program = new Command();
 
 async function main() {
-	renderTitle();
+	try {
+		renderTitle();
 
-	console.log(chalk.bold("\n🚀 Creating a new Better-T Stack project...\n"));
+		console.log(chalk.bold("\n🚀 Creating a new Better-T Stack project...\n"));
 
-	const projectName = await input({
-		message: "Project name:",
-		default: "my-better-t-app",
-	});
+		const projectName = await input({
+			message: "Project name:",
+			default: "my-better-t-app",
+		});
 
-	const database = await select<ProjectDatabase>({
-		message: chalk.cyan("Select database:"),
-		choices: [
-			{
-				value: "libsql",
-				name: "libSQL",
-				description: chalk.dim(
-					"(Recommended) - Turso's embedded SQLite database",
-				),
-			},
-			{
-				value: "postgres",
-				name: "PostgreSQL",
-				description: chalk.dim("Traditional relational database"),
-			},
-		],
-	});
+		const database = await select<ProjectDatabase>({
+			message: chalk.cyan("Select database:"),
+			choices: [
+				{
+					value: "libsql",
+					name: "libSQL",
+					description: chalk.dim(
+						"(Recommended) - Turso's embedded SQLite database",
+					),
+				},
+				{
+					value: "postgres",
+					name: "PostgreSQL",
+					description: chalk.dim("Traditional relational database"),
+				},
+			],
+		});
 
-	const auth = await confirm({
-		message: "Add authentication with Better-Auth?",
-		default: true,
-	});
+		const auth = await confirm({
+			message: "Add authentication with Better-Auth?",
+			default: true,
+		});
 
-	const features = await checkbox<ProjectFeature>({
-		message: chalk.cyan("Select additional features:"),
-		choices: [
-			{
-				value: "docker",
-				name: "Docker setup",
-				description: chalk.dim("Containerize your application"),
-			},
-			{
-				value: "github-actions",
-				name: "GitHub Actions",
-				description: chalk.dim("CI/CD workflows"),
-			},
-			{
-				value: "SEO",
-				name: "Basic SEO setup",
-				description: chalk.dim("Search engine optimization configuration"),
-			},
-		],
-	});
+		const features = await checkbox<ProjectFeature>({
+			message: chalk.cyan("Select additional features:"),
+			choices: [
+				{
+					value: "docker",
+					name: "Docker setup",
+					description: chalk.dim("Containerize your application"),
+				},
+				{
+					value: "github-actions",
+					name: "GitHub Actions",
+					description: chalk.dim("CI/CD workflows"),
+				},
+				{
+					value: "SEO",
+					name: "Basic SEO setup",
+					description: chalk.dim("Search engine optimization configuration"),
+				},
+			],
+		});
 
-	const projectOptions = {
-		projectName,
-		git: true,
-		database,
-		auth,
-		features,
-	};
+		const projectOptions = {
+			projectName,
+			git: true,
+			database,
+			auth,
+			features,
+		};
 
-	await createProject(projectOptions);
+		await createProject(projectOptions);
+	} catch (error) {
+		if (error instanceof Error && error.message.includes("User force closed")) {
+			console.log("\n");
+			logger.warn("Operation cancelled by user");
+			process.exit(0);
+		}
+		logger.error("An unexpected error occurred:", error);
+		process.exit(1);
+	}
 }
+
+process.on("SIGINT", () => {
+	console.log("\n");
+	logger.warn("Operation cancelled by user");
+	process.exit(0);
+});
 
 program
 	.name("create-better-t-stack")

@@ -4,6 +4,7 @@ import { confirm, input } from "@inquirer/prompts";
 import { execa } from "execa";
 import fs from "fs-extra";
 import ora, { type Ora } from "ora";
+import { logger } from "../utils/logger";
 
 async function isTursoInstalled() {
 	try {
@@ -48,10 +49,18 @@ async function installTursoCLI(isMac: boolean, spinner: Ora) {
 		await execa("turso", ["auth", "login"]);
 		spinner.succeed("Logged in to Turso!");
 	} catch (error) {
-		console.error(error);
+		if (error instanceof Error && error.message.includes("User force closed")) {
+			spinner.stop();
+			console.log("\n");
+			logger.warn("Turso CLI installation cancelled by user");
+			throw error;
+		}
+		logger.error("Error during Turso CLI installation:", error);
 		spinner.fail(
 			"Failed to install Turso CLI. Proceeding with manual setup...",
 		);
+
+		throw error;
 	}
 }
 
@@ -108,7 +117,7 @@ TURSO_AUTH_TOKEN="${authToken.trim()}"`;
 			spinner.succeed("Turso database configured successfully!");
 			return;
 		} catch (error) {
-			console.error(error);
+			logger.error("Error during Turso database creation:", error);
 			spinner.fail(
 				"Failed to install Turso CLI. Proceeding with manual setup...",
 			);
