@@ -4,6 +4,7 @@ import { Command } from "commander";
 import { createProject } from "./create-project";
 import { renderTitle } from "./render-title";
 import type { ProjectDatabase, ProjectFeature } from "./types";
+import { getVersion } from "./utils/get-version";
 import { logger } from "./utils/logger";
 
 const program = new Command();
@@ -116,7 +117,7 @@ process.on("SIGINT", () => {
 program
 	.name("create-better-t-stack")
 	.description("Create a new Better-T Stack project")
-	.version("1.0.0")
+	.version(getVersion())
 	.option("-y, --yes", "Accept all defaults")
 	.action((options) => main(options));
 

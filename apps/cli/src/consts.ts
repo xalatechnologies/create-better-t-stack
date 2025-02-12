@@ -1,3 +1,6 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 export const TITLE_TEXT = `
      ╔════════════════════════════════════════════════════════════╗
      ║                                                            ║
@@ -19,3 +22,7 @@ export const TITLE_TEXT = `
      ║                                                            ║
      ╚════════════════════════════════════════════════════════════╝
  `;
+
+const __filename = fileURLToPath(import.meta.url);
+const distPath = path.dirname(__filename);
+export const PKG_ROOT = path.join(distPath, "../");
