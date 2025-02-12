@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.3.0
+
+### Minor Changes
+
+- 4659db9: feat: add package manager selection and configuration
+
 ## 0.2.1
 
 ### Patch Changes
