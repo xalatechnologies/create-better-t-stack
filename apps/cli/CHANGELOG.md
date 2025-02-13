@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.3.2
+
+### Patch Changes
+
+- d99e161: use script syntax in execa
+
 ## 0.3.1
 
 ### Patch Changes
