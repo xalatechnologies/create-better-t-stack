@@ -3,7 +3,6 @@ import {
 	confirm,
 	group,
 	intro,
-	isCancel,
 	multiselect,
 	outro,
 	select,
@@ -24,11 +23,10 @@ import type {
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
 import { getUserPkgManager } from "./utils/get-package-manager";
 import { getVersion } from "./utils/get-version";
-import { logger } from "./utils/logger";
 
 process.on("SIGINT", () => {
 	console.log("\n");
-	logger.warn("Operation cancelled");
+	chalk.red("Operation cancelled");
 	process.exit(0);
 });
 
@@ -42,6 +40,7 @@ async function gatherConfig(
 			text({
 				message: "📝 Project name",
 				placeholder: "my-better-t-app",
+				defaultValue: flags.projectName || "my-better-t-app",
 				validate: (value) => {
 					if (!value) return "Project name is required";
 				},
