@@ -1,11 +1,11 @@
 import path from "node:path";
 import { confirm, select } from "@inquirer/prompts";
-import { detect } from "detect-package-manager";
 import { execa } from "execa";
 import fs from "fs-extra";
 import ora from "ora";
 import { setupTurso } from "./helpers/db-setup";
 import type { PackageManager, ProjectConfig } from "./types";
+import { getUserPkgManager } from "./utils/get-package-manager";
 import { logger } from "./utils/logger";
 
 export async function createProject(options: ProjectConfig) {
@@ -38,7 +38,7 @@ export async function createProject(options: ProjectConfig) {
 		let packageManager = options.packageManager;
 
 		if (!packageManager) {
-			const detectedPackageManager = await detect();
+			const detectedPackageManager = getUserPkgManager();
 
 			const useDetectedPackageManager = await confirm({
 				message: `Use detected package manager (${detectedPackageManager})?`,
