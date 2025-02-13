@@ -12,7 +12,7 @@ export async function createProject(options: ProjectConfig) {
 	let shouldInstallDeps = false;
 
 	try {
-		await tasks([
+		const tasksList = [
 			{
 				title: "Creating project directory",
 				task: async () => {
@@ -33,15 +33,22 @@ export async function createProject(options: ProjectConfig) {
 					}
 				},
 			},
-			{
+		];
+
+		if (options.git) {
+			tasksList.push({
 				title: "Initializing git repository",
 				task: async () => {
-					if (options.git) {
-						await $`git init ${projectDir}`;
-					}
+					await $`git init ${projectDir}`;
 				},
-			},
-		]);
+			});
+		}
+
+		await tasks(tasksList);
+
+		if (options.database === "libsql") {
+			await setupTurso(projectDir);
+		}
 
 		const installDepsResponse = await confirm({
 			message: `📦 Install dependencies using ${options.packageManager}?`,
@@ -69,10 +76,6 @@ export async function createProject(options: ProjectConfig) {
 				}
 				throw error;
 			}
-		}
-
-		if (options.database === "libsql") {
-			await setupTurso(projectDir);
 		}
 
 		log.success("✨ Project created successfully!\n");

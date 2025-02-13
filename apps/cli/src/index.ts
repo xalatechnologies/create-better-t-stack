@@ -3,6 +3,7 @@ import {
 	confirm,
 	group,
 	intro,
+	log,
 	multiselect,
 	outro,
 	select,
@@ -25,8 +26,7 @@ import { getUserPkgManager } from "./utils/get-package-manager";
 import { getVersion } from "./utils/get-version";
 
 process.on("SIGINT", () => {
-	console.log("\n");
-	chalk.red("Operation cancelled");
+	log.error("Operation cancelled");
 	process.exit(0);
 });
 
@@ -35,102 +35,119 @@ const program = new Command();
 async function gatherConfig(
 	flags: Partial<ProjectConfig>,
 ): Promise<ProjectConfig> {
-	const result = await group({
-		projectName: () =>
-			text({
-				message: "📝 Project name",
-				placeholder: "my-better-t-app",
-				defaultValue: flags.projectName || "my-better-t-app",
-				validate: (value) => {
-					if (!value) return "Project name is required";
-				},
-			}),
-		database: () =>
-			!flags.database
-				? select<ProjectDatabase>({
-						message: "💾 Select database",
-						options: [
-							{
-								value: "libsql",
-								label: "libSQL",
-								hint: "✨ (Recommended) - Turso's embedded SQLite database",
-							},
-							{
-								value: "postgres",
-								label: "PostgreSQL",
-								hint: "🐘 Traditional relational database",
-							},
-						],
-					})
-				: Promise.resolve(flags.database),
-		auth: () =>
-			flags.auth === undefined
-				? confirm({
-						message: "🔐 Add authentication with Better-Auth?",
-					})
-				: Promise.resolve(flags.auth),
-		features: () =>
-			!flags.features
-				? multiselect<ProjectFeature>({
-						message: "🎯 Select additional features",
-						options: [
-							{
-								value: "docker",
-								label: "Docker setup",
-								hint: "🐳 Containerize your application",
-							},
-							{
-								value: "github-actions",
-								label: "GitHub Actions",
-								hint: "⚡ CI/CD workflows",
-							},
-							{
-								value: "SEO",
-								label: "Basic SEO setup",
-								hint: "🔍 Search engine optimization configuration",
-							},
-						],
-					})
-				: Promise.resolve(flags.features),
-		packageManager: async () => {
-			const detectedPackageManager = getUserPkgManager();
+	const shouldAskGit = flags.git !== false;
 
-			const useDetected = await confirm({
-				message: `📦 Use detected package manager (${detectedPackageManager})?`,
-			});
+	const result = await group(
+		{
+			projectName: () =>
+				text({
+					message: "📝 Project name",
+					placeholder: "my-better-t-app",
+					initialValue: flags.projectName,
+					validate: (value) => {
+						if (!value) return "Project name is required";
+					},
+				}),
+			database: () =>
+				!flags.database
+					? select<ProjectDatabase>({
+							message: "💾 Select database",
+							options: [
+								{
+									value: "libsql",
+									label: "libSQL",
+									hint: "✨ (Recommended) - Turso's embedded SQLite database",
+								},
+								{
+									value: "postgres",
+									label: "PostgreSQL",
+									hint: "🐘 Traditional relational database",
+								},
+							],
+						})
+					: Promise.resolve(flags.database),
+			auth: () =>
+				flags.auth === undefined
+					? confirm({
+							message: "🔐 Add authentication with Better-Auth?",
+						})
+					: Promise.resolve(flags.auth),
+			features: () =>
+				!flags.features
+					? multiselect<ProjectFeature>({
+							message: "🎯 Select additional features",
+							options: [
+								{
+									value: "docker",
+									label: "Docker setup",
+									hint: "🐳 Containerize your application",
+								},
+								{
+									value: "github-actions",
+									label: "GitHub Actions",
+									hint: "⚡ CI/CD workflows",
+								},
+								{
+									value: "SEO",
+									label: "Basic SEO setup",
+									hint: "🔍 Search engine optimization configuration",
+								},
+							],
+						})
+					: Promise.resolve(flags.features),
+			git: () =>
+				shouldAskGit
+					? confirm({
+							message: "🗃️ Initialize Git repository?",
+							initialValue: true,
+						})
+					: Promise.resolve(false),
+			packageManager: async () => {
+				const detectedPackageManager = getUserPkgManager();
 
-			if (useDetected) return detectedPackageManager;
+				const useDetected = await confirm({
+					message: `📦 Use detected package manager (${detectedPackageManager})?`,
+				});
 
-			return select<PackageManager>({
-				message: "📦 Select package manager",
-				options: [
-					{ value: "npm", label: "npm", hint: "Node Package Manager" },
-					{
-						value: "yarn",
-						label: "yarn",
-						hint: "Fast, reliable, and secure dependency management",
-					},
-					{
-						value: "pnpm",
-						label: "pnpm",
-						hint: "Fast, disk space efficient package manager",
-					},
-					{
-						value: "bun",
-						label: "bun",
-						hint: "All-in-one JavaScript runtime & toolkit",
-					},
-				],
-			});
+				if (useDetected) return detectedPackageManager;
+
+				return select<PackageManager>({
+					message: "📦 Select package manager",
+					options: [
+						{ value: "npm", label: "npm", hint: "Node Package Manager" },
+						{
+							value: "bun",
+							label: "bun",
+							hint: "All-in-one JavaScript runtime & toolkit (recommended)",
+						},
+						{
+							value: "pnpm",
+							label: "pnpm",
+							hint: "Fast, disk space efficient package manager",
+						},
+						{
+							value: "yarn",
+							label: "yarn",
+							hint: "Fast, reliable, and secure dependency management",
+						},
+					],
+				});
+			},
 		},
-	});
+		{
+			onCancel: () => {
+				cancel("Operation cancelled.");
+				process.exit(0);
+			},
+		},
+	);
 
 	return {
 		projectName: result.projectName as string,
 		database: (result.database as ProjectDatabase) ?? "libsql",
 		auth: (result.auth as boolean) ?? true,
 		features: (result.features as ProjectFeature[]) ?? [],
-		git: flags.git ?? true,
+		git: (result.git as boolean) ?? true,
 		packageManager: (result.packageManager as PackageManager) ?? "npm",
 	};
 }
@@ -203,43 +220,27 @@ async function main() {
 				git: chalk.cyan(config.git),
 			};
 
-			console.log();
-			console.log(
-				chalk.dim("├─") +
-					chalk.blue(" Project Name: ") +
-					colorizedConfig.projectName,
-			);
-			console.log(
-				chalk.dim("├─") + chalk.blue(" Database: ") + colorizedConfig.database,
-			);
-			console.log(
-				chalk.dim("├─") +
-					chalk.blue(" Authentication: ") +
-					colorizedConfig.auth,
-			);
-			console.log(
-				chalk.dim("├─") +
-					chalk.blue(" Features: ") +
-					(colorizedConfig.features.length
+			log.message(
+				`${chalk.blue("Project Name: ")}${
+					colorizedConfig.projectName
+				}\n${chalk.blue("Database: ")}${colorizedConfig.database}\n${chalk.blue(
+					"Authentication: ",
+				)}${colorizedConfig.auth}\n${chalk.blue("Features: ")}${
+					colorizedConfig.features.length
 						? colorizedConfig.features.join(", ")
-						: chalk.gray("none")),
+						: chalk.gray("none")
+				}\n${chalk.blue("Git Init: ")}${colorizedConfig.git}\n`,
 			);
-			console.log(
-				chalk.dim("└─") + chalk.blue(" Git Init: ") + colorizedConfig.git,
-			);
-			console.log();
+
 			s.stop("Configuration loaded");
 		}
 
 		await createProject(config);
 
-		console.log();
-		console.log(
-			chalk.dim("🔄 You can reproduce this setup with the following command:"),
-		);
-		console.log();
-		console.log(chalk.dim("  ") + generateReproducibleCommand(config));
-		console.log();
+		log.message("You can reproduce this setup with the following command:", {
+			symbol: chalk.cyan("🔄"),
+		});
+		log.info(generateReproducibleCommand(config));
 
 		outro("Project created successfully! 🎉");
 	} catch (error) {
