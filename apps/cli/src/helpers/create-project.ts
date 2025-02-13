@@ -1,13 +1,14 @@
 import path from "node:path";
 import { confirm, select } from "@inquirer/prompts";
+import chalk from "chalk";
 import { $ } from "execa";
 import fs from "fs-extra";
 import ora from "ora";
-import { DEFAULT_CONFIG } from "./consts";
-import { setupTurso } from "./helpers/db-setup";
-import type { PackageManager, ProjectConfig } from "./types";
-import { getUserPkgManager } from "./utils/get-package-manager";
-import { logger } from "./utils/logger";
+import { DEFAULT_CONFIG } from "../consts";
+import type { PackageManager, ProjectConfig } from "../types";
+import { getUserPkgManager } from "../utils/get-package-manager";
+import { logger } from "../utils/logger";
+import { setupTurso } from "./db-setup";
 
 export async function createProject(options: ProjectConfig) {
 	const spinner = ora("Creating project directory...").start();
@@ -16,16 +17,19 @@ export async function createProject(options: ProjectConfig) {
 	try {
 		await fs.ensureDir(projectDir);
 		spinner.succeed();
+		console.log();
 
 		spinner.start("Cloning template repository...");
 		await $`npx degit https://github.com/AmanVarshney01/Better-T-Stack.git ${projectDir}`;
 		spinner.succeed();
+		console.log();
 
 		const initGit = await confirm({
-			message: "Initialize a git repository?",
+			message: chalk.blue.bold("🔄 Initialize a git repository?"),
 			default: true,
 		}).catch((error) => {
 			spinner.stop();
+			console.log();
 			throw error;
 		});
 
@@ -33,6 +37,7 @@ export async function createProject(options: ProjectConfig) {
 			spinner.start("Initializing git repository...");
 			await $`git init ${projectDir}`;
 			spinner.succeed();
+			console.log();
 		}
 
 		let packageManager = options.packageManager;
@@ -41,7 +46,11 @@ export async function createProject(options: ProjectConfig) {
 			const detectedPackageManager = getUserPkgManager();
 
 			const useDetectedPackageManager = await confirm({
-				message: `Use detected package manager (${detectedPackageManager})?`,
+				message: chalk.blue.bold(
+					`📦 Use detected package manager (${chalk.cyan(
+						detectedPackageManager,
+					)})?`,
+				),
 				default: true,
 			}).catch((error) => {
 				spinner.stop();
@@ -51,13 +60,34 @@ export async function createProject(options: ProjectConfig) {
 			if (useDetectedPackageManager) {
 				packageManager = detectedPackageManager;
 			} else {
+				console.log();
 				packageManager = await select<PackageManager>({
-					message: "Select package manager:",
+					message: chalk.blue.bold("📦 Select package manager:"),
 					choices: [
-						{ value: "npm", name: "npm" },
-						{ value: "yarn", name: "yarn" },
-						{ value: "pnpm", name: "pnpm" },
-						{ value: "bun", name: "bun" },
+						{
+							value: "npm",
+							name: chalk.yellow("npm"),
+							description: chalk.dim("Node Package Manager"),
+						},
+						{
+							value: "yarn",
+							name: chalk.blue("yarn"),
+							description: chalk.dim(
+								"Fast, reliable, and secure dependency management",
+							),
+						},
+						{
+							value: "pnpm",
+							name: chalk.magenta("pnpm"),
+							description: chalk.dim(
+								"Fast, disk space efficient package manager",
+							),
+						},
+						{
+							value: "bun",
+							name: chalk.cyan("bun"),
+							description: chalk.dim("All-in-one JavaScript runtime & toolkit"),
+						},
 					],
 				}).catch((error) => {
 					spinner.stop();
@@ -66,16 +96,22 @@ export async function createProject(options: ProjectConfig) {
 			}
 		}
 
+		console.log();
+
 		const installDeps = await confirm({
-			message: `Install dependencies using ${packageManager}?`,
+			message: chalk.blue.bold(
+				`📦 Install dependencies using ${chalk.cyan(packageManager)}?`,
+			),
 			default: true,
 		}).catch((error) => {
 			spinner.stop();
 			throw error;
 		});
 
+		console.log();
+
 		if (installDeps) {
-			spinner.start(`Installing dependencies using ${packageManager}...`);
+			spinner.start(`📦 Installing dependencies using ${packageManager}...`);
 			switch (packageManager ?? DEFAULT_CONFIG.packageManager) {
 				case "npm":
 					await $`npm install ${projectDir}`;
@@ -93,6 +129,7 @@ export async function createProject(options: ProjectConfig) {
 					throw new Error("Unsupported package manager");
 			}
 			spinner.succeed();
+			console.log();
 		}
 
 		if (options.database === "libsql") {

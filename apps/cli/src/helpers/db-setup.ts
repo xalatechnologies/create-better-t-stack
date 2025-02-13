@@ -1,6 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 import { confirm, input } from "@inquirer/prompts";
+import chalk from "chalk";
 import { $ } from "execa";
 import fs from "fs-extra";
 import ora, { type Ora } from "ora";
@@ -17,6 +18,7 @@ async function loginToTurso(spinner: Ora) {
 		spinner.start("Logging in to Turso...");
 		await $`turso auth login`;
 		spinner.succeed("Logged in to Turso successfully!");
+		console.log();
 	} catch (error) {
 		spinner.fail("Failed to log in to Turso");
 		throw error;
@@ -25,6 +27,7 @@ async function loginToTurso(spinner: Ora) {
 
 async function installTursoCLI(isMac: boolean, spinner: Ora) {
 	try {
+		console.log();
 		spinner.start("Installing Turso CLI...");
 
 		if (isMac) {
@@ -36,6 +39,7 @@ async function installTursoCLI(isMac: boolean, spinner: Ora) {
 		}
 
 		spinner.succeed("Turso CLI installed successfully!");
+		console.log();
 	} catch (error) {
 		if (error instanceof Error && error.message.includes("User force closed")) {
 			spinner.stop();
@@ -108,7 +112,7 @@ export async function setupTurso(projectDir: string) {
 
 		if (!isCliInstalled) {
 			const shouldInstall = await confirm({
-				message: "Would you like to install Turso CLI?",
+				message: chalk.blue.bold("🔧 Would you like to install Turso CLI?"),
 				default: true,
 			}).catch((error) => {
 				spinner.stop();
@@ -130,8 +134,9 @@ export async function setupTurso(projectDir: string) {
 		}
 
 		const defaultDbName = path.basename(projectDir);
+
 		let dbName = await input({
-			message: `Enter database name (default: ${defaultDbName}):`,
+			message: chalk.blue.bold("💾 Enter database name:"),
 			default: defaultDbName,
 		}).catch((error) => {
 			spinner.stop();
@@ -141,6 +146,7 @@ export async function setupTurso(projectDir: string) {
 		let success = false;
 		while (!success) {
 			try {
+				console.log();
 				spinner.start(`Creating Turso database "${dbName}"...`);
 				const config = await createTursoDatabase(dbName);
 				await writeEnvFile(projectDir, config);

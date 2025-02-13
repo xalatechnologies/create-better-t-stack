@@ -2,7 +2,7 @@ import { checkbox, confirm, input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import { DEFAULT_CONFIG } from "./consts";
-import { createProject } from "./create-project";
+import { createProject } from "./helpers/create-project";
 import { renderTitle } from "./render-title";
 import type {
 	PackageManager,
@@ -36,59 +36,65 @@ async function gatherConfig(
 	config.projectName =
 		flags.projectName ??
 		(await input({
-			message: "Project name:",
+			message: chalk.blue.bold("📝 Project name:"),
 			default: "my-better-t-app",
 		}));
+
+	console.log();
 
 	if (flags.database) {
 		config.database = flags.database;
 	} else {
 		config.database = await select<ProjectDatabase>({
-			message: chalk.cyan("Select database:"),
+			message: chalk.blue.bold("💾 Select database:"),
 			choices: [
 				{
 					value: "libsql",
-					name: "libSQL",
+					name: chalk.green("libSQL"),
 					description: chalk.dim(
-						"(Recommended) - Turso's embedded SQLite database",
+						"✨ (Recommended) - Turso's embedded SQLite database",
 					),
 				},
 				{
 					value: "postgres",
-					name: "PostgreSQL",
-					description: chalk.dim("Traditional relational database"),
+					name: chalk.yellow("PostgreSQL"),
+					description: chalk.dim("🐘 Traditional relational database"),
 				},
 			],
 		});
 	}
 
+	console.log();
+
 	config.auth =
 		flags.auth ??
 		(await confirm({
-			message: "Add authentication with Better-Auth?",
+			message: chalk.blue.bold("🔐 Add authentication with Better-Auth?"),
 			default: true,
 		}));
+
+	console.log();
 
 	if (flags.features) {
 		config.features = flags.features;
 	} else {
 		config.features = await checkbox<ProjectFeature>({
-			message: chalk.cyan("Select additional features:"),
+			message: chalk.blue.bold("🎯 Select additional features:"),
 			choices: [
 				{
 					value: "docker",
-					name: "Docker setup",
-					description: chalk.dim("Containerize your application"),
+					name: chalk.cyan("Docker setup"),
+					description: chalk.dim("🐳 Containerize your application"),
 				},
 				{
 					value: "github-actions",
-					name: "GitHub Actions",
-					description: chalk.dim("CI/CD workflows"),
+					name: chalk.magenta("GitHub Actions"),
+					description: chalk.dim("⚡ CI/CD workflows"),
 				},
 				{
 					value: "SEO",
-					name: "Basic SEO setup",
-					description: chalk.dim("Search engine optimization configuration"),
+					name: chalk.green("Basic SEO setup"),
+					description: chalk.dim("🔍 Search engine optimization configuration"),
 				},
 			],
 		});
@@ -100,8 +106,7 @@ async function gatherConfig(
 async function main() {
 	try {
 		renderTitle();
-		logger.info("\n🚀 Creating a new Better-T Stack project...\n");
-
+		logger.info(chalk.bold(" Creating a new Better-T Stack project...\n"));
 		program
 			.name("create-better-t-stack")
 			.description("Create a new Better-T Stack project")
@@ -140,8 +145,40 @@ async function main() {
 			: await gatherConfig(flagConfig);
 
 		if (options.yes) {
-			logger.info("Using default configuration");
-			logger.info(JSON.stringify(config, null, 2));
+			logger.info(chalk.blue.bold("\n📦 Using default configuration:"));
+			const colorizedConfig = {
+				projectName: chalk.green(config.projectName),
+				database: chalk.yellow(config.database),
+				auth: chalk.cyan(config.auth),
+				features: config.features.map((feature) => chalk.magenta(feature)),
+				git: chalk.cyan(config.git),
+			};
+
+			console.log();
+			console.log(
+				chalk.dim("├─") +
+					chalk.blue(" Project Name: ") +
+					colorizedConfig.projectName,
+			);
+			console.log(
+				chalk.dim("├─") + chalk.blue(" Database: ") + colorizedConfig.database,
+			);
+			console.log(
+				chalk.dim("├─") +
+					chalk.blue(" Authentication: ") +
+					colorizedConfig.auth,
+			);
+			console.log(
+				chalk.dim("├─") +
+					chalk.blue(" Features: ") +
+					(colorizedConfig.features.length
+						? colorizedConfig.features.join(", ")
+						: chalk.gray("none")),
+			);
+			console.log(
+				chalk.dim("└─") + chalk.blue(" Git Init: ") + colorizedConfig.git,
+			);
+			console.log();
 		}
 
 		await createProject(config);
