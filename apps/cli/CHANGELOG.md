@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.3.1
+
+### Patch Changes
+
+- 7481bee: fix package manager detection
+
 ## 0.3.0
 
 ### Minor Changes
