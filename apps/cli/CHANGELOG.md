@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.4.1
+
+### Patch Changes
+
+- 305fb72: remove logger and fix minor bugs
+
 ## 0.4.0
 
 ### Minor Changes
