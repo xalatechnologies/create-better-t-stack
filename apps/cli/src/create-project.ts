@@ -1,6 +1,6 @@
 import path from "node:path";
 import { confirm, select } from "@inquirer/prompts";
-import { execa } from "execa";
+import { $ } from "execa";
 import fs from "fs-extra";
 import ora from "ora";
 import { setupTurso } from "./helpers/db-setup";
@@ -17,11 +17,7 @@ export async function createProject(options: ProjectConfig) {
 		spinner.succeed();
 
 		spinner.start("Cloning template repository...");
-		await execa("npx", [
-			"degit",
-			"https://github.com/AmanVarshney01/Better-T-Stack.git",
-			projectDir,
-		]);
+		await $`npx degit https://github.com/AmanVarshney01/Better-T-Stack.git ${projectDir}`;
 		spinner.succeed();
 
 		const initGit = await confirm({
@@ -31,7 +27,7 @@ export async function createProject(options: ProjectConfig) {
 
 		if (initGit) {
 			spinner.start("Initializing git repository...");
-			await execa("git", ["init"], { cwd: projectDir });
+			await $`git init ${projectDir}`;
 			spinner.succeed();
 		}
 
@@ -69,16 +65,16 @@ export async function createProject(options: ProjectConfig) {
 			spinner.start(`Installing dependencies using ${packageManager}...`);
 			switch (packageManager) {
 				case "npm":
-					await execa("npm", ["install"], { cwd: projectDir });
+					await $`npm install ${projectDir}`;
 					break;
 				case "yarn":
-					await execa("yarn", ["install"], { cwd: projectDir });
+					await $`yarn install ${projectDir}`;
 					break;
 				case "pnpm":
-					await execa("pnpm", ["install"], { cwd: projectDir });
+					await $`pnpm install ${projectDir}`;
 					break;
 				case "bun":
-					await execa("bun", ["install"], { cwd: projectDir });
+					await $`bun install ${projectDir}`;
 					break;
 				default:
 					throw new Error("Unsupported package manager");

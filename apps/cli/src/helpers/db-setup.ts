@@ -1,7 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 import { confirm, input } from "@inquirer/prompts";
-import { execa } from "execa";
+import { $ } from "execa";
 import fs from "fs-extra";
 import ora, { type Ora } from "ora";
 import { logger } from "../utils/logger";
@@ -15,7 +15,7 @@ interface TursoConfig {
 async function loginToTurso(spinner: Ora) {
 	try {
 		spinner.start("Logging in to Turso...");
-		await execa("turso", ["auth", "login"]);
+		await $`turso auth login`;
 		spinner.succeed("Logged in to Turso successfully!");
 	} catch (error) {
 		spinner.fail("Failed to log in to Turso");
@@ -28,13 +28,11 @@ async function installTursoCLI(isMac: boolean, spinner: Ora) {
 		spinner.start("Installing Turso CLI...");
 
 		if (isMac) {
-			await execa("brew", ["install", "tursodatabase/tap/turso"]);
+			await $`brew install tursodatabase/tap/turso`;
 		} else {
-			const { stdout: installScript } = await execa("curl", [
-				"-sSfL",
-				"https://get.tur.so/install.sh",
-			]);
-			await execa("bash", [], { input: installScript });
+			const { stdout: installScript } =
+				await $`curl -sSfL https://get.tur.so/install.sh`;
+			await $`bash -c '${installScript}'`;
 		}
 
 		spinner.succeed("Turso CLI installed successfully!");
@@ -51,7 +49,7 @@ async function installTursoCLI(isMac: boolean, spinner: Ora) {
 
 async function createTursoDatabase(dbName: string): Promise<TursoConfig> {
 	try {
-		await execa("turso", ["db", "create", dbName]);
+		await $`turso db create ${dbName}`;
 	} catch (error) {
 		if (error instanceof Error && error.message.includes("already exists")) {
 			throw new Error("DATABASE_EXISTS");
@@ -59,19 +57,9 @@ async function createTursoDatabase(dbName: string): Promise<TursoConfig> {
 		throw error;
 	}
 
-	const { stdout: dbUrl } = await execa("turso", [
-		"db",
-		"show",
-		dbName,
-		"--url",
-	]);
+	const { stdout: dbUrl } = await $`turso db show ${dbName} --url`;
 
-	const { stdout: authToken } = await execa("turso", [
-		"db",
-		"tokens",
-		"create",
-		dbName,
-	]);
+	const { stdout: authToken } = await $`turso db tokens create ${dbName}`;
 
 	return {
 		dbUrl: dbUrl.trim(),
