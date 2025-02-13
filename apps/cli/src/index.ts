@@ -52,7 +52,7 @@ async function gatherConfig(
 
 				while (!isValid) {
 					const response = await text({
-						message: "📝 Project name",
+						message: "📝 What is your project named? (directory name or path)",
 						placeholder: defaultName,
 						initialValue: flags.projectName,
 						defaultValue: defaultName,
@@ -85,17 +85,17 @@ async function gatherConfig(
 			database: () =>
 				!flags.database
 					? select<ProjectDatabase>({
-							message: "💾 Select database",
+							message: "💾 Which database would you like to use?",
 							options: [
 								{
 									value: "libsql",
 									label: "libSQL",
-									hint: "✨ (Recommended) - Turso's embedded SQLite database",
+									hint: "Turso's embedded SQLite database (recommended)",
 								},
 								{
 									value: "postgres",
 									label: "PostgreSQL",
-									hint: "🐘 Traditional relational database",
+									hint: "Traditional relational database",
 								},
 							],
 						})
@@ -103,28 +103,29 @@ async function gatherConfig(
 			auth: () =>
 				flags.auth === undefined
 					? confirm({
-							message: "🔐 Add authentication with Better-Auth?",
+							message:
+								"🔐 Would you like to add authentication with Better-Auth?",
 						})
 					: Promise.resolve(flags.auth),
 			features: () =>
 				!flags.features
 					? multiselect<ProjectFeature>({
-							message: "🎯 Select additional features",
+							message: "✨ Which features would you like to add?",
 							options: [
 								{
 									value: "docker",
 									label: "Docker setup",
-									hint: "🐳 Containerize your application",
+									hint: "Containerize your application",
 								},
 								{
 									value: "github-actions",
 									label: "GitHub Actions",
-									hint: "⚡ CI/CD workflows",
+									hint: "CI/CD workflows",
 								},
 								{
 									value: "SEO",
 									label: "Basic SEO setup",
-									hint: "🔍 Search engine optimization configuration",
+									hint: "Search engine optimization configuration",
 								},
 							],
 						})
@@ -132,7 +133,7 @@ async function gatherConfig(
 			git: () =>
 				flags.git !== false
 					? confirm({
-							message: "🗃️ Initialize Git repository?",
+							message: "🗃️ Initialize a new git repository?",
 							initialValue: true,
 						})
 					: Promise.resolve(false),
@@ -140,20 +141,15 @@ async function gatherConfig(
 				const detectedPackageManager = getUserPkgManager();
 
 				const useDetected = await confirm({
-					message: `📦 Use detected package manager (${detectedPackageManager})?`,
+					message: `📦 Use ${detectedPackageManager} as your package manager?`,
 				});
 
 				if (useDetected) return detectedPackageManager;
 
 				return select<PackageManager>({
-					message: "📦 Select package manager",
+					message: "📦 Which package manager would you like to use?",
 					options: [
 						{ value: "npm", label: "npm", hint: "Node Package Manager" },
-						{
-							value: "bun",
-							label: "bun",
-							hint: "All-in-one JavaScript runtime & toolkit (recommended)",
-						},
 						{
 							value: "pnpm",
 							label: "pnpm",
@@ -164,7 +160,13 @@ async function gatherConfig(
 							label: "yarn",
 							hint: "Fast, reliable, and secure dependency management",
 						},
+						{
+							value: "bun",
+							label: "bun",
+							hint: "All-in-one JavaScript runtime & toolkit (recommended)",
+						},
 					],
+					initialValue: "bun",
 				});
 			},
 		},
@@ -191,7 +193,7 @@ async function main() {
 	try {
 		process.stdout.write("\x1Bc");
 		renderTitle();
-		intro(chalk.bold("Creating a new Better-T Stack project"));
+		intro(chalk.bold("✨ Creating a new Better-T-Stack project"));
 		program
 			.name("create-better-t-stack")
 			.description("Create a new Better-T Stack project")
@@ -256,15 +258,15 @@ async function main() {
 			};
 
 			log.message(
-				`${chalk.blue("Project Name: ")}${
+				`${chalk.blue("📝 Project Name: ")}${
 					colorizedConfig.projectName
-				}\n${chalk.blue("Database: ")}${colorizedConfig.database}\n${chalk.blue(
-					"Authentication: ",
-				)}${colorizedConfig.auth}\n${chalk.blue("Features: ")}${
+				}\n${chalk.blue("💾 Database: ")}${colorizedConfig.database}\n${chalk.blue(
+					"🔐 Authentication: ",
+				)}${colorizedConfig.auth}\n${chalk.blue("✨ Features: ")}${
 					colorizedConfig.features.length
 						? colorizedConfig.features.join(", ")
 						: chalk.gray("none")
-				}\n${chalk.blue("Git Init: ")}${colorizedConfig.git}\n`,
+				}\n${chalk.blue("🗃️ Git Init: ")}${colorizedConfig.git}\n`,
 			);
 
 			s.stop("Configuration loaded");
@@ -272,12 +274,11 @@ async function main() {
 
 		await createProject(config);
 
-		log.message("You can reproduce this setup with the following command:", {
-			symbol: chalk.cyan("🔄"),
-		});
-		log.info(generateReproducibleCommand(config));
+		log.info(
+			`You can reproduce this setup with the following command:\n${generateReproducibleCommand(config)}`,
+		);
 
-		outro("Project created successfully! 🎉");
+		outro("🎉 Project created successfully!");
 	} catch (error) {
 		s.stop("Failed");
 		if (error instanceof Error) {

@@ -5,6 +5,16 @@ import type { ProjectConfig } from "../types";
 export function generateReproducibleCommand(config: ProjectConfig): string {
 	const flags: string[] = [];
 
+	const isMainlyDefault = Object.entries(config).every(([key, value]) => {
+		if (key === "projectName") return true;
+		if (key === "features" && Array.isArray(value)) return value.length === 0;
+		return value === DEFAULT_CONFIG[key as keyof ProjectConfig];
+	});
+
+	if (isMainlyDefault) {
+		flags.push(chalk.gray("-y"));
+	}
+
 	if (config.database !== DEFAULT_CONFIG.database) {
 		flags.push(chalk.cyan(`--database ${config.database}`));
 	}

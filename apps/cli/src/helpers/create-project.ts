@@ -14,13 +14,13 @@ export async function createProject(options: ProjectConfig) {
 	try {
 		const tasksList = [
 			{
-				title: "Creating project directory",
+				title: "📁 Creating project directory",
 				task: async () => {
 					await fs.ensureDir(projectDir);
 				},
 			},
 			{
-				title: "Cloning template repository",
+				title: "📥 Cloning template repository",
 				task: async () => {
 					try {
 						await $`npx degit AmanVarshney01/Better-T-Stack ${projectDir}`;
@@ -37,7 +37,7 @@ export async function createProject(options: ProjectConfig) {
 
 		if (options.git) {
 			tasksList.push({
-				title: "Initializing git repository",
+				title: "🗃️ Initializing git repository",
 				task: async () => {
 					await $`git init ${projectDir}`;
 				},
@@ -51,7 +51,7 @@ export async function createProject(options: ProjectConfig) {
 		}
 
 		const installDepsResponse = await confirm({
-			message: `📦 Install dependencies using ${options.packageManager}?`,
+			message: `📦 Install dependencies with ${options.packageManager}?`,
 		});
 
 		if (isCancel(installDepsResponse)) {
@@ -62,13 +62,13 @@ export async function createProject(options: ProjectConfig) {
 		shouldInstallDeps = installDepsResponse;
 
 		if (shouldInstallDeps) {
-			s.start(`Installing dependencies using ${options.packageManager}...`);
+			s.start(`📦 Installing dependencies using ${options.packageManager}...`);
 			try {
 				await $({
 					cwd: projectDir,
 					stdio: "inherit",
 				})`${options.packageManager} install`;
-				s.stop("Dependencies installed successfully");
+				s.stop("✅ Dependencies installed successfully");
 			} catch (error) {
 				s.stop("Failed to install dependencies");
 				if (error instanceof Error) {
@@ -79,16 +79,9 @@ export async function createProject(options: ProjectConfig) {
 		}
 
 		log.success("✨ Project created successfully!\n");
-		log.info(chalk.dim("Next steps:"));
-		log.info(`  cd ${options.projectName}`);
-		if (!shouldInstallDeps) {
-			log.info(`  ${options.packageManager} install`);
-		}
-		log.info(
-			`  ${
-				options.packageManager === "npm" ? "npm run" : options.packageManager
-			} dev`,
-		);
+		log.info(`${chalk.dim("Next steps:")}
+cd ${options.projectName}${!shouldInstallDeps ? `\n${options.packageManager} install` : ""}
+${options.packageManager === "npm" ? "npm run" : options.packageManager} dev`);
 	} catch (error) {
 		s.stop("Failed");
 		if (error instanceof Error) {
