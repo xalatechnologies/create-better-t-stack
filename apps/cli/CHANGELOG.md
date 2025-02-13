@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.4.3
+
+### Patch Changes
+
+- ecd7db9: feat: add project name validation
+
 ## 0.4.2
 
 ### Patch Changes
