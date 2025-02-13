@@ -189,7 +189,7 @@ async function gatherConfig(
 async function main() {
 	const s = spinner();
 	try {
-		console.clear();
+		process.stdout.write("\x1Bc");
 		renderTitle();
 		intro(chalk.bold("Creating a new Better-T Stack project"));
 		program

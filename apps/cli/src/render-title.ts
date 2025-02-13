@@ -18,6 +18,20 @@ const catppuccinTheme = {
 };
 
 export const renderTitle = () => {
-	const catppuccinGradient = gradient(Object.values(catppuccinTheme));
-	console.log(catppuccinGradient.multiline(TITLE_TEXT));
+	const terminalWidth = process.stdout.columns || 80;
+	const titleLines = TITLE_TEXT.split("\n");
+	const titleWidth = Math.max(...titleLines.map((line) => line.length));
+
+	if (terminalWidth < titleWidth) {
+		const simplifiedTitle = `
+    ╔══════════════════╗
+    ║  Better T-Stack  ║
+    ╚══════════════════╝
+    `;
+		console.log(
+			gradient(Object.values(catppuccinTheme)).multiline(simplifiedTitle),
+		);
+	} else {
+		console.log(gradient(Object.values(catppuccinTheme)).multiline(TITLE_TEXT));
+	}
 };
