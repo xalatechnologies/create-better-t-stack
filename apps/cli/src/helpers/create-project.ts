@@ -24,27 +24,29 @@ export async function createProject(options: ProjectConfig) {
 		spinner.succeed();
 		console.log();
 
-		const initGit = await confirm({
-			message: chalk.blue.bold("🔄 Initialize a git repository?"),
-			default: true,
-		}).catch((error) => {
-			spinner.stop();
-			console.log();
-			throw error;
-		});
+		let shouldInitGit = options.git;
 
-		if (initGit) {
+		if (!options.yes && shouldInitGit) {
+			shouldInitGit = await confirm({
+				message: chalk.blue.bold("🔄 Initialize a git repository?"),
+				default: true,
+			}).catch((error) => {
+				spinner.stop();
+				console.log();
+				throw error;
+			});
+		}
+
+		if (shouldInitGit) {
 			spinner.start("Initializing git repository...");
 			await $`git init ${projectDir}`;
 			spinner.succeed();
-			console.log();
 		}
 
-		let packageManager = options.packageManager;
+		const detectedPackageManager = getUserPkgManager();
+		let packageManager = options.packageManager ?? detectedPackageManager;
 
-		if (!packageManager) {
-			const detectedPackageManager = getUserPkgManager();
-
+		if (!options.yes) {
 			const useDetectedPackageManager = await confirm({
 				message: chalk.blue.bold(
 					`📦 Use detected package manager (${chalk.cyan(
@@ -57,9 +59,7 @@ export async function createProject(options: ProjectConfig) {
 				throw error;
 			});
 
-			if (useDetectedPackageManager) {
-				packageManager = detectedPackageManager;
-			} else {
+			if (!useDetectedPackageManager) {
 				console.log();
 				packageManager = await select<PackageManager>({
 					message: chalk.blue.bold("📦 Select package manager:"),
@@ -96,8 +96,6 @@ export async function createProject(options: ProjectConfig) {
 			}
 		}
 
-		console.log();
-
 		const installDeps = await confirm({
 			message: chalk.blue.bold(
 				`📦 Install dependencies using ${chalk.cyan(packageManager)}?`,
@@ -114,16 +112,16 @@ export async function createProject(options: ProjectConfig) {
 			spinner.start(`📦 Installing dependencies using ${packageManager}...`);
 			switch (packageManager ?? DEFAULT_CONFIG.packageManager) {
 				case "npm":
-					await $`npm install ${projectDir}`;
+					await $`cd ${projectDir} && npm install`;
 					break;
 				case "yarn":
-					await $`yarn install ${projectDir}`;
+					await $`cd ${projectDir} && yarn install`;
 					break;
 				case "pnpm":
-					await $`pnpm install ${projectDir}`;
+					await $`cd ${projectDir} && pnpm install`;
 					break;
 				case "bun":
-					await $`bun install ${projectDir}`;
+					await $`cd ${projectDir} && bun install`;
 					break;
 				default:
 					throw new Error("Unsupported package manager");

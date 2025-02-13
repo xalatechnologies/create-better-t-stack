@@ -103,6 +103,7 @@ export async function setupTurso(projectDir: string) {
 
 	try {
 		if (!canInstallCLI) {
+			logger.warn("\nAutomatic Turso setup is not supported on Windows.");
 			await writeEnvFile(projectDir);
 			displayManualSetupInstructions();
 			return;

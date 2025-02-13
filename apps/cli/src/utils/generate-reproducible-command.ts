@@ -1,11 +1,9 @@
 import chalk from "chalk";
 import { DEFAULT_CONFIG } from "../consts";
 import type { ProjectConfig } from "../types";
-import { getUserPkgManager } from "./get-package-manager";
 
 export function generateReproducibleCommand(config: ProjectConfig): string {
 	const flags: string[] = [];
-	const defaultPackageManager = getUserPkgManager();
 
 	if (config.database !== DEFAULT_CONFIG.database) {
 		flags.push(chalk.cyan(`--database ${config.database}`));
@@ -15,9 +13,13 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		flags.push(chalk.yellow("--no-auth"));
 	}
 
+	if (!config.git) {
+		flags.push(chalk.red("--no-git"));
+	}
+
 	if (
 		config.packageManager &&
-		config.packageManager !== defaultPackageManager
+		config.packageManager !== DEFAULT_CONFIG.packageManager
 	) {
 		flags.push(chalk.magenta(`--package-manager ${config.packageManager}`));
 	}

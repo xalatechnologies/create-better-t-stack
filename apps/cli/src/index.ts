@@ -30,7 +30,7 @@ async function gatherConfig(
 		database: "libsql",
 		auth: true,
 		features: [],
-		git: true,
+		git: flags.git ?? true,
 	};
 
 	config.projectName =
@@ -119,6 +119,7 @@ async function main() {
 			.option("--docker", "Include Docker setup")
 			.option("--github-actions", "Include GitHub Actions")
 			.option("--seo", "Include SEO setup")
+			.option("--no-git", "Skip git initialization")
 			.option(
 				"--package-manager <type>",
 				"Package manager to use (npm, yarn, pnpm, or bun)",
@@ -133,6 +134,7 @@ async function main() {
 			database: options.database as ProjectDatabase,
 			auth: options.auth,
 			packageManager: options.packageManager as PackageManager,
+			git: options.git ?? true,
 			features: [
 				...(options.docker ? ["docker"] : []),
 				...(options.githubActions ? ["github-actions"] : []),
@@ -141,7 +143,21 @@ async function main() {
 		};
 
 		const config = options.yes
-			? DEFAULT_CONFIG
+			? {
+					...DEFAULT_CONFIG,
+					yes: true,
+					projectName: projectDirectory ?? DEFAULT_CONFIG.projectName,
+					database: options.database ?? DEFAULT_CONFIG.database,
+					auth: options.auth ?? DEFAULT_CONFIG.auth,
+					git: options.git ?? DEFAULT_CONFIG.git,
+					packageManager:
+						options.packageManager ?? DEFAULT_CONFIG.packageManager,
+					features: [
+						...(options.docker ? ["docker"] : []),
+						...(options.githubActions ? ["github-actions"] : []),
+						...(options.seo ? ["SEO"] : []),
+					] as ProjectFeature[],
+				}
 			: await gatherConfig(flagConfig);
 
 		if (options.yes) {
