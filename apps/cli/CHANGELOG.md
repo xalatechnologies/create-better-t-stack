@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.3.4
+
+### Patch Changes
+
+- 0bd0c8e: colorize the prompts
+
 ## 0.3.3
 
 ### Patch Changes
