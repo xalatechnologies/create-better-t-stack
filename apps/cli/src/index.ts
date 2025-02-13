@@ -54,7 +54,7 @@ async function gatherConfig(
 					const response = await text({
 						message: "📝 Project name",
 						placeholder: defaultName,
-						initialValue: flags.projectName || defaultName,
+						initialValue: flags.projectName,
 						defaultValue: defaultName,
 						validate: (value) => {
 							const nameToUse = value.trim() || defaultName;
@@ -189,6 +189,7 @@ async function gatherConfig(
 async function main() {
 	const s = spinner();
 	try {
+		console.clear();
 		renderTitle();
 		intro(chalk.bold("Creating a new Better-T Stack project"));
 		program
