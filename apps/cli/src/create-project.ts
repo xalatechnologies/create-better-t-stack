@@ -3,6 +3,7 @@ import { confirm, select } from "@inquirer/prompts";
 import { $ } from "execa";
 import fs from "fs-extra";
 import ora from "ora";
+import { DEFAULT_CONFIG } from "./consts";
 import { setupTurso } from "./helpers/db-setup";
 import type { PackageManager, ProjectConfig } from "./types";
 import { getUserPkgManager } from "./utils/get-package-manager";
@@ -23,6 +24,9 @@ export async function createProject(options: ProjectConfig) {
 		const initGit = await confirm({
 			message: "Initialize a git repository?",
 			default: true,
+		}).catch((error) => {
+			spinner.stop();
+			throw error;
 		});
 
 		if (initGit) {
@@ -39,6 +43,9 @@ export async function createProject(options: ProjectConfig) {
 			const useDetectedPackageManager = await confirm({
 				message: `Use detected package manager (${detectedPackageManager})?`,
 				default: true,
+			}).catch((error) => {
+				spinner.stop();
+				throw error;
 			});
 
 			if (useDetectedPackageManager) {
@@ -52,6 +59,9 @@ export async function createProject(options: ProjectConfig) {
 						{ value: "pnpm", name: "pnpm" },
 						{ value: "bun", name: "bun" },
 					],
+				}).catch((error) => {
+					spinner.stop();
+					throw error;
 				});
 			}
 		}
@@ -59,11 +69,14 @@ export async function createProject(options: ProjectConfig) {
 		const installDeps = await confirm({
 			message: `Install dependencies using ${packageManager}?`,
 			default: true,
+		}).catch((error) => {
+			spinner.stop();
+			throw error;
 		});
 
 		if (installDeps) {
 			spinner.start(`Installing dependencies using ${packageManager}...`);
-			switch (packageManager) {
+			switch (packageManager ?? DEFAULT_CONFIG.packageManager) {
 				case "npm":
 					await $`npm install ${projectDir}`;
 					break;
@@ -96,6 +109,19 @@ export async function createProject(options: ProjectConfig) {
 			`  ${packageManager === "npm" ? "npm run" : packageManager} dev`,
 		);
 	} catch (error) {
+		spinner.stop();
+
+		if (
+			error instanceof Error &&
+			(error.name === "ExitPromptError" ||
+				error.message.includes("User force closed"))
+		) {
+			console.log("\n");
+			logger.warn("Operation cancelled");
+			process.exit(0);
+			return;
+		}
+
 		spinner.fail("Failed to create project");
 		logger.error("Error during project creation:", error);
 		process.exit(1);

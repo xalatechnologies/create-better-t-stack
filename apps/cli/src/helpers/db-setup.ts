@@ -97,19 +97,22 @@ export async function setupTurso(projectDir: string) {
 	const isMac = platform === "darwin";
 	const canInstallCLI = platform !== "win32";
 
-	if (!canInstallCLI) {
-		await writeEnvFile(projectDir);
-		displayManualSetupInstructions();
-		return;
-	}
-
 	try {
+		if (!canInstallCLI) {
+			await writeEnvFile(projectDir);
+			displayManualSetupInstructions();
+			return;
+		}
+
 		const isCliInstalled = await isTursoInstalled();
 
 		if (!isCliInstalled) {
 			const shouldInstall = await confirm({
 				message: "Would you like to install Turso CLI?",
 				default: true,
+			}).catch((error) => {
+				spinner.stop();
+				throw error;
 			});
 
 			if (!shouldInstall) {
@@ -130,6 +133,9 @@ export async function setupTurso(projectDir: string) {
 		let dbName = await input({
 			message: `Enter database name (default: ${defaultDbName}):`,
 			default: defaultDbName,
+		}).catch((error) => {
+			spinner.stop();
+			throw error;
 		});
 
 		let success = false;
@@ -146,6 +152,9 @@ export async function setupTurso(projectDir: string) {
 					dbName = await input({
 						message: "Please enter a different database name:",
 						default: `${dbName}-${Math.floor(Math.random() * 1000)}`,
+					}).catch((error) => {
+						spinner.stop();
+						throw error;
 					});
 				} else {
 					throw error;
@@ -153,6 +162,19 @@ export async function setupTurso(projectDir: string) {
 			}
 		}
 	} catch (error) {
+		spinner.stop();
+
+		if (
+			error instanceof Error &&
+			(error.name === "ExitPromptError" ||
+				error.message.includes("User force closed"))
+		) {
+			logger.warn("\nTurso setup cancelled");
+			await writeEnvFile(projectDir);
+			displayManualSetupInstructions();
+			return;
+		}
+
 		logger.error("Error during Turso setup:", error);
 		await writeEnvFile(projectDir);
 		displayManualSetupInstructions();

@@ -14,6 +14,12 @@ import { generateReproducibleCommand } from "./utils/generate-reproducible-comma
 import { getVersion } from "./utils/get-version";
 import { logger } from "./utils/logger";
 
+process.on("SIGINT", () => {
+	console.log("\n");
+	logger.warn("Operation cancelled");
+	process.exit(0);
+});
+
 const program = new Command();
 
 async function gatherConfig(
@@ -143,20 +149,19 @@ async function main() {
 		logger.info("\n📋 To reproduce this setup, run:");
 		logger.success(chalk.cyan(generateReproducibleCommand(config)));
 	} catch (error) {
-		if (error instanceof Error && error.message.includes("User force closed")) {
+		if (
+			error instanceof Error &&
+			(error.name === "ExitPromptError" ||
+				error.message.includes("User force closed"))
+		) {
 			console.log("\n");
-			logger.warn("Operation cancelled by user");
+			logger.warn("Operation cancelled");
 			process.exit(0);
 		}
+
 		logger.error("An unexpected error occurred:", error);
 		process.exit(1);
 	}
 }
-
-process.on("SIGINT", () => {
-	console.log("\n");
-	logger.warn("Operation cancelled by user");
-	process.exit(0);
-});
 
 main();
