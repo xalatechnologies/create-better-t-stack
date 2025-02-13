@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.4.6
+
+### Patch Changes
+
+- 31f1271: Improve prompts
+
 ## 0.4.5
 
 ### Patch Changes
