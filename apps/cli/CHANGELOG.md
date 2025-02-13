@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.4.2
+
+### Patch Changes
+
+- d8875f0: bug fixes
+
 ## 0.4.1
 
 ### Patch Changes
