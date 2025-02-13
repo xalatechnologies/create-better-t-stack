@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.3.3
+
+### Patch Changes
+
+- ffda73e: Improve error handling
+
 ## 0.3.2
 
 ### Patch Changes
