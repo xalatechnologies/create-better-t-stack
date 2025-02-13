@@ -1,4 +1,15 @@
-import { checkbox, confirm, input, select } from "@inquirer/prompts";
+import {
+	cancel,
+	confirm,
+	group,
+	intro,
+	isCancel,
+	multiselect,
+	outro,
+	select,
+	spinner,
+	text,
+} from "@clack/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import { DEFAULT_CONFIG } from "./consts";
@@ -11,6 +22,7 @@ import type {
 	ProjectFeature,
 } from "./types";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
+import { getUserPkgManager } from "./utils/get-package-manager";
 import { getVersion } from "./utils/get-version";
 import { logger } from "./utils/logger";
 
@@ -25,88 +37,110 @@ const program = new Command();
 async function gatherConfig(
 	flags: Partial<ProjectConfig>,
 ): Promise<ProjectConfig> {
-	const config: ProjectConfig = {
-		projectName: "",
-		database: "libsql",
-		auth: true,
-		features: [],
+	const result = await group({
+		projectName: () =>
+			text({
+				message: "📝 Project name",
+				placeholder: "my-better-t-app",
+				validate: (value) => {
+					if (!value) return "Project name is required";
+				},
+			}),
+		database: () =>
+			!flags.database
+				? select<ProjectDatabase>({
+						message: "💾 Select database",
+						options: [
+							{
+								value: "libsql",
+								label: "libSQL",
+								hint: "✨ (Recommended) - Turso's embedded SQLite database",
+							},
+							{
+								value: "postgres",
+								label: "PostgreSQL",
+								hint: "🐘 Traditional relational database",
+							},
+						],
+					})
+				: Promise.resolve(flags.database),
+		auth: () =>
+			flags.auth === undefined
+				? confirm({
+						message: "🔐 Add authentication with Better-Auth?",
+					})
+				: Promise.resolve(flags.auth),
+		features: () =>
+			!flags.features
+				? multiselect<ProjectFeature>({
+						message: "🎯 Select additional features",
+						options: [
+							{
+								value: "docker",
+								label: "Docker setup",
+								hint: "🐳 Containerize your application",
+							},
+							{
+								value: "github-actions",
+								label: "GitHub Actions",
+								hint: "⚡ CI/CD workflows",
+							},
+							{
+								value: "SEO",
+								label: "Basic SEO setup",
+								hint: "🔍 Search engine optimization configuration",
+							},
+						],
+					})
+				: Promise.resolve(flags.features),
+		packageManager: async () => {
+			const detectedPackageManager = getUserPkgManager();
+
+			const useDetected = await confirm({
+				message: `📦 Use detected package manager (${detectedPackageManager})?`,
+			});
+
+			if (useDetected) return detectedPackageManager;
+
+			return select<PackageManager>({
+				message: "📦 Select package manager",
+				options: [
+					{ value: "npm", label: "npm", hint: "Node Package Manager" },
+					{
+						value: "yarn",
+						label: "yarn",
+						hint: "Fast, reliable, and secure dependency management",
+					},
+					{
+						value: "pnpm",
+						label: "pnpm",
+						hint: "Fast, disk space efficient package manager",
+					},
+					{
+						value: "bun",
+						label: "bun",
+						hint: "All-in-one JavaScript runtime & toolkit",
+					},
+				],
+			});
+		},
+	});
+
+	return {
+		projectName: result.projectName as string,
+		database: (result.database as ProjectDatabase) ?? "libsql",
+		auth: (result.auth as boolean) ?? true,
+		features: (result.features as ProjectFeature[]) ?? [],
 		git: flags.git ?? true,
+		packageManager: (result.packageManager as PackageManager) ?? "npm",
 	};
-
-	config.projectName =
-		flags.projectName ??
-		(await input({
-			message: chalk.blue.bold("📝 Project name:"),
-			default: "my-better-t-app",
-		}));
-
-	console.log();
-
-	if (flags.database) {
-		config.database = flags.database;
-	} else {
-		config.database = await select<ProjectDatabase>({
-			message: chalk.blue.bold("💾 Select database:"),
-			choices: [
-				{
-					value: "libsql",
-					name: chalk.green("libSQL"),
-					description: chalk.dim(
-						"✨ (Recommended) - Turso's embedded SQLite database",
-					),
-				},
-				{
-					value: "postgres",
-					name: chalk.yellow("PostgreSQL"),
-					description: chalk.dim("🐘 Traditional relational database"),
-				},
-			],
-		});
-	}
-
-	console.log();
-
-	config.auth =
-		flags.auth ??
-		(await confirm({
-			message: chalk.blue.bold("🔐 Add authentication with Better-Auth?"),
-			default: true,
-		}));
-
-	console.log();
-
-	if (flags.features) {
-		config.features = flags.features;
-	} else {
-		config.features = await checkbox<ProjectFeature>({
-			message: chalk.blue.bold("🎯 Select additional features:"),
-			choices: [
-				{
-					value: "docker",
-					name: chalk.cyan("Docker setup"),
-					description: chalk.dim("🐳 Containerize your application"),
-				},
-				{
-					value: "github-actions",
-					name: chalk.magenta("GitHub Actions"),
-					description: chalk.dim("⚡ CI/CD workflows"),
-				},
-				{
-					value: "SEO",
-					name: chalk.green("Basic SEO setup"),
-					description: chalk.dim("🔍 Search engine optimization configuration"),
-				},
-			],
-		});
-	}
-
-	return config;
 }
 
 async function main() {
+	const s = spinner();
 	try {
 		renderTitle();
-		logger.info(chalk.bold(" Creating a new Better-T Stack project...\n"));
+		intro(chalk.bold("Creating a new Better-T Stack project"));
 		program
 			.name("create-better-t-stack")
 			.description("Create a new Better-T Stack project")
@@ -161,7 +195,7 @@ async function main() {
 			: await gatherConfig(flagConfig);
 
 		if (options.yes) {
-			logger.info(chalk.blue.bold("\n📦 Using default configuration:"));
+			s.start("Using default configuration");
 			const colorizedConfig = {
 				projectName: chalk.green(config.projectName),
 				database: chalk.yellow(config.database),
@@ -195,25 +229,26 @@ async function main() {
 				chalk.dim("└─") + chalk.blue(" Git Init: ") + colorizedConfig.git,
 			);
 			console.log();
+			s.stop("Configuration loaded");
 		}
 
 		await createProject(config);
 
-		logger.info("\n📋 To reproduce this setup, run:");
-		logger.success(chalk.cyan(generateReproducibleCommand(config)));
-	} catch (error) {
-		if (
-			error instanceof Error &&
-			(error.name === "ExitPromptError" ||
-				error.message.includes("User force closed"))
-		) {
-			console.log("\n");
-			logger.warn("Operation cancelled");
-			process.exit(0);
-		}
+		console.log();
+		console.log(
+			chalk.dim("🔄 You can reproduce this setup with the following command:"),
+		);
+		console.log();
+		console.log(chalk.dim("  ") + generateReproducibleCommand(config));
+		console.log();
 
-		logger.error("An unexpected error occurred:", error);
-		process.exit(1);
+		outro("Project created successfully! 🎉");
+	} catch (error) {
+		s.stop("Failed");
+		if (error instanceof Error) {
+			cancel("An unexpected error occurred");
+			process.exit(1);
+		}
 	}
 }
 

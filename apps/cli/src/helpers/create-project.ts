@@ -1,164 +1,96 @@
 import path from "node:path";
-import { confirm, select } from "@inquirer/prompts";
+import { cancel, confirm, isCancel, log, spinner, tasks } from "@clack/prompts";
 import chalk from "chalk";
 import { $ } from "execa";
 import fs from "fs-extra";
-import ora from "ora";
-import { DEFAULT_CONFIG } from "../consts";
-import type { PackageManager, ProjectConfig } from "../types";
-import { getUserPkgManager } from "../utils/get-package-manager";
-import { logger } from "../utils/logger";
+import type { ProjectConfig } from "../types";
 import { setupTurso } from "./db-setup";
 
 export async function createProject(options: ProjectConfig) {
-	const spinner = ora("Creating project directory...").start();
+	const s = spinner();
 	const projectDir = path.resolve(process.cwd(), options.projectName);
+	let shouldInstallDeps = false;
 
 	try {
-		await fs.ensureDir(projectDir);
-		spinner.succeed();
-		console.log();
+		await tasks([
+			{
+				title: "Creating project directory",
+				task: async () => {
+					await fs.ensureDir(projectDir);
+				},
+			},
+			{
+				title: "Cloning template repository",
+				task: async () => {
+					try {
+						await $`npx degit AmanVarshney01/Better-T-Stack ${projectDir}`;
+					} catch (error) {
+						log.error("Failed to clone template repository");
+						if (error instanceof Error) {
+							log.error(error.message);
+						}
+						throw error;
+					}
+				},
+			},
+			{
+				title: "Initializing git repository",
+				task: async () => {
+					if (options.git) {
+						await $`git init ${projectDir}`;
+					}
+				},
+			},
+		]);
 
-		spinner.start("Cloning template repository...");
-		await $`npx degit https://github.com/AmanVarshney01/Better-T-Stack.git ${projectDir}`;
-		spinner.succeed();
-		console.log();
-
-		let shouldInitGit = options.git;
-
-		if (!options.yes && shouldInitGit) {
-			shouldInitGit = await confirm({
-				message: chalk.blue.bold("🔄 Initialize a git repository?"),
-				default: true,
-			}).catch((error) => {
-				spinner.stop();
-				console.log();
-				throw error;
-			});
-		}
-
-		if (shouldInitGit) {
-			spinner.start("Initializing git repository...");
-			await $`git init ${projectDir}`;
-			spinner.succeed();
-		}
-
-		const detectedPackageManager = getUserPkgManager();
-		let packageManager = options.packageManager ?? detectedPackageManager;
-
-		if (!options.yes) {
-			const useDetectedPackageManager = await confirm({
-				message: chalk.blue.bold(
-					`📦 Use detected package manager (${chalk.cyan(
-						detectedPackageManager,
-					)})?`,
-				),
-				default: true,
-			}).catch((error) => {
-				spinner.stop();
-				throw error;
-			});
-
-			if (!useDetectedPackageManager) {
-				console.log();
-				packageManager = await select<PackageManager>({
-					message: chalk.blue.bold("📦 Select package manager:"),
-					choices: [
-						{
-							value: "npm",
-							name: chalk.yellow("npm"),
-							description: chalk.dim("Node Package Manager"),
-						},
-						{
-							value: "yarn",
-							name: chalk.blue("yarn"),
-							description: chalk.dim(
-								"Fast, reliable, and secure dependency management",
-							),
-						},
-						{
-							value: "pnpm",
-							name: chalk.magenta("pnpm"),
-							description: chalk.dim(
-								"Fast, disk space efficient package manager",
-							),
-						},
-						{
-							value: "bun",
-							name: chalk.cyan("bun"),
-							description: chalk.dim("All-in-one JavaScript runtime & toolkit"),
-						},
-					],
-				}).catch((error) => {
-					spinner.stop();
-					throw error;
-				});
-			}
-		}
-
-		const installDeps = await confirm({
-			message: chalk.blue.bold(
-				`📦 Install dependencies using ${chalk.cyan(packageManager)}?`,
-			),
-			default: true,
-		}).catch((error) => {
-			spinner.stop();
-			throw error;
+		const installDepsResponse = await confirm({
+			message: `📦 Install dependencies using ${options.packageManager}?`,
 		});
 
-		console.log();
+		if (isCancel(installDepsResponse)) {
+			cancel("Operation cancelled");
+			process.exit(0);
+		}
 
-		if (installDeps) {
-			spinner.start(`📦 Installing dependencies using ${packageManager}...`);
-			switch (packageManager ?? DEFAULT_CONFIG.packageManager) {
-				case "npm":
-					await $`cd ${projectDir} && npm install`;
-					break;
-				case "yarn":
-					await $`cd ${projectDir} && yarn install`;
-					break;
-				case "pnpm":
-					await $`cd ${projectDir} && pnpm install`;
-					break;
-				case "bun":
-					await $`cd ${projectDir} && bun install`;
-					break;
-				default:
-					throw new Error("Unsupported package manager");
+		shouldInstallDeps = installDepsResponse;
+
+		if (shouldInstallDeps) {
+			s.start(`Installing dependencies using ${options.packageManager}...`);
+			try {
+				await $({
+					cwd: projectDir,
+					stdio: "inherit",
+				})`${options.packageManager} install`;
+				s.stop("Dependencies installed successfully");
+			} catch (error) {
+				s.stop("Failed to install dependencies");
+				if (error instanceof Error) {
+					log.error(`Installation error: ${error.message}`);
+				}
+				throw error;
 			}
-			spinner.succeed();
-			console.log();
 		}
 
 		if (options.database === "libsql") {
 			await setupTurso(projectDir);
 		}
 
-		logger.success("\n✨ Project created successfully!\n");
-		logger.info("Next steps:");
-		logger.info(`  cd ${options.projectName}`);
-		if (!installDeps) {
-			logger.info(`  ${packageManager} install`);
+		log.success("✨ Project created successfully!\n");
+		log.info(chalk.dim("Next steps:"));
+		log.info(`  cd ${options.projectName}`);
+		if (!shouldInstallDeps) {
+			log.info(`  ${options.packageManager} install`);
 		}
-		logger.info(
-			`  ${packageManager === "npm" ? "npm run" : packageManager} dev`,
+		log.info(
+			`  ${
+				options.packageManager === "npm" ? "npm run" : options.packageManager
+			} dev`,
 		);
 	} catch (error) {
-		spinner.stop();
-
-		if (
-			error instanceof Error &&
-			(error.name === "ExitPromptError" ||
-				error.message.includes("User force closed"))
-		) {
-			console.log("\n");
-			logger.warn("Operation cancelled");
-			process.exit(0);
-			return;
+		s.stop("Failed");
+		if (error instanceof Error) {
+			log.error(`Error during project creation: ${error.message}`);
+			process.exit(1);
 		}
-
-		spinner.fail("Failed to create project");
-		logger.error("Error during project creation:", error);
-		process.exit(1);
 	}
 }

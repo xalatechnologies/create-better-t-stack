@@ -8,7 +8,7 @@ export type ProjectConfig = {
 	git: boolean;
 	database: ProjectDatabase;
 	auth: boolean;
-	packageManager?: PackageManager;
+	packageManager: PackageManager;
 	features: ProjectFeature[];
 };
 
