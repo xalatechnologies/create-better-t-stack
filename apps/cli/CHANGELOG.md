@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.4.4
+
+### Patch Changes
+
+- 92d2443: clear console on start
+
 ## 0.4.3
 
 ### Patch Changes
