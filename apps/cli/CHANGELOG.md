@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.4.0
+
+### Minor Changes
+
+- 76a14ea: refractor: migrate inquirer to @clack/prompts
+
 ## 0.3.4
 
 ### Patch Changes
