@@ -1,3 +1,4 @@
+import path from "node:path";
 import {
 	cancel,
 	confirm,
@@ -12,6 +13,7 @@ import {
 } from "@clack/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
+import fs from "fs-extra";
 import { DEFAULT_CONFIG } from "./consts";
 import { createProject } from "./helpers/create-project";
 import { renderTitle } from "./render-title";
@@ -35,19 +37,51 @@ const program = new Command();
 async function gatherConfig(
 	flags: Partial<ProjectConfig>,
 ): Promise<ProjectConfig> {
-	const shouldAskGit = flags.git !== false;
-
 	const result = await group(
 		{
-			projectName: () =>
-				text({
-					message: "📝 Project name",
-					placeholder: "my-better-t-app",
-					initialValue: flags.projectName,
-					validate: (value) => {
-						if (!value) return "Project name is required";
-					},
-				}),
+			projectName: async () => {
+				let isValid = false;
+				let projectName: string | symbol = "";
+				let defaultName = DEFAULT_CONFIG.projectName;
+				let counter = 1;
+
+				while (fs.pathExistsSync(path.resolve(process.cwd(), defaultName))) {
+					defaultName = `${DEFAULT_CONFIG.projectName}-${counter}`;
+					counter++;
+				}
+
+				while (!isValid) {
+					const response = await text({
+						message: "📝 Project name",
+						placeholder: defaultName,
+						initialValue: flags.projectName || defaultName,
+						defaultValue: defaultName,
+						validate: (value) => {
+							const nameToUse = value.trim() || defaultName;
+							const projectDir = path.resolve(process.cwd(), nameToUse);
+
+							if (fs.pathExistsSync(projectDir)) {
+								const dirContents = fs.readdirSync(projectDir);
+								if (dirContents.length > 0) {
+									return `Directory "${nameToUse}" already exists and is not empty. Please choose a different name.`;
+								}
+							}
+
+							isValid = true;
+							return undefined;
+						},
+					});
+
+					if (typeof response === "symbol") {
+						cancel("Operation cancelled.");
+						process.exit(0);
+					}
+
+					projectName = response || defaultName;
+				}
+
+				return projectName as string;
+			},
 			database: () =>
 				!flags.database
 					? select<ProjectDatabase>({
@@ -96,7 +130,7 @@ async function gatherConfig(
 						})
 					: Promise.resolve(flags.features),
 			git: () =>
-				shouldAskGit
+				flags.git !== false
 					? confirm({
 							message: "🗃️ Initialize Git repository?",
 							initialValue: true,
@@ -143,12 +177,12 @@ async function gatherConfig(
 	);
 
 	return {
-		projectName: result.projectName as string,
-		database: (result.database as ProjectDatabase) ?? "libsql",
-		auth: (result.auth as boolean) ?? true,
-		features: (result.features as ProjectFeature[]) ?? [],
-		git: (result.git as boolean) ?? true,
-		packageManager: (result.packageManager as PackageManager) ?? "npm",
+		projectName: result.projectName ?? "",
+		database: result.database ?? "libsql",
+		auth: result.auth ?? true,
+		features: result.features ?? [],
+		git: result.git ?? true,
+		packageManager: result.packageManager ?? "npm",
 	};
 }
 

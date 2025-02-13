@@ -170,6 +170,8 @@ export async function setupTurso(projectDir: string) {
 			const dbNameResponse = await text({
 				message: "Enter database name:",
 				defaultValue: suggestedName,
+				initialValue: suggestedName,
+				placeholder: suggestedName,
 			});
 
 			if (isCancel(dbNameResponse)) {
