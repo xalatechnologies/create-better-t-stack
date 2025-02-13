@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.4.5
+
+### Patch Changes
+
+- 7fc5010: add small title for shorter window
+
 ## 0.4.4
 
 ### Patch Changes
