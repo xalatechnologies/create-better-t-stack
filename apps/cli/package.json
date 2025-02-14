@@ -8,6 +8,12 @@
 		"create-better-t-stack": "dist/index.js"
 	},
 	"keywords": [],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/better-t-stack/create-better-t-stack.git",
+		"directory": "apps/cli"
+	},
+	"homepage": "https://github.com/better-t-stack/create-better-t-stack/tree/main/apps/cli#readme",
 	"scripts": {
 		"build": "tsup",
 		"dev": "tsup --watch",
