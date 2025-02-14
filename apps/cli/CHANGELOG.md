@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.6.0
+
+### Minor Changes
+
+- aa3eaad: refactor: simplify package manager flags
+
 ## 0.5.0
 
 ### Minor Changes
