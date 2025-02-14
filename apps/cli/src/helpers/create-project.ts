@@ -64,10 +64,10 @@ export async function createProject(options: ProjectConfig) {
 		if (shouldInstallDeps) {
 			s.start(`📦 Installing dependencies using ${options.packageManager}...`);
 			try {
-				await $({
+				const { stdout } = await $({
 					cwd: projectDir,
-					stdio: "inherit",
 				})`${options.packageManager} install`;
+				log.step(stdout);
 				s.stop("✅ Dependencies installed successfully");
 			} catch (error) {
 				s.stop("Failed to install dependencies");

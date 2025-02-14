@@ -40,6 +40,7 @@ async function gatherConfig(
 	const result = await group(
 		{
 			projectName: async () => {
+				if (flags.projectName) return flags.projectName;
 				let isValid = false;
 				let projectName: string | symbol = "";
 				let defaultName = DEFAULT_CONFIG.projectName;
@@ -83,8 +84,9 @@ async function gatherConfig(
 				return projectName as string;
 			},
 			database: () =>
-				!flags.database
-					? select<ProjectDatabase>({
+				flags.database !== undefined
+					? Promise.resolve(flags.database)
+					: select<ProjectDatabase>({
 							message: "💾 Which database would you like to use?",
 							options: [
 								{
@@ -98,18 +100,19 @@ async function gatherConfig(
 									hint: "Traditional relational database",
 								},
 							],
-						})
-					: Promise.resolve(flags.database),
+						}),
 			auth: () =>
-				flags.auth === undefined
-					? confirm({
+				flags.auth !== undefined
+					? Promise.resolve(flags.auth)
+					: confirm({
 							message:
 								"🔐 Would you like to add authentication with Better-Auth?",
-						})
-					: Promise.resolve(flags.auth),
+							initialValue: DEFAULT_CONFIG.auth,
+						}),
 			features: () =>
-				!flags.features
-					? multiselect<ProjectFeature>({
+				flags.features !== undefined
+					? Promise.resolve(flags.features)
+					: multiselect<ProjectFeature>({
 							message: "✨ Which features would you like to add?",
 							options: [
 								{
@@ -128,16 +131,18 @@ async function gatherConfig(
 									hint: "Search engine optimization configuration",
 								},
 							],
-						})
-					: Promise.resolve(flags.features),
+						}),
 			git: () =>
-				flags.git !== false
-					? confirm({
+				flags.git !== undefined
+					? Promise.resolve(flags.git)
+					: confirm({
 							message: "🗃️ Initialize a new git repository?",
-							initialValue: true,
-						})
-					: Promise.resolve(false),
+							initialValue: DEFAULT_CONFIG.git,
+						}),
 			packageManager: async () => {
+				if (flags.packageManager !== undefined) {
+					return flags.packageManager;
+				}
 				const detectedPackageManager = getUserPkgManager();
 
 				const useDetected = await confirm({
@@ -179,13 +184,50 @@ async function gatherConfig(
 	);
 
 	return {
-		projectName: result.projectName ?? "",
-		database: result.database ?? "libsql",
-		auth: result.auth ?? true,
-		features: result.features ?? [],
-		git: result.git ?? true,
-		packageManager: result.packageManager ?? "npm",
+		projectName: result.projectName ?? DEFAULT_CONFIG.projectName,
+		database: result.database ?? DEFAULT_CONFIG.database,
+		auth: result.auth ?? DEFAULT_CONFIG.auth,
+		features: result.features ?? DEFAULT_CONFIG.features,
+		git: result.git ?? DEFAULT_CONFIG.git,
+		packageManager: result.packageManager ?? DEFAULT_CONFIG.packageManager,
 	};
+}
+
+function displayConfig(config: Partial<ProjectConfig>) {
+	const configDisplay = [];
+
+	if (config.projectName) {
+		configDisplay.push(
+			`${chalk.blue("📝 Project Name: ")}${chalk.green(config.projectName)}`,
+		);
+	}
+	if (config.database) {
+		configDisplay.push(
+			`${chalk.blue("💾 Database: ")}${chalk.yellow(config.database)}`,
+		);
+	}
+	if (config.auth !== undefined) {
+		configDisplay.push(
+			`${chalk.blue("🔐 Authentication: ")}${chalk.cyan(config.auth)}`,
+		);
+	}
+	if (config.features?.length) {
+		configDisplay.push(
+			`${chalk.blue("✨ Features: ")}${config.features.map((f) => chalk.magenta(f)).join(", ")}`,
+		);
+	}
+	if (config.git !== undefined) {
+		configDisplay.push(
+			`${chalk.blue("🗃️ Git Init: ")}${chalk.cyan(config.git)}`,
+		);
+	}
+	if (config.packageManager) {
+		configDisplay.push(
+			`${chalk.blue("📦 Package Manager: ")}${chalk.yellow(config.packageManager)}`,
+		);
+	}
+
+	return configDisplay.join("\n");
 }
 
 async function main() {
@@ -217,17 +259,29 @@ async function main() {
 		const projectDirectory = program.args[0];
 
 		const flagConfig: Partial<ProjectConfig> = {
-			projectName: projectDirectory,
-			database: options.database as ProjectDatabase,
-			auth: options.auth,
-			packageManager: options.packageManager as PackageManager,
-			git: options.git ?? true,
-			features: [
-				...(options.docker ? ["docker"] : []),
-				...(options.githubActions ? ["github-actions"] : []),
-				...(options.seo ? ["SEO"] : []),
-			] as ProjectFeature[],
+			projectName: projectDirectory || undefined,
+			database: options.database as ProjectDatabase | undefined,
+			auth: "auth" in options ? options.auth : undefined,
+			packageManager: options.packageManager as PackageManager | undefined,
+			git: "git" in options ? options.git : undefined,
+			features:
+				options.docker || options.githubActions || options.seo
+					? ([
+							...(options.docker ? ["docker"] : []),
+							...(options.githubActions ? ["github-actions"] : []),
+							...(options.seo ? ["SEO"] : []),
+						] as ProjectFeature[])
+					: undefined,
 		};
+
+		if (
+			!options.yes &&
+			Object.values(flagConfig).some((v) => v !== undefined)
+		) {
+			log.message(chalk.bold("\n🎯 Using these pre-selected options:"));
+			log.message(displayConfig(flagConfig));
+			log.message("");
+		}
 
 		const config = options.yes
 			? {
@@ -248,28 +302,9 @@ async function main() {
 			: await gatherConfig(flagConfig);
 
 		if (options.yes) {
-			s.start("Using default configuration");
-			const colorizedConfig = {
-				projectName: chalk.green(config.projectName),
-				database: chalk.yellow(config.database),
-				auth: chalk.cyan(config.auth),
-				features: config.features.map((feature) => chalk.magenta(feature)),
-				git: chalk.cyan(config.git),
-			};
-
-			log.message(
-				`${chalk.blue("📝 Project Name: ")}${
-					colorizedConfig.projectName
-				}\n${chalk.blue("💾 Database: ")}${colorizedConfig.database}\n${chalk.blue(
-					"🔐 Authentication: ",
-				)}${colorizedConfig.auth}\n${chalk.blue("✨ Features: ")}${
-					colorizedConfig.features.length
-						? colorizedConfig.features.join(", ")
-						: chalk.gray("none")
-				}\n${chalk.blue("🗃️ Git Init: ")}${colorizedConfig.git}\n`,
-			);
-
-			s.stop("Configuration loaded");
+			log.message(chalk.bold("\n🎯 Using these default options:"));
+			log.message(displayConfig(config));
+			log.message("");
 		}
 
 		await createProject(config);
