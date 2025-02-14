@@ -248,11 +248,12 @@ async function main() {
 			.option("--docker", "Include Docker setup")
 			.option("--github-actions", "Include GitHub Actions")
 			.option("--seo", "Include SEO setup")
+			.option("--git", "Include git setup")
 			.option("--no-git", "Skip git initialization")
-			.option(
-				"--package-manager <type>",
-				"Package manager to use (npm, yarn, pnpm, or bun)",
-			)
+			.option("--npm", "Use npm package manager")
+			.option("--pnpm", "Use pnpm package manager")
+			.option("--yarn", "Use yarn package manager")
+			.option("--bun", "Use bun package manager")
 			.parse();
 
 		const options = program.opts();
@@ -262,7 +263,15 @@ async function main() {
 			projectName: projectDirectory || undefined,
 			database: options.database as ProjectDatabase | undefined,
 			auth: "auth" in options ? options.auth : undefined,
-			packageManager: options.packageManager as PackageManager | undefined,
+			packageManager: options.npm
+				? "npm"
+				: options.pnpm
+					? "pnpm"
+					: options.yarn
+						? "yarn"
+						: options.bun
+							? "bun"
+							: undefined,
 			git: "git" in options ? options.git : undefined,
 			features:
 				options.docker || options.githubActions || options.seo

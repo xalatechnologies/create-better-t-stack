@@ -27,11 +27,12 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		flags.push(chalk.red("--no-git"));
 	}
 
+	// Updated package manager flag handling
 	if (
 		config.packageManager &&
 		config.packageManager !== DEFAULT_CONFIG.packageManager
 	) {
-		flags.push(chalk.magenta(`--package-manager ${config.packageManager}`));
+		flags.push(chalk.magenta(`--${config.packageManager}`));
 	}
 
 	for (const feature of config.features) {
