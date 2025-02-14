@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.6.1
+
+### Patch Changes
+
+- f73c7d2: fix: dependency installation output flow
+
 ## 0.6.0
 
 ### Minor Changes
