@@ -1,6 +1,7 @@
 import path from "node:path";
 import { cancel, confirm, isCancel, log, spinner, tasks } from "@clack/prompts";
 import chalk from "chalk";
+import degit from "degit";
 import { $ } from "execa";
 import fs from "fs-extra";
 import type { ProjectConfig } from "../types";
@@ -23,7 +24,10 @@ export async function createProject(options: ProjectConfig) {
 				title: "📥 Cloning template repository",
 				task: async () => {
 					try {
-						await $`npx degit AmanVarshney01/Better-T-Stack ${projectDir}`;
+						const emitter = degit("better-t-stack/Better-T-Stack#bare", {
+							cache: true,
+						});
+						await emitter.clone(projectDir);
 					} catch (error) {
 						log.error("Failed to clone template repository");
 						if (error instanceof Error) {
@@ -39,7 +43,9 @@ export async function createProject(options: ProjectConfig) {
 			tasksList.push({
 				title: "🗃️ Initializing git repository",
 				task: async () => {
-					await $`git init ${projectDir}`;
+					await $({
+						cwd: projectDir,
+					})`git init`;
 				},
 			});
 		}
