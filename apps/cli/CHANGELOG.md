@@ -1,5 +1,11 @@
 # create-better-t-stack
 
+## 0.5.0
+
+### Minor Changes
+
+- 0983fc1: feat(cli): display pre-selected flags before prompts
+
 ## 0.4.6
 
 ### Patch Changes
