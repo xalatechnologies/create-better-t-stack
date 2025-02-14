@@ -35,4 +35,4 @@ Options:
   --bun                 Use bun as package manager
   -h, --help            Display help
 ```
-Created by [Nitish Singh](https://github.com/nitishsinghal) & [Aman Varshney](https://github.com/AmanVarshney01)
+Created by [Nitish Singh](https://github.com/FgrReloaded) & [Aman Varshney](https://github.com/AmanVarshney01)
