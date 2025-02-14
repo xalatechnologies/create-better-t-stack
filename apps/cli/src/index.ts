@@ -131,6 +131,7 @@ async function gatherConfig(
 									hint: "Search engine optimization configuration",
 								},
 							],
+							required: false,
 						}),
 			git: () =>
 				flags.git !== undefined

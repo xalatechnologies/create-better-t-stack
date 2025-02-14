@@ -64,10 +64,9 @@ export async function createProject(options: ProjectConfig) {
 		if (shouldInstallDeps) {
 			s.start(`📦 Installing dependencies using ${options.packageManager}...`);
 			try {
-				const { stdout } = await $({
+				await $({
 					cwd: projectDir,
 				})`${options.packageManager} install`;
-				log.step(stdout);
 				s.stop("✅ Dependencies installed successfully");
 			} catch (error) {
 				s.stop("Failed to install dependencies");
@@ -78,7 +77,6 @@ export async function createProject(options: ProjectConfig) {
 			}
 		}
 
-		log.success("✨ Project created successfully!\n");
 		log.info(`${chalk.dim("Next steps:")}
 cd ${options.projectName}${!shouldInstallDeps ? `\n${options.packageManager} install` : ""}
 ${options.packageManager === "npm" ? "npm run" : options.packageManager} dev`);
