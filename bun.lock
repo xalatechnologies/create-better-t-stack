@@ -14,7 +14,7 @@
     },
     "apps/cli": {
       "name": "create-better-t-stack",
-      "version": "0.6.2",
+      "version": "0.7.2",
       "bin": {
         "create-better-t-stack": "dist/index.js"
       },
@@ -42,6 +42,7 @@
         "fumadocs-core": "15.0.6",
         "fumadocs-mdx": "11.5.3",
         "fumadocs-ui": "15.0.6",
+        "lucide-react": "^0.475.0",
         "next": "15.1.6",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",

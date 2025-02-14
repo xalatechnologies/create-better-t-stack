@@ -11,6 +11,7 @@ export const baseOptions: BaseLayoutProps = {
 	nav: {
 		// can be JSX too!
 		title: "Better-T-Stack",
+		enabled: false,
 	},
 	links: [
 		{
