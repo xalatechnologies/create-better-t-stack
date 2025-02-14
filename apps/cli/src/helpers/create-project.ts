@@ -1,9 +1,9 @@
 import path from "node:path";
 import { cancel, confirm, isCancel, log, spinner, tasks } from "@clack/prompts";
-import chalk from "chalk";
 import degit from "degit";
 import { $ } from "execa";
 import fs from "fs-extra";
+import pc from "picocolors";
 import type { ProjectConfig } from "../types";
 import { setupTurso } from "./db-setup";
 
@@ -29,9 +29,9 @@ export async function createProject(options: ProjectConfig) {
 						});
 						await emitter.clone(projectDir);
 					} catch (error) {
-						log.error("Failed to clone template repository");
+						log.error(pc.red("Failed to clone template repository"));
 						if (error instanceof Error) {
-							log.error(error.message);
+							log.error(pc.red(error.message));
 						}
 						throw error;
 					}
@@ -57,39 +57,41 @@ export async function createProject(options: ProjectConfig) {
 		}
 
 		const installDepsResponse = await confirm({
-			message: `📦 Install dependencies with ${options.packageManager}?`,
+			message: `📦 Install dependencies with ${pc.magenta(options.packageManager)}?`,
 		});
 
 		if (isCancel(installDepsResponse)) {
-			cancel("Operation cancelled");
+			cancel(pc.red("Operation cancelled"));
 			process.exit(0);
 		}
 
 		shouldInstallDeps = installDepsResponse;
 
 		if (shouldInstallDeps) {
-			s.start(`📦 Installing dependencies using ${options.packageManager}...`);
+			s.start(
+				`📦 Installing dependencies using ${pc.magenta(options.packageManager)}...`,
+			);
 			try {
 				await $({
 					cwd: projectDir,
 				})`${options.packageManager} install`;
 				s.stop("✅ Dependencies installed successfully");
 			} catch (error) {
-				s.stop("Failed to install dependencies");
+				s.stop(pc.red("Failed to install dependencies"));
 				if (error instanceof Error) {
-					log.error(`Installation error: ${error.message}`);
+					log.error(pc.red(`Installation error: ${error.message}`));
 				}
 				throw error;
 			}
 		}
 
-		log.info(`${chalk.dim("Next steps:")}
-cd ${options.projectName}${!shouldInstallDeps ? `\n${options.packageManager} install` : ""}
-${options.packageManager === "npm" ? "npm run" : options.packageManager} dev`);
+		log.info(`${pc.dim("Next steps:")}
+${pc.cyan("cd")} ${options.projectName}${!shouldInstallDeps ? `\n${pc.cyan(options.packageManager)} install` : ""}
+${pc.cyan(options.packageManager === "npm" ? "npm run" : options.packageManager)} ${"dev"}`);
 	} catch (error) {
-		s.stop("Failed");
+		s.stop(pc.red("Failed"));
 		if (error instanceof Error) {
-			log.error(`Error during project creation: ${error.message}`);
+			log.error(pc.red(`Error during project creation: ${error.message}`));
 			process.exit(1);
 		}
 	}

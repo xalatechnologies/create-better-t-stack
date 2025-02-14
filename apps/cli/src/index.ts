@@ -11,12 +11,11 @@ import {
 	spinner,
 	text,
 } from "@clack/prompts";
-import chalk from "chalk";
 import { Command } from "commander";
 import fs from "fs-extra";
+import pc from "picocolors";
 import { DEFAULT_CONFIG } from "./consts";
 import { createProject } from "./helpers/create-project";
-import { renderTitle } from "./render-title";
 import type {
 	PackageManager,
 	ProjectConfig,
@@ -26,9 +25,10 @@ import type {
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
 import { getUserPkgManager } from "./utils/get-package-manager";
 import { getVersion } from "./utils/get-version";
+import { renderTitle } from "./utils/render-title";
 
 process.on("SIGINT", () => {
-	log.error("Operation cancelled");
+	log.error(pc.red("Operation cancelled"));
 	process.exit(0);
 });
 
@@ -74,7 +74,7 @@ async function gatherConfig(
 					});
 
 					if (typeof response === "symbol") {
-						cancel("Operation cancelled.");
+						cancel(pc.red("Operation cancelled."));
 						process.exit(0);
 					}
 
@@ -178,7 +178,7 @@ async function gatherConfig(
 		},
 		{
 			onCancel: () => {
-				cancel("Operation cancelled.");
+				cancel(pc.red("Operation cancelled."));
 				process.exit(0);
 			},
 		},
@@ -198,33 +198,25 @@ function displayConfig(config: Partial<ProjectConfig>) {
 	const configDisplay = [];
 
 	if (config.projectName) {
-		configDisplay.push(
-			`${chalk.blue("📝 Project Name: ")}${chalk.green(config.projectName)}`,
-		);
+		configDisplay.push(`${pc.blue("📝 Project Name:")} ${config.projectName}`);
 	}
 	if (config.database) {
-		configDisplay.push(
-			`${chalk.blue("💾 Database: ")}${chalk.yellow(config.database)}`,
-		);
+		configDisplay.push(`${pc.blue("💾 Database:")} ${config.database}`);
 	}
 	if (config.auth !== undefined) {
-		configDisplay.push(
-			`${chalk.blue("🔐 Authentication: ")}${chalk.cyan(config.auth)}`,
-		);
+		configDisplay.push(`${pc.blue("🔐 Authentication:")} ${config.auth}`);
 	}
 	if (config.features?.length) {
 		configDisplay.push(
-			`${chalk.blue("✨ Features: ")}${config.features.map((f) => chalk.magenta(f)).join(", ")}`,
+			`${pc.blue("✨ Features:")} ${config.features.join(", ")}`,
 		);
 	}
 	if (config.git !== undefined) {
-		configDisplay.push(
-			`${chalk.blue("🗃️ Git Init: ")}${chalk.cyan(config.git)}`,
-		);
+		configDisplay.push(`${pc.blue("🗃️ Git Init:")} ${config.git}`);
 	}
 	if (config.packageManager) {
 		configDisplay.push(
-			`${chalk.blue("📦 Package Manager: ")}${chalk.yellow(config.packageManager)}`,
+			`${pc.blue("📦 Package Manager:")} ${config.packageManager}`,
 		);
 	}
 
@@ -236,7 +228,7 @@ async function main() {
 	try {
 		process.stdout.write("\x1Bc");
 		renderTitle();
-		intro(chalk.bold("✨ Creating a new Better-T-Stack project"));
+		intro(pc.magenta("✨ Creating a new Better-T-Stack project"));
 		program
 			.name("create-better-t-stack")
 			.description("Create a new Better-T Stack project")
@@ -288,7 +280,7 @@ async function main() {
 			!options.yes &&
 			Object.values(flagConfig).some((v) => v !== undefined)
 		) {
-			log.message(chalk.bold("\n🎯 Using these pre-selected options:"));
+			log.info(pc.yellow("🎯 Using these pre-selected options:"));
 			log.message(displayConfig(flagConfig));
 			log.message("");
 		}
@@ -312,22 +304,26 @@ async function main() {
 			: await gatherConfig(flagConfig);
 
 		if (options.yes) {
-			log.message(chalk.bold("\n🎯 Using these default options:"));
+			log.info(pc.yellow("🎯 Using these default options:"));
 			log.message(displayConfig(config));
 			log.message("");
 		}
 
 		await createProject(config);
 
-		log.info(
-			`You can reproduce this setup with the following command:\n${generateReproducibleCommand(config)}`,
+		log.success(
+			pc.blue(
+				`You can reproduce this setup with the following command:\n${pc.white(
+					generateReproducibleCommand(config),
+				)}`,
+			),
 		);
 
-		outro("🎉 Project created successfully!");
+		outro(pc.magenta("🎉 Project created successfully!"));
 	} catch (error) {
-		s.stop("Failed");
+		s.stop(pc.red("Failed"));
 		if (error instanceof Error) {
-			cancel("An unexpected error occurred");
+			cancel(pc.red("An unexpected error occurred"));
 			process.exit(1);
 		}
 	}

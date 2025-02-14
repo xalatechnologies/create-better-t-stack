@@ -3,19 +3,15 @@ import path from "node:path";
 import {
 	cancel,
 	confirm,
-	group,
-	intro,
 	isCancel,
 	log,
-	multiselect,
 	outro,
-	select,
 	spinner,
-	tasks,
 	text,
 } from "@clack/prompts";
 import { $ } from "execa";
 import fs from "fs-extra";
+import pc from "picocolors";
 import { isTursoInstalled, isTursoLoggedIn } from "../utils/turso-cli";
 
 interface TursoConfig {
@@ -30,7 +26,7 @@ async function loginToTurso() {
 		await $`turso auth login`;
 		s.stop("✅ Logged in to Turso successfully!");
 	} catch (error) {
-		s.stop("Failed to log in to Turso");
+		s.stop(pc.red("Failed to log in to Turso"));
 		throw error;
 	}
 }
@@ -52,10 +48,10 @@ async function installTursoCLI(isMac: boolean) {
 	} catch (error) {
 		if (error instanceof Error && error.message.includes("User force closed")) {
 			s.stop();
-			log.warn("Turso CLI installation cancelled by user");
+			log.warn(pc.yellow("Turso CLI installation cancelled by user"));
 			throw new Error("Installation cancelled");
 		}
-		s.stop("Failed to install Turso CLI");
+		s.stop(pc.red("Failed to install Turso CLI"));
 		throw error;
 	}
 }
@@ -91,14 +87,15 @@ TURSO_AUTH_TOKEN=`;
 }
 
 function displayManualSetupInstructions() {
-	log.info("🔧 Manual Turso Setup Instructions:");
-	log.info("1. Visit https://turso.tech and create an account");
-	log.info("2. Create a new database from the dashboard");
-	log.info("3. Get your database URL and authentication token");
-	log.info("4. Add these credentials to the .env file in packages/server/.env");
-	log.info("\nThe .env file has been created with placeholder variables:");
-	log.info("TURSO_DATABASE_URL=your_database_url");
-	log.info("TURSO_AUTH_TOKEN=your_auth_token");
+	log.info(`🔧 Manual Turso Setup Instructions:
+
+1. Visit https://turso.tech and create an account
+2. Create a new database from the dashboard
+3. Get your database URL and authentication token
+4. Add these credentials to the .env file in packages/server/.env
+
+TURSO_DATABASE_URL=your_database_url
+TURSO_AUTH_TOKEN=your_auth_token`);
 }
 
 export async function setupTurso(projectDir: string) {
@@ -107,7 +104,7 @@ export async function setupTurso(projectDir: string) {
 	const canInstallCLI = platform !== "win32";
 
 	if (!canInstallCLI) {
-		log.warn("Automatic Turso setup is not supported on Windows.");
+		log.warn(pc.yellow("Automatic Turso setup is not supported on Windows."));
 		await writeEnvFile(projectDir);
 		displayManualSetupInstructions();
 		return;
@@ -122,7 +119,7 @@ export async function setupTurso(projectDir: string) {
 			});
 
 			if (isCancel(shouldInstall)) {
-				cancel("Operation cancelled");
+				cancel(pc.red("Operation cancelled"));
 				process.exit(0);
 			}
 
@@ -144,7 +141,7 @@ export async function setupTurso(projectDir: string) {
 				}
 				s.stop("✅ Turso CLI installed successfully!");
 			} catch (error) {
-				s.stop("Failed to install Turso CLI");
+				s.stop(pc.red("Failed to install Turso CLI"));
 				throw error;
 			}
 		}
@@ -157,7 +154,7 @@ export async function setupTurso(projectDir: string) {
 				await $`turso auth login`;
 				s.stop("✅ Logged in to Turso successfully!");
 			} catch (error) {
-				s.stop("Failed to log in to Turso");
+				s.stop(pc.red("Failed to log in to Turso"));
 				throw error;
 			}
 		}
@@ -175,7 +172,7 @@ export async function setupTurso(projectDir: string) {
 			});
 
 			if (isCancel(dbNameResponse)) {
-				cancel("Operation cancelled");
+				cancel(pc.red("Operation cancelled"));
 				process.exit(0);
 			}
 
@@ -190,7 +187,7 @@ export async function setupTurso(projectDir: string) {
 				success = true;
 			} catch (error) {
 				if (error instanceof Error && error.message === "DATABASE_EXISTS") {
-					s.stop(`Database "${dbName}" already exists`);
+					s.stop(pc.yellow(`Database "${pc.red(dbName)}" already exists`));
 					suggestedName = `${dbName}-${Math.floor(Math.random() * 1000)}`;
 				} else {
 					throw error;
@@ -198,9 +195,9 @@ export async function setupTurso(projectDir: string) {
 			}
 		}
 	} catch (error) {
-		log.error(`Error during Turso setup: ${error}`);
+		log.error(pc.red(`Error during Turso setup: ${error}`));
 		await writeEnvFile(projectDir);
 		displayManualSetupInstructions();
-		outro("Setup completed with manual configuration required.");
+		log.success("Setup completed with manual configuration required.");
 	}
 }
