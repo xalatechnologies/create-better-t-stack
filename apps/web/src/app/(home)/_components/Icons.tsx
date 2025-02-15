@@ -18,6 +18,7 @@ const PackageIcon = ({ pm, className }: { pm: string; className?: string }) => {
 					strokeLinejoin="round"
 					strokeMiterlimit="2"
 				>
+					<title>yarn</title>
 					<path
 						d="M256 0c141.344 0 256 114.656 256 256S397.344 512 256 512 0 397.344 0 256 114.656 0 256 0z"
 						fill="#2c8ebb"
@@ -39,7 +40,7 @@ const PackageIcon = ({ pm, className }: { pm: string; className?: string }) => {
 					viewBox="0 0 32 32"
 					xmlns="http://www.w3.org/2000/svg"
 				>
-					<title>file_type_pnpm</title>
+					<title>pnpm</title>
 					<path d="M30,10.75H21.251V2H30Z" style={{ fill: "#f9ad00" }} />
 					<path d="M20.374,10.75h-8.75V2h8.75Z" style={{ fill: "#f9ad00" }} />
 					<path d="M10.749,10.75H2V2h8.749Z" style={{ fill: "#f9ad00" }} />
@@ -58,6 +59,7 @@ const PackageIcon = ({ pm, className }: { pm: string; className?: string }) => {
 					fill="none"
 					viewBox="0 0 100 100"
 				>
+					<title>bun</title>
 					<path
 						fill="#000"
 						d="M89.237 32.3c-.2-.213-.412-.425-.625-.625-.212-.2-.412-.425-.625-.625-.212-.2-.412-.425-.625-.625-.212-.2-.412-.425-.625-.625-.212-.2-.412-.425-.625-.625-.212-.2-.412-.425-.625-.625-.212-.2-.412-.425-.625-.625A33.08 33.08 0 0 1 94.75 51c0 20.712-21.025 37.562-46.875 37.562-14.475 0-27.425-5.287-36.038-13.575l.625.625.625.625.625.625.625.625.625.625.625.625.625.625c8.6 8.638 21.838 14.2 36.663 14.2 25.85 0 46.875-16.85 46.875-37.5 0-8.825-3.8-17.187-10.513-23.762"

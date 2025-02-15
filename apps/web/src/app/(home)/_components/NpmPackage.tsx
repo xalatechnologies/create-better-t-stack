@@ -5,20 +5,22 @@ import { useEffect, useState } from "react";
 const NpmPackage = () => {
 	const [version, setVersion] = useState("");
 
-	const getLatestVersion = async () => {
-		const res = await fetch(
-			"https://registry.npmjs.org/create-better-t-stack/latest",
-		);
-		const data = await res.json();
-		setVersion(data.version);
-	};
-
 	useEffect(() => {
+		const getLatestVersion = async () => {
+			const res = await fetch(
+				"https://registry.npmjs.org/create-better-t-stack/latest",
+			);
+			const data = await res.json();
+			setVersion(data.version);
+		};
 		getLatestVersion();
 	}, []);
 
 	return (
-		<button className="bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
+		<button
+			type="button"
+			className="bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block"
+		>
 			<span className="absolute inset-0 overflow-hidden rounded-full">
 				<span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 			</span>
@@ -31,6 +33,7 @@ const NpmPackage = () => {
 					width="16"
 					xmlns="http://www.w3.org/2000/svg"
 				>
+					<title>arrow</title>
 					<path
 						d="M10.75 8.75L14.25 12L10.75 15.25"
 						stroke="currentColor"

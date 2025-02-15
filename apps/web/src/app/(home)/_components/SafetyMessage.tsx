@@ -1,10 +1,5 @@
-
 const SafetyMessage = () => {
-  return (
-    <div className="relative">
+	return <div className="relative" />;
+};
 
-    </div>
-  )
-}
-
-export default SafetyMessage
+export default SafetyMessage;
