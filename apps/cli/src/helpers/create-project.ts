@@ -24,9 +24,7 @@ export async function createProject(options: ProjectConfig) {
 				title: "📥 Cloning template repository",
 				task: async () => {
 					try {
-						const emitter = degit("better-t-stack/Better-T-Stack#bare", {
-							cache: true,
-						});
+						const emitter = degit("better-t-stack/Better-T-Stack#bare");
 						await emitter.clone(projectDir);
 					} catch (error) {
 						log.error(pc.red("Failed to clone template repository"));
