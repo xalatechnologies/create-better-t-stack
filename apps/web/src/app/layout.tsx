@@ -12,7 +12,13 @@ export default function Layout({ children }: { children: ReactNode }) {
 	return (
 		<html lang="en" className={inter.className} suppressHydrationWarning>
 			<body className="flex flex-col min-h-screen relative bg-black">
-				<RootProvider>
+				<RootProvider
+					search={{
+						options: {
+							type: "static",
+						},
+					}}
+				>
 					<Navbar />
 					<div className="relative z-10 bg-zinc-50 dark:bg-zinc-950 pt-20 transition-colors duration-300  overflow-hidden">
 						<Suspense fallback={<LoadingSpinner />}>{children}</Suspense>

@@ -4,6 +4,9 @@
 	"scripts": {
 		"build": "turbo build",
 		"dev": "turbo dev",
+		"build:web": "turbo run build --filter=web",
+		"build:web:cloudflare": "bun install && bun run build:web",
+		"build:cli": "turbo run build --filter=cli",
 		"check": "turbo check",
 		"prepare": "husky",
 		"publish-packages": "turbo run build && changeset publish"
@@ -20,7 +23,7 @@
 		"*": ["biome check --write ."]
 	},
 	"engines": {
-		"node": ">=18"
+		"node": ">=20"
 	},
 	"packageManager": "bun@1.2.2",
 	"workspaces": ["apps/*"]
