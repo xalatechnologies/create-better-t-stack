@@ -4,6 +4,7 @@ import { Poppins } from "next/font/google";
 import React from "react";
 import BackgroundGradients from "./_components/BackgroundGradients";
 import CodeContainer from "./_components/CodeContainer";
+import Featured from "./_components/FeaturedSection";
 import NpmPackage from "./_components/NpmPackage";
 import SideCircles from "./_components/SideCircles";
 import Spotlight from "./_components/Spotlight";
@@ -61,7 +62,37 @@ export default function HomePage() {
 				</div>
 			</div>
 			<TerminalDisplay />
-			<TechConstellation />
+			<div className="w-full max-w-6xl mx-auto space-y-12 mt-12">
+				<div className="text-center space-y-6 relative z-10">
+					<h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-700 via-gray-100 to-stone-600 pb-2">
+						A Symphony of Modern Tech
+					</h2>
+					<div className="space-y-4 max-w-3xl mx-auto">
+						<p className="text-xl text-gray-300 leading-relaxed">
+							Carefully orchestrated stack of{" "}
+							<span className="text-blue-400 font-semibold">
+								cutting-edge technologies
+							</span>
+							, working in perfect harmony to deliver an exceptional development
+							experience.
+						</p>
+						<div className="flex flex-wrap justify-center gap-4 text-sm text-gray-400">
+							<span className="px-3 py-1 bg-gray-800/50 rounded-full hover:bg-gray-800 transition-colors">
+								End-to-end Type Safety
+							</span>
+							<span className="px-3 py-1 bg-gray-800/50 rounded-full hover:bg-gray-800 transition-colors">
+								Lightning Fast Performance
+							</span>
+							<span className="px-3 py-1 bg-gray-800/50 rounded-full hover:bg-gray-800 transition-colors">
+								Modern Development Tools
+							</span>
+						</div>
+					</div>
+					<div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-900/50 to-transparent -z-10 blur-xl" />
+				</div>
+				<TechConstellation />
+			</div>
+			<Featured />
 		</main>
 	);
 }

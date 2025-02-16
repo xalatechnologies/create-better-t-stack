@@ -56,7 +56,7 @@ const Navbar = () => {
 
 			<div
 				className={`flex items-center backdrop-blur-md bg-white/5 rounded-full border border-white/10 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
-					scrolled ? "w-[470px]" : "w-[335px]"
+					scrolled ? "w-[475px]" : "w-[335px]"
 				}`}
 			>
 				<div

@@ -1,13 +1,14 @@
 "use client";
 
 import { technologies } from "@/lib/constant";
-import { useEffect, useRef, useState } from "react";
+import { type JSX, useEffect, useRef, useState } from "react";
 
 type TechConstellationProp = {
 	fromRef: React.RefObject<HTMLElement>;
 	toRef: React.RefObject<HTMLElement>;
 	containerRef: React.RefObject<HTMLElement>;
 	delay?: number;
+	curveDirection?: number;
 };
 
 const AnimatedBeam = ({
@@ -15,6 +16,7 @@ const AnimatedBeam = ({
 	toRef,
 	containerRef,
 	delay = 0,
+	curveDirection = 50,
 }: TechConstellationProp) => {
 	const [path, setPath] = useState("");
 
@@ -32,14 +34,14 @@ const AnimatedBeam = ({
 			const toY = toRect.top - containerRect.top + toRect.height / 2;
 
 			setPath(
-				`M ${fromX},${fromY} Q ${(fromX + toX) / 2},${(fromY + toY) / 2 - 50} ${toX},${toY}`,
+				`M ${fromX},${fromY} Q ${(fromX + toX) / 2},${(fromY + toY) / 2 - curveDirection} ${toX},${toY}`,
 			);
 		};
 
 		updatePath();
 		window.addEventListener("resize", updatePath);
 		return () => window.removeEventListener("resize", updatePath);
-	}, [fromRef, toRef, containerRef]);
+	}, [fromRef, toRef, containerRef, curveDirection]);
 
 	return (
 		<svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
@@ -49,7 +51,7 @@ const AnimatedBeam = ({
 				fill="none"
 				stroke="url(#gradient)"
 				strokeWidth="2"
-				className="opacity-50"
+				className="opacity-30"
 			>
 				<animate
 					attributeName="stroke-dasharray"
@@ -76,6 +78,74 @@ const TechConstellation = () => {
 	const techRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 	const [isVisible, setIsVisible] = useState(false);
 
+	const calculateRadius = (category: string) => {
+		switch (category) {
+			case "core":
+				return 160;
+			case "frontend":
+			case "backend":
+				return 240;
+			default:
+				return 200;
+		}
+	};
+
+	const renderCategoryBeams = (category: string) => {
+		const categoryTechs = technologies.filter(
+			(tech) => tech.category === category,
+		);
+		const beams: JSX.Element[] = [];
+
+		if (category !== "core") {
+			categoryTechs.forEach((tech, index) => {
+				const curveDirection = tech.category === "frontend" ? 50 : -50;
+				beams.push(
+					<AnimatedBeam
+						key={`beam-center-${tech.name}`}
+						fromRef={centerRef as React.RefObject<HTMLElement>}
+						toRef={{ current: techRefs.current[tech.name] as HTMLElement }}
+						containerRef={containerRef as React.RefObject<HTMLElement>}
+						delay={index * 0.2}
+						curveDirection={curveDirection}
+					/>,
+				);
+			});
+		}
+
+		for (let i = 0; i < categoryTechs.length - 1; i++) {
+			const curveDirection = category === "frontend" ? 30 : -30;
+			beams.push(
+				<AnimatedBeam
+					key={`beam-${categoryTechs[i].name}-${categoryTechs[i + 1].name}`}
+					fromRef={{
+						current: techRefs.current[categoryTechs[i].name] as HTMLElement,
+					}}
+					toRef={{
+						current: techRefs.current[categoryTechs[i + 1].name] as HTMLElement,
+					}}
+					containerRef={containerRef as React.RefObject<HTMLElement>}
+					delay={(i + categoryTechs.length) * 0.2}
+					curveDirection={curveDirection}
+				/>,
+			);
+		}
+
+		if (category === "core") {
+			beams.push(
+				<AnimatedBeam
+					key="beam-core-connection"
+					fromRef={{ current: techRefs.current.Bun as HTMLElement }}
+					toRef={{ current: techRefs.current.tRPC as HTMLElement }}
+					containerRef={containerRef as React.RefObject<HTMLElement>}
+					delay={0}
+					curveDirection={0}
+				/>,
+			);
+		}
+
+		return beams;
+	};
+
 	useEffect(() => {
 		setIsVisible(true);
 	}, []);
@@ -83,17 +153,17 @@ const TechConstellation = () => {
 	return (
 		<div
 			ref={containerRef}
-			className="relative w-full h-screen bg-gradient-to-b from-transparent to-gray-950 overflow-hidden flex items-center justify-center"
+			className="relative w-full h-[90vh] bg-gradient-to-b from-transparent via-gray-950 to-transparent overflow-hidden flex items-center justify-center"
 		>
 			<div
 				ref={centerRef}
-				className={`absolute z-10 w-32 h-32 bg-blue-600 rounded-xl flex items-center justify-center transform transition-all duration-1000 ${isVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"}`}
+				className={`absolute z-10 w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center transform transition-all duration-1000 ${isVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"}`}
 			>
-				<span className="text-4xl font-bold text-white">TS</span>
+				<span className="text-3xl font-bold text-white">TS</span>
 			</div>
 
 			{technologies.map((tech, index) => {
-				const radius = 250;
+				const radius = calculateRadius(tech.category);
 				const x = Math.cos((tech.angle * Math.PI) / 180) * radius;
 				const y = Math.sin((tech.angle * Math.PI) / 180) * radius;
 
@@ -112,35 +182,32 @@ const TechConstellation = () => {
 						}}
 					>
 						<div
-							className={`w-16 h-16 ${tech.color} rounded-full flex items-center justify-center
+							className={`w-12 h-12 ${tech.color} rounded-full flex items-center justify-center
 																											transform hover:scale-125 transition-all duration-300 cursor-pointer
 																											shadow-lg hover:shadow-xl hover:rotate-12`}
 						>
-							<tech.icon className={`w-8 h-8 ${tech.textColor}`} />
+							<tech.icon className={`w-6 h-6 ${tech.textColor}`} />
 						</div>
 
 						<div
-							className="opacity-0 group-hover:opacity-100 absolute -top-12 left-1/2 transform -translate-x-1/2
-																										bg-gray-900 text-white px-4 py-2 rounded-lg shadow-xl transition-all duration-300
-																										whitespace-nowrap text-sm hover:scale-105"
+							className={`opacity-100 absolute ${tech.top ? tech.top : "-top-[48px]"} ${tech.left ? tech.left : "left-1/2"} transform -translate-x-1/2
+																										bg-gray-900 text-white px-3 py-1.5 rounded-lg shadow-xl transition-all duration-300
+																										whitespace-nowrap text-xs hover:scale-105`}
 						>
 							<strong>{tech.name}</strong>
-							<p className="text-gray-300 text-xs">{tech.description}</p>
+							<p className="text-gray-300 text-[10px]">{tech.description}</p>
 						</div>
 					</div>
 				);
 			})}
 
-			{isVisible &&
-				technologies.map((tech, index) => (
-					<AnimatedBeam
-						key={`beam-${tech.name}`}
-						fromRef={centerRef as React.RefObject<HTMLElement>}
-						toRef={{ current: techRefs.current[tech.name] as HTMLElement }}
-						containerRef={containerRef as React.RefObject<HTMLElement>}
-						delay={index * 0.2}
-					/>
-				))}
+			{isVisible && (
+				<>
+					{renderCategoryBeams("core")}
+					{renderCategoryBeams("frontend")}
+					{renderCategoryBeams("backend")}
+				</>
+			)}
 
 			<div className="absolute inset-0 overflow-hidden">
 				{[...Array(20)].map((_, i) => (
