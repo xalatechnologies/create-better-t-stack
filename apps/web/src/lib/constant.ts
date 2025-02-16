@@ -9,6 +9,7 @@ import {
 	ServerCog,
 	Workflow,
 } from "lucide-react";
+import type { TechNode } from "./types";
 
 export const technologies = [
 	{
@@ -101,5 +102,163 @@ export const technologies = [
 		textColor: "text-white",
 		description: "SQLite-compatible database engine",
 		left: "left-[6rem]",
+	},
+];
+
+export const initialNodes: TechNode[] = [
+	{
+		id: "bun",
+		type: "techNode",
+		position: { x: 536, y: 204 },
+		data: {
+			label: "Bun",
+			category: "core",
+			description: "Fast all-in-one JavaScript runtime",
+			isDefault: true,
+			isActive: true,
+		},
+	},
+	{
+		id: "tanstack",
+		type: "techNode",
+		position: { x: 362, y: 296 },
+		data: {
+			label: "TanStack Router",
+			category: "frontend",
+			description: "Type-safe routing",
+			isDefault: true,
+			isActive: true,
+			group: "router",
+		},
+	},
+	{
+		id: "tailwind",
+		type: "techNode",
+		position: { x: 494, y: 379 },
+		data: {
+			label: "Tailwind CSS",
+			category: "frontend",
+			description: "Utility-first CSS framework",
+			isDefault: true,
+			isActive: true,
+			isStatic: true,
+		},
+	},
+	{
+		id: "shadcn",
+		type: "techNode",
+		position: { x: 358, y: 486 },
+		data: {
+			label: "shadcn/ui",
+			category: "frontend",
+			description: "Re-usable components",
+			isDefault: true,
+			isActive: true,
+			isStatic: true,
+		},
+	},
+	{
+		id: "hono",
+		type: "techNode",
+		position: { x: 700, y: 325 },
+		data: {
+			label: "Hono",
+			category: "backend",
+			description: "Ultrafast web framework",
+			isDefault: true,
+			isActive: true,
+			group: "backend",
+		},
+	},
+	{
+		id: "express",
+		type: "techNode",
+		position: { x: 897, y: 389 },
+		data: {
+			label: "Express",
+			category: "backend",
+			description: "Fast, unopinionated web framework",
+			isDefault: false,
+			isActive: false,
+			group: "backend",
+		},
+	},
+	{
+		id: "libsql",
+		type: "techNode",
+		position: { x: 544, y: 532 },
+		data: {
+			label: "libSQL",
+			category: "database",
+			description: "SQLite-compatible database",
+			isDefault: true,
+			isActive: true,
+			group: "database",
+		},
+	},
+	{
+		id: "postgres",
+		type: "techNode",
+		position: { x: 318, y: 579 },
+		data: {
+			label: "PostgreSQL",
+			category: "database",
+			description: "Advanced SQL database",
+			isDefault: false,
+			isActive: false,
+			group: "database",
+		},
+	},
+	{
+		id: "drizzle",
+		type: "techNode",
+		position: { x: 559, y: 651 },
+		data: {
+			label: "Drizzle",
+			category: "orm",
+			description: "TypeScript ORM",
+			isDefault: true,
+			isActive: true,
+			group: "orm",
+		},
+	},
+	{
+		id: "prisma",
+		type: "techNode",
+		position: { x: 707, y: 675 },
+		data: {
+			label: "Prisma",
+			category: "orm",
+			description: "Next-generation ORM",
+			isDefault: false,
+			isActive: false,
+			group: "orm",
+		},
+	},
+	{
+		id: "better-auth",
+		type: "techNode",
+		position: { x: 770, y: 502 },
+		data: {
+			label: "Better-Auth",
+			category: "auth",
+			description: "Modern authentication",
+			isDefault: true,
+			isActive: true,
+			group: "auth",
+		},
+	},
+	{
+		id: "no-auth",
+		type: "techNode",
+		position: { x: 950, y: 621 },
+		data: {
+			label: "No Auth",
+			category: "auth",
+			description: "No authentication needed",
+			isDefault: false,
+			isActive: false,
+			group: "auth",
+		},
 	},
 ];

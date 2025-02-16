@@ -4,7 +4,8 @@ import { Poppins } from "next/font/google";
 import React from "react";
 import BackgroundGradients from "./_components/BackgroundGradients";
 import CodeContainer from "./_components/CodeContainer";
-import Featured from "./_components/FeaturedSection";
+import CustomizableSection from "./_components/CustomizableSection";
+// import Featured from "./_components/FeaturedSection";
 import NpmPackage from "./_components/NpmPackage";
 import SideCircles from "./_components/SideCircles";
 import Spotlight from "./_components/Spotlight";
@@ -62,6 +63,7 @@ export default function HomePage() {
 				</div>
 			</div>
 			<TerminalDisplay />
+
 			<div className="w-full max-w-6xl mx-auto space-y-12 mt-12">
 				<div className="text-center space-y-6 relative z-10">
 					<h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-700 via-gray-100 to-stone-600 pb-2">
@@ -90,9 +92,9 @@ export default function HomePage() {
 					</div>
 					<div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-900/50 to-transparent -z-10 blur-xl" />
 				</div>
-				<TechConstellation />
 			</div>
-			<Featured />
+			<TechConstellation />
+			<CustomizableSection />
 		</main>
 	);
 }

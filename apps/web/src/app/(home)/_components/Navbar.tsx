@@ -56,7 +56,7 @@ const Navbar = () => {
 
 			<div
 				className={`flex items-center backdrop-blur-md bg-white/5 rounded-full border border-white/10 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
-					scrolled ? "w-[475px]" : "w-[335px]"
+					scrolled ? "w-[480px]" : "w-[335px]"
 				}`}
 			>
 				<div
@@ -126,7 +126,7 @@ const Navbar = () => {
 					style={{
 						transform: scrolled ? "translateY(0)" : "translateY(-8px)",
 					}}
-					className={`text-gray-300 hover:text-white transition-all duration-300 py-2 px-4 rounded-full ${
+					className={`text-violet-700 hover:text-white transition-all duration-300 py-2 px-4 rounded-full ${
 						scrolled
 							? "opacity-100 translate-y-0"
 							: "opacity-0 pointer-events-none"

@@ -10,6 +10,8 @@
 		"postinstall": "fumadocs-mdx"
 	},
 	"dependencies": {
+		"@xyflow/react": "^12.4.3",
+		"framer-motion": "^12.4.3",
 		"fumadocs-core": "15.0.6",
 		"fumadocs-mdx": "11.5.3",
 		"fumadocs-ui": "15.0.6",
