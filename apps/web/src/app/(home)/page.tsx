@@ -1,3 +1,4 @@
+"use client";
 import ShinyText from "components/ShinyText/ShinyText";
 import { Poppins } from "next/font/google";
 import React from "react";
@@ -6,6 +7,8 @@ import CodeContainer from "./_components/CodeContainer";
 import NpmPackage from "./_components/NpmPackage";
 import SideCircles from "./_components/SideCircles";
 import Spotlight from "./_components/Spotlight";
+import TechConstellation from "./_components/TechConstellation";
+import TerminalDisplay from "./_components/Terminal";
 
 const poppins = Poppins({
 	subsets: ["latin"],
@@ -21,7 +24,7 @@ export default function HomePage() {
 			<BackgroundGradients />
 			<Spotlight />
 			<SideCircles />
-			<div className="max-w-6xl mx-auto text-center mb-16 relative z-50">
+			<div className="max-w-6xl mx-auto text-center mb-16 relative z-50 ">
 				<div className="relative z-10">
 					<div className="flex flex-col items-center justify-center space-y-4 text-center">
 						<NpmPackage />
@@ -57,6 +60,8 @@ export default function HomePage() {
 					<div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-3xl transform -skew-y-12" />
 				</div>
 			</div>
+			<TerminalDisplay />
+			<TechConstellation />
 		</main>
 	);
 }
