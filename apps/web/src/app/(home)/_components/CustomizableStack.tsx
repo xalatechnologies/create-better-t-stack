@@ -12,6 +12,7 @@ import { useCallback, useState } from "react";
 import { TechSelector } from "./TechSelector";
 import "@xyflow/react/dist/style.css";
 import { initialNodes } from "@/lib/constant";
+import { CommandDisplay } from "./CommandDisplay";
 import { TechNodeComponent } from "./TechNodeComponent";
 
 const initialEdges = [
@@ -136,10 +137,29 @@ const CustomizableStack = () => {
 		[nodes, edges, setEdges, setNodes],
 	);
 
+	const generateCommand = useCallback(() => {
+		const flags: string[] = ["-y"];
+
+		if (activeNodes.database !== "libsql") {
+			flags.splice(flags.indexOf("-y"), 1);
+			flags.push(`--database ${activeNodes.database}`);
+		}
+
+		if (activeNodes.auth !== "better-auth") {
+			flags.splice(flags.indexOf("-y"), 1);
+			flags.push("--no-auth");
+		}
+
+		return `npx create-better-t-stack my-app ${flags.join(" ")}`;
+	}, [activeNodes]);
+
 	return (
-		<div className="relative w-full max-w-5xl mx-auto z-50">
+		<div className="relative w-full max-w-5xl mx-auto z-50 mt-24">
 			<TechSelector onSelect={handleTechSelect} activeNodes={activeNodes} />
-			<div className="absolute top-4 right-4 z-50 max-w-xs bg-gray-950/10 p-4 rounded-xl border border-gray-800 backdrop-blur-3xl">
+			<div className="absolute -top-16 left-1/2 -translate-x-1/2 z-50 w-96">
+				<CommandDisplay command={generateCommand()} />
+			</div>
+			<div className="bg-gray-950/10 p-4 absolute top-4 right-4 z-50 w-96 rounded-xl border border-gray-800 backdrop-blur-3xl">
 				<div className="text-sm text-gray-300">
 					Select technologies from the left panel to customize your stack. The
 					graph will automatically update connections.
