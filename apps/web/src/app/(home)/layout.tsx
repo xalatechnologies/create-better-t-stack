@@ -2,6 +2,7 @@ import { baseOptions } from "@/app/layout.config";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import Navbar from "./_components/Navbar";
 
 export const metadata: Metadata = {
 	title: "Better-T-Stack",
@@ -9,5 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({ children }: { children: ReactNode }) {
-	return <HomeLayout {...baseOptions}>{children}</HomeLayout>;
+	return (
+		<HomeLayout {...baseOptions}>
+			<Navbar />
+			{children}
+		</HomeLayout>
+	);
 }

@@ -20,7 +20,7 @@ const poppins = Poppins({
 export default function HomePage() {
 	return (
 		<main
-			className="min-h-screen flex flex-col items-center justify-start p-8"
+			className="min-h-screen flex flex-col items-center justify-start p-8 pt-20"
 			style={poppins.style}
 		>
 			<BackgroundGradients />

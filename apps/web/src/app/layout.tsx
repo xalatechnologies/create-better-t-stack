@@ -1,8 +1,7 @@
 import "./global.css";
 import { RootProvider } from "fumadocs-ui/provider";
 import { Poppins } from "next/font/google";
-import { type ReactNode, Suspense } from "react";
-import Navbar from "./(home)/_components/Navbar";
+import type { ReactNode } from "react";
 
 const poppins = Poppins({
 	subsets: ["latin"],
@@ -20,20 +19,11 @@ export default function Layout({ children }: { children: ReactNode }) {
 						},
 					}}
 				>
-					<Navbar />
-					<div className="relative z-10 bg-zinc-50 dark:bg-zinc-950 pt-20 transition-colors duration-300  overflow-hidden">
-						<Suspense fallback={<LoadingSpinner />}>{children}</Suspense>
+					<div className="relative z-10 bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300  overflow-hidden">
+						{children}
 					</div>
 				</RootProvider>
 			</body>
 		</html>
-	);
-}
-
-function LoadingSpinner() {
-	return (
-		<div className="flex items-center justify-center min-h-[200px]">
-			<div className="w-8 h-8 border-4 border-zinc-300 border-t-zinc-800 rounded-full animate-spin" />
-		</div>
 	);
 }

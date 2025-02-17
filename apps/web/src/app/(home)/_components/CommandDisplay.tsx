@@ -18,7 +18,7 @@ export function CommandDisplay({ command }: CommandDisplayProps) {
 
 	return (
 		<div className="relative group">
-			<div className="bg-gray-950/90 border border-gray-800 rounded-lg p-4 font-mono text-sm text-gray-300 overflow-x-auto">
+			<div className="bg-gray-950/20 backdrop-blur-xl border border-gray-800 rounded-lg p-4 font-mono text-sm text-gray-300 overflow-x-auto">
 				<button
 					type="button"
 					onClick={copyToClipboard}
