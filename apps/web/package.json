@@ -11,6 +11,7 @@
 	},
 	"dependencies": {
 		"@xyflow/react": "^12.4.3",
+		"babel-plugin-react-compiler": "^19.0.0-beta-21e868a-20250216",
 		"framer-motion": "^12.4.3",
 		"fumadocs-core": "15.0.6",
 		"fumadocs-mdx": "11.5.3",

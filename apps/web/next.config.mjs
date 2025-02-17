@@ -6,6 +6,9 @@ const withMDX = createMDX();
 const config = {
 	reactStrictMode: true,
 	output: "export",
+	experimental: {
+		reactCompiler: true,
+	},
 };
 
 export default withMDX(config);
