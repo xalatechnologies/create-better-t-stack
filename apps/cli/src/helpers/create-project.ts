@@ -15,13 +15,13 @@ export async function createProject(options: ProjectConfig) {
 	try {
 		const tasksList = [
 			{
-				title: "📁 Creating project directory",
+				title: "Creating project directory",
 				task: async () => {
 					await fs.ensureDir(projectDir);
 				},
 			},
 			{
-				title: "📥 Cloning template repository",
+				title: "Cloning template repository",
 				task: async () => {
 					try {
 						const emitter = degit("better-t-stack/Better-T-Stack#bare");
@@ -39,7 +39,7 @@ export async function createProject(options: ProjectConfig) {
 
 		if (options.git) {
 			tasksList.push({
-				title: "🗃️ Initializing git repository",
+				title: "Initializing git repository",
 				task: async () => {
 					await $({
 						cwd: projectDir,
@@ -55,7 +55,7 @@ export async function createProject(options: ProjectConfig) {
 		}
 
 		const installDepsResponse = await confirm({
-			message: `📦 Install dependencies with ${pc.magenta(options.packageManager)}?`,
+			message: `Install dependencies with ${options.packageManager}?`,
 		});
 
 		if (isCancel(installDepsResponse)) {
@@ -66,14 +66,12 @@ export async function createProject(options: ProjectConfig) {
 		shouldInstallDeps = installDepsResponse;
 
 		if (shouldInstallDeps) {
-			s.start(
-				`📦 Installing dependencies using ${pc.magenta(options.packageManager)}...`,
-			);
+			s.start(`Installing dependencies using ${options.packageManager}...`);
 			try {
 				await $({
 					cwd: projectDir,
 				})`${options.packageManager} install`;
-				s.stop("✅ Dependencies installed successfully");
+				s.stop("Dependencies installed successfully");
 			} catch (error) {
 				s.stop(pc.red("Failed to install dependencies"));
 				if (error instanceof Error) {

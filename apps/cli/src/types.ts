@@ -2,6 +2,8 @@ export type ProjectFeature = "docker" | "github-actions" | "SEO";
 
 export type ProjectDatabase = "libsql" | "postgres";
 
+export type PackageManager = "npm" | "yarn" | "pnpm" | "bun";
+
 export type ProjectConfig = {
 	yes?: boolean;
 	projectName: string;
@@ -11,5 +13,3 @@ export type ProjectConfig = {
 	packageManager: PackageManager;
 	features: ProjectFeature[];
 };
-
-export type PackageManager = "npm" | "yarn" | "pnpm" | "bun";

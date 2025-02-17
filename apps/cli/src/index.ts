@@ -53,7 +53,7 @@ async function gatherConfig(
 
 				while (!isValid) {
 					const response = await text({
-						message: "📝 What is your project named? (directory name or path)",
+						message: "What is your project named? (directory name or path)",
 						placeholder: defaultName,
 						initialValue: flags.projectName,
 						defaultValue: defaultName,
@@ -87,7 +87,7 @@ async function gatherConfig(
 				flags.database !== undefined
 					? Promise.resolve(flags.database)
 					: select<ProjectDatabase>({
-							message: "💾 Which database would you like to use?",
+							message: "Which database would you like to use?",
 							options: [
 								{
 									value: "libsql",
@@ -105,15 +105,14 @@ async function gatherConfig(
 				flags.auth !== undefined
 					? Promise.resolve(flags.auth)
 					: confirm({
-							message:
-								"🔐 Would you like to add authentication with Better-Auth?",
+							message: "Would you like to add authentication with Better-Auth?",
 							initialValue: DEFAULT_CONFIG.auth,
 						}),
 			features: () =>
 				flags.features !== undefined
 					? Promise.resolve(flags.features)
 					: multiselect<ProjectFeature>({
-							message: "✨ Which features would you like to add?",
+							message: "Which features would you like to add?",
 							options: [
 								{
 									value: "docker",
@@ -137,7 +136,7 @@ async function gatherConfig(
 				flags.git !== undefined
 					? Promise.resolve(flags.git)
 					: confirm({
-							message: "🗃️ Initialize a new git repository?",
+							message: "Initialize a new git repository?",
 							initialValue: DEFAULT_CONFIG.git,
 						}),
 			packageManager: async () => {
@@ -147,13 +146,13 @@ async function gatherConfig(
 				const detectedPackageManager = getUserPkgManager();
 
 				const useDetected = await confirm({
-					message: `📦 Use ${detectedPackageManager} as your package manager?`,
+					message: `Use ${detectedPackageManager} as your package manager?`,
 				});
 
 				if (useDetected) return detectedPackageManager;
 
 				return select<PackageManager>({
-					message: "📦 Which package manager would you like to use?",
+					message: "Which package manager would you like to use?",
 					options: [
 						{ value: "npm", label: "npm", hint: "Node Package Manager" },
 						{
@@ -198,25 +197,23 @@ function displayConfig(config: Partial<ProjectConfig>) {
 	const configDisplay = [];
 
 	if (config.projectName) {
-		configDisplay.push(`${pc.blue("📝 Project Name:")} ${config.projectName}`);
+		configDisplay.push(`${pc.blue("Project Name:")} ${config.projectName}`);
 	}
 	if (config.database) {
-		configDisplay.push(`${pc.blue("💾 Database:")} ${config.database}`);
+		configDisplay.push(`${pc.blue("Database:")} ${config.database}`);
 	}
 	if (config.auth !== undefined) {
-		configDisplay.push(`${pc.blue("🔐 Authentication:")} ${config.auth}`);
+		configDisplay.push(`${pc.blue("Authentication:")} ${config.auth}`);
 	}
 	if (config.features?.length) {
-		configDisplay.push(
-			`${pc.blue("✨ Features:")} ${config.features.join(", ")}`,
-		);
+		configDisplay.push(`${pc.blue("Features:")} ${config.features.join(", ")}`);
 	}
 	if (config.git !== undefined) {
-		configDisplay.push(`${pc.blue("🗃️ Git Init:")} ${config.git}`);
+		configDisplay.push(`${pc.blue("Git Init:")} ${config.git}`);
 	}
 	if (config.packageManager) {
 		configDisplay.push(
-			`${pc.blue("📦 Package Manager:")} ${config.packageManager}`,
+			`${pc.blue("Package Manager:")} ${config.packageManager}`,
 		);
 	}
 
@@ -228,7 +225,7 @@ async function main() {
 	try {
 		process.stdout.write("\x1Bc");
 		renderTitle();
-		intro(pc.magenta("✨ Creating a new Better-T-Stack project"));
+		intro(pc.magenta("Creating a new Better-T-Stack project"));
 		program
 			.name("create-better-t-stack")
 			.description("Create a new Better-T Stack project")
@@ -280,7 +277,7 @@ async function main() {
 			!options.yes &&
 			Object.values(flagConfig).some((v) => v !== undefined)
 		) {
-			log.info(pc.yellow("🎯 Using these pre-selected options:"));
+			log.info(pc.yellow("Using these pre-selected options:"));
 			log.message(displayConfig(flagConfig));
 			log.message("");
 		}
@@ -304,7 +301,7 @@ async function main() {
 			: await gatherConfig(flagConfig);
 
 		if (options.yes) {
-			log.info(pc.yellow("🎯 Using these default options:"));
+			log.info(pc.yellow("Using these default options:"));
 			log.message(displayConfig(config));
 			log.message("");
 		}
@@ -319,7 +316,7 @@ async function main() {
 			),
 		);
 
-		outro(pc.magenta("🎉 Project created successfully!"));
+		outro(pc.magenta("Project created successfully!"));
 	} catch (error) {
 		s.stop(pc.red("Failed"));
 		if (error instanceof Error) {

@@ -1,14 +1,6 @@
 import os from "node:os";
 import path from "node:path";
-import {
-	cancel,
-	confirm,
-	isCancel,
-	log,
-	outro,
-	spinner,
-	text,
-} from "@clack/prompts";
+import { cancel, confirm, isCancel, log, spinner, text } from "@clack/prompts";
 import { $ } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
@@ -22,9 +14,9 @@ interface TursoConfig {
 async function loginToTurso() {
 	const s = spinner();
 	try {
-		s.start("🔄 Logging in to Turso...");
+		s.start("Logging in to Turso...");
 		await $`turso auth login`;
-		s.stop("✅ Logged in to Turso successfully!");
+		s.stop("Logged in to Turso successfully!");
 	} catch (error) {
 		s.stop(pc.red("Failed to log in to Turso"));
 		throw error;
@@ -34,7 +26,7 @@ async function loginToTurso() {
 async function installTursoCLI(isMac: boolean) {
 	const s = spinner();
 	try {
-		s.start("🔄 Installing Turso CLI...");
+		s.start("Installing Turso CLI...");
 
 		if (isMac) {
 			await $`brew install tursodatabase/tap/turso`;
@@ -44,7 +36,7 @@ async function installTursoCLI(isMac: boolean) {
 			await $`bash -c '${installScript}'`;
 		}
 
-		s.stop("✅ Turso CLI installed successfully!");
+		s.stop("Turso CLI installed successfully!");
 	} catch (error) {
 		if (error instanceof Error && error.message.includes("User force closed")) {
 			s.stop();
@@ -87,7 +79,7 @@ TURSO_AUTH_TOKEN=`;
 }
 
 function displayManualSetupInstructions() {
-	log.info(`🔧 Manual Turso Setup Instructions:
+	log.info(`Manual Turso Setup Instructions:
 
 1. Visit https://turso.tech and create an account
 2. Create a new database from the dashboard
@@ -115,7 +107,7 @@ export async function setupTurso(projectDir: string) {
 
 		if (!isCliInstalled) {
 			const shouldInstall = await confirm({
-				message: "🔧 Would you like to install Turso CLI?",
+				message: "Would you like to install Turso CLI?",
 			});
 
 			if (isCancel(shouldInstall)) {
@@ -130,7 +122,7 @@ export async function setupTurso(projectDir: string) {
 			}
 
 			const s = spinner();
-			s.start("🔄 Installing Turso CLI...");
+			s.start("Installing Turso CLI...");
 			try {
 				if (isMac) {
 					await $`brew install tursodatabase/tap/turso`;
@@ -139,7 +131,7 @@ export async function setupTurso(projectDir: string) {
 						await $`curl -sSfL https://get.tur.so/install.sh`;
 					await $`bash -c '${installScript}'`;
 				}
-				s.stop("✅ Turso CLI installed successfully!");
+				s.stop("Turso CLI installed successfully!");
 			} catch (error) {
 				s.stop(pc.red("Failed to install Turso CLI"));
 				throw error;
@@ -149,10 +141,10 @@ export async function setupTurso(projectDir: string) {
 		const isLoggedIn = await isTursoLoggedIn();
 		if (!isLoggedIn) {
 			const s = spinner();
-			s.start("🔄 Logging in to Turso...");
+			s.start("Logging in to Turso...");
 			try {
 				await $`turso auth login`;
-				s.stop("✅ Logged in to Turso successfully!");
+				s.stop("Logged in to Turso successfully!");
 			} catch (error) {
 				s.stop(pc.red("Failed to log in to Turso"));
 				throw error;
@@ -165,7 +157,7 @@ export async function setupTurso(projectDir: string) {
 
 		while (!success) {
 			const dbNameResponse = await text({
-				message: "📝 Enter a name for your database:",
+				message: "Enter a name for your database:",
 				defaultValue: suggestedName,
 				initialValue: suggestedName,
 				placeholder: suggestedName,
@@ -180,10 +172,10 @@ export async function setupTurso(projectDir: string) {
 			const s = spinner();
 
 			try {
-				s.start(`🔄 Creating Turso database "${dbName}"...`);
+				s.start(`Creating Turso database "${dbName}"...`);
 				const config = await createTursoDatabase(dbName);
 				await writeEnvFile(projectDir, config);
-				s.stop("✅ Turso database configured successfully!");
+				s.stop("Turso database configured successfully!");
 				success = true;
 			} catch (error) {
 				if (error instanceof Error && error.message === "DATABASE_EXISTS") {

@@ -13,7 +13,7 @@
 		"url": "git+https://github.com/better-t-stack/create-better-t-stack.git",
 		"directory": "apps/cli"
 	},
-	"homepage": "https://github.com/better-t-stack/create-better-t-stack/tree/main/apps/cli#readme",
+	"homepage": "https://better-t-stack.pages.dev/",
 	"scripts": {
 		"build": "tsup",
 		"dev": "tsup --watch",
