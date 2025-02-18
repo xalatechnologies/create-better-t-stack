@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: { children: ReactNode }) {
 	return (
-		<main className="relative z-10 min-h-svh bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300 overflow-hidden">
+		<main className="relative z-10 min-h-svh bg-zinc-50 dark:bg-slate-950 transition-colors duration-300 overflow-hidden">
 			<Navbar />
 			{children}
 			<Footer />
