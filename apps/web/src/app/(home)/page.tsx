@@ -5,12 +5,12 @@ import React from "react";
 import BackgroundGradients from "./_components/BackgroundGradients";
 import CodeContainer from "./_components/CodeContainer";
 import CustomizableSection from "./_components/CustomizableSection";
-// import Featured from "./_components/FeaturedSection";
 import NpmPackage from "./_components/NpmPackage";
 import SideCircles from "./_components/SideCircles";
 import Spotlight from "./_components/Spotlight";
 import TechConstellation from "./_components/TechConstellation";
 import TerminalDisplay from "./_components/Terminal";
+import Testimonials from "./_components/Testimonials";
 
 const poppins = Poppins({
 	subsets: ["latin"],
@@ -20,7 +20,7 @@ const poppins = Poppins({
 export default function HomePage() {
 	return (
 		<main
-			className="min-h-screen flex flex-col items-center justify-start sm:p-8 p-4 pt-20"
+			className="min-h-screen flex flex-col items-center justify-start sm:p-8 p-4 !pt-20"
 			style={poppins.style}
 		>
 			<BackgroundGradients />
@@ -95,6 +95,7 @@ export default function HomePage() {
 			</div>
 			<TechConstellation />
 			<CustomizableSection />
+			<Testimonials />
 		</main>
 	);
 }
