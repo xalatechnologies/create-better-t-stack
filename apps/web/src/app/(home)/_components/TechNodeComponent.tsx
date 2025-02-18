@@ -33,11 +33,13 @@ export function TechNodeComponent({ data }: { data: TechNodeData }) {
 
 	return (
 		<div className="relative group">
-			<Handle
-				type="target"
-				position={Position.Top}
-				className="!w-1.5 !h-1.5 !bg-indigo-400/70"
-			/>
+			{data.label !== "Bun" && (
+				<Handle
+					type="target"
+					position={Position.Top}
+					className="!w-1.5 !h-1.5 !bg-indigo-400/70"
+				/>
+			)}
 
 			<div className={`${baseStyles} ${activeStyles} backdrop-blur-3xl`}>
 				<div className="text-white font-medium text-sm tracking-wide mb-1.5">
