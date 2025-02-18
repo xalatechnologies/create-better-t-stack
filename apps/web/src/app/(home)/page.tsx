@@ -31,7 +31,7 @@ export default function HomePage() {
 					<div className="flex flex-col items-center justify-center space-y-4 text-center">
 						<NpmPackage />
 						<h1 className="text-6xl font-extrabold text-white">
-							<span className="block text-7xl bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-400 to-yellow-200">
+							<span className="block sm:text-7xl text-6xl bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-400 to-yellow-200">
 								Better-T Stack
 							</span>
 							<span className="relative">
@@ -39,7 +39,7 @@ export default function HomePage() {
 							</span>
 						</h1>
 
-						<p className="text-2xl font-medium text-gray-300 max-w-2xl">
+						<p className="sm:text-2xl text-xl font-medium text-gray-300 max-w-2xl">
 							<span className="inline-block transform hover:scale-105 transition-transform duration-200">
 								Scaffold
 							</span>{" "}
@@ -54,7 +54,7 @@ export default function HomePage() {
 						<ShinyText
 							text="Be the safest developer with typesafe Typescript"
 							speed={3}
-							className="text-lg"
+							className="sm:text-lg text-md"
 						/>
 					</div>
 				</div>
@@ -64,7 +64,7 @@ export default function HomePage() {
 			</div>
 			<TerminalDisplay />
 
-			<div className="w-full max-w-6xl mx-auto space-y-12 mt-12">
+			<div className="w-full max-w-6xl mx-auto space-y-12 mt-12 relative z-50">
 				<div className="text-center space-y-6 relative z-10">
 					<h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-700 via-gray-100 to-stone-600 pb-2">
 						A Symphony of Modern Tech

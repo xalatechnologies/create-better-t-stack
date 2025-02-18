@@ -41,14 +41,14 @@ const Navbar = () => {
 
 	return (
 		<nav
-			className={`fixed top-0 left-0 z-[100] w-screen px-8 py-5 flex items-center justify-between transition-all duration-300 ${
+			className={`fixed top-0 left-0 z-[100] w-screen px-8 py-5 flex items-center sm:justify-between justify-center transition-all duration-300 ${
 				scrolled
 					? "bg-transparent border-transparent"
-					: "bg-black/10 backdrop-blur-xl border-b border-white/10"
+					: "sm:bg-black/10 sm:backdrop-blur-xl sm:border-b border-white/10"
 			}`}
 		>
 			<div
-				className={`flex items-center space-x-2 transition-opacity duration-300 ${scrolled ? "opacity-0" : "opacity-100"}`}
+				className={`max-md:hidden flex items-center space-x-2 transition-opacity duration-300 ${scrolled ? "opacity-0" : "opacity-100"}`}
 			>
 				<div className="bg-gradient-to-br from-purple-500 via-pink-400 to-yellow-200 w-8 h-8 rounded-lg flex items-center justify-center">
 					<div className="bg-white w-4 h-4 rounded-sm" />
@@ -58,7 +58,7 @@ const Navbar = () => {
 
 			<div
 				className={`flex items-center backdrop-blur-md bg-white/5 rounded-full border border-white/10 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
-					scrolled ? "w-[420px]" : "w-[280px]"
+					scrolled ? "w-[420px]" : "sm:w-[280px] w-[350px]"
 				}`}
 			>
 				<div
@@ -85,7 +85,8 @@ const Navbar = () => {
 					onMouseLeave={() => setActiveLink("home")}
 					className="text-gray-300 hover:text-white transition-colors py-2 px-4 rounded-full relative flex gap-2 items-center"
 				>
-					<PackageIcon pm="github" className="w-4 h-4" /> Github
+					<PackageIcon pm="github" className="w-4 h-4" />{" "}
+					<span className="max-sm:hidden">Github</span>
 				</Link>
 				<Link
 					href="https://www.npmjs.com/package/create-better-t-stack"
@@ -97,7 +98,8 @@ const Navbar = () => {
 					onMouseLeave={() => setActiveLink("home")}
 					className="text-gray-300 hover:text-white transition-colors py-2 px-4 rounded-full relative flex gap-2 items-center"
 				>
-					<PackageIcon pm="npm" className="w-4 h-4 rounded-full" /> Npm
+					<PackageIcon pm="npm" className="w-4 h-4 rounded-full" />{" "}
+					<span className="max-sm:hidden">Npm</span>
 				</Link>
 				<span
 					className="text-gray-500 transition-all duration-300"
@@ -116,12 +118,12 @@ const Navbar = () => {
 					onMouseOver={() => setActiveLink("documentation")}
 					onMouseLeave={() => setActiveLink("home")}
 					style={{
-						transform: scrolled ? "translateY(0)" : "translateY(-8px)",
+						transform: scrolled ? "translateY(0)" : "sm:translateY(-8px)",
 					}}
 					className={` hover:text-white transition-all duration-300 py-2 px-4 rounded-full ${
 						scrolled
-							? "opacity-100 translate-y-0"
-							: "opacity-0 pointer-events-none"
+							? "sm:opacity-100 sm:translate-y-0"
+							: "sm:opacity-0 sm:pointer-events-none"
 					}`}
 				>
 					Documentation
@@ -135,7 +137,7 @@ const Navbar = () => {
 			>
 				<button
 					type="button"
-					className="relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
+					className="relative max-sm:hidden inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
 				>
 					<span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
 					<span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-6 py-px text-sm font-medium text-white backdrop-blur-3xl">

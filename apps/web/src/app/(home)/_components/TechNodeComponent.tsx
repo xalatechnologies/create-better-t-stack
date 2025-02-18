@@ -20,7 +20,7 @@ interface TechNodeData {
 
 export function TechNodeComponent({ data }: { data: TechNodeData }) {
 	const baseStyles = `
-    relative px-5 py-4 rounded-lg
+    relative lg:px-5 lg:py-4 px-3 py-1 rounded-lg
     transition-all duration-300
     border border-white/20
     before:content-[''] before:absolute before:left-0 before:top-0 before:w-1.5 before:h-full
@@ -37,19 +37,19 @@ export function TechNodeComponent({ data }: { data: TechNodeData }) {
 				<Handle
 					type="target"
 					position={Position.Top}
-					className="!w-1.5 !h-1.5 !bg-indigo-400/70"
+					className="!w-2 !h-2 !bg-indigo-400/70"
 				/>
 			)}
 
 			<div className={`${baseStyles} ${activeStyles} backdrop-blur-3xl`}>
-				<div className="text-white font-medium text-sm tracking-wide mb-1.5">
+				<div className="text-white font-medium lg:text-sm text-xs tracking-wide lg:mb-1.5 mb-1">
 					{data.label}
 				</div>
-				<div className="text-[11px] leading-relaxed text-white/80">
+				<div className="lg:text-[11px] text-[9px] leading-relaxed text-white/80">
 					{data.description}
 				</div>
 				{!data.isDefault && !data.isStatic && (
-					<div className="text-[10px] text-indigo-200/70 mt-2 italic">
+					<div className="lg:text-[10px] text-[8px] text-indigo-200/70 mt-2 italic">
 						Alternative Option
 					</div>
 				)}
@@ -58,7 +58,7 @@ export function TechNodeComponent({ data }: { data: TechNodeData }) {
 			<Handle
 				type="source"
 				position={Position.Bottom}
-				className="!w-1.5 !h-1.5 !bg-indigo-400/70"
+				className="!w-2 !h-2 !bg-indigo-400/70"
 			/>
 		</div>
 	);

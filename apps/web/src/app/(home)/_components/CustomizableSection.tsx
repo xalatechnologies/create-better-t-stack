@@ -3,7 +3,7 @@ import CustomizableStack from "./CustomizableStack";
 
 export default function CustomizableSection() {
 	return (
-		<section className="w-full max-w-6xl mx-auto space-y-12 mt-24 relative">
+		<section className="w-full max-w-6xl mx-auto space-y-12 mt-24 relative z-50">
 			<div className="text-center space-y-6 relative z-10">
 				<motion.h2
 					initial={{ opacity: 0, y: 20 }}

@@ -22,7 +22,7 @@ const TerminalDisplay = () => {
   `;
 
 	return (
-		<div className="max-w-6xl mx-auto p-6 mt-12">
+		<div className="max-w-6xl mx-auto p-6 mt-12 relative z-50">
 			<div className="bg-gray-900/30 backdrop-blur-3xl rounded-lg shadow-xl overflow-hidden">
 				<div className="bg-gray-800/30 backdrop-blur-3xl px-4 py-2 flex items-center">
 					<div className="flex space-x-2">

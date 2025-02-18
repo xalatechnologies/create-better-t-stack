@@ -43,7 +43,7 @@ const CodeContainer = () => {
 			<div className="relative group">
 				<div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg backdrop-blur-lg opacity-25 transition duration-1000 group-hover:duration-200" />
 				<div className="relative rounded-lg p-1 bg-slate-900/30 backdrop-blur-xl">
-					<div className="p-4 font-mono text-gray-300 text-sm bg-black/20 rounded-lg flex items-center justify-between">
+					<div className="sm:p-4 p-2 font-mono text-gray-300 text-sm bg-black/20 rounded-lg flex items-center justify-between">
 						<div className="flex items-center gap-2">
 							<ChevronRight />
 							<span className="text-base bg-clip-text text-transparent bg-gradient-to-br from-purple-400 via-pink-400 to-yellow-400">
