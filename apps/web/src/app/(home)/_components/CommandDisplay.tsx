@@ -30,7 +30,7 @@ export function CommandDisplay({ command }: CommandDisplayProps) {
 						<Copy className="w-4 h-4 text-gray-400" />
 					)}
 				</button>
-				<pre className="pr-12">{command}</pre>
+				<pre className="pr-12 max-sm:text-xs">{command}</pre>
 			</div>
 		</div>
 	);

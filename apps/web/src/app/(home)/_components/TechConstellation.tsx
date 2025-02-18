@@ -153,7 +153,7 @@ const TechConstellation = () => {
 	return (
 		<div
 			ref={containerRef}
-			className="relative z-50 w-full h-[90vh] bg-gradient-to-b from-transparent mt-8 via-gray-950 to-transparent overflow-hidden flex items-center justify-center"
+			className="relative z-50 w-full h-[90vh] bg-gradient-to-b from-transparent mt-8 via-gray-950 to-transparent overflow-auto flex items-center justify-center "
 		>
 			<div
 				ref={centerRef}

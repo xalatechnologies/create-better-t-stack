@@ -26,7 +26,7 @@ interface TechSelectorProps {
 
 export function TechSelector({ onSelect, activeNodes }: TechSelectorProps) {
 	return (
-		<div className="absolute top-4 left-4 z-50 space-y-4 bg-gray-950/10 p-4 rounded-xl border border-gray-800 backdrop-blur-3xl">
+		<div className="absolute max-sm:w-11/12 top-4 left-4 z-50 sm:space-y-4 space-y-2 bg-gray-950/10 sm:p-4 px-4 py-2 rounded-xl border border-gray-800 backdrop-blur-3xl">
 			<div className="text-sm font-medium text-gray-200">Customize Stack</div>
 			{Object.entries(techOptions).map(([category, options]) => (
 				<div key={category} className="space-y-2">

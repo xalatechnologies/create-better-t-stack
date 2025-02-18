@@ -20,7 +20,7 @@ const poppins = Poppins({
 export default function HomePage() {
 	return (
 		<main
-			className="min-h-screen flex flex-col items-center justify-start p-8 pt-20"
+			className="min-h-screen flex flex-col items-center justify-start sm:p-8 p-4 pt-20"
 			style={poppins.style}
 		>
 			<BackgroundGradients />
@@ -66,11 +66,11 @@ export default function HomePage() {
 
 			<div className="w-full max-w-6xl mx-auto space-y-12 mt-12 relative z-50">
 				<div className="text-center space-y-6 relative z-10">
-					<h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-700 via-gray-100 to-stone-600 pb-2">
+					<h2 className="sm:text-4xl text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-700 via-gray-100 to-stone-600 pb-2">
 						A Symphony of Modern Tech
 					</h2>
 					<div className="space-y-4 max-w-3xl mx-auto">
-						<p className="text-xl text-gray-300 leading-relaxed">
+						<p className="sm:text-xl text-gray-300 leading-relaxed">
 							Carefully orchestrated stack of{" "}
 							<span className="text-blue-400 font-semibold">
 								cutting-edge technologies
@@ -78,7 +78,7 @@ export default function HomePage() {
 							, working in perfect harmony to deliver an exceptional development
 							experience.
 						</p>
-						<div className="flex flex-wrap justify-center gap-4 text-sm text-gray-400">
+						<div className="flex flex-wrap justify-center sm:gap-4 gap-2 sm:text-sm text-xs text-gray-400">
 							<span className="px-3 py-1 bg-gray-800/50 rounded-full hover:bg-gray-800 transition-colors">
 								End-to-end Type Safety
 							</span>

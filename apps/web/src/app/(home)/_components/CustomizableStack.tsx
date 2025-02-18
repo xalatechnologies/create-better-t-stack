@@ -7,7 +7,7 @@ import {
 	useEdgesState,
 	useNodesState,
 } from "@xyflow/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TechSelector } from "./TechSelector";
 import "@xyflow/react/dist/style.css";
 import { initialNodes } from "@/lib/constant";
@@ -47,6 +47,23 @@ const CustomizableStack = () => {
 		orm: "drizzle",
 		auth: "better-auth",
 	});
+	const [windowSize, setWindowSize] = useState("lg");
+
+	useEffect(() => {
+		const handleResize = () => {
+			if (window.innerWidth < 1024 && window.innerWidth > 768) {
+				setWindowSize("md");
+			} else if (window.innerWidth < 768) {
+				setWindowSize("sm");
+			} else {
+				setWindowSize("lg");
+			}
+		};
+
+		handleResize();
+		window.addEventListener("resize", handleResize);
+		return () => window.removeEventListener("resize", handleResize);
+	}, []);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const cleanupConnectionsByCategory = useCallback((category: string) => {
@@ -262,17 +279,17 @@ const CustomizableStack = () => {
 	return (
 		<div className="relative w-full max-w-5xl mx-auto z-50 mt-24">
 			<TechSelector onSelect={handleTechSelect} activeNodes={activeNodes} />
-			<div className="absolute -top-16 left-1/2 -translate-x-1/2 z-50 w-96">
+			<div className="absolute -top-16 left-1/2 max-sm:left-[60%] -translate-x-1/2 z-50 w-96">
 				<CommandDisplay command={generateCommand()} />
 			</div>
-			<div className="bg-gray-950/10 lg:p-4 p-1 absolute lg:top-4 top-2 lg:right-4 right-2 z-50 w-80 rounded-xl border border-gray-800 backdrop-blur-3xl">
+			<div className="max-sm:hidden bg-gray-950/10 lg:p-4 p-1 absolute lg:top-4 top-2 lg:right-4 right-2 z-50 w-80 rounded-xl border border-gray-800 backdrop-blur-3xl">
 				<div className="lg:text-sm text-xs text-gray-300 text-center">
 					Select technologies from the left panel to customize your stack. The
 					graph will automatically update connections.
 				</div>
 			</div>
 			<div className="absolute inset-0 backdrop-blur-3xl bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-xl" />
-			<div className="h-[600px] lg:pl-28 relative backdrop-blur-sm bg-gray-950/50 rounded-xl overflow-hidden border border-gray-800">
+			<div className="h-[600px] lg:pl-28 max-sm:pt-36  relative backdrop-blur-sm bg-gray-950/50 rounded-xl overflow-hidden border border-gray-800">
 				<ReactFlow
 					nodes={nodes}
 					edges={edges}
@@ -281,8 +298,8 @@ const CustomizableStack = () => {
 					onConnect={onConnect}
 					nodeTypes={nodeTypes}
 					fitView
-					minZoom={1}
-					maxZoom={1}
+					// minZoom={1}
+					maxZoom={windowSize === "sm" ? 0.6 : windowSize === "md" ? 0.6 : 1}
 					zoomOnScroll={false}
 					zoomOnPinch={false}
 					preventScrolling={false}
