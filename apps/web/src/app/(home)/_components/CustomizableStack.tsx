@@ -2,8 +2,6 @@
 
 import {
 	Background,
-	type Connection,
-	type Edge,
 	ReactFlow,
 	useEdgesState,
 	useNodesState,
@@ -66,76 +64,73 @@ const CustomizableStack = () => {
 					},
 				})),
 			);
-
-			const sourceNodes = nodes.filter(
-				(n) => n.data.isActive && !n.data.isStatic,
-			);
-			const targetNode = nodes.find((n) => n.id === techId);
-
-			if (!targetNode) return;
-
 			setEdges((eds) =>
-				eds.filter(
-					(edge) =>
-						!nodes.some(
-							(n) =>
-								n.data.category === category &&
-								(edge.source === n.id || edge.target === n.id),
-						),
-				),
+				eds.filter((edge) => {
+					const targetNode = nodes.find((n) => n.id === edge.target);
+					const sourceNode = nodes.find((n) => n.id === edge.source);
+					return !(
+						targetNode?.data.category === category ||
+						sourceNode?.data.category === category
+					);
+				}),
 			);
 
-			setEdges((eds) => [
-				...eds,
-				...sourceNodes.map((source) => ({
-					id: `${source.id}-${techId}`,
-					source: source.id,
-					target: techId,
-					animated: true,
-				})),
-			]);
+			if (category === "database") {
+				const honoNode = nodes.find((n) => n.id === "hono");
+				const ormNode = nodes.find(
+					(n) => n.data.category === "orm" && n.data.isActive,
+				);
+
+				if (honoNode && ormNode) {
+					setEdges((eds) => [
+						...eds,
+						{
+							id: `hono-${techId}`,
+							source: "hono",
+							target: techId,
+							animated: true,
+						},
+						{
+							id: `${techId}-${ormNode.id}`,
+							source: techId,
+							target: ormNode.id,
+							animated: true,
+						},
+					]);
+				}
+			} else if (category === "auth") {
+				setEdges((eds) => [
+					...eds,
+					{
+						id: `hono-${techId}`,
+						source: "hono",
+						target: techId,
+						animated: true,
+					},
+				]);
+			} else if (category === "orm") {
+				const dbNode = nodes.find(
+					(n) => n.data.category === "database" && n.data.isActive,
+				);
+				if (dbNode) {
+					setEdges((eds) => [
+						...eds,
+						{
+							id: `${dbNode.id}-${techId}`,
+							source: dbNode.id,
+							target: techId,
+							animated: true,
+						},
+					]);
+				}
+			}
 		},
 		[nodes, setNodes, setEdges],
 	);
 
-	const onConnect = useCallback(
-		(connection: Connection) => {
-			const sourceNode = nodes.find((n) => n.id === connection.source);
-			const targetNode = nodes.find((n) => n.id === connection.target);
-
-			if (!sourceNode || !targetNode) return;
-
-			if (sourceNode.data.group === targetNode.data.group) {
-				return;
-			}
-
-			const edgesToRemove = edges.filter((edge) => {
-				const edgeTarget = nodes.find((n) => n.id === edge.target);
-				return edgeTarget?.data.group === targetNode.data.group;
-			});
-
-			setEdges((eds) => {
-				const newEdges = eds.filter((edge) => !edgesToRemove.includes(edge));
-				return [...newEdges, { ...(connection as Edge), animated: true }];
-			});
-
-			setNodes((nds) =>
-				nds.map((node) => ({
-					...node,
-					data: {
-						...node.data,
-						isActive:
-							node.id === connection.source || node.id === connection.target
-								? true
-								: node.data.group !== targetNode.data.group
-									? node.data.isActive
-									: false,
-					},
-				})),
-			);
-		},
-		[nodes, edges, setEdges, setNodes],
-	);
+	const onConnect = useCallback(() => {
+		return;
+	}, []);
 
 	const generateCommand = useCallback(() => {
 		const flags: string[] = ["-y"];

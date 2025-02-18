@@ -94,7 +94,7 @@ export const technologies = [
 		description: "TypeScript ORM",
 	},
 	{
-		name: "libSQL",
+		name: "Sqlite",
 		category: "backend",
 		angle: -30,
 		icon: Boxes,
@@ -171,11 +171,11 @@ export const initialNodes: TechNode[] = [
 		},
 	},
 	{
-		id: "libsql",
+		id: "sqlite",
 		type: "techNode",
 		position: { x: 544, y: 532 },
 		data: {
-			label: "libSQL",
+			label: "Sqlite",
 			category: "database",
 			description: "SQLite-compatible database",
 			isDefault: true,
