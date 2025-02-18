@@ -5,7 +5,6 @@ import BackgroundGradients from "./_components/BackgroundGradients";
 import CodeContainer from "./_components/CodeContainer";
 import CustomizableSection from "./_components/CustomizableSection";
 import NpmPackage from "./_components/NpmPackage";
-import Spotlight from "./_components/Spotlight";
 import TechConstellation from "./_components/TechConstellation";
 import TerminalDisplay from "./_components/Terminal";
 import Testimonials from "./_components/Testimonials";
@@ -14,7 +13,6 @@ export default function HomePage() {
 	return (
 		<main className="flex flex-col items-center justify-start sm:p-8 p-4 !pt-40">
 			<BackgroundGradients />
-			<Spotlight />
 			<div className="max-w-6xl mx-auto text-center mb-16 relative z-50 ">
 				<div className="relative z-10">
 					<div className="flex flex-col items-center justify-center space-y-4 text-center">
