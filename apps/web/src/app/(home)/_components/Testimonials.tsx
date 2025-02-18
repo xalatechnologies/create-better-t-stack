@@ -29,7 +29,7 @@ const testimonials = [
 
 const Testimonials = () => {
 	return (
-		<section className="w-full py-24 px-4 bg-gray-900/50 backdrop-blur-sm">
+		<section className="w-full py-24 px-4 bg-gradient-to-b from-transparent via-gray-900/50 to-transparent backdrop-blur-sm relative z-50">
 			<div className="max-w-6xl mx-auto">
 				<div className="text-center mb-16">
 					<h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
