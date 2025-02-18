@@ -8,7 +8,7 @@ export const PKG_ROOT = path.join(distPath, "../");
 
 export const DEFAULT_CONFIG: ProjectConfig = {
 	projectName: "my-better-t-app",
-	database: "libsql",
+	database: "sqlite",
 	auth: true,
 	features: [],
 	git: true,

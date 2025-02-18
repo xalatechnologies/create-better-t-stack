@@ -1,6 +1,6 @@
 export type ProjectFeature = "docker" | "github-actions" | "SEO";
 
-export type ProjectDatabase = "libsql" | "postgres";
+export type ProjectDatabase = "sqlite" | "postgres";
 
 export type PackageManager = "npm" | "yarn" | "pnpm" | "bun";
 

@@ -90,9 +90,9 @@ async function gatherConfig(
 							message: "Which database would you like to use?",
 							options: [
 								{
-									value: "libsql",
-									label: "libSQL",
-									hint: "Turso's embedded SQLite database (recommended)",
+									value: "sqlite",
+									label: "SQLite",
+									hint: "by Turso (recommended)",
 								},
 								{
 									value: "postgres",
@@ -232,7 +232,8 @@ async function main() {
 			.version(getVersion())
 			.argument("[project-directory]", "Project name/directory")
 			.option("-y, --yes", "Use default configuration")
-			.option("--database <type>", "Database type (libsql or postgres)")
+			.option("--sqlite", "Use SQLite database")
+			.option("--postgres", "Use PostgreSQL database")
 			.option("--auth", "Include authentication")
 			.option("--no-auth", "Exclude authentication")
 			.option("--docker", "Include Docker setup")
@@ -251,7 +252,11 @@ async function main() {
 
 		const flagConfig: Partial<ProjectConfig> = {
 			projectName: projectDirectory || undefined,
-			database: options.database as ProjectDatabase | undefined,
+			database: options.sqlite
+				? "sqlite"
+				: options.postgres
+					? "postgres"
+					: undefined,
 			auth: "auth" in options ? options.auth : undefined,
 			packageManager: options.npm
 				? "npm"

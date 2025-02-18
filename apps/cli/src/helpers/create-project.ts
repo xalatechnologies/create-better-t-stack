@@ -50,7 +50,7 @@ export async function createProject(options: ProjectConfig) {
 
 		await tasks(tasksList);
 
-		if (options.database === "libsql") {
+		if (options.database === "sqlite") {
 			await setupTurso(projectDir);
 		}
 

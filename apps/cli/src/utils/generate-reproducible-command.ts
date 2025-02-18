@@ -15,7 +15,7 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 	}
 
 	if (config.database !== DEFAULT_CONFIG.database) {
-		flags.push(`--database ${config.database}`);
+		flags.push(config.database === "sqlite" ? "--sqlite" : "--postgres");
 	}
 
 	if (config.auth !== DEFAULT_CONFIG.auth) {
