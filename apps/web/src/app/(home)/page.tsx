@@ -1,6 +1,5 @@
 "use client";
 import ShinyText from "components/ShinyText/ShinyText";
-import { Poppins } from "next/font/google";
 import React from "react";
 import BackgroundGradients from "./_components/BackgroundGradients";
 import CodeContainer from "./_components/CodeContainer";
@@ -12,17 +11,9 @@ import TechConstellation from "./_components/TechConstellation";
 import TerminalDisplay from "./_components/Terminal";
 import Testimonials from "./_components/Testimonials";
 
-const poppins = Poppins({
-	subsets: ["latin"],
-	weight: ["400", "500", "600", "700"],
-});
-
 export default function HomePage() {
 	return (
-		<main
-			className="min-h-screen flex flex-col items-center justify-start sm:p-8 p-4 !pt-20"
-			style={poppins.style}
-		>
+		<main className="flex flex-col items-center justify-start sm:p-8 p-4 !pt-40">
 			<BackgroundGradients />
 			<Spotlight />
 			<SideCircles />

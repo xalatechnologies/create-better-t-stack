@@ -1,5 +1,3 @@
-import { baseOptions } from "@/app/layout.config";
-import { HomeLayout } from "fumadocs-ui/layouts/home";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Footer from "./_components/Footer";
@@ -12,10 +10,10 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: { children: ReactNode }) {
 	return (
-		<HomeLayout {...baseOptions}>
+		<main className="relative z-10 min-h-svh bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300 overflow-hidden">
 			<Navbar />
 			{children}
 			<Footer />
-		</HomeLayout>
+		</main>
 	);
 }

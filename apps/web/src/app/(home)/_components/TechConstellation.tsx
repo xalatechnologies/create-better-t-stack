@@ -77,6 +77,22 @@ const TechConstellation = () => {
 	const centerRef = useRef<HTMLDivElement>(null);
 	const techRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 	const [isVisible, setIsVisible] = useState(false);
+	const [stars, setStars] = useState<
+		Array<{
+			left: string;
+			top: string;
+			delay: string;
+		}>
+	>([]);
+
+	useEffect(() => {
+		const newStars = Array.from({ length: 20 }, () => ({
+			left: `${Math.random() * 100}%`,
+			top: `${Math.random() * 100}%`,
+			delay: `${Math.random() * 5}s`,
+		}));
+		setStars(newStars);
+	}, []);
 
 	const calculateRadius = (category: string) => {
 		switch (category) {
@@ -210,15 +226,14 @@ const TechConstellation = () => {
 			)}
 
 			<div className="absolute inset-0 overflow-hidden">
-				{[...Array(20)].map((_, i) => (
+				{stars.map((star) => (
 					<div
-						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-						key={`star-${i}`}
+						key={star.top}
 						className="absolute w-2 h-2 bg-blue-500 rounded-full opacity-20"
 						style={{
-							left: `${Math.random() * 100}%`,
-							top: `${Math.random() * 100}%`,
-							animationDelay: `${Math.random() * 5}s`,
+							left: star.left,
+							top: star.top,
+							animationDelay: star.delay,
 						}}
 					/>
 				))}

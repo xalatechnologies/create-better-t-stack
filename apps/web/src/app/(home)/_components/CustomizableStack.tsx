@@ -304,10 +304,13 @@ const CustomizableStack = () => {
 					zoomOnPinch={false}
 					preventScrolling={false}
 					nodesConnectable={true}
-					nodesDraggable={false}
+					nodesDraggable={true}
 					connectOnClick={true}
 					deleteKeyCode="Delete"
 					selectionKeyCode="Shift"
+					proOptions={{
+						hideAttribution: true,
+					}}
 				>
 					<Background
 						className="bg-gray-950/5"

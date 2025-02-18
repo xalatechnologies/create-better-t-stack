@@ -11,7 +11,7 @@ const poppins = Poppins({
 export default function Layout({ children }: { children: ReactNode }) {
 	return (
 		<html lang="en" className={poppins.className} suppressHydrationWarning>
-			<body className="flex flex-col min-h-screen relative bg-black">
+			<body>
 				<RootProvider
 					search={{
 						options: {
@@ -19,9 +19,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 						},
 					}}
 				>
-					<div className="relative z-10 bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300  overflow-hidden">
-						{children}
-					</div>
+					{children}
 				</RootProvider>
 			</body>
 		</html>
