@@ -44,7 +44,7 @@ const CustomizableStack = () => {
 	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 	const [activeNodes, setActiveNodes] = useState({
 		backend: "hono",
-		database: "libsql",
+		database: "sqlite",
 		orm: "drizzle",
 		auth: "better-auth",
 	});
@@ -140,9 +140,9 @@ const CustomizableStack = () => {
 	const generateCommand = useCallback(() => {
 		const flags: string[] = ["-y"];
 
-		if (activeNodes.database !== "libsql") {
+		if (activeNodes.database !== "sqlite") {
 			flags.splice(flags.indexOf("-y"), 1);
-			flags.push(`--database ${activeNodes.database}`);
+			flags.push(`--${activeNodes.database}`);
 		}
 
 		if (activeNodes.auth !== "better-auth") {

@@ -1,8 +1,10 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import PackageIcon from "./Icons";
 
 const Navbar = () => {
-	const [activeLink, setActiveLink] = useState("about");
+	const [activeLink, setActiveLink] = useState("home");
 	const [bgStyles, setBgStyles] = useState({});
 	const [scrolled, setScrolled] = useState(false);
 	const linkRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
@@ -56,57 +58,47 @@ const Navbar = () => {
 
 			<div
 				className={`flex items-center backdrop-blur-md bg-white/5 rounded-full border border-white/10 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
-					scrolled ? "w-[480px]" : "w-[350px]"
+					scrolled ? "w-[420px]" : "w-[280px]"
 				}`}
 			>
 				<div
 					className="absolute transition-all duration-300 ease-in-out bg-white/5 border border-white/10 rounded-full py-2"
 					style={bgStyles}
 				/>
-				{/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
-				<a
-					href="#about"
+				<Link
+					href="/"
 					ref={(ref) => {
-						linkRefs.current.about = ref;
+						linkRefs.current.home = ref;
 					}}
-					onClick={() => setActiveLink("about")}
+					onMouseOver={() => setActiveLink("home")}
 					className="text-gray-300 hover:text-white transition-colors py-2 px-4 rounded-full relative"
 				>
-					About
-				</a>
-				{/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
-				<a
-					href="#careers"
+					Home
+				</Link>
+				<Link
+					href="https://www.github.com/better-t-stack/create-better-t-stack"
+					target="_blank"
 					ref={(ref) => {
-						linkRefs.current.careers = ref;
+						linkRefs.current.github = ref;
 					}}
-					onClick={() => setActiveLink("careers")}
-					className="text-gray-300 hover:text-white transition-colors py-2 px-4 rounded-full relative"
+					onMouseOver={() => setActiveLink("github")}
+					onMouseLeave={() => setActiveLink("home")}
+					className="text-gray-300 hover:text-white transition-colors py-2 px-4 rounded-full relative flex gap-2 items-center"
 				>
-					Careers
-				</a>
-				{/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
-				<a
-					href="#blog"
+					<PackageIcon pm="github" className="w-4 h-4" /> Github
+				</Link>
+				<Link
+					href="https://www.npmjs.com/package/create-better-t-stack"
+					target="_blank"
 					ref={(ref) => {
-						linkRefs.current.blog = ref;
+						linkRefs.current.npm = ref;
 					}}
-					onClick={() => setActiveLink("blog")}
-					className="text-gray-300 hover:text-white transition-colors py-2 px-4 rounded-full relative"
+					onMouseOver={() => setActiveLink("npm")}
+					onMouseLeave={() => setActiveLink("home")}
+					className="text-gray-300 hover:text-white transition-colors py-2 px-4 rounded-full relative flex gap-2 items-center"
 				>
-					Blog
-				</a>
-				{/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
-				<a
-					href="#changelog"
-					ref={(ref) => {
-						linkRefs.current.changelog = ref;
-					}}
-					onClick={() => setActiveLink("changelog")}
-					className="text-gray-300 hover:text-white transition-colors py-2 px-4 rounded-full relative"
-				>
-					Changelog
-				</a>
+					<PackageIcon pm="npm" className="w-4 h-4 rounded-full" /> Npm
+				</Link>
 				<span
 					className="text-gray-500 transition-all duration-300"
 					style={{
@@ -116,13 +108,13 @@ const Navbar = () => {
 				>
 					|
 				</span>
-				{/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
-				<a
-					href="#documentation"
+				<Link
+					href="/docs"
 					ref={(ref) => {
 						linkRefs.current.documentation = ref;
 					}}
-					onClick={() => setActiveLink("documentation")}
+					onMouseOver={() => setActiveLink("documentation")}
+					onMouseLeave={() => setActiveLink("home")}
 					style={{
 						transform: scrolled ? "translateY(0)" : "translateY(-8px)",
 					}}
@@ -133,7 +125,7 @@ const Navbar = () => {
 					}`}
 				>
 					Documentation
-				</a>
+				</Link>
 			</div>
 
 			<div

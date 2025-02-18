@@ -171,19 +171,6 @@ export const initialNodes: TechNode[] = [
 		},
 	},
 	{
-		id: "express",
-		type: "techNode",
-		position: { x: 897, y: 389 },
-		data: {
-			label: "Express",
-			category: "backend",
-			description: "Fast, unopinionated web framework",
-			isDefault: false,
-			isActive: false,
-			group: "backend",
-		},
-	},
-	{
 		id: "libsql",
 		type: "techNode",
 		position: { x: 544, y: 532 },

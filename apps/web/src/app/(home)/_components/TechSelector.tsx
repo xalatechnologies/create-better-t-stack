@@ -5,12 +5,8 @@ type TechOption = {
 };
 
 const techOptions: Record<string, TechOption[]> = {
-	backend: [
-		{ id: "hono", label: "Hono", category: "backend" },
-		{ id: "express", label: "Express", category: "backend" },
-	],
 	database: [
-		{ id: "libsql", label: "libSQL", category: "database" },
+		{ id: "sqlite", label: "Sqlite", category: "database" },
 		{ id: "postgres", label: "PostgreSQL", category: "database" },
 	],
 	orm: [
