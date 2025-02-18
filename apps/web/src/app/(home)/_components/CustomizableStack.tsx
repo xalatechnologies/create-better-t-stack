@@ -2,6 +2,7 @@
 
 import {
 	Background,
+	type Connection,
 	ReactFlow,
 	useEdgesState,
 	useNodesState,
@@ -16,8 +17,8 @@ import { TechNodeComponent } from "./TechNodeComponent";
 const initialEdges = [
 	{ id: "bun-hono", source: "bun", target: "hono", animated: true },
 	{ id: "bun-tanstack", source: "bun", target: "tanstack", animated: true },
-	{ id: "hono-libsql", source: "hono", target: "libsql", animated: true },
-	{ id: "libsql-drizzle", source: "libsql", target: "drizzle", animated: true },
+	{ id: "hono-libsql", source: "hono", target: "sqlite", animated: true },
+	{ id: "libsql-drizzle", source: "sqlite", target: "drizzle", animated: true },
 	{
 		id: "hono-better-auth",
 		source: "hono",
@@ -47,6 +48,29 @@ const CustomizableStack = () => {
 		auth: "better-auth",
 	});
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	const cleanupConnectionsByCategory = useCallback((category: string) => {
+		setEdges((eds) =>
+			eds.filter((edge) => {
+				if (category === "database") {
+					return !(
+						["postgres", "sqlite"].includes(edge.target) ||
+						["postgres", "sqlite"].includes(edge.source) ||
+						edge.target === "drizzle" ||
+						edge.target === "prisma"
+					);
+				}
+				if (category === "orm") {
+					return !(edge.target === "drizzle" || edge.target === "prisma");
+				}
+				if (category === "auth") {
+					return !["better-auth", "no-auth"].includes(edge.target);
+				}
+				return true;
+			}),
+		);
+	}, []);
+
 	const handleTechSelect = useCallback(
 		(category: string, techId: string) => {
 			setActiveNodes((prev) => ({ ...prev, [category]: techId }));
@@ -64,16 +88,8 @@ const CustomizableStack = () => {
 					},
 				})),
 			);
-			setEdges((eds) =>
-				eds.filter((edge) => {
-					const targetNode = nodes.find((n) => n.id === edge.target);
-					const sourceNode = nodes.find((n) => n.id === edge.source);
-					return !(
-						targetNode?.data.category === category ||
-						sourceNode?.data.category === category
-					);
-				}),
-			);
+
+			cleanupConnectionsByCategory(category);
 
 			if (category === "database") {
 				const honoNode = nodes.find((n) => n.id === "hono");
@@ -125,12 +141,105 @@ const CustomizableStack = () => {
 				}
 			}
 		},
-		[nodes, setNodes, setEdges],
+		[nodes, setNodes, setEdges, cleanupConnectionsByCategory],
 	);
 
-	const onConnect = useCallback(() => {
-		return;
-	}, []);
+	const isValidConnection = useCallback(
+		(connection: Connection) => {
+			const sourceNode = nodes.find((n) => n.id === connection.source);
+			const targetNode = nodes.find((n) => n.id === connection.target);
+
+			if (!sourceNode || !targetNode) return false;
+
+			if (sourceNode.id === "hono" && targetNode.data.category === "database") {
+				return ["postgres", "sqlite"].includes(targetNode.id);
+			}
+
+			if (sourceNode.id === "hono" && targetNode.data.category === "auth") {
+				return ["better-auth", "no-auth"].includes(targetNode.id);
+			}
+
+			if (
+				["postgres", "sqlite"].includes(sourceNode.id) &&
+				targetNode.data.category === "orm"
+			) {
+				return true;
+			}
+
+			return false;
+		},
+		[nodes],
+	);
+
+	const cleanupPreviousConnections = useCallback(
+		(connection: Connection) => {
+			const sourceNode = nodes.find((n) => n.id === connection.source);
+			const targetNode = nodes.find((n) => n.id === connection.target);
+			if (!targetNode || !sourceNode) return;
+
+			cleanupConnectionsByCategory(targetNode.data.category);
+		},
+		[nodes, cleanupConnectionsByCategory],
+	);
+
+	const onConnect = useCallback(
+		(connection: Connection) => {
+			if (!isValidConnection(connection)) return;
+			cleanupPreviousConnections(connection);
+			const targetNode = nodes.find((n) => n.id === connection.target);
+			if (!targetNode) return;
+
+			setEdges((eds) => {
+				const newEdges = [
+					...eds,
+					{
+						id: `${connection.source}-${connection.target}`,
+						source: connection.source,
+						target: connection.target,
+						animated: true,
+					},
+				];
+
+				if (targetNode.data.category === "database") {
+					const activeOrm = nodes.find(
+						(n) => n.data.category === "orm" && n.data.isActive,
+					);
+					if (activeOrm) {
+						newEdges.push({
+							id: `${connection.target}-${activeOrm.id}`,
+							source: connection.target,
+							target: activeOrm.id,
+							animated: true,
+						});
+					}
+				}
+
+				return newEdges;
+			});
+
+			if (targetNode.data.category) {
+				setActiveNodes((prev) => ({
+					...prev,
+					[targetNode.data.category]: connection.target,
+				}));
+
+				setNodes((nds) =>
+					nds.map((node) => ({
+						...node,
+						data: {
+							...node.data,
+							isActive: node.data.isStatic
+								? true
+								: node.data.category === targetNode.data.category
+									? node.id === connection.target
+									: node.data.isActive,
+						},
+					})),
+				);
+			}
+		},
+		[nodes, setEdges, setNodes, cleanupPreviousConnections, isValidConnection],
+	);
 
 	const generateCommand = useCallback(() => {
 		const flags: string[] = ["-y"];
@@ -178,6 +287,10 @@ const CustomizableStack = () => {
 					zoomOnPinch={false}
 					preventScrolling={false}
 					nodesConnectable={true}
+					nodesDraggable={false}
+					connectOnClick={true}
+					deleteKeyCode="Delete"
+					selectionKeyCode="Shift"
 				>
 					<Background
 						className="bg-gray-950/5"
