@@ -13,4 +13,5 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 	features: [],
 	git: true,
 	packageManager: "npm",
+	orm: "drizzle",
 };

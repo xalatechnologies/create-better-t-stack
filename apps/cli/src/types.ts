@@ -4,6 +4,8 @@ export type ProjectDatabase = "sqlite" | "postgres";
 
 export type PackageManager = "npm" | "yarn" | "pnpm" | "bun";
 
+export type ProjectORM = "drizzle" | "prisma";
+
 export type ProjectConfig = {
 	yes?: boolean;
 	projectName: string;
@@ -12,4 +14,5 @@ export type ProjectConfig = {
 	auth: boolean;
 	packageManager: PackageManager;
 	features: ProjectFeature[];
+	orm: ProjectORM;
 };

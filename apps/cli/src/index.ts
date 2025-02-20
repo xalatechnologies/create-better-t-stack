@@ -21,6 +21,7 @@ import type {
 	ProjectConfig,
 	ProjectDatabase,
 	ProjectFeature,
+	ProjectORM,
 } from "./types";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
 import { getUserPkgManager } from "./utils/get-package-manager";
@@ -100,6 +101,25 @@ async function gatherConfig(
 									hint: "Traditional relational database",
 								},
 							],
+						}),
+			orm: () =>
+				flags.orm !== undefined
+					? Promise.resolve(flags.orm)
+					: select<ProjectORM>({
+							message: "Which ORM would you like to use?",
+							options: [
+								{
+									value: "drizzle",
+									label: "Drizzle",
+									hint: "Type-safe, lightweight ORM (recommended)",
+								},
+								// {
+								// 	value: "prisma",
+								// 	label: "Prisma (coming soon)",
+								// 	hint: "Feature-rich ORM with great DX",
+								// },
+							],
+							initialValue: "drizzle",
 						}),
 			auth: () =>
 				flags.auth !== undefined
@@ -186,6 +206,7 @@ async function gatherConfig(
 	return {
 		projectName: result.projectName ?? DEFAULT_CONFIG.projectName,
 		database: result.database ?? DEFAULT_CONFIG.database,
+		orm: result.orm ?? DEFAULT_CONFIG.orm,
 		auth: result.auth ?? DEFAULT_CONFIG.auth,
 		features: result.features ?? DEFAULT_CONFIG.features,
 		git: result.git ?? DEFAULT_CONFIG.git,
@@ -201,6 +222,9 @@ function displayConfig(config: Partial<ProjectConfig>) {
 	}
 	if (config.database) {
 		configDisplay.push(`${pc.blue("Database:")} ${config.database}`);
+	}
+	if (config.orm) {
+		configDisplay.push(`${pc.blue("ORM:")} ${config.orm}`);
 	}
 	if (config.auth !== undefined) {
 		configDisplay.push(`${pc.blue("Authentication:")} ${config.auth}`);
@@ -245,6 +269,8 @@ async function main() {
 			.option("--pnpm", "Use pnpm package manager")
 			.option("--yarn", "Use yarn package manager")
 			.option("--bun", "Use bun package manager")
+			.option("--drizzle", "Use Drizzle ORM")
+			.option("--prisma", "Use Prisma ORM (coming soon)")
 			.parse();
 
 		const options = program.opts();
@@ -257,6 +283,7 @@ async function main() {
 				: options.postgres
 					? "postgres"
 					: undefined,
+			orm: options.drizzle ? "drizzle" : options.prisma ? "prisma" : undefined,
 			auth: "auth" in options ? options.auth : undefined,
 			packageManager: options.npm
 				? "npm"
@@ -293,6 +320,11 @@ async function main() {
 					yes: true,
 					projectName: projectDirectory ?? DEFAULT_CONFIG.projectName,
 					database: options.database ?? DEFAULT_CONFIG.database,
+					orm: options.drizzle
+						? "drizzle"
+						: options.prisma
+							? "prisma"
+							: DEFAULT_CONFIG.orm, // Add this line
 					auth: options.auth ?? DEFAULT_CONFIG.auth,
 					git: options.git ?? DEFAULT_CONFIG.git,
 					packageManager:

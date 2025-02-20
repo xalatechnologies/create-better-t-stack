@@ -18,6 +18,10 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		flags.push(config.database === "sqlite" ? "--sqlite" : "--postgres");
 	}
 
+	if (config.orm !== DEFAULT_CONFIG.orm) {
+		flags.push(config.orm === "drizzle" ? "--drizzle" : "--prisma");
+	}
+
 	if (config.auth !== DEFAULT_CONFIG.auth) {
 		flags.push("--no-auth");
 	}
