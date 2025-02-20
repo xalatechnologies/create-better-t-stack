@@ -4,7 +4,7 @@ import pc from "picocolors";
 import { DEFAULT_CONFIG } from "./constants";
 import { createProject } from "./helpers/create-project";
 import { gatherConfig } from "./prompts/config-prompts";
-import type { PackageManager, ProjectConfig, ProjectFeature } from "./types";
+import type { ProjectConfig, ProjectFeature } from "./types";
 import { displayConfig } from "./utils/display-config";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
 import { getVersion } from "./utils/get-version";
@@ -20,7 +20,6 @@ const program = new Command();
 async function main() {
 	const s = spinner();
 	try {
-		process.stdout.write("\x1Bc");
 		renderTitle();
 		intro(pc.magenta("Creating a new Better-T-Stack project"));
 		program

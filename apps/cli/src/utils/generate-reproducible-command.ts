@@ -14,7 +14,6 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		flags.push("-y");
 	}
 
-	// Handle database flag
 	if (config.database !== DEFAULT_CONFIG.database) {
 		if (config.database === "none") {
 			flags.push("--no-database");
@@ -23,7 +22,6 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		}
 	}
 
-	// Handle ORM flag only if database is not "none"
 	if (config.database !== "none" && config.orm !== DEFAULT_CONFIG.orm) {
 		flags.push(config.orm === "drizzle" ? "--drizzle" : "--prisma");
 	}
