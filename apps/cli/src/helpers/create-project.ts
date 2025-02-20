@@ -52,6 +52,8 @@ export async function createProject(options: ProjectConfig) {
 
 		if (options.database === "sqlite") {
 			await setupTurso(projectDir);
+		} else if (options.database === "postgres") {
+			// Handle postgres setup
 		}
 
 		const installDepsResponse = await confirm({

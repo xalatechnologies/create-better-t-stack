@@ -9,9 +9,9 @@ export const PKG_ROOT = path.join(distPath, "../");
 export const DEFAULT_CONFIG: ProjectConfig = {
 	projectName: "my-better-t-app",
 	database: "sqlite",
+	orm: "drizzle",
 	auth: true,
 	features: [],
 	git: true,
 	packageManager: "npm",
-	orm: "drizzle",
 };

@@ -1,10 +1,10 @@
 export type ProjectFeature = "docker" | "github-actions" | "SEO";
 
-export type ProjectDatabase = "sqlite" | "postgres";
+export type ProjectDatabase = "sqlite" | "postgres" | "none";
 
 export type PackageManager = "npm" | "yarn" | "pnpm" | "bun";
 
-export type ProjectORM = "drizzle" | "prisma";
+export type ProjectORM = "drizzle" | "prisma" | "none";
 
 export type ProjectConfig = {
 	yes?: boolean;

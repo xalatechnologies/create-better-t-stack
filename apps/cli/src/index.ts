@@ -1,30 +1,12 @@
-import path from "node:path";
-import {
-	cancel,
-	confirm,
-	group,
-	intro,
-	log,
-	multiselect,
-	outro,
-	select,
-	spinner,
-	text,
-} from "@clack/prompts";
+import { cancel, intro, log, outro, spinner } from "@clack/prompts";
 import { Command } from "commander";
-import fs from "fs-extra";
 import pc from "picocolors";
-import { DEFAULT_CONFIG } from "./consts";
+import { DEFAULT_CONFIG } from "./constants";
 import { createProject } from "./helpers/create-project";
-import type {
-	PackageManager,
-	ProjectConfig,
-	ProjectDatabase,
-	ProjectFeature,
-	ProjectORM,
-} from "./types";
+import { gatherConfig } from "./prompts/config-prompts";
+import type { PackageManager, ProjectConfig, ProjectFeature } from "./types";
+import { displayConfig } from "./utils/display-config";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
-import { getUserPkgManager } from "./utils/get-package-manager";
 import { getVersion } from "./utils/get-version";
 import { renderTitle } from "./utils/render-title";
 
@@ -34,215 +16,6 @@ process.on("SIGINT", () => {
 });
 
 const program = new Command();
-
-async function gatherConfig(
-	flags: Partial<ProjectConfig>,
-): Promise<ProjectConfig> {
-	const result = await group(
-		{
-			projectName: async () => {
-				if (flags.projectName) return flags.projectName;
-				let isValid = false;
-				let projectName: string | symbol = "";
-				let defaultName = DEFAULT_CONFIG.projectName;
-				let counter = 1;
-
-				while (fs.pathExistsSync(path.resolve(process.cwd(), defaultName))) {
-					defaultName = `${DEFAULT_CONFIG.projectName}-${counter}`;
-					counter++;
-				}
-
-				while (!isValid) {
-					const response = await text({
-						message: "What is your project named? (directory name or path)",
-						placeholder: defaultName,
-						initialValue: flags.projectName,
-						defaultValue: defaultName,
-						validate: (value) => {
-							const nameToUse = value.trim() || defaultName;
-							const projectDir = path.resolve(process.cwd(), nameToUse);
-
-							if (fs.pathExistsSync(projectDir)) {
-								const dirContents = fs.readdirSync(projectDir);
-								if (dirContents.length > 0) {
-									return `Directory "${nameToUse}" already exists and is not empty. Please choose a different name.`;
-								}
-							}
-
-							isValid = true;
-							return undefined;
-						},
-					});
-
-					if (typeof response === "symbol") {
-						cancel(pc.red("Operation cancelled."));
-						process.exit(0);
-					}
-
-					projectName = response || defaultName;
-				}
-
-				return projectName as string;
-			},
-			database: () =>
-				flags.database !== undefined
-					? Promise.resolve(flags.database)
-					: select<ProjectDatabase>({
-							message: "Which database would you like to use?",
-							options: [
-								{
-									value: "sqlite",
-									label: "SQLite",
-									hint: "by Turso (recommended)",
-								},
-								{
-									value: "postgres",
-									label: "PostgreSQL",
-									hint: "Traditional relational database",
-								},
-							],
-						}),
-			orm: () =>
-				flags.orm !== undefined
-					? Promise.resolve(flags.orm)
-					: select<ProjectORM>({
-							message: "Which ORM would you like to use?",
-							options: [
-								{
-									value: "drizzle",
-									label: "Drizzle",
-									hint: "Type-safe, lightweight ORM (recommended)",
-								},
-								// {
-								// 	value: "prisma",
-								// 	label: "Prisma (coming soon)",
-								// 	hint: "Feature-rich ORM with great DX",
-								// },
-							],
-							initialValue: "drizzle",
-						}),
-			auth: () =>
-				flags.auth !== undefined
-					? Promise.resolve(flags.auth)
-					: confirm({
-							message: "Would you like to add authentication with Better-Auth?",
-							initialValue: DEFAULT_CONFIG.auth,
-						}),
-			features: () =>
-				flags.features !== undefined
-					? Promise.resolve(flags.features)
-					: multiselect<ProjectFeature>({
-							message: "Which features would you like to add?",
-							options: [
-								{
-									value: "docker",
-									label: "Docker setup",
-									hint: "Containerize your application",
-								},
-								{
-									value: "github-actions",
-									label: "GitHub Actions",
-									hint: "CI/CD workflows",
-								},
-								{
-									value: "SEO",
-									label: "Basic SEO setup",
-									hint: "Search engine optimization configuration",
-								},
-							],
-							required: false,
-						}),
-			git: () =>
-				flags.git !== undefined
-					? Promise.resolve(flags.git)
-					: confirm({
-							message: "Initialize a new git repository?",
-							initialValue: DEFAULT_CONFIG.git,
-						}),
-			packageManager: async () => {
-				if (flags.packageManager !== undefined) {
-					return flags.packageManager;
-				}
-				const detectedPackageManager = getUserPkgManager();
-
-				const useDetected = await confirm({
-					message: `Use ${detectedPackageManager} as your package manager?`,
-				});
-
-				if (useDetected) return detectedPackageManager;
-
-				return select<PackageManager>({
-					message: "Which package manager would you like to use?",
-					options: [
-						{ value: "npm", label: "npm", hint: "Node Package Manager" },
-						{
-							value: "pnpm",
-							label: "pnpm",
-							hint: "Fast, disk space efficient package manager",
-						},
-						{
-							value: "yarn",
-							label: "yarn",
-							hint: "Fast, reliable, and secure dependency management",
-						},
-						{
-							value: "bun",
-							label: "bun",
-							hint: "All-in-one JavaScript runtime & toolkit (recommended)",
-						},
-					],
-					initialValue: "bun",
-				});
-			},
-		},
-		{
-			onCancel: () => {
-				cancel(pc.red("Operation cancelled."));
-				process.exit(0);
-			},
-		},
-	);
-
-	return {
-		projectName: result.projectName ?? DEFAULT_CONFIG.projectName,
-		database: result.database ?? DEFAULT_CONFIG.database,
-		orm: result.orm ?? DEFAULT_CONFIG.orm,
-		auth: result.auth ?? DEFAULT_CONFIG.auth,
-		features: result.features ?? DEFAULT_CONFIG.features,
-		git: result.git ?? DEFAULT_CONFIG.git,
-		packageManager: result.packageManager ?? DEFAULT_CONFIG.packageManager,
-	};
-}
-
-function displayConfig(config: Partial<ProjectConfig>) {
-	const configDisplay = [];
-
-	if (config.projectName) {
-		configDisplay.push(`${pc.blue("Project Name:")} ${config.projectName}`);
-	}
-	if (config.database) {
-		configDisplay.push(`${pc.blue("Database:")} ${config.database}`);
-	}
-	if (config.orm) {
-		configDisplay.push(`${pc.blue("ORM:")} ${config.orm}`);
-	}
-	if (config.auth !== undefined) {
-		configDisplay.push(`${pc.blue("Authentication:")} ${config.auth}`);
-	}
-	if (config.features?.length) {
-		configDisplay.push(`${pc.blue("Features:")} ${config.features.join(", ")}`);
-	}
-	if (config.git !== undefined) {
-		configDisplay.push(`${pc.blue("Git Init:")} ${config.git}`);
-	}
-	if (config.packageManager) {
-		configDisplay.push(
-			`${pc.blue("Package Manager:")} ${config.packageManager}`,
-		);
-	}
-
-	return configDisplay.join("\n");
-}
 
 async function main() {
 	const s = spinner();
@@ -256,6 +29,7 @@ async function main() {
 			.version(getVersion())
 			.argument("[project-directory]", "Project name/directory")
 			.option("-y, --yes", "Use default configuration")
+			.option("--no-database", "Skip database setup")
 			.option("--sqlite", "Use SQLite database")
 			.option("--postgres", "Use PostgreSQL database")
 			.option("--auth", "Include authentication")
@@ -277,38 +51,28 @@ async function main() {
 		const projectDirectory = program.args[0];
 
 		const flagConfig: Partial<ProjectConfig> = {
-			projectName: projectDirectory || undefined,
-			database: options.sqlite
-				? "sqlite"
-				: options.postgres
-					? "postgres"
-					: undefined,
-			orm: options.drizzle ? "drizzle" : options.prisma ? "prisma" : undefined,
-			auth: "auth" in options ? options.auth : undefined,
-			packageManager: options.npm
-				? "npm"
-				: options.pnpm
-					? "pnpm"
-					: options.yarn
-						? "yarn"
-						: options.bun
-							? "bun"
-							: undefined,
-			git: "git" in options ? options.git : undefined,
-			features:
-				options.docker || options.githubActions || options.seo
-					? ([
-							...(options.docker ? ["docker"] : []),
-							...(options.githubActions ? ["github-actions"] : []),
-							...(options.seo ? ["SEO"] : []),
-						] as ProjectFeature[])
-					: undefined,
+			...(projectDirectory && { projectName: projectDirectory }),
+			...(options.database === false && { database: "none" }),
+			...(options.sqlite && { database: "sqlite" }),
+			...(options.postgres && { database: "postgres" }),
+			...(options.drizzle && { orm: "drizzle" }),
+			...(options.prisma && { orm: "prisma" }),
+			...("auth" in options && { auth: options.auth }),
+			...(options.npm && { packageManager: "npm" }),
+			...(options.pnpm && { packageManager: "pnpm" }),
+			...(options.yarn && { packageManager: "yarn" }),
+			...(options.bun && { packageManager: "bun" }),
+			...("git" in options && { git: options.git }),
+			...((options.docker || options.githubActions || options.seo) && {
+				features: [
+					...(options.docker ? ["docker"] : []),
+					...(options.githubActions ? ["github-actions"] : []),
+					...(options.seo ? ["SEO"] : []),
+				] as ProjectFeature[],
+			}),
 		};
 
-		if (
-			!options.yes &&
-			Object.values(flagConfig).some((v) => v !== undefined)
-		) {
+		if (!options.yes && Object.keys(flagConfig).length > 0) {
 			log.info(pc.yellow("Using these pre-selected options:"));
 			log.message(displayConfig(flagConfig));
 			log.message("");
@@ -317,23 +81,26 @@ async function main() {
 		const config = options.yes
 			? {
 					...DEFAULT_CONFIG,
-					yes: true,
 					projectName: projectDirectory ?? DEFAULT_CONFIG.projectName,
-					database: options.database ?? DEFAULT_CONFIG.database,
-					orm: options.drizzle
-						? "drizzle"
-						: options.prisma
-							? "prisma"
-							: DEFAULT_CONFIG.orm, // Add this line
+					database:
+						options.database === false
+							? "none"
+							: (options.database ?? DEFAULT_CONFIG.database),
+					orm:
+						options.database === false
+							? "none"
+							: options.drizzle
+								? "drizzle"
+								: options.prisma
+									? "prisma"
+									: DEFAULT_CONFIG.orm,
 					auth: options.auth ?? DEFAULT_CONFIG.auth,
 					git: options.git ?? DEFAULT_CONFIG.git,
 					packageManager:
-						options.packageManager ?? DEFAULT_CONFIG.packageManager,
-					features: [
-						...(options.docker ? ["docker"] : []),
-						...(options.githubActions ? ["github-actions"] : []),
-						...(options.seo ? ["SEO"] : []),
-					] as ProjectFeature[],
+						flagConfig.packageManager ?? DEFAULT_CONFIG.packageManager,
+					features: flagConfig.features?.length
+						? flagConfig.features
+						: DEFAULT_CONFIG.features,
 				}
 			: await gatherConfig(flagConfig);
 

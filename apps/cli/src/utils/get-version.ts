@@ -1,6 +1,6 @@
 import path from "node:path";
 import fs from "fs-extra";
-import { PKG_ROOT } from "../consts";
+import { PKG_ROOT } from "../constants";
 
 export const getVersion = () => {
 	const packageJsonPath = path.join(PKG_ROOT, "package.json");

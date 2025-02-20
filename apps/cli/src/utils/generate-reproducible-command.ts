@@ -1,4 +1,4 @@
-import { DEFAULT_CONFIG } from "../consts";
+import { DEFAULT_CONFIG } from "../constants";
 import type { ProjectConfig } from "../types";
 
 export function generateReproducibleCommand(config: ProjectConfig): string {
@@ -14,11 +14,17 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		flags.push("-y");
 	}
 
+	// Handle database flag
 	if (config.database !== DEFAULT_CONFIG.database) {
-		flags.push(config.database === "sqlite" ? "--sqlite" : "--postgres");
+		if (config.database === "none") {
+			flags.push("--no-database");
+		} else {
+			flags.push(config.database === "sqlite" ? "--sqlite" : "--postgres");
+		}
 	}
 
-	if (config.orm !== DEFAULT_CONFIG.orm) {
+	// Handle ORM flag only if database is not "none"
+	if (config.database !== "none" && config.orm !== DEFAULT_CONFIG.orm) {
 		flags.push(config.orm === "drizzle" ? "--drizzle" : "--prisma");
 	}
 
