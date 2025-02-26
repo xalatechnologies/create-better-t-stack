@@ -1,5 +1,5 @@
 "use client";
-import ShinyText from "components/ShinyText/ShinyText";
+import ShinyText from "@/app/(home)/_components/ShinyText";
 import React from "react";
 import BackgroundGradients from "./_components/BackgroundGradients";
 import CodeContainer from "./_components/CodeContainer";
