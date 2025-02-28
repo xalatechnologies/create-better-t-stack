@@ -17,6 +17,11 @@ export async function getORMChoice(
 				label: "Drizzle",
 				hint: "Type-safe, lightweight ORM (recommended)",
 			},
+			{
+				value: "prisma",
+				label: "Prisma",
+				hint: "Powerful, feature-rich ORM with schema migrations",
+			},
 		],
 		initialValue: "drizzle",
 	});

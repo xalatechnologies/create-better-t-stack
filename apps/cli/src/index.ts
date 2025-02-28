@@ -22,6 +22,7 @@ async function main() {
 	try {
 		renderTitle();
 		intro(pc.magenta("Creating a new Better-T-Stack project"));
+
 		program
 			.name("create-better-t-stack")
 			.description("Create a new Better-T Stack project")
