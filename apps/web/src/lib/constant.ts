@@ -21,7 +21,7 @@ export const technologies = [
 		textColor: "text-black",
 		description: "Fast all-in-one JavaScript runtime",
 		top: "top-[2px]",
-		left: "left-[10rem]",
+		left: "left-[11rem]",
 	},
 	{
 		name: "tRPC",
@@ -43,7 +43,7 @@ export const technologies = [
 		textColor: "text-white",
 		description: "Type-safe routing",
 		top: "top-[2px]",
-		left: "left-[7.5rem]",
+		left: "left-[8.5rem]",
 	},
 	{
 		name: "Tailwind CSS",
@@ -92,6 +92,7 @@ export const technologies = [
 		color: "bg-green-400",
 		textColor: "text-black",
 		description: "TypeScript ORM",
+		left: "left-[4rem]",
 	},
 	{
 		name: "Sqlite",

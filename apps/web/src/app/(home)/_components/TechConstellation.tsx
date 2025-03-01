@@ -213,6 +213,24 @@ const TechConstellation = () => {
 							<strong>{tech.name}</strong>
 							<p className="text-gray-300 text-[10px]">{tech.description}</p>
 						</div>
+						<div
+							className={`absolute ${tech.top ? tech.top : "-top-[60px]"} ${tech.left ? tech.left : "left-1/2"}
+                              transform -translate-x-1/2 bg-gradient-to-br from-gray-900/90 to-gray-950/90
+                              text-white px-3 py-1.5 rounded-lg transition-all duration-300
+                              whitespace-nowrap text-xs hover:scale-105 backdrop-blur-sm
+                              border border-blue-800/30 shadow-[0_0_10px_rgba(0,0,0,0.4)]
+                              group min-w-[160px] text-center z-30`}
+						>
+							<div className="absolute inset-0 bg-noise opacity-10 rounded-lg" />
+							<strong className="text-sm text-blue-200 block">
+								{tech.name}
+							</strong>
+							<p className="text-gray-300 mt-1">{tech.description}</p>
+							<div
+								className="absolute h-0.5 w-0 bg-gradient-to-r from-blue-500/0 via-blue-500 to-blue-500/0
+                                bottom-0 left-0 group-hover:w-full transition-all duration-500 border-beam"
+							/>
+						</div>
 					</div>
 				);
 			})}
