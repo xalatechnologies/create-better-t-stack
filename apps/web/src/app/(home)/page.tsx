@@ -88,6 +88,44 @@ export default function HomePage() {
 			</div>
 			<TechConstellation />
 			<CustomizableSection />
+			<div className="w-full pt-16 relative overflow-hidden">
+				<div className="max-w-6xl mx-auto relative">
+					<div className="flex items-center justify-center">
+						<div className="hidden sm:flex items-center w-1/3">
+							<div className="h-px flex-grow bg-gradient-to-r from-transparent to-blue-500/70" />
+							<div className="h-8 w-8 rounded-full bg-gray-900 border border-gray-700 flex items-center justify-center relative">
+								<div
+									className="h-2 w-2 bg-blue-400 rounded-full animate-ping absolute"
+									style={{ animationDuration: "2.5s" }}
+								/>
+							</div>
+						</div>
+
+						<div className="relative flex flex-col items-center justify-center px-6 z-10">
+							<div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 blur-xl -z-10" />
+						</div>
+
+						<div className="hidden sm:flex items-center w-1/3">
+							<div className="h-8 w-8 rounded-full bg-gray-900 border border-gray-700 flex items-center justify-center relative">
+								<div
+									className="h-2 w-2 bg-indigo-400 rounded-full animate-ping absolute"
+									style={{ animationDuration: "2.5s" }}
+								/>
+							</div>
+							<div className="h-px flex-grow bg-gradient-to-l from-transparent to-indigo-500/70" />
+						</div>
+					</div>
+
+					<div className="sm:hidden h-px w-full mt-4 bg-gradient-to-r from-blue-500/30 via-indigo-500 to-blue-500/30" />
+
+					<div className="absolute -top-10 left-1/4 text-6xl text-gray-800/10 font-mono transform rotate-12">
+						{"{"}
+					</div>
+					<div className="absolute -bottom-10 right-1/4 text-6xl text-gray-800/10 font-mono transform -rotate-12">
+						{"}"}
+					</div>
+				</div>
+			</div>
 			<Testimonials />
 		</main>
 	);
