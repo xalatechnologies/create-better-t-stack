@@ -1,7 +1,6 @@
 "use client";
 import ShinyText from "@/app/(home)/_components/ShinyText";
 import React from "react";
-import BackgroundGradients from "./_components/BackgroundGradients";
 import CodeContainer from "./_components/CodeContainer";
 import CustomizableSection from "./_components/CustomizableSection";
 import NpmPackage from "./_components/NpmPackage";
@@ -12,11 +11,9 @@ import Testimonials from "./_components/Testimonials";
 export default function HomePage() {
 	return (
 		<main className="flex flex-col items-center justify-start sm:p-8 p-4 !pt-40">
-			<BackgroundGradients />
 			<div className="max-w-6xl mx-auto text-center mb-16 relative z-50 ">
 				<div className="relative z-10">
 					<div className="flex flex-col items-center justify-center space-y-4 text-center">
-						<NpmPackage />
 						<h1 className="text-6xl font-extrabold text-white">
 							<span className="block sm:text-7xl text-6xl bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-400 to-yellow-200">
 								Better-T Stack
@@ -25,6 +22,7 @@ export default function HomePage() {
 								<span className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 via-pink-500 to-rose-500 transform origin-left transition-transform duration-300 ease-out scale-x-0 group-hover:scale-x-100" />
 							</span>
 						</h1>
+						<NpmPackage />
 
 						<p className="sm:text-2xl text-xl font-medium text-gray-300 max-w-2xl">
 							<span className="inline-block transform hover:scale-105 transition-transform duration-200">
