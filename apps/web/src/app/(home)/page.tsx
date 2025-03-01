@@ -15,11 +15,11 @@ export default function HomePage() {
 				<div className="relative z-10">
 					<div className="flex flex-col items-center justify-center space-y-4 text-center">
 						<h1 className="text-6xl font-extrabold text-white">
-							<span className="block sm:text-7xl text-6xl bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-400 to-yellow-200">
+							<span className="block sm:text-7xl text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">
 								Better-T Stack
 							</span>
 							<span className="relative">
-								<span className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 via-pink-500 to-rose-500 transform origin-left transition-transform duration-300 ease-out scale-x-0 group-hover:scale-x-100" />
+								<span className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-indigo-500 transform origin-left transition-transform duration-300 ease-out scale-x-0 group-hover:scale-x-100" />
 							</span>
 						</h1>
 						<NpmPackage />
@@ -28,7 +28,7 @@ export default function HomePage() {
 							<span className="inline-block transform hover:scale-105 transition-transform duration-200">
 								Scaffold
 							</span>{" "}
-							<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+							<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">
 								production-ready
 							</span>{" "}
 							<span className="inline-block transition-transform duration-200">
@@ -44,7 +44,7 @@ export default function HomePage() {
 					</div>
 				</div>
 				<div className="absolute inset-0 -z-10">
-					<div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-3xl transform -skew-y-12" />
+					<div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 blur-3xl transform -skew-y-12" />
 				</div>
 			</div>
 			<TerminalDisplay />
