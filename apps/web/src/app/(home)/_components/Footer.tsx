@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const Footer = () => {
 	return (
 		<footer className="relative w-full font-mono">
@@ -18,25 +20,30 @@ const Footer = () => {
 						</h3>
 						<ul className="text-gray-400 space-y-2">
 							<li>
-								<a
+								<Link
+									target="_blank"
 									href="https://github.com/better-t-stack/create-better-t-stack"
 									className="hover:text-white transition-colors"
 								>
 									<span className="text-gray-500">-</span> GitHub
-								</a>
+								</Link>
 							</li>
 							<li>
-								<a
+								<Link
+									target="_blank"
 									href="https://www.npmjs.com/package/create-better-t-stack"
 									className="hover:text-white transition-colors"
 								>
 									<span className="text-gray-500">-</span> NPM
-								</a>
+								</Link>
 							</li>
 							<li>
-								<a href="/docs" className="hover:text-white transition-colors">
+								<Link
+									href="/docs"
+									className="hover:text-white transition-colors"
+								>
 									<span className="text-gray-500">-</span> Documentation
-								</a>
+								</Link>
 							</li>
 						</ul>
 					</div>
