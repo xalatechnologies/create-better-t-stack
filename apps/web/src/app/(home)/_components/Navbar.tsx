@@ -41,7 +41,7 @@ const Navbar = () => {
 
 	return (
 		<nav
-			className={`fixed top-0 right-0 z-[100] w-screen px-8 py-5 flex items-center sm:justify-between justify-center transition-all duration-300 ${
+			className={`fixed top-0 right-0 z-[100] w-screen px-8 py-5 grid grid-cols-1 md:grid-cols-3 items-center transition-all duration-300 ${
 				scrolled
 					? "bg-transparent border-transparent"
 					: "sm:bg-black/40 sm:backdrop-blur-xl sm:border-b border-blue-500/20"
@@ -62,82 +62,84 @@ const Navbar = () => {
 				</span>
 			</div>
 
-			<div
-				className={`flex items-center backdrop-blur-md bg-black/40 rounded-md border border-blue-500/30 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
-					scrolled ? "w-[420px]" : "sm:w-[280px] w-[350px]"
-				}`}
-			>
+			<div className="flex justify-center">
 				<div
-					className="absolute transition-all duration-300 ease-in-out bg-blue-900/20 border border-blue-500/20 rounded-md py-2"
-					style={bgStyles}
-				/>
-				<Link
-					href="/"
-					ref={(ref) => {
-						linkRefs.current.home = ref;
-					}}
-					onMouseOver={() => setActiveLink("home")}
-					className="text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative font-mono"
-				>
-					<span className="text-blue-500">~/</span>home
-				</Link>
-				<Link
-					href="https://www.github.com/better-t-stack/create-better-t-stack"
-					target="_blank"
-					ref={(ref) => {
-						linkRefs.current.github = ref;
-					}}
-					onMouseOver={() => setActiveLink("github")}
-					onMouseLeave={() => setActiveLink("home")}
-					className="text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono"
-				>
-					<PackageIcon pm="github" className="w-4 h-4" />{" "}
-					<span className="max-sm:hidden">github</span>
-				</Link>
-				<Link
-					href="https://www.npmjs.com/package/create-better-t-stack"
-					target="_blank"
-					ref={(ref) => {
-						linkRefs.current.npm = ref;
-					}}
-					onMouseOver={() => setActiveLink("npm")}
-					onMouseLeave={() => setActiveLink("home")}
-					className="text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono"
-				>
-					<PackageIcon pm="npm" className="w-4 h-4 rounded-full" />{" "}
-					<span className="max-sm:hidden">npm</span>
-				</Link>
-				<span
-					className="text-blue-500 transition-all duration-300"
-					style={{
-						opacity: scrolled ? 1 : 0,
-						transform: scrolled ? "translateY(0)" : "translateY(-8px)",
-					}}
-				>
-					|
-				</span>
-				<Link
-					href="/docs"
-					ref={(ref) => {
-						linkRefs.current.documentation = ref;
-					}}
-					onMouseOver={() => setActiveLink("documentation")}
-					onMouseLeave={() => setActiveLink("home")}
-					style={{
-						transform: scrolled ? "translateY(0)" : "sm:translateY(-8px)",
-					}}
-					className={`hover:text-blue-300 transition-all duration-300 py-2 px-4 rounded-md font-mono ${
-						scrolled
-							? "sm:opacity-100 sm:translate-y-0"
-							: "sm:opacity-0 sm:pointer-events-none"
+					className={`flex items-center backdrop-blur-md bg-black/40 rounded-md border border-blue-500/30 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
+						scrolled ? "w-[420px]" : "sm:w-[280px] w-[350px]"
 					}`}
 				>
-					documentation
-				</Link>
+					<div
+						className="absolute transition-all duration-300 ease-in-out bg-blue-900/20 border border-blue-500/20 rounded-md py-2"
+						style={bgStyles}
+					/>
+					<Link
+						href="/"
+						ref={(ref) => {
+							linkRefs.current.home = ref;
+						}}
+						onMouseOver={() => setActiveLink("home")}
+						className="text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative font-mono"
+					>
+						<span className="text-blue-500">~/</span>home
+					</Link>
+					<Link
+						href="https://www.github.com/better-t-stack/create-better-t-stack"
+						target="_blank"
+						ref={(ref) => {
+							linkRefs.current.github = ref;
+						}}
+						onMouseOver={() => setActiveLink("github")}
+						onMouseLeave={() => setActiveLink("home")}
+						className="text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono"
+					>
+						<PackageIcon pm="github" className="w-4 h-4" />{" "}
+						<span className="max-sm:hidden">github</span>
+					</Link>
+					<Link
+						href="https://www.npmjs.com/package/create-better-t-stack"
+						target="_blank"
+						ref={(ref) => {
+							linkRefs.current.npm = ref;
+						}}
+						onMouseOver={() => setActiveLink("npm")}
+						onMouseLeave={() => setActiveLink("home")}
+						className="text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono"
+					>
+						<PackageIcon pm="npm" className="w-4 h-4 rounded-full" />{" "}
+						<span className="max-sm:hidden">npm</span>
+					</Link>
+					<span
+						className="text-blue-500 transition-all duration-300"
+						style={{
+							opacity: scrolled ? 1 : 0,
+							transform: scrolled ? "translateY(0)" : "translateY(-8px)",
+						}}
+					>
+						|
+					</span>
+					<Link
+						href="/docs"
+						ref={(ref) => {
+							linkRefs.current.documentation = ref;
+						}}
+						onMouseOver={() => setActiveLink("documentation")}
+						onMouseLeave={() => setActiveLink("home")}
+						style={{
+							transform: scrolled ? "translateY(0)" : "sm:translateY(-8px)",
+						}}
+						className={`hover:text-blue-300 transition-all duration-300 py-2 px-4 rounded-md font-mono ${
+							scrolled
+								? "sm:opacity-100 sm:translate-y-0"
+								: "sm:opacity-0 sm:pointer-events-none"
+						}`}
+					>
+						documentation
+					</Link>
+				</div>
 			</div>
 
 			<div
-				className={`transition-opacity duration-300 ${
+				className={`flex justify-end transition-opacity duration-300 ${
 					scrolled ? "opacity-0 pointer-events-none" : "opacity-100"
 				}`}
 			>
