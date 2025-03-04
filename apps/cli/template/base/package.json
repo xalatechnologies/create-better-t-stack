@@ -1,0 +1,23 @@
+{
+  "name": "better-t-stack",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:client": "turbo -F @better-t/client dev",
+    "dev:server": "turbo -F @better-t/server dev",
+    "db:local": "turbo -F @better-t/server db:local",
+    "db:push": "turbo -F @better-t/server db:push"
+  },
+  "packageManager": "bun@1.2.4",
+  "dependencies": {
+    "drizzle-orm": "^0.38.4"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.2"
+  }
+}

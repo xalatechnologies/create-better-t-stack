@@ -1,131 +1,116 @@
 import path from "node:path";
-import { cancel, confirm, isCancel, log, spinner, tasks } from "@clack/prompts";
-import degit from "degit";
+import { cancel, spinner } from "@clack/prompts";
 import { $ } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
+import { PKG_ROOT } from "../constants";
 import type { ProjectConfig } from "../types";
 import { configureAuth } from "./auth-setup";
 import { createReadme } from "./create-readme";
-import { setupTurso } from "./db-setup";
+import { setupDatabase } from "./db-setup";
 import { setupFeatures } from "./feature-setup";
 import { displayPostInstallInstructions } from "./post-installation";
 
-export async function createProject(options: ProjectConfig) {
+export async function createProject(options: ProjectConfig): Promise<string> {
 	const s = spinner();
 	const projectDir = path.resolve(process.cwd(), options.projectName);
-	let shouldInstallDeps = false;
 
 	try {
-		const tasksList = [
-			{
-				title: "Creating project directory",
-				task: async () => {
-					await fs.ensureDir(projectDir);
-				},
-			},
-			{
-				title: "Cloning template repository",
-				task: async () => {
-					try {
-						const emitter = degit("better-t-stack/Better-T-Stack#bare");
-						await emitter.clone(projectDir);
-					} catch (error) {
-						log.error(pc.red("Failed to clone template repository"));
-						if (error instanceof Error) {
-							log.error(pc.red(error.message));
-						}
-						throw error;
-					}
-				},
-			},
-		];
+		await fs.ensureDir(projectDir);
 
-		if (options.database === "none") {
-			tasksList.push({
-				title: "Removing database configuration",
-				task: async () => {
-					await fs.remove(path.join(projectDir, "packages/server/src/db"));
-				},
-			});
+		const templateDir = path.join(PKG_ROOT, "template/base");
+		if (!(await fs.pathExists(templateDir))) {
+			throw new Error(`Template directory not found: ${templateDir}`);
 		}
+		await fs.copy(templateDir, projectDir);
 
-		tasksList.push({
-			title: options.auth
-				? "Setting up authentication"
-				: "Removing authentication",
-			task: async () => {
-				await configureAuth(
-					projectDir,
-					options.auth,
-					options.database !== "none",
-					options,
-				);
-			},
-		});
-
-		if (options.git) {
-			tasksList.push({
-				title: "Initializing git repository",
-				task: async () => {
-					await $({
-						cwd: projectDir,
-					})`git init`;
-				},
-			});
-		}
-
-		if (options.features.length > 0) {
-			tasksList.push({
-				title: "Setting up additional features",
-				task: async () => {
-					await setupFeatures(projectDir, options.features);
-				},
-			});
-		}
-
-		await tasks(tasksList);
-
-		if (options.database === "sqlite") {
-			await setupTurso(projectDir);
-		} else if (options.database === "postgres") {
-			log.info(
-				pc.blue(
-					"PostgreSQL setup is manual. You'll need to set up your own PostgreSQL database and update the connection details in .env",
-				),
+		if (options.orm !== "none" && options.database !== "none") {
+			const ormTemplateDir = path.join(
+				PKG_ROOT,
+				options.orm === "drizzle"
+					? "template/with-drizzle"
+					: "template/with-prisma",
 			);
-		}
 
-		const installDepsResponse = await confirm({
-			message: `Install dependencies with ${options.packageManager}?`,
-		});
-
-		if (isCancel(installDepsResponse)) {
-			cancel(pc.red("Operation cancelled"));
-			process.exit(0);
-		}
-
-		shouldInstallDeps = installDepsResponse;
-
-		if (shouldInstallDeps) {
-			s.start(`Installing dependencies using ${options.packageManager}...`);
-			try {
-				await $({
-					cwd: projectDir,
-				})`${options.packageManager} install`;
-				s.stop("Dependencies installed successfully");
-			} catch (error) {
-				s.stop(pc.red("Failed to install dependencies"));
-				if (error instanceof Error) {
-					log.error(pc.red(`Installation error: ${error.message}`));
-				}
-				throw error;
+			if (await fs.pathExists(ormTemplateDir)) {
+				await fs.copy(ormTemplateDir, projectDir, { overwrite: true });
 			}
 		}
 
-		const rootPackageJsonPath = path.join(projectDir, "package.json");
-		if (await fs.pathExists(rootPackageJsonPath)) {
-			const packageJson = await fs.readJson(rootPackageJsonPath);
+		const gitignoreFiles = [
+			[
+				path.join(projectDir, "_gitignore"),
+				path.join(projectDir, ".gitignore"),
+			],
+			[
+				path.join(projectDir, "packages/client/_gitignore"),
+				path.join(projectDir, "packages/client/.gitignore"),
+			],
+			[
+				path.join(projectDir, "packages/server/_gitignore"),
+				path.join(projectDir, "packages/server/.gitignore"),
+			],
+		];
+
+		for (const [source, target] of gitignoreFiles) {
+			if (await fs.pathExists(source)) {
+				await fs.move(source, target);
+			}
+		}
+
+		const envFiles = [
+			[
+				path.join(projectDir, "packages/server/_env"),
+				path.join(projectDir, "packages/server/.env"),
+			],
+		];
+
+		for (const [source, target] of envFiles) {
+			if (await fs.pathExists(source)) {
+				if (!(await fs.pathExists(target))) {
+					await fs.move(source, target);
+				} else {
+					await fs.remove(source);
+				}
+			}
+		}
+
+		await setupDatabase(
+			projectDir,
+			options.database,
+			options.orm,
+			options.turso ?? options.database === "sqlite",
+		);
+		await configureAuth(
+			projectDir,
+			options.auth,
+			options.database !== "none",
+			options,
+		);
+
+		if (options.git) {
+			await $({ cwd: projectDir })`git init`;
+		}
+
+		if (options.features.length > 0) {
+			await setupFeatures(projectDir, options.features);
+		}
+
+		const packageJsonPath = path.join(projectDir, "package.json");
+		if (await fs.pathExists(packageJsonPath)) {
+			const packageJson = await fs.readJson(packageJsonPath);
+			packageJson.name = options.projectName;
+
+			if (options.packageManager !== "bun") {
+				packageJson.packageManager =
+					options.packageManager === "npm"
+						? "npm@10.2.4"
+						: options.packageManager === "pnpm"
+							? "pnpm@8.15.4"
+							: options.packageManager === "yarn"
+								? "yarn@4.1.0"
+								: "bun@1.2.4";
+			}
 
 			if (options.auth && options.database !== "none") {
 				packageJson.scripts["auth:generate"] =
@@ -150,7 +135,7 @@ export async function createProject(options: ProjectConfig) {
 				}
 			}
 
-			await fs.writeJson(rootPackageJsonPath, packageJson, { spaces: 2 });
+			await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
 		}
 
 		await createReadme(projectDir, options);
@@ -160,14 +145,17 @@ export async function createProject(options: ProjectConfig) {
 			options.database,
 			options.projectName,
 			options.packageManager,
-			shouldInstallDeps,
+			!options.noInstall,
 			options.orm,
 		);
+
+		return projectDir;
 	} catch (error) {
-		s.stop(pc.red("Failed"));
+		s.message(pc.red("Failed"));
 		if (error instanceof Error) {
-			log.error(pc.red(`Error during project creation: ${error.message}`));
+			cancel(pc.red(`Error during project creation: ${error.message}`));
 			process.exit(1);
 		}
+		throw error;
 	}
 }

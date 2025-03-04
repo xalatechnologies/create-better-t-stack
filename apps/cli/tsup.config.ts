@@ -6,6 +6,7 @@ export default defineConfig({
 	clean: true,
 	dts: true,
 	shims: true,
+	minify: true,
 	splitting: false,
 	outDir: "dist",
 	banner: {

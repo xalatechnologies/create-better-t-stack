@@ -27,6 +27,12 @@ export function displayConfig(config: Partial<ProjectConfig>) {
 			`${pc.blue("Package Manager:")} ${config.packageManager}`,
 		);
 	}
+	if (config.noInstall !== undefined) {
+		configDisplay.push(`${pc.blue("Skip Install:")} ${config.noInstall}`);
+	}
+	if (config.turso !== undefined) {
+		configDisplay.push(`${pc.blue("Turso Setup:")} ${config.turso}`);
+	}
 
 	return configDisplay.join("\n");
 }

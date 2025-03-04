@@ -1,48 +1,52 @@
-import { DEFAULT_CONFIG } from "../constants";
 import type { ProjectConfig } from "../types";
 
 export function generateReproducibleCommand(config: ProjectConfig): string {
 	const flags: string[] = [];
 
-	const isMainlyDefault = Object.entries(config).every(([key, value]) => {
-		if (key === "projectName") return true;
-		if (key === "features" && Array.isArray(value)) return value.length === 0;
-		return value === DEFAULT_CONFIG[key as keyof ProjectConfig];
-	});
-
-	if (isMainlyDefault) {
-		flags.push("-y");
+	if (config.database === "none") {
+		flags.push("--no-database");
+	} else if (config.database === "sqlite") {
+		flags.push("--sqlite");
+	} else if (config.database === "postgres") {
+		flags.push("--postgres");
 	}
 
-	if (config.database !== DEFAULT_CONFIG.database) {
-		if (config.database === "none") {
-			flags.push("--no-database");
-		} else {
-			flags.push(config.database === "sqlite" ? "--sqlite" : "--postgres");
+	if (config.database !== "none") {
+		if (config.orm === "drizzle") {
+			flags.push("--drizzle");
+		} else if (config.orm === "prisma") {
+			flags.push("--prisma");
 		}
 	}
 
-	if (config.database !== "none" && config.orm !== DEFAULT_CONFIG.orm) {
-		flags.push(config.orm === "drizzle" ? "--drizzle" : "--prisma");
-	}
-
-	if (config.auth !== DEFAULT_CONFIG.auth) {
+	if (config.auth) {
+		flags.push("--auth");
+	} else {
 		flags.push("--no-auth");
 	}
 
-	if (!config.git) {
+	if (config.git) {
+		flags.push("--git");
+	} else {
 		flags.push("--no-git");
 	}
 
-	if (
-		config.packageManager &&
-		config.packageManager !== DEFAULT_CONFIG.packageManager
-	) {
+	if (config.noInstall) {
+		flags.push("--no-install");
+	} else {
+		flags.push("--install");
+	}
+
+	if (config.packageManager) {
 		flags.push(`--${config.packageManager}`);
 	}
 
-	for (const feature of config.features) {
-		flags.push(`--${feature}`);
+	if (config.features.length > 0) {
+		for (const feature of config.features) {
+			flags.push(`--${feature}`);
+		}
+	} else {
+		flags.push("--no-features");
 	}
 
 	const baseCommand = "npx create-better-t-stack";

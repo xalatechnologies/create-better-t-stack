@@ -1,15 +1,15 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
-import type { ProjectORM } from "../types";
+import type { ProjectOrm } from "../types";
 
 export async function getORMChoice(
-	orm: ProjectORM | undefined,
+	orm: ProjectOrm | undefined,
 	hasDatabase: boolean,
-): Promise<ProjectORM> {
+): Promise<ProjectOrm> {
 	if (!hasDatabase) return "none";
 	if (orm !== undefined) return orm;
 
-	const response = await select<ProjectORM>({
+	const response = await select<ProjectOrm>({
 		message: "Which ORM would you like to use?",
 		options: [
 			{
