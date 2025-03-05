@@ -2,19 +2,31 @@
 
 > **Note:** This CLI is currently a work in progress (WIP).
 
-An interactive CLI tool to quickly scaffold full-stack applications using the Better-T-Stack framework.
+An interactive CLI tool to quickly scaffold full-stack TypeScript applications using the Better-T-Stack framework.
 
 ## Quick Start
 
 Run without installing globally:
 
 ```bash
-npx create-better-t-stack
+npx create-better-t-stack@latest
 # OR
 bunx create-better-t-stack
 ```
 
 Follow the prompts to configure your project.
+
+## Features
+
+- **Monorepo**: Turborepo for optimized build system and workspace management
+- **Frontend**: React, TanStack Router, TanStack Query, Tailwind CSS with shadcn/ui components
+- **Backend**: Hono, tRPC
+- **Database Options**: SQLite (via Turso), PostgreSQL, or no database
+- **ORM Selection**: Choose between Drizzle ORM or Prisma
+- **Authentication**: Optional auth setup with Better-Auth
+- **Developer Experience**: Git initialization, various package manager support (npm, pnpm, yarn, bun)
+- **Deployment**: Optional Docker configuration
+- **CI/CD**: Optional GitHub Actions workflows
 
 ## Usage
 
@@ -40,26 +52,44 @@ Options:
   --bun                 Use bun as package manager
   --drizzle             Use Drizzle ORM
   --prisma              Use Prisma ORM
+  --install             Install dependencies (default)
+  --no-install          Skip installing dependencies
+  --turso               Set up Turso for SQLite database (default with sqlite)
+  --no-turso            Skip Turso setup for SQLite database
   -h, --help            Display help
 ```
 
-## Features
+## Examples
 
-- **Project Setup**: Scaffold a full-stack TypeScript project with a monorepo structure
-- **Database Options**: Choose between SQLite (via Turso), PostgreSQL, or no database
-- **Authentication**: Optional auth setup with Better-Auth
-- **ORM Selection**: Choose between Drizzle ORM or Prisma
-- **Deployment**: Optional Docker configuration
-- **CI/CD**: GitHub Actions workflows
-- **Developer Experience**: Git initialization and package manager selection
+Create a project with default configuration:
+```bash
+npx create-better-t-stack my-app -y
+```
 
-## Stack
+Create a project with specific options:
+```bash
+npx create-better-t-stack my-app --postgres --prisma --auth --docker
+```
 
-The generated project includes:
+## Project Structure
 
-- **Frontend**: React, TanStack Router, TanStack Query
-- **Backend**: Hono, tRPC
-- **Styling**: Tailwind CSS with shadcn/ui components
-- **Database**: SQLite (Turso) or PostgreSQL with your choice of ORM
+The generated project follows a Turborepo monorepo structure:
+
+```
+my-app/
+├── packages/
+│   ├── client/         # Frontend application (React, TanStack Router)
+│   └── server/         # Backend API (Hono, tRPC)
+├── package.json        # Root package.json with Turborepo configuration
+└── README.md           # Project documentation
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+MIT
 
 Created by [Nitish Singh](https://github.com/FgrReloaded) & [Aman Varshney](https://github.com/AmanVarshney01)

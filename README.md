@@ -1,72 +1,47 @@
-# Create Better-T-Stack
+# Better-T-Stack
 
-A CLI tool to scaffold Better-T Stack projects with best practices and modern tooling.
+Better-T-Stack is a project scaffolding system for creating modern TypeScript applications with complete type safety from frontend to backend.
 
-## Features
+## Repository Structure
 
-- 🚀 Quick project setup with one command
-- 📦 TypeScript/JavaScript support
-- 🗄️ Database options (libSQL/PostgreSQL)
-- 🔒 Optional authentication setup
-- 🐳 Docker configuration
-- 🔄 GitHub Actions workflows
-- 🎯 SEO optimization
+This repository is organized as a monorepo containing:
+
+- **CLI**: [`create-better-t-stack`](apps/cli) - A scaffolding CLI that creates type-safe TypeScript projects
+- **Documentation**: [`web`](apps/web) - The official website and documentation
 
 ## Quick Start
 
 ```bash
 # Using npm
-npx create-better-t my-app
+npx create-better-t-stack my-app
 
 # Using bun
-bunx create-better-t my-app
+bunx create-better-t-stack my-app
 ```
 
-Just follow the interactive prompts!
+## Features
 
-## Options
+- 🚀 Fast project setup with interactive CLI
+- 📦 Complete TypeScript type safety from database to frontend
+- 🗄️ Multiple database options (libSQL/PostgreSQL)
+- 🧩 Choice of ORMs (Drizzle or Prisma)
+- 🔒 Built-in authentication with Better-Auth
+- 🐳 Optional Docker configuration
+- 🔄 Optional GitHub Actions workflows
 
-```bash
-Usage: create-better-t [project-directory] [options]
+## Documentation
 
-Options:
-  --typescript     Use TypeScript (default)
-  --javascript    Use JavaScript
-  --git           Initialize git repository (default)
-  --no-git        Skip git initialization
-  -h, --help      Display help
-```
-
-## Project Structure
-
-The generated project follows the Better-T Stack architecture:
-- Built with Bun
-- Type-safe database with DrizzleORM
-- Simple authentication system
-- Modern development practices
+Visit [better-t-stack.pages.dev](https://better-t-stack.pages.dev) for full documentation.
 
 ## Development
 
-To contribute to this CLI:
-
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/better-t-stack-cli.git
+git clone https://github.com/better-t-stack/create-better-t-stack.git
 
 # Install dependencies
 bun install
 
 # Start development
 bun dev
-
-# Build
-bun run build
 ```
-
-## License
-
-MIT
-
-## Credits
-
-Developed by Nitish Singh & Aman Varshney – Built on top of the Better-T Stack by [Aman Varshney](https://github.com/AmanVarshney01/Better-T-Stack)
