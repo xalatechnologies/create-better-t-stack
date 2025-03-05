@@ -9,20 +9,19 @@ const Navbar = () => {
 	const [scrolled, setScrolled] = useState(false);
 	const linkRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
 
-	const updateBackground = (linkId: string) => {
-		const linkElement = linkRefs.current[linkId];
-		if (linkElement) {
-			setBgStyles({
-				padding: "1rem 0rem",
-				width: `${linkElement.clientWidth - 12}px`,
-				transform: `translateX(${linkElement.offsetLeft}px)`,
-				opacity: 1,
-			});
-		}
-	};
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
+		const updateBackground = (linkId: string) => {
+			const linkElement = linkRefs.current[linkId];
+			if (linkElement) {
+				setBgStyles({
+					padding: "1rem 0rem",
+					width: `${linkElement.clientWidth - 12}px`,
+					transform: `translateX(${linkElement.offsetLeft}px)`,
+					opacity: 1,
+				});
+			}
+		};
+
 		updateBackground(activeLink);
 
 		const handleScroll = () => {
@@ -48,16 +47,14 @@ const Navbar = () => {
 			}`}
 		>
 			<div
-				className={`max-md:hidden flex items-center space-x-2 transition-opacity duration-300 ${
+				className={`max-md:hidden flex flex-row items-center space-x-2 transition-opacity duration-300 ${
 					scrolled ? "opacity-0" : "opacity-100"
 				}`}
 			>
-				<div className="bg-gradient-to-br from-blue-500 via-blue-400 to-indigo-300 w-8 h-8 rounded-lg flex items-center justify-center">
-					<div className="bg-black w-4 h-4 rounded-sm flex items-center justify-center">
-						<span className="text-blue-500 text-xs font-mono">$_</span>
-					</div>
+				<div className="w-4 h-4 rounded-sm flex items-center justify-center">
+					<span className="text-blue-500 text-md">$_</span>
 				</div>
-				<span className="text-blue-400 font-mono font-semibold text-lg">
+				<span className="text-blue-400 font-semibold text-md">
 					Better-T Stack
 				</span>
 			</div>
@@ -127,7 +124,7 @@ const Navbar = () => {
 						style={{
 							transform: scrolled ? "translateY(0)" : "sm:translateY(-8px)",
 						}}
-						className={`hover:text-blue-300 transition-all duration-300 py-2 px-4 rounded-md font-mono ${
+						className={`hover:text-blue-300 text-gray-300 transition-all duration-300 py-2 px-4 rounded-md font-mono ${
 							scrolled
 								? "sm:opacity-100 sm:translate-y-0"
 								: "sm:opacity-0 sm:pointer-events-none"
