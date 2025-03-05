@@ -22,7 +22,7 @@
 		"test": "vitest run",
 		"prepublishOnly": "npm run build"
 	},
-	"files": ["dist", "templates"],
+	"files": ["dist", "template"],
 	"dependencies": {
 		"@clack/prompts": "^0.10.0",
 		"commander": "^13.1.0",
