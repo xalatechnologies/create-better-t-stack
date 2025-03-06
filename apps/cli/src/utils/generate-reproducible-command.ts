@@ -41,12 +41,12 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		flags.push(`--${config.packageManager}`);
 	}
 
-	if (config.features.length > 0) {
-		for (const feature of config.features) {
-			flags.push(`--${feature}`);
+	if (config.addons.length > 0) {
+		for (const addon of config.addons) {
+			flags.push(`--${addon}`);
 		}
 	} else {
-		flags.push("--no-features");
+		flags.push("--no-addons");
 	}
 
 	const baseCommand = "npx create-better-t-stack";

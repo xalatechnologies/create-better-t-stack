@@ -11,7 +11,7 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 	database: "sqlite",
 	orm: "drizzle",
 	auth: true,
-	features: [],
+	addons: [],
 	git: true,
 	packageManager: "npm",
 	noInstall: false,

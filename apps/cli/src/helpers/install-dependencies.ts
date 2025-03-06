@@ -13,7 +13,6 @@ export async function installDependencies({
 	packageManager,
 }: InstallDependenciesOptions) {
 	const s = spinner();
-	log.info(pc.blue(`Installing dependencies using ${packageManager}...`));
 
 	try {
 		s.start(`Running ${packageManager} install...`);
@@ -34,7 +33,7 @@ export async function installDependencies({
 				break;
 		}
 
-		s.stop(pc.green("Dependencies installed successfully"));
+		s.stop("Dependencies installed successfully");
 	} catch (error) {
 		s.stop(pc.red("Failed to install dependencies"));
 		if (error instanceof Error) {

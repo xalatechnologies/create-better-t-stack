@@ -2,14 +2,14 @@ import { cancel, group } from "@clack/prompts";
 import pc from "picocolors";
 import type {
 	PackageManager,
+	ProjectAddons,
 	ProjectConfig,
 	ProjectDatabase,
-	ProjectFeature,
 	ProjectOrm,
 } from "../types";
+import { getAddonsChoice } from "./addons";
 import { getAuthChoice } from "./auth";
 import { getDatabaseChoice } from "./database";
-import { getFeaturesChoice } from "./features";
 import { getGitChoice } from "./git";
 import { getNoInstallChoice } from "./install";
 import { getORMChoice } from "./orm";
@@ -22,7 +22,7 @@ interface PromptGroupResults {
 	database: ProjectDatabase;
 	orm: ProjectOrm;
 	auth: boolean;
-	features: ProjectFeature[];
+	addons: ProjectAddons[];
 	git: boolean;
 	packageManager: PackageManager;
 	noInstall: boolean;
@@ -46,7 +46,7 @@ export async function gatherConfig(
 				results.database === "sqlite"
 					? getTursoSetupChoice(flags.turso)
 					: Promise.resolve(false),
-			features: () => getFeaturesChoice(flags.features),
+			addons: () => getAddonsChoice(flags.addons),
 			git: () => getGitChoice(flags.git),
 			packageManager: () => getPackageManagerChoice(flags.packageManager),
 			noInstall: () => getNoInstallChoice(flags.noInstall),
@@ -64,7 +64,7 @@ export async function gatherConfig(
 		database: result.database,
 		orm: result.orm,
 		auth: result.auth,
-		features: result.features,
+		addons: result.addons,
 		git: result.git,
 		packageManager: result.packageManager,
 		noInstall: result.noInstall,

@@ -5,7 +5,7 @@ import { DEFAULT_CONFIG } from "./constants";
 import { createProject } from "./helpers/create-project";
 import { installDependencies } from "./helpers/install-dependencies";
 import { gatherConfig } from "./prompts/config-prompts";
-import type { ProjectConfig, ProjectFeature } from "./types";
+import type { ProjectAddons, ProjectConfig } from "./types";
 import { displayConfig } from "./utils/display-config";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
 import { getVersion } from "./utils/get-version";
@@ -33,7 +33,7 @@ async function main() {
 		.option("--docker", "Include Docker setup")
 		.option("--github-actions", "Include GitHub Actions")
 		.option("--seo", "Include SEO setup")
-		.option("--no-features", "Skip all additional features")
+		.option("--no-addons", "Skip all additional addons")
 		.option("--git", "Include git setup")
 		.option("--no-git", "Skip git initialization")
 		.option("--npm", "Use npm package manager")
@@ -75,15 +75,15 @@ async function main() {
 			...((options.docker ||
 				options.githubActions ||
 				options.seo ||
-				options.features === false) && {
-				features:
-					options.features === false
+				options.addons === false) && {
+				addons:
+					options.addons === false
 						? []
 						: ([
 								...(options.docker ? ["docker"] : []),
 								...(options.githubActions ? ["github-actions"] : []),
 								...(options.seo ? ["SEO"] : []),
-							] as ProjectFeature[]),
+							] as ProjectAddons[]),
 			}),
 		};
 
@@ -117,9 +117,9 @@ async function main() {
 							: DEFAULT_CONFIG.noInstall,
 					packageManager:
 						flagConfig.packageManager ?? DEFAULT_CONFIG.packageManager,
-					features: flagConfig.features?.length
-						? flagConfig.features
-						: DEFAULT_CONFIG.features,
+					addons: flagConfig.addons?.length
+						? flagConfig.addons
+						: DEFAULT_CONFIG.addons,
 					turso:
 						"turso" in options
 							? options.turso

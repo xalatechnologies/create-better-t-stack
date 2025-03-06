@@ -45,7 +45,7 @@ interface ActiveNodes {
 	orm: string;
 	auth: string;
 	packageManager: string;
-	features: {
+	addons: {
 		docker: boolean;
 		githubActions: boolean;
 		seo: boolean;
@@ -62,7 +62,7 @@ const CustomizableStack = () => {
 		orm: "drizzle",
 		auth: "better-auth",
 		packageManager: "npm",
-		features: {
+		addons: {
 			docker: false,
 			githubActions: false,
 			seo: false,
@@ -128,10 +128,10 @@ const CustomizableStack = () => {
 			setActiveNodes((prev) => ({
 				...prev,
 				[category]: techId,
-				...(category === "features" && {
-					features: {
-						...prev.features,
-						[techId]: !prev.features[techId as keyof typeof prev.features],
+				...(category === "addons" && {
+					addons: {
+						...prev.addons,
+						[techId]: !prev.addons[techId as keyof typeof prev.addons],
 					},
 				}),
 			}));
@@ -342,16 +342,15 @@ const CustomizableStack = () => {
 		const command = "npx create-better-t-stack my-app";
 		const flags: string[] = [];
 
-		// Check if all defaults are being used
 		const isAllDefaults =
 			activeNodes.database === "sqlite" &&
 			activeNodes.auth === "better-auth" &&
 			activeNodes.orm === "drizzle" &&
 			activeNodes.packageManager === "npm" &&
-			activeNodes.features.git === true &&
-			!activeNodes.features.docker &&
-			!activeNodes.features.githubActions &&
-			!activeNodes.features.seo;
+			activeNodes.addons.git === true &&
+			!activeNodes.addons.docker &&
+			!activeNodes.addons.githubActions &&
+			!activeNodes.addons.seo;
 
 		// If using all defaults, just use -y flag
 		if (isAllDefaults) {
@@ -387,19 +386,19 @@ const CustomizableStack = () => {
 		}
 
 		// Feature flags
-		if (activeNodes.features.docker) {
+		if (activeNodes.addons.docker) {
 			flags.push("--docker");
 		}
 
-		if (activeNodes.features.githubActions) {
+		if (activeNodes.addons.githubActions) {
 			flags.push("--github-actions");
 		}
 
-		if (activeNodes.features.seo) {
+		if (activeNodes.addons.seo) {
 			flags.push("--seo");
 		}
 
-		if (!activeNodes.features.git) {
+		if (!activeNodes.addons.git) {
 			flags.push("--no-git");
 		}
 
@@ -408,21 +407,17 @@ const CustomizableStack = () => {
 
 	return (
 		<div className="relative w-full max-w-5xl mx-auto z-50 mt-24">
-			{/* Command Display - Fixed at top with proper centering */}
 			<div className="absolute -top-16 left-0 right-0 mx-auto flex justify-center z-50">
 				<CommandDisplay command={command} />
 			</div>
 
-			{/* Main container with proper layout */}
 			<div className="relative rounded-xl border border-gray-800 overflow-hidden">
 				<div className="absolute inset-0 backdrop-blur-3xl bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10" />
 
-				{/* Tech selector fixed to the left side */}
 				<div className="absolute left-0 top-0 bottom-0 lg:w-52 md:w-44 w-36 z-50 bg-gray-950/30 border-r border-gray-800/50">
 					<TechSelector onSelect={handleTechSelect} activeNodes={activeNodes} />
 				</div>
 
-				{/* Help text */}
 				<div className="max-sm:hidden bg-gray-950/30 lg:p-4 p-1 absolute lg:top-4 top-2 lg:right-4 right-2 z-50 w-80 rounded-xl border border-gray-800 backdrop-blur-3xl">
 					<div className="lg:text-sm text-xs text-gray-300 text-center">
 						Select technologies from the left panel to customize your stack. The
@@ -430,7 +425,6 @@ const CustomizableStack = () => {
 					</div>
 				</div>
 
-				{/* Flow container with proper spacing from the selector */}
 				<div className="h-[600px] lg:pl-52 md:pl-44 pl-36 relative backdrop-blur-sm bg-gray-950/50">
 					<ReactFlow
 						nodes={nodes}

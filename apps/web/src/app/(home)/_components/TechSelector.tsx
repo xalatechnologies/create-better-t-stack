@@ -4,7 +4,7 @@ interface ActiveNodes {
 	orm: string;
 	auth: string;
 	packageManager: string;
-	features: {
+	addons: {
 		docker: boolean;
 		githubActions: boolean;
 		seo: boolean;
@@ -38,11 +38,11 @@ const techOptions: Record<string, TechOption[]> = {
 		{ id: "yarn", label: "Yarn", category: "packageManager" },
 		{ id: "bun", label: "Bun", category: "packageManager" },
 	],
-	features: [
-		{ id: "docker", label: "Docker", category: "features" },
-		{ id: "githubActions", label: "GitHub Actions", category: "features" },
-		{ id: "seo", label: "SEO", category: "features" },
-		{ id: "git", label: "Git", category: "features" },
+	addons: [
+		{ id: "docker", label: "Docker", category: "addons" },
+		{ id: "githubActions", label: "GitHub Actions", category: "addons" },
+		{ id: "seo", label: "SEO", category: "addons" },
+		{ id: "git", label: "Git", category: "addons" },
 	],
 };
 
@@ -60,7 +60,7 @@ export function TechSelector({ onSelect, activeNodes }: TechSelectorProps) {
 
 			{/* Regular tech options */}
 			{Object.entries(techOptions)
-				.filter(([category]) => category !== "features")
+				.filter(([category]) => category !== "addons")
 				.map(([category, options]) => (
 					<div key={category} className="space-y-2">
 						<div className="text-xs text-gray-400 capitalize">{category}</div>
@@ -71,7 +71,7 @@ export function TechSelector({ onSelect, activeNodes }: TechSelectorProps) {
 									variant="secondary"
 									className={`cursor-pointer hover:bg-gray-700 ${
 										activeNodes[
-											category as keyof Omit<ActiveNodes, "features">
+											category as keyof Omit<ActiveNodes, "addons">
 										] === option.id && "bg-blue-600 text-white"
 									}`}
 									onClick={() => onSelect(category, option.id)}
@@ -85,18 +85,18 @@ export function TechSelector({ onSelect, activeNodes }: TechSelectorProps) {
 
 			{/* Feature toggles */}
 			<div className="space-y-2">
-				<div className="text-xs text-gray-400">Features</div>
+				<div className="text-xs text-gray-400">Addons</div>
 				<div className="flex flex-wrap gap-1">
-					{techOptions.features.map((option) => (
+					{techOptions.addons.map((option) => (
 						<Badge
 							key={option.id}
 							variant="secondary"
 							className={`cursor-pointer hover:bg-gray-700 ${
-								activeNodes.features[
-									option.id as keyof typeof activeNodes.features
+								activeNodes.addons[
+									option.id as keyof typeof activeNodes.addons
 								] === true && "bg-blue-600 text-white"
 							}`}
-							onClick={() => onSelect("features", option.id)}
+							onClick={() => onSelect("addons", option.id)}
 						>
 							{option.label}
 						</Badge>

@@ -16,8 +16,8 @@ export function displayConfig(config: Partial<ProjectConfig>) {
 	if (config.auth !== undefined) {
 		configDisplay.push(`${pc.blue("Authentication:")} ${config.auth}`);
 	}
-	if (config.features?.length) {
-		configDisplay.push(`${pc.blue("Features:")} ${config.features.join(", ")}`);
+	if (config.addons?.length) {
+		configDisplay.push(`${pc.blue("Addons:")} ${config.addons.join(", ")}`);
 	}
 	if (config.git !== undefined) {
 		configDisplay.push(`${pc.blue("Git Init:")} ${config.git}`);

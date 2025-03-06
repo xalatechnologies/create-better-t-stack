@@ -2,21 +2,18 @@ import path from "node:path";
 import { log } from "@clack/prompts";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type { ProjectFeature } from "../types";
+import type { ProjectAddons } from "../types";
 
-export async function setupFeatures(
-	projectDir: string,
-	features: ProjectFeature[],
-) {
-	if (features.includes("docker")) {
+export async function setupAddons(projectDir: string, addons: ProjectAddons[]) {
+	if (addons.includes("docker")) {
 		await setupDocker(projectDir);
 	}
 
-	if (features.includes("github-actions")) {
+	if (addons.includes("github-actions")) {
 		await setupGithubActions(projectDir);
 	}
 
-	if (features.includes("SEO")) {
+	if (addons.includes("SEO")) {
 		log.info(
 			pc.yellow(
 				"SEO feature is still a work-in-progress and will be available in a future update.",

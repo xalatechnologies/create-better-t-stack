@@ -175,7 +175,7 @@ const CodeContainer = () => {
 											<span className="text-yellow-400">yes</span>
 										</p>
 										<p className="text-white">
-											Features:{" "}
+											Addons:{" "}
 											<span className="text-yellow-400">
 												docker, github-actions, SEO
 											</span>

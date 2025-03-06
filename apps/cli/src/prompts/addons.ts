@@ -1,14 +1,14 @@
 import { cancel, isCancel, multiselect } from "@clack/prompts";
 import pc from "picocolors";
-import type { ProjectFeature } from "../types";
+import type { ProjectAddons } from "../types";
 
-export async function getFeaturesChoice(
-	features?: ProjectFeature[],
-): Promise<ProjectFeature[]> {
-	if (features !== undefined) return features;
+export async function getAddonsChoice(
+	Addons?: ProjectAddons[],
+): Promise<ProjectAddons[]> {
+	if (Addons !== undefined) return Addons;
 
-	const response = await multiselect<ProjectFeature>({
-		message: "Which features would you like to add?",
+	const response = await multiselect<ProjectAddons>({
+		message: "Which Addons would you like to add?",
 		options: [
 			{
 				value: "docker",

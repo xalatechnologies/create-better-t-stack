@@ -15,7 +15,6 @@ export async function setupDatabase(
 
 	if (databaseType === "none") {
 		await fs.remove(path.join(serverDir, "src/db"));
-		log.info(pc.yellow("Database configuration removed"));
 		return;
 	}
 

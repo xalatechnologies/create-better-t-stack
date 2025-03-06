@@ -5,10 +5,10 @@ import fs from "fs-extra";
 import pc from "picocolors";
 import { PKG_ROOT } from "../constants";
 import type { ProjectConfig } from "../types";
+import { setupAddons } from "./addons-setup";
 import { configureAuth } from "./auth-setup";
 import { createReadme } from "./create-readme";
 import { setupDatabase } from "./db-setup";
-import { setupFeatures } from "./feature-setup";
 import { displayPostInstallInstructions } from "./post-installation";
 
 export async function createProject(options: ProjectConfig): Promise<string> {
@@ -92,8 +92,8 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			await $({ cwd: projectDir })`git init`;
 		}
 
-		if (options.features.length > 0) {
-			await setupFeatures(projectDir, options.features);
+		if (options.addons.length > 0) {
+			await setupAddons(projectDir, options.addons);
 		}
 
 		const packageJsonPath = path.join(projectDir, "package.json");

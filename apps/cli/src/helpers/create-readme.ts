@@ -19,7 +19,7 @@ function generateReadmeContent(options: ProjectConfig): string {
 		packageManager,
 		database,
 		auth,
-		features = [],
+		addons = [],
 		orm = "drizzle",
 	} = options;
 
@@ -32,7 +32,7 @@ This project was created with [Better-T-Stack](https://github.com/better-t-stack
 
 ## Features
 
-${generateFeaturesList(database, auth, features, orm)}
+${generateFeaturesList(database, auth, addons, orm)}
 
 ## Getting Started
 
