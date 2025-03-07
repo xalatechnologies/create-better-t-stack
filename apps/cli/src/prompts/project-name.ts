@@ -5,10 +5,12 @@ import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
 
 const INVALID_CHARS = ["<", ">", ":", '"', "|", "?", "*"];
-
 const MAX_LENGTH = 255;
 
 function validateDirectoryName(name: string): string | undefined {
+	// Allow "." as it represents current directory
+	if (name === ".") return undefined;
+
 	if (!name) return "Project name cannot be empty";
 	if (name.length > MAX_LENGTH) {
 		return `Project name must be less than ${MAX_LENGTH} characters`;
@@ -30,21 +32,28 @@ function validateDirectoryName(name: string): string | undefined {
 
 export async function getProjectName(initialName?: string): Promise<string> {
 	if (initialName) {
-		const finalDirName = path.basename(initialName);
-		const validationError = validateDirectoryName(finalDirName);
-		if (!validationError) {
-			const projectDir = path.resolve(process.cwd(), initialName);
-			if (
-				!fs.pathExistsSync(projectDir) ||
-				fs.readdirSync(projectDir).length === 0
-			) {
+		if (initialName === ".") {
+			const projectDir = process.cwd();
+			if (fs.readdirSync(projectDir).length === 0) {
 				return initialName;
+			}
+		} else {
+			const finalDirName = path.basename(initialName);
+			const validationError = validateDirectoryName(finalDirName);
+			if (!validationError) {
+				const projectDir = path.resolve(process.cwd(), initialName);
+				if (
+					!fs.pathExistsSync(projectDir) ||
+					fs.readdirSync(projectDir).length === 0
+				) {
+					return initialName;
+				}
 			}
 		}
 	}
 
 	let isValid = false;
-	let projectName = "";
+	let projectPath = "";
 	let defaultName = DEFAULT_CONFIG.projectName;
 	let counter = 1;
 
@@ -55,18 +64,29 @@ export async function getProjectName(initialName?: string): Promise<string> {
 
 	while (!isValid) {
 		const response = await text({
-			message: "What is your project named? (directory name or path)",
+			message:
+				"Enter your project name or path (relative to current directory)",
 			placeholder: defaultName,
 			initialValue: initialName,
 			defaultValue: defaultName,
 			validate: (value) => {
 				const nameToUse = value.trim() || defaultName;
 
-				const finalDirName = path.basename(nameToUse);
+				if (nameToUse === ".") {
+					const dirContents = fs.readdirSync(process.cwd());
+					if (dirContents.length > 0) {
+						return "Current directory is not empty. Please choose a different directory.";
+					}
+					isValid = true;
+					return undefined;
+				}
+
+				const projectDir = path.resolve(process.cwd(), nameToUse);
+				const finalDirName = path.basename(projectDir);
+
 				const validationError = validateDirectoryName(finalDirName);
 				if (validationError) return validationError;
 
-				const projectDir = path.resolve(process.cwd(), nameToUse);
 				if (!projectDir.startsWith(process.cwd())) {
 					return "Project path must be within current directory";
 				}
@@ -74,7 +94,7 @@ export async function getProjectName(initialName?: string): Promise<string> {
 				if (fs.pathExistsSync(projectDir)) {
 					const dirContents = fs.readdirSync(projectDir);
 					if (dirContents.length > 0) {
-						return `Directory "${nameToUse}" already exists and is not empty. Please choose a different name.`;
+						return `Directory "${nameToUse}" already exists and is not empty. Please choose a different name or path.`;
 					}
 				}
 
@@ -88,8 +108,8 @@ export async function getProjectName(initialName?: string): Promise<string> {
 			process.exit(0);
 		}
 
-		projectName = response || defaultName;
+		projectPath = response || defaultName;
 	}
 
-	return projectName;
+	return projectPath;
 }
