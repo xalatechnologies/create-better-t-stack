@@ -58,7 +58,6 @@ export function TechSelector({ onSelect, activeNodes }: TechSelectorProps) {
 				Options
 			</div>
 
-			{/* Regular tech options */}
 			{Object.entries(techOptions)
 				.filter(([category]) => category !== "addons")
 				.map(([category, options]) => (
@@ -69,7 +68,7 @@ export function TechSelector({ onSelect, activeNodes }: TechSelectorProps) {
 								<Badge
 									key={option.id}
 									variant="secondary"
-									className={`cursor-pointer hover:bg-gray-700 ${
+									className={`cursor-pointer hover:bg-gray-700 text-gray-300 ${
 										activeNodes[
 											category as keyof Omit<ActiveNodes, "addons">
 										] === option.id && "bg-blue-600 text-white"
@@ -83,7 +82,6 @@ export function TechSelector({ onSelect, activeNodes }: TechSelectorProps) {
 					</div>
 				))}
 
-			{/* Feature toggles */}
 			<div className="space-y-2">
 				<div className="text-xs text-gray-400">Addons</div>
 				<div className="flex flex-wrap gap-1">
@@ -91,7 +89,7 @@ export function TechSelector({ onSelect, activeNodes }: TechSelectorProps) {
 						<Badge
 							key={option.id}
 							variant="secondary"
-							className={`cursor-pointer hover:bg-gray-700 ${
+							className={`cursor-pointer hover:bg-gray-700 text-gray-300 ${
 								activeNodes.addons[
 									option.id as keyof typeof activeNodes.addons
 								] === true && "bg-blue-600 text-white"
