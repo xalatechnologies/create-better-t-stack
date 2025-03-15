@@ -37,7 +37,7 @@ export async function getPackageManagerChoice(
 			{
 				value: "bun",
 				label: "bun",
-				hint: "All-in-one JavaScript runtime & toolkit (recommended)",
+				hint: "All-in-one JavaScript runtime & toolkit",
 			},
 		],
 		initialValue: "bun",

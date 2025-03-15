@@ -37,27 +37,6 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			}
 		}
 
-		const gitignoreFiles = [
-			[
-				path.join(projectDir, "_gitignore"),
-				path.join(projectDir, ".gitignore"),
-			],
-			[
-				path.join(projectDir, "packages/client/_gitignore"),
-				path.join(projectDir, "packages/client/.gitignore"),
-			],
-			[
-				path.join(projectDir, "packages/server/_gitignore"),
-				path.join(projectDir, "packages/server/.gitignore"),
-			],
-		];
-
-		for (const [source, target] of gitignoreFiles) {
-			if (await fs.pathExists(source)) {
-				await fs.move(source, target);
-			}
-		}
-
 		const envFiles = [
 			[
 				path.join(projectDir, "packages/server/_env"),
@@ -112,26 +91,31 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 								: "bun@1.2.4";
 			}
 
-			if (options.auth && options.database !== "none") {
-				packageJson.scripts["auth:generate"] =
-					"cd packages/server && npx @better-auth/cli generate --output ./src/db/auth-schema.ts";
+			if (options.database !== "none") {
+				if (options.database === "sqlite") {
+					packageJson.scripts["db:local"] =
+						"cd packages/server && turso dev --db-file local.db";
+				}
 
-				if (options.orm === "prisma") {
-					packageJson.scripts["prisma:generate"] =
-						"cd packages/server && npx prisma generate";
-					packageJson.scripts["prisma:push"] =
-						"cd packages/server && npx prisma db push";
-					packageJson.scripts["prisma:studio"] =
-						"cd packages/server && npx prisma studio";
+				if (options.auth) {
+					packageJson.scripts["auth:generate"] =
+						"cd packages/server && npx @better-auth/cli generate --output ./src/db/auth-schema.ts";
 
-					packageJson.scripts["db:setup"] =
-						"npm run auth:generate && npm run prisma:generate && npm run prisma:push";
-				} else if (options.orm === "drizzle") {
-					packageJson.scripts["drizzle:migrate"] =
-						"cd packages/server && npx @better-auth/cli migrate";
-
-					packageJson.scripts["db:setup"] =
-						"npm run auth:generate && npm run drizzle:migrate";
+					if (options.orm === "prisma") {
+						packageJson.scripts["prisma:generate"] =
+							"cd packages/server && npx prisma generate";
+						packageJson.scripts["prisma:push"] =
+							"cd packages/server && npx prisma db push";
+						packageJson.scripts["prisma:studio"] =
+							"cd packages/server && npx prisma studio";
+						packageJson.scripts["db:setup"] =
+							"npm run auth:generate && npm run prisma:generate && npm run prisma:push";
+					} else if (options.orm === "drizzle") {
+						packageJson.scripts["drizzle:migrate"] =
+							"cd packages/server && npx @better-auth/cli migrate";
+						packageJson.scripts["db:setup"] =
+							"npm run auth:generate && npm run drizzle:migrate";
+					}
 				}
 			}
 

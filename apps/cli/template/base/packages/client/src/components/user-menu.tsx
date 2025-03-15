@@ -28,6 +28,33 @@ export default function UserMenu() {
     return <Skeleton className="h-9 w-24" />;
   }
 
+  if (!session) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline">Sign In</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="bg-card">
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                navigate({
+                  to: "/sign-in",
+                });
+              }}
+            >
+              Sign In
+            </Button>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

@@ -28,7 +28,7 @@ function generateReadmeContent(options: ProjectConfig): string {
 
 	return `# ${projectName}
 
-This project was created with [Better-T-Stack](https://github.com/better-t-stack/Better-T-Stack).
+This project was created with [Better-T-Stack](https://github.com/better-t-stack/Better-T-Stack), a modern TypeScript stack that combines React, TanStack Router, Hono, tRPC, and more.
 
 ## Features
 
@@ -42,6 +42,8 @@ First, install the dependencies:
 ${packageManager} install
 \`\`\`
 
+${generateDatabaseSetup(database, auth, packageManagerRunCmd, orm)}
+
 Then, run the development server:
 
 \`\`\`bash
@@ -50,10 +52,6 @@ ${packageManagerRunCmd} dev
 
 Open [http://localhost:3001](http://localhost:3001) in your browser to see the client application.
 The API is running at [http://localhost:3000](http://localhost:3000).
-
-## Database Setup
-
-${generateDatabaseSetup(database, auth, packageManagerRunCmd, orm)}
 
 ## Project Structure
 
@@ -64,9 +62,9 @@ ${projectName}/
 │   └── server/         # Backend API (Hono, tRPC)
 \`\`\`
 
-## Scripts
+## Available Scripts
 
-${generateScriptsList(packageManagerRunCmd)}
+${generateScriptsList(packageManagerRunCmd, database, orm, auth)}
 `;
 }
 
@@ -77,31 +75,34 @@ function generateFeaturesList(
 	orm: string,
 ): string {
 	const featuresList = [
-		"TypeScript - For type safety",
-		"TanStack Router - File-based routing",
-		`${orm === "drizzle" ? "Drizzle" : "Prisma"} - ORM`,
-		"TailwindCSS - Utility-first CSS",
-		"shadcn/ui - Reusable components",
-		"Hono - Lightweight, performant server",
+		"- **TypeScript** - For type safety and improved developer experience",
+		"- **TanStack Router** - File-based routing with full type safety",
+		"- **TailwindCSS** - Utility-first CSS for rapid UI development",
+		"- **shadcn/ui** - Reusable UI components",
+		"- **Hono** - Lightweight, performant server framework",
+		"- **tRPC** - End-to-end type-safe APIs",
 	];
 
 	if (database !== "none") {
 		featuresList.push(
-			`${database === "sqlite" ? "SQLite/Turso DB" : "PostgreSQL"} - Database`,
+			`- **${orm === "drizzle" ? "Drizzle" : "Prisma"}** - TypeScript-first ORM`,
+			`- **${database === "sqlite" ? "SQLite/Turso" : "PostgreSQL"}** - Database engine`,
 		);
 	}
 
 	if (auth) {
-		featuresList.push("Authentication - Email & password auth");
+		featuresList.push(
+			"- **Authentication** - Email & password authentication with Better Auth",
+		);
 	}
 
 	for (const feature of features) {
 		if (feature === "docker") {
-			featuresList.push("Docker - Containerized deployment");
+			featuresList.push("- **Docker** - Containerized deployment");
 		} else if (feature === "github-actions") {
-			featuresList.push("GitHub Actions - CI/CD");
+			featuresList.push("- **GitHub Actions** - CI/CD workflows");
 		} else if (feature === "SEO") {
-			featuresList.push("SEO - Search engine optimization");
+			featuresList.push("- **SEO** - Search engine optimization tools");
 		}
 	}
 
@@ -115,63 +116,90 @@ function generateDatabaseSetup(
 	orm: string,
 ): string {
 	if (database === "none") {
-		return "This project does not include a database.";
+		return "";
 	}
 
-	if (database === "sqlite") {
-		return `This project uses SQLite/Turso for the database.
+	let setup = "## Database Setup\n\n";
 
-1. Start the local database:
+	if (database === "sqlite") {
+		setup += `This project uses SQLite${orm === "drizzle" ? " with Drizzle ORM" : " with Prisma"}.
+
+1. Start the local SQLite database:
 \`\`\`bash
 ${packageManagerRunCmd} db:local
 \`\`\`
 
-2. Update your \`.env\` file with the connection details.
+2. Update your \`.env\` file with the appropriate connection details if needed.
+`;
+	} else if (database === "postgres") {
+		setup += `This project uses PostgreSQL${orm === "drizzle" ? " with Drizzle ORM" : " with Prisma"}.
 
-${
-	auth
-		? `3. If using authentication, generate the auth schema:
+1. Make sure you have a PostgreSQL database set up.
+2. Update your \`packages/server/.env\` file with your PostgreSQL connection details.
+`;
+	}
+
+	if (auth) {
+		setup += `
+3. Generate the authentication schema:
 \`\`\`bash
 ${packageManagerRunCmd} auth:generate
 \`\`\`
 
-4. Apply the schema to your database:
+4. ${
+			orm === "prisma"
+				? `Generate the Prisma client and push the schema:
 \`\`\`bash
-${packageManagerRunCmd} ${orm === "drizzle" ? "drizzle:migrate" : "prisma:push"}
+${packageManagerRunCmd} prisma:generate
+${packageManagerRunCmd} prisma:push
 \`\`\``
-		: ""
-}`;
+				: `Apply the Drizzle migrations:
+\`\`\`bash
+${packageManagerRunCmd} drizzle:migrate
+\`\`\``
+		}
+`;
 	}
 
-	if (database === "postgres") {
-		return `This project uses PostgreSQL for the database.
-
-1. Set up your PostgreSQL database.
-2. Update your \`.env\` file with the connection details.
-
-${
-	auth
-		? `3. If using authentication, generate the auth schema:
-\`\`\`bash
-${packageManagerRunCmd} auth:generate
-\`\`\`
-
-4. Apply the schema to your database:
-\`\`\`bash
-${packageManagerRunCmd} ${orm === "drizzle" ? "drizzle:migrate" : "prisma:push"}
-\`\`\``
-		: ""
-}`;
-	}
-
-	return "";
+	return setup;
 }
 
-function generateScriptsList(packageManagerRunCmd: string): string {
-	return `- \`${packageManagerRunCmd} dev\`: Start both client and server in development mode
+function generateScriptsList(
+	packageManagerRunCmd: string,
+	database: string,
+	orm: string,
+	auth: boolean,
+): string {
+	let scripts = `- \`${packageManagerRunCmd} dev\`: Start both client and server in development mode
 - \`${packageManagerRunCmd} build\`: Build both client and server
 - \`${packageManagerRunCmd} dev:client\`: Start only the client
-- \`${packageManagerRunCmd} dev:server\`: Start only the server
-- \`${packageManagerRunCmd} db:local\`: Start the local SQLite database (if applicable)
-- \`${packageManagerRunCmd} db:push\`: Push schema changes to the database`;
+- \`${packageManagerRunCmd} dev:server\`: Start only the server`;
+
+	if (database !== "none") {
+		if (database === "sqlite") {
+			scripts += `\n- \`${packageManagerRunCmd} db:local\`: Start the local SQLite database`;
+		}
+
+		if (orm === "prisma") {
+			scripts += `
+- \`${packageManagerRunCmd} prisma:generate\`: Generate Prisma client
+- \`${packageManagerRunCmd} prisma:push\`: Push schema changes to database
+- \`${packageManagerRunCmd} prisma:studio\`: Open Prisma Studio`;
+		} else if (orm === "drizzle") {
+			scripts += `
+- \`${packageManagerRunCmd} db:generate\`: Generate database schema
+- \`${packageManagerRunCmd} db:push\`: Push schema changes to database
+- \`${packageManagerRunCmd} db:studio\`: Open Drizzle Studio`;
+		}
+	}
+
+	if (auth) {
+		scripts += `\n- \`${packageManagerRunCmd} auth:generate\`: Generate authentication schema`;
+	}
+
+	if (auth && database !== "none") {
+		scripts += `\n- \`${packageManagerRunCmd} db:setup\`: Complete database setup for auth`;
+	}
+
+	return scripts;
 }

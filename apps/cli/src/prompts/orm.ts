@@ -15,7 +15,7 @@ export async function getORMChoice(
 			{
 				value: "drizzle",
 				label: "Drizzle",
-				hint: "Type-safe, lightweight ORM (recommended)",
+				hint: "Type-safe, lightweight ORM",
 			},
 			{
 				value: "prisma",

@@ -1,7 +1,5 @@
 import path from "node:path";
-import { log } from "@clack/prompts";
 import fs from "fs-extra";
-import pc from "picocolors";
 import type { ProjectAddons } from "../types";
 
 export async function setupAddons(projectDir: string, addons: ProjectAddons[]) {

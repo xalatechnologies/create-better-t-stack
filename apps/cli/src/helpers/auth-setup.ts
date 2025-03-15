@@ -50,11 +50,58 @@ export async function configureAuth(
 			);
 		} else {
 			const envPath = path.join(serverDir, ".env");
-			const envExamplePath = path.join(serverDir, "_env");
+			const templateEnvPath = path.join(
+				PKG_ROOT,
+				options.orm === "drizzle"
+					? "template/with-drizzle/packages/server/_env"
+					: "template/base/packages/server/_env",
+			);
 
-			if (await fs.pathExists(envExamplePath)) {
-				await fs.copy(envExamplePath, envPath);
-				await fs.remove(envExamplePath);
+			if (!(await fs.pathExists(envPath))) {
+				if (await fs.pathExists(templateEnvPath)) {
+					await fs.copy(templateEnvPath, envPath);
+				} else {
+					const defaultEnv = `BETTER_AUTH_SECRET=${generateAuthSecret()}
+BETTER_AUTH_URL=http://localhost:3000
+CORS_ORIGIN=http://localhost:3001
+${options.database === "sqlite" ? "TURSO_CONNECTION_URL=http://127.0.0.1:8080" : ""}
+${options.orm === "prisma" ? 'DATABASE_URL="file:./dev.db"' : ""}
+`;
+					await fs.writeFile(envPath, defaultEnv);
+				}
+			} else {
+				let envContent = await fs.readFile(envPath, "utf8");
+
+				if (!envContent.includes("BETTER_AUTH_SECRET")) {
+					envContent += `\nBETTER_AUTH_SECRET=${generateAuthSecret()}`;
+				}
+
+				if (!envContent.includes("BETTER_AUTH_URL")) {
+					envContent += "\nBETTER_AUTH_URL=http://localhost:3000";
+				}
+
+				if (!envContent.includes("CORS_ORIGIN")) {
+					envContent += "\nCORS_ORIGIN=http://localhost:3001";
+				}
+
+				if (
+					options.database === "sqlite" &&
+					!envContent.includes("TURSO_CONNECTION_URL")
+				) {
+					envContent += "\nTURSO_CONNECTION_URL=http://127.0.0.1:8080";
+				}
+
+				if (options.orm === "prisma" && !envContent.includes("DATABASE_URL")) {
+					envContent += '\nDATABASE_URL="file:./dev.db"';
+				}
+
+				await fs.writeFile(envPath, envContent);
+			}
+
+			const clientEnvPath = path.join(clientDir, ".env");
+			if (!(await fs.pathExists(clientEnvPath))) {
+				const clientEnvContent = "VITE_SERVER_URL=http://localhost:3000\n";
+				await fs.writeFile(clientEnvPath, clientEnvContent);
 			}
 
 			if (options.orm === "prisma") {
@@ -70,6 +117,15 @@ export async function configureAuth(
 				) {
 					await fs.ensureDir(path.dirname(prismaAuthPath));
 					await fs.copy(defaultPrismaAuthPath, prismaAuthPath);
+				}
+
+				let authContent = await fs.readFile(prismaAuthPath, "utf8");
+				if (!authContent.includes("trustedOrigins")) {
+					authContent = authContent.replace(
+						"export const auth = betterAuth({",
+						"export const auth = betterAuth({\n    trustedOrigins: [process.env.CORS_ORIGIN!],",
+					);
+					await fs.writeFile(prismaAuthPath, authContent);
 				}
 			} else if (options.orm === "drizzle") {
 				const drizzleAuthPath = path.join(serverDir, "src/lib/auth.ts");
@@ -94,4 +150,15 @@ export async function configureAuth(
 		}
 		throw error;
 	}
+}
+
+function generateAuthSecret(length = 32): string {
+	const characters =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	let result = "";
+	const charactersLength = characters.length;
+	for (let i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
 }

@@ -18,7 +18,7 @@ export async function getDatabaseChoice(
 			{
 				value: "sqlite",
 				label: "SQLite",
-				hint: "by Turso (recommended)",
+				hint: "by Turso",
 			},
 			{
 				value: "postgres",
