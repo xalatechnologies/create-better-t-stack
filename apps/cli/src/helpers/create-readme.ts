@@ -151,11 +151,11 @@ ${packageManagerRunCmd} auth:generate
 				? `Generate the Prisma client and push the schema:
 \`\`\`bash
 ${packageManagerRunCmd} prisma:generate
-${packageManagerRunCmd} prisma:push
+${packageManagerRunCmd} db:push
 \`\`\``
 				: `Apply the Drizzle migrations:
 \`\`\`bash
-${packageManagerRunCmd} drizzle:migrate
+${packageManagerRunCmd} db:push
 \`\`\``
 		}
 `;
@@ -183,7 +183,7 @@ function generateScriptsList(
 		if (orm === "prisma") {
 			scripts += `
 - \`${packageManagerRunCmd} prisma:generate\`: Generate Prisma client
-- \`${packageManagerRunCmd} prisma:push\`: Push schema changes to database
+- \`${packageManagerRunCmd} db:push\`: Push schema changes to database
 - \`${packageManagerRunCmd} prisma:studio\`: Open Prisma Studio`;
 		} else if (orm === "drizzle") {
 			scripts += `

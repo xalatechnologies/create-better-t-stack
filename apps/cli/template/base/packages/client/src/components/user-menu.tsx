@@ -43,7 +43,7 @@ export default function UserMenu() {
               className="w-full"
               onClick={() => {
                 navigate({
-                  to: "/sign-in",
+                  to: "/",
                 });
               }}
             >

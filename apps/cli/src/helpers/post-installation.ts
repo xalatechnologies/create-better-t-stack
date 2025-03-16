@@ -19,21 +19,18 @@ export function displayPostInstallInstructions(
 	}
 
 	if (hasAuth && database !== "none") {
-		steps.push(`${pc.yellow("Authentication Setup:")}`);
-		steps.push(
-			`${pc.cyan("1.")} Generate auth schema: ${pc.green(`${runCmd} auth:generate`)}`,
-		);
+		steps.push(`${pc.yellow("Database Setup:")}`);
 
 		if (orm === "prisma") {
 			steps.push(
-				`${pc.cyan("2.")} Generate Prisma client: ${pc.green(`${runCmd} prisma:generate`)}`,
+				`${pc.cyan("1.")} Generate Prisma client: ${pc.green(`${runCmd} prisma:generate`)}`,
 			);
 			steps.push(
-				`${pc.cyan("3.")} Push schema to database: ${pc.green(`${runCmd} prisma:push`)}`,
+				`${pc.cyan("2.")} Push schema to database: ${pc.green(`${runCmd} prisma:push`)}`,
 			);
 		} else if (orm === "drizzle") {
 			steps.push(
-				`${pc.cyan("2.")} Apply migrations: ${pc.green(`${runCmd} drizzle:migrate`)}`,
+				`${pc.cyan("1.")} Apply migrations: ${pc.green(`${runCmd} db:push`)}`,
 			);
 		}
 	}

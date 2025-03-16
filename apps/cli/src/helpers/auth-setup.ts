@@ -127,6 +127,22 @@ ${options.orm === "prisma" ? 'DATABASE_URL="file:./dev.db"' : ""}
 					);
 					await fs.writeFile(prismaAuthPath, authContent);
 				}
+
+				const packageJsonPath = path.join(projectDir, "package.json");
+				if (await fs.pathExists(packageJsonPath)) {
+					const packageJson = await fs.readJson(packageJsonPath);
+
+					packageJson.scripts["prisma:generate"] =
+						"cd packages/server && npx prisma generate";
+					packageJson.scripts["prisma:push"] =
+						"cd packages/server && npx prisma db push";
+					packageJson.scripts["prisma:studio"] =
+						"cd packages/server && npx prisma studio";
+					packageJson.scripts["db:setup"] =
+						"npm run auth:generate && npm run prisma:generate && npm run prisma:push";
+
+					await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
+				}
 			} else if (options.orm === "drizzle") {
 				const drizzleAuthPath = path.join(serverDir, "src/lib/auth.ts");
 				const defaultDrizzleAuthPath = path.join(
@@ -140,6 +156,18 @@ ${options.orm === "prisma" ? 'DATABASE_URL="file:./dev.db"' : ""}
 				) {
 					await fs.ensureDir(path.dirname(drizzleAuthPath));
 					await fs.copy(defaultDrizzleAuthPath, drizzleAuthPath);
+				}
+
+				const packageJsonPath = path.join(projectDir, "package.json");
+				if (await fs.pathExists(packageJsonPath)) {
+					const packageJson = await fs.readJson(packageJsonPath);
+
+					packageJson.scripts["db:push"] =
+						"cd packages/server && npx @better-auth/cli migrate";
+					packageJson.scripts["db:setup"] =
+						"npm run auth:generate && npm run db:push";
+
+					await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
 				}
 			}
 		}
