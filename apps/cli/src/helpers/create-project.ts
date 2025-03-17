@@ -27,9 +27,7 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		if (options.orm !== "none" && options.database !== "none") {
 			const ormTemplateDir = path.join(
 				PKG_ROOT,
-				options.orm === "drizzle"
-					? "template/with-drizzle"
-					: "template/with-prisma",
+				getOrmTemplateDir(options.orm, options.database),
 			);
 
 			if (await fs.pathExists(ormTemplateDir)) {
@@ -142,4 +140,20 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		}
 		throw error;
 	}
+}
+
+function getOrmTemplateDir(orm: string, database: string): string {
+	if (orm === "drizzle") {
+		return database === "sqlite"
+			? "template/with-drizzle-sqlite"
+			: "template/with-drizzle-postgres";
+	}
+
+	if (orm === "prisma") {
+		return database === "sqlite"
+			? "template/with-prisma-sqlite"
+			: "template/with-prisma-postgres";
+	}
+
+	return "template/base";
 }

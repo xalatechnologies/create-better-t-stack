@@ -52,9 +52,11 @@ export async function configureAuth(
 			const envPath = path.join(serverDir, ".env");
 			const templateEnvPath = path.join(
 				PKG_ROOT,
-				options.orm === "drizzle"
-					? "template/with-drizzle/packages/server/_env"
-					: "template/base/packages/server/_env",
+				getOrmTemplatePath(
+					options.orm,
+					options.database,
+					"packages/server/_env",
+				),
 			);
 
 			if (!(await fs.pathExists(envPath))) {
@@ -108,7 +110,11 @@ ${options.orm === "prisma" ? 'DATABASE_URL="file:./dev.db"' : ""}
 				const prismaAuthPath = path.join(serverDir, "src/lib/auth.ts");
 				const defaultPrismaAuthPath = path.join(
 					PKG_ROOT,
-					"template/with-prisma/packages/server/src/lib/auth.ts",
+					getOrmTemplatePath(
+						options.orm,
+						options.database,
+						"packages/server/src/lib/auth.ts",
+					),
 				);
 
 				if (
@@ -147,7 +153,11 @@ ${options.orm === "prisma" ? 'DATABASE_URL="file:./dev.db"' : ""}
 				const drizzleAuthPath = path.join(serverDir, "src/lib/auth.ts");
 				const defaultDrizzleAuthPath = path.join(
 					PKG_ROOT,
-					"template/with-drizzle/packages/server/src/lib/auth.ts",
+					getOrmTemplatePath(
+						options.orm,
+						options.database,
+						"packages/server/src/lib/auth.ts",
+					),
 				);
 
 				if (
@@ -178,6 +188,24 @@ ${options.orm === "prisma" ? 'DATABASE_URL="file:./dev.db"' : ""}
 		}
 		throw error;
 	}
+}
+
+function getOrmTemplatePath(
+	orm: string,
+	database: string,
+	relativePath: string,
+): string {
+	if (orm === "drizzle") {
+		return database === "sqlite"
+			? `template/with-drizzle-sqlite/${relativePath}`
+			: `template/with-drizzle-postgres/${relativePath}`;
+	}
+	if (orm === "prisma") {
+		return database === "sqlite"
+			? `template/with-prisma-sqlite/${relativePath}`
+			: `template/with-prisma-postgres/${relativePath}`;
+	}
+	return `template/base/${relativePath}`;
 }
 
 function generateAuthSecret(length = 32): string {

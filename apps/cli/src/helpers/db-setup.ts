@@ -21,24 +21,21 @@ export async function setupDatabase(
 	try {
 		if (databaseType === "sqlite") {
 			if (orm === "drizzle") {
-				await setupDrizzleDependencies(projectDir);
-				await setupTurso(projectDir, setupTursoDb);
+				await setupDrizzleDependencies(projectDir, "sqlite");
+				if (setupTursoDb) {
+					await setupTurso(projectDir, true);
+				}
 			} else if (orm === "prisma") {
-				await setupPrismaDependencies(projectDir);
-				await setupTurso(projectDir, setupTursoDb);
+				await setupPrismaDependencies(projectDir, "sqlite");
+				if (setupTursoDb) {
+					await setupTurso(projectDir, true);
+				}
 			}
 		} else if (databaseType === "postgres") {
-			log.info(
-				pc.blue(
-					"PostgreSQL setup is coming in a future update. Using SQLite configuration for now.",
-				),
-			);
 			if (orm === "drizzle") {
-				await setupDrizzleDependencies(projectDir);
-				await setupTurso(projectDir, setupTursoDb);
+				await setupDrizzleDependencies(projectDir, "postgres");
 			} else if (orm === "prisma") {
-				await setupPrismaDependencies(projectDir);
-				await setupTurso(projectDir, setupTursoDb);
+				await setupPrismaDependencies(projectDir, "postgres");
 			}
 		}
 	} catch (error) {
@@ -50,7 +47,10 @@ export async function setupDatabase(
 	}
 }
 
-async function setupDrizzleDependencies(projectDir: string): Promise<void> {
+async function setupDrizzleDependencies(
+	projectDir: string,
+	dbType: string,
+): Promise<void> {
 	const serverDir = path.join(projectDir, "packages/server");
 
 	const packageJsonPath = path.join(serverDir, "package.json");
@@ -60,8 +60,13 @@ async function setupDrizzleDependencies(projectDir: string): Promise<void> {
 		packageJson.dependencies = {
 			...packageJson.dependencies,
 			"drizzle-orm": "^0.38.4",
-			"@libsql/client": "^0.14.0",
 		};
+
+		if (dbType === "sqlite") {
+			packageJson.dependencies["@libsql/client"] = "^0.14.0";
+		} else if (dbType === "postgres") {
+			packageJson.dependencies.postgres = "^3.4.5";
+		}
 
 		packageJson.devDependencies = {
 			...packageJson.devDependencies,
@@ -79,7 +84,10 @@ async function setupDrizzleDependencies(projectDir: string): Promise<void> {
 	}
 }
 
-async function setupPrismaDependencies(projectDir: string): Promise<void> {
+async function setupPrismaDependencies(
+	projectDir: string,
+	dbType: string,
+): Promise<void> {
 	const serverDir = path.join(projectDir, "packages/server");
 
 	const packageJsonPath = path.join(serverDir, "package.json");
@@ -89,9 +97,14 @@ async function setupPrismaDependencies(projectDir: string): Promise<void> {
 		packageJson.dependencies = {
 			...packageJson.dependencies,
 			"@prisma/client": "^5.7.1",
-			"@prisma/adapter-libsql": "^5.7.1",
-			"@libsql/client": "^0.14.0",
 		};
+
+		if (dbType === "sqlite") {
+			packageJson.dependencies["@prisma/adapter-libsql"] = "^5.7.1";
+			packageJson.dependencies["@libsql/client"] = "^0.14.0";
+		} else if (dbType === "postgres") {
+			// PostgreSQL specific dependencies if needed
+		}
 
 		packageJson.devDependencies = {
 			...packageJson.devDependencies,
@@ -112,7 +125,10 @@ async function setupPrismaDependencies(projectDir: string): Promise<void> {
 	if (await fs.pathExists(envPath)) {
 		const envContent = await fs.readFile(envPath, "utf8");
 		if (!envContent.includes("DATABASE_URL")) {
-			const databaseUrlLine = `\nDATABASE_URL="file:./dev.db"`;
+			const databaseUrlLine =
+				dbType === "sqlite"
+					? `\nDATABASE_URL="file:./dev.db"`
+					: `\nDATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"`;
 			await fs.appendFile(envPath, databaseUrlLine);
 		}
 	}
