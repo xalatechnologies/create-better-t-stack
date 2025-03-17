@@ -17,9 +17,17 @@ export async function configureAuth(
 	try {
 		if (!enableAuth) {
 			await fs.remove(path.join(clientDir, "src/components/sign-up-form.tsx"));
+			await fs.remove(path.join(clientDir, "src/components/sign-in-form.tsx"));
+			await fs.remove(path.join(clientDir, "src/components/auth-forms.tsx"));
 			await fs.remove(path.join(clientDir, "src/components/user-menu.tsx"));
 			await fs.remove(path.join(clientDir, "src/lib/auth-client.ts"));
-			await fs.remove(path.join(clientDir, "src/lib/schemas.ts"));
+
+			const indexRoutePath = path.join(clientDir, "src/routes/index.tsx");
+			const indexRouteContent = await fs.readFile(indexRoutePath, "utf8");
+			const updatedIndexRouteContent = indexRouteContent
+				.replace(/import AuthForms from "@\/components\/auth-forms";\n/, "")
+				.replace(/<AuthForms \/>/, "");
+			await fs.writeFile(indexRoutePath, updatedIndexRouteContent, "utf8");
 
 			await fs.remove(path.join(serverDir, "src/lib/auth.ts"));
 
