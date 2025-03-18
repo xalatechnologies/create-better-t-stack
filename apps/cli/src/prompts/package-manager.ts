@@ -1,4 +1,4 @@
-import { cancel, confirm, isCancel, select } from "@clack/prompts";
+import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
 import type { PackageManager } from "../types";
 import { getUserPkgManager } from "../utils/get-package-manager";
@@ -9,21 +9,16 @@ export async function getPackageManagerChoice(
 	if (packageManager !== undefined) return packageManager;
 
 	const detectedPackageManager = getUserPkgManager();
-	const useDetected = await confirm({
-		message: `Use ${detectedPackageManager} as your package manager?`,
-	});
-
-	if (isCancel(useDetected)) {
-		cancel(pc.red("Operation cancelled"));
-		process.exit(0);
-	}
-
-	if (useDetected) return detectedPackageManager;
 
 	const response = await select<PackageManager>({
-		message: "Which package manager would you like to use?",
+		message: "Which package manager do you want to use?",
 		options: [
 			{ value: "npm", label: "npm", hint: "Node Package Manager" },
+			{
+				value: "bun",
+				label: "bun",
+				hint: "All-in-one JavaScript runtime & toolkit",
+			},
 			{
 				value: "pnpm",
 				label: "pnpm",
@@ -34,13 +29,8 @@ export async function getPackageManagerChoice(
 				label: "yarn",
 				hint: "Fast, reliable, and secure dependency management",
 			},
-			{
-				value: "bun",
-				label: "bun",
-				hint: "All-in-one JavaScript runtime & toolkit",
-			},
 		],
-		initialValue: "bun",
+		initialValue: detectedPackageManager,
 	});
 
 	if (isCancel(response)) {

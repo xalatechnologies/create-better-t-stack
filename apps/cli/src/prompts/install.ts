@@ -8,7 +8,7 @@ export async function getNoInstallChoice(
 	if (noInstall !== undefined) return noInstall;
 
 	const response = await confirm({
-		message: "Install dependencies?",
+		message: "Do you want to install project dependencies?",
 		initialValue: !DEFAULT_CONFIG.noInstall,
 	});
 
