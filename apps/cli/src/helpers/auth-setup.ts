@@ -8,7 +8,6 @@ import type { ProjectConfig } from "../types";
 export async function setupAuth(
 	projectDir: string,
 	enableAuth: boolean,
-	hasDatabase: boolean,
 	options: ProjectConfig,
 ): Promise<void> {
 	const serverDir = path.join(projectDir, "packages/server");
@@ -16,15 +15,6 @@ export async function setupAuth(
 
 	try {
 		if (!enableAuth) {
-			return;
-		}
-
-		if (!hasDatabase) {
-			log.warn(
-				pc.yellow(
-					"Authentication enabled but no database selected. Auth will not function properly.",
-				),
-			);
 			return;
 		}
 

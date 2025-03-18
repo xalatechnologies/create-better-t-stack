@@ -70,12 +70,7 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			options.turso ?? options.database === "sqlite",
 		);
 
-		await setupAuth(
-			projectDir,
-			options.auth,
-			options.database !== "none",
-			options,
-		);
+		await setupAuth(projectDir, options.auth, options);
 
 		if (options.git) {
 			await $({ cwd: projectDir })`git init`;
