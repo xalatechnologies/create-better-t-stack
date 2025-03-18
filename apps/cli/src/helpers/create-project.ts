@@ -6,7 +6,7 @@ import pc from "picocolors";
 import { PKG_ROOT } from "../constants";
 import type { ProjectConfig } from "../types";
 import { setupAddons } from "./addons-setup";
-import { configureAuth } from "./auth-setup";
+import { setupAuth } from "./auth-setup";
 import { createReadme } from "./create-readme";
 import { setupDatabase } from "./db-setup";
 import { displayPostInstallInstructions } from "./post-installation";
@@ -24,6 +24,13 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		}
 		await fs.copy(templateDir, projectDir);
 
+		if (options.auth) {
+			const authTemplateDir = path.join(PKG_ROOT, "template/with-auth");
+			if (await fs.pathExists(authTemplateDir)) {
+				await fs.copy(authTemplateDir, projectDir, { overwrite: true });
+			}
+		}
+
 		if (options.orm !== "none" && options.database !== "none") {
 			const ormTemplateDir = path.join(
 				PKG_ROOT,
@@ -39,6 +46,10 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			[
 				path.join(projectDir, "packages/server/_env"),
 				path.join(projectDir, "packages/server/.env"),
+			],
+			[
+				path.join(projectDir, "packages/client/_env"),
+				path.join(projectDir, "packages/client/.env"),
 			],
 		];
 
@@ -58,7 +69,8 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			options.orm,
 			options.turso ?? options.database === "sqlite",
 		);
-		await configureAuth(
+
+		await setupAuth(
 			projectDir,
 			options.auth,
 			options.database !== "none",

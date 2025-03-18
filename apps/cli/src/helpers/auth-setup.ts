@@ -5,7 +5,7 @@ import pc from "picocolors";
 import { PKG_ROOT } from "../constants";
 import type { ProjectConfig } from "../types";
 
-export async function configureAuth(
+export async function setupAuth(
 	projectDir: string,
 	enableAuth: boolean,
 	hasDatabase: boolean,
@@ -16,177 +16,98 @@ export async function configureAuth(
 
 	try {
 		if (!enableAuth) {
-			await fs.remove(path.join(clientDir, "src/components/sign-up-form.tsx"));
-			await fs.remove(path.join(clientDir, "src/components/sign-in-form.tsx"));
-			await fs.remove(path.join(clientDir, "src/components/auth-forms.tsx"));
-			await fs.remove(path.join(clientDir, "src/components/user-menu.tsx"));
-			await fs.remove(path.join(clientDir, "src/lib/auth-client.ts"));
+			return;
+		}
 
-			const indexRoutePath = path.join(clientDir, "src/routes/index.tsx");
-			const indexRouteContent = await fs.readFile(indexRoutePath, "utf8");
-			const updatedIndexRouteContent = indexRouteContent
-				.replace(/import AuthForms from "@\/components\/auth-forms";\n/, "")
-				.replace(/<AuthForms \/>/, "");
-			await fs.writeFile(indexRoutePath, updatedIndexRouteContent, "utf8");
-
-			await fs.remove(path.join(serverDir, "src/lib/auth.ts"));
-
-			const indexFilePath = path.join(serverDir, "src/index.ts");
-			const indexContent = await fs.readFile(indexFilePath, "utf8");
-			const updatedIndexContent = indexContent
-				.replace(/import { auth } from "\.\/lib\/auth";\n/, "")
-				.replace(
-					/app\.on\(\["POST", "GET"\], "\/api\/auth\/\*\*", \(c\) => auth\.handler\(c\.req\.raw\)\);\n\n/,
-					"",
-				);
-			await fs.writeFile(indexFilePath, updatedIndexContent, "utf8");
-
-			const contextFilePath = path.join(serverDir, "src/lib/context.ts");
-			const contextContent = await fs.readFile(contextFilePath, "utf8");
-			const updatedContextContent = contextContent
-				.replace(/import { auth } from "\.\/auth";\n/, "")
-				.replace(
-					/const session = await auth\.api\.getSession\({\n\s+headers: hono\.req\.raw\.headers,\n\s+}\);/,
-					"const session = null;",
-				);
-			await fs.writeFile(contextFilePath, updatedContextContent, "utf8");
-		} else if (!hasDatabase) {
+		if (!hasDatabase) {
 			log.warn(
 				pc.yellow(
 					"Authentication enabled but no database selected. Auth will not function properly.",
 				),
 			);
-		} else {
-			const envPath = path.join(serverDir, ".env");
-			const templateEnvPath = path.join(
-				PKG_ROOT,
-				getOrmTemplatePath(
-					options.orm,
-					options.database,
-					"packages/server/_env",
-				),
-			);
+			return;
+		}
 
-			if (!(await fs.pathExists(envPath))) {
-				if (await fs.pathExists(templateEnvPath)) {
-					await fs.copy(templateEnvPath, envPath);
-				} else {
-					const defaultEnv = `BETTER_AUTH_SECRET=${generateAuthSecret()}
+		const envPath = path.join(serverDir, ".env");
+		const templateEnvPath = path.join(
+			PKG_ROOT,
+			getOrmTemplatePath(options.orm, options.database, "packages/server/_env"),
+		);
+
+		if (!(await fs.pathExists(envPath))) {
+			if (await fs.pathExists(templateEnvPath)) {
+				await fs.copy(templateEnvPath, envPath);
+			} else {
+				const defaultEnv = `BETTER_AUTH_SECRET=${generateAuthSecret()}
 BETTER_AUTH_URL=http://localhost:3000
 CORS_ORIGIN=http://localhost:3001
 ${options.database === "sqlite" ? "TURSO_CONNECTION_URL=http://127.0.0.1:8080" : ""}
 ${options.orm === "prisma" ? 'DATABASE_URL="file:./dev.db"' : ""}
 `;
-					await fs.writeFile(envPath, defaultEnv);
-				}
-			} else {
-				let envContent = await fs.readFile(envPath, "utf8");
+				await fs.writeFile(envPath, defaultEnv);
+			}
+		} else {
+			let envContent = await fs.readFile(envPath, "utf8");
 
-				if (!envContent.includes("BETTER_AUTH_SECRET")) {
-					envContent += `\nBETTER_AUTH_SECRET=${generateAuthSecret()}`;
-				}
-
-				if (!envContent.includes("BETTER_AUTH_URL")) {
-					envContent += "\nBETTER_AUTH_URL=http://localhost:3000";
-				}
-
-				if (!envContent.includes("CORS_ORIGIN")) {
-					envContent += "\nCORS_ORIGIN=http://localhost:3001";
-				}
-
-				if (
-					options.database === "sqlite" &&
-					!envContent.includes("TURSO_CONNECTION_URL")
-				) {
-					envContent += "\nTURSO_CONNECTION_URL=http://127.0.0.1:8080";
-				}
-
-				if (options.orm === "prisma" && !envContent.includes("DATABASE_URL")) {
-					envContent += '\nDATABASE_URL="file:./dev.db"';
-				}
-
-				await fs.writeFile(envPath, envContent);
+			if (!envContent.includes("BETTER_AUTH_SECRET")) {
+				envContent += `\nBETTER_AUTH_SECRET=${generateAuthSecret()}`;
 			}
 
-			const clientEnvPath = path.join(clientDir, ".env");
-			if (!(await fs.pathExists(clientEnvPath))) {
-				const clientEnvContent = "VITE_SERVER_URL=http://localhost:3000\n";
-				await fs.writeFile(clientEnvPath, clientEnvContent);
+			if (!envContent.includes("BETTER_AUTH_URL")) {
+				envContent += "\nBETTER_AUTH_URL=http://localhost:3000";
 			}
 
-			if (options.orm === "prisma") {
-				const prismaAuthPath = path.join(serverDir, "src/lib/auth.ts");
-				const defaultPrismaAuthPath = path.join(
-					PKG_ROOT,
-					getOrmTemplatePath(
-						options.orm,
-						options.database,
-						"packages/server/src/lib/auth.ts",
-					),
-				);
+			if (!envContent.includes("CORS_ORIGIN")) {
+				envContent += "\nCORS_ORIGIN=http://localhost:3001";
+			}
 
-				if (
-					(await fs.pathExists(defaultPrismaAuthPath)) &&
-					!(await fs.pathExists(prismaAuthPath))
-				) {
-					await fs.ensureDir(path.dirname(prismaAuthPath));
-					await fs.copy(defaultPrismaAuthPath, prismaAuthPath);
-				}
+			if (
+				options.database === "sqlite" &&
+				!envContent.includes("TURSO_CONNECTION_URL")
+			) {
+				envContent += "\nTURSO_CONNECTION_URL=http://127.0.0.1:8080";
+			}
 
-				let authContent = await fs.readFile(prismaAuthPath, "utf8");
-				if (!authContent.includes("trustedOrigins")) {
-					authContent = authContent.replace(
-						"export const auth = betterAuth({",
-						"export const auth = betterAuth({\n    trustedOrigins: [process.env.CORS_ORIGIN!],",
-					);
-					await fs.writeFile(prismaAuthPath, authContent);
-				}
+			if (options.orm === "prisma" && !envContent.includes("DATABASE_URL")) {
+				envContent += '\nDATABASE_URL="file:./dev.db"';
+			}
 
-				const packageJsonPath = path.join(projectDir, "package.json");
-				if (await fs.pathExists(packageJsonPath)) {
-					const packageJson = await fs.readJson(packageJsonPath);
+			await fs.writeFile(envPath, envContent);
+		}
 
-					packageJson.scripts["prisma:generate"] =
-						"cd packages/server && npx prisma generate";
-					packageJson.scripts["prisma:push"] =
-						"cd packages/server && npx prisma db push";
-					packageJson.scripts["prisma:studio"] =
-						"cd packages/server && npx prisma studio";
-					packageJson.scripts["db:setup"] =
-						"npm run auth:generate && npm run prisma:generate && npm run prisma:push";
+		const clientEnvPath = path.join(clientDir, ".env");
+		if (!(await fs.pathExists(clientEnvPath))) {
+			const clientEnvContent = "VITE_SERVER_URL=http://localhost:3000\n";
+			await fs.writeFile(clientEnvPath, clientEnvContent);
+		}
 
-					await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
-				}
-			} else if (options.orm === "drizzle") {
-				const drizzleAuthPath = path.join(serverDir, "src/lib/auth.ts");
-				const defaultDrizzleAuthPath = path.join(
-					PKG_ROOT,
-					getOrmTemplatePath(
-						options.orm,
-						options.database,
-						"packages/server/src/lib/auth.ts",
-					),
-				);
+		if (options.orm === "prisma") {
+			const packageJsonPath = path.join(projectDir, "package.json");
+			if (await fs.pathExists(packageJsonPath)) {
+				const packageJson = await fs.readJson(packageJsonPath);
 
-				if (
-					(await fs.pathExists(defaultDrizzleAuthPath)) &&
-					!(await fs.pathExists(drizzleAuthPath))
-				) {
-					await fs.ensureDir(path.dirname(drizzleAuthPath));
-					await fs.copy(defaultDrizzleAuthPath, drizzleAuthPath);
-				}
+				packageJson.scripts["prisma:generate"] =
+					"cd packages/server && npx prisma generate";
+				packageJson.scripts["prisma:push"] =
+					"cd packages/server && npx prisma db push";
+				packageJson.scripts["prisma:studio"] =
+					"cd packages/server && npx prisma studio";
+				packageJson.scripts["db:setup"] =
+					"npm run auth:generate && npm run prisma:generate && npm run prisma:push";
 
-				const packageJsonPath = path.join(projectDir, "package.json");
-				if (await fs.pathExists(packageJsonPath)) {
-					const packageJson = await fs.readJson(packageJsonPath);
+				await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
+			}
+		} else if (options.orm === "drizzle") {
+			const packageJsonPath = path.join(projectDir, "package.json");
+			if (await fs.pathExists(packageJsonPath)) {
+				const packageJson = await fs.readJson(packageJsonPath);
 
-					packageJson.scripts["db:push"] =
-						"cd packages/server && npx @better-auth/cli migrate";
-					packageJson.scripts["db:setup"] =
-						"npm run auth:generate && npm run db:push";
+				packageJson.scripts["db:push"] =
+					"cd packages/server && npx @better-auth/cli migrate";
+				packageJson.scripts["db:setup"] =
+					"npm run auth:generate && npm run db:push";
 
-					await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
-				}
+				await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
 			}
 		}
 	} catch (error) {
