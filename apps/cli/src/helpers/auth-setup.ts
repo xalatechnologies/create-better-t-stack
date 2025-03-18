@@ -2,8 +2,8 @@ import path from "node:path";
 import { log } from "@clack/prompts";
 import fs from "fs-extra";
 import pc from "picocolors";
-import { PKG_ROOT } from "../constants";
 import type { ProjectConfig } from "../types";
+import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupAuth(
 	projectDir: string,
@@ -18,53 +18,54 @@ export async function setupAuth(
 			return;
 		}
 
+		addPackageDependency({
+			dependencies: ["better-auth"],
+			devDependencies: false,
+			projectDir: serverDir,
+		});
+
 		const envPath = path.join(serverDir, ".env");
-		const templateEnvPath = path.join(
-			PKG_ROOT,
-			getOrmTemplatePath(options.orm, options.database, "packages/server/_env"),
-		);
 
-		if (!(await fs.pathExists(envPath))) {
-			if (await fs.pathExists(templateEnvPath)) {
-				await fs.copy(templateEnvPath, envPath);
-			} else {
-				const defaultEnv = `BETTER_AUTH_SECRET=${generateAuthSecret()}
-BETTER_AUTH_URL=http://localhost:3000
-CORS_ORIGIN=http://localhost:3001
-${options.database === "sqlite" ? "TURSO_CONNECTION_URL=http://127.0.0.1:8080" : ""}
-${options.orm === "prisma" ? 'DATABASE_URL="file:./dev.db"' : ""}
-`;
-				await fs.writeFile(envPath, defaultEnv);
-			}
-		} else {
-			let envContent = await fs.readFile(envPath, "utf8");
+		// Create or update the .env file directly with required variables
+		let envContent = "";
 
-			if (!envContent.includes("BETTER_AUTH_SECRET")) {
-				envContent += `\nBETTER_AUTH_SECRET=${generateAuthSecret()}`;
-			}
-
-			if (!envContent.includes("BETTER_AUTH_URL")) {
-				envContent += "\nBETTER_AUTH_URL=http://localhost:3000";
-			}
-
-			if (!envContent.includes("CORS_ORIGIN")) {
-				envContent += "\nCORS_ORIGIN=http://localhost:3001";
-			}
-
-			if (
-				options.database === "sqlite" &&
-				!envContent.includes("TURSO_CONNECTION_URL")
-			) {
-				envContent += "\nTURSO_CONNECTION_URL=http://127.0.0.1:8080";
-			}
-
-			if (options.orm === "prisma" && !envContent.includes("DATABASE_URL")) {
-				envContent += '\nDATABASE_URL="file:./dev.db"';
-			}
-
-			await fs.writeFile(envPath, envContent);
+		if (await fs.pathExists(envPath)) {
+			envContent = await fs.readFile(envPath, "utf8");
 		}
 
+		// Only add variables that don't already exist
+		if (!envContent.includes("BETTER_AUTH_SECRET")) {
+			envContent += `\nBETTER_AUTH_SECRET=${generateAuthSecret()}`;
+		}
+
+		if (!envContent.includes("BETTER_AUTH_URL")) {
+			envContent += "\nBETTER_AUTH_URL=http://localhost:3000";
+		}
+
+		if (!envContent.includes("CORS_ORIGIN")) {
+			envContent += "\nCORS_ORIGIN=http://localhost:3001";
+		}
+
+		if (
+			options.database === "sqlite" &&
+			!envContent.includes("TURSO_CONNECTION_URL")
+		) {
+			envContent += "\nTURSO_CONNECTION_URL=http://127.0.0.1:8080";
+		}
+
+		if (options.orm === "prisma" && !envContent.includes("DATABASE_URL")) {
+			if (options.database === "sqlite") {
+				envContent += '\nDATABASE_URL="file:./dev.db"';
+			} else if (options.database === "postgres") {
+				envContent +=
+					'\nDATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"';
+			}
+		}
+
+		// Write the updated content
+		await fs.writeFile(envPath, envContent.trim());
+
+		// Create client .env file if it doesn't exist
 		const clientEnvPath = path.join(clientDir, ".env");
 		if (!(await fs.pathExists(clientEnvPath))) {
 			const clientEnvContent = "VITE_SERVER_URL=http://localhost:3000\n";
@@ -107,24 +108,6 @@ ${options.orm === "prisma" ? 'DATABASE_URL="file:./dev.db"' : ""}
 		}
 		throw error;
 	}
-}
-
-function getOrmTemplatePath(
-	orm: string,
-	database: string,
-	relativePath: string,
-): string {
-	if (orm === "drizzle") {
-		return database === "sqlite"
-			? `template/with-drizzle-sqlite/${relativePath}`
-			: `template/with-drizzle-postgres/${relativePath}`;
-	}
-	if (orm === "prisma") {
-		return database === "sqlite"
-			? `template/with-prisma-sqlite/${relativePath}`
-			: `template/with-prisma-postgres/${relativePath}`;
-	}
-	return `template/base/${relativePath}`;
 }
 
 function generateAuthSecret(length = 32): string {

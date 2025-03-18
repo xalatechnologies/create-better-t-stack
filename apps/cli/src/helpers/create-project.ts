@@ -42,27 +42,6 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			}
 		}
 
-		const envFiles = [
-			[
-				path.join(projectDir, "packages/server/_env"),
-				path.join(projectDir, "packages/server/.env"),
-			],
-			[
-				path.join(projectDir, "packages/client/_env"),
-				path.join(projectDir, "packages/client/.env"),
-			],
-		];
-
-		for (const [source, target] of envFiles) {
-			if (await fs.pathExists(source)) {
-				if (!(await fs.pathExists(target))) {
-					await fs.move(source, target);
-				} else {
-					await fs.remove(source);
-				}
-			}
-		}
-
 		await setupDatabase(
 			projectDir,
 			options.database,
