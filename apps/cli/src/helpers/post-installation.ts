@@ -1,12 +1,13 @@
 import { log } from "@clack/prompts";
 import pc from "picocolors";
+import type { PackageManager, ProjectDatabase, ProjectOrm } from "../types";
 
 export function displayPostInstallInstructions(
-	database: string,
+	database: ProjectDatabase,
 	projectName: string,
-	packageManager: string,
+	packageManager: PackageManager,
 	depsInstalled: boolean,
-	orm?: string,
+	orm?: ProjectOrm,
 ) {
 	const runCmd = packageManager === "npm" ? "npm run" : packageManager;
 	const cdCmd = `cd ${projectName}`;
@@ -25,8 +26,8 @@ ${database !== "none" ? getDatabaseInstructions(database, orm, runCmd) : ""}`);
 }
 
 function getDatabaseInstructions(
-	database: string,
-	orm?: string,
+	database: ProjectDatabase,
+	orm?: ProjectOrm,
 	runCmd?: string,
 ): string {
 	const instructions = [];
@@ -39,7 +40,7 @@ function getDatabaseInstructions(
 			`${pc.cyan("•")} Database UI: ${pc.dim(`${runCmd} db:studio`)}`,
 		);
 
-		if (database === "turso") {
+		if (database === "sqlite") {
 			instructions.push(
 				`${pc.yellow("NOTE:")} Turso support with Prisma is in Early Access and requires additional setup.`,
 				`${pc.dim("Learn more at: https://www.prisma.io/docs/orm/overview/databases/turso")}`,
@@ -52,12 +53,12 @@ function getDatabaseInstructions(
 		instructions.push(
 			`${pc.cyan("•")} Database UI: ${pc.dim(`${runCmd} db:studio`)}`,
 		);
-	}
 
-	if (database === "sqlite") {
-		instructions.push(
-			`${pc.cyan("•")} Start local DB: ${pc.dim(`cd packages/server && ${runCmd} db:local`)}`,
-		);
+		if (database === "sqlite") {
+			instructions.push(
+				`${pc.cyan("•")} Start local DB: ${pc.dim(`cd packages/server && ${runCmd} db:local`)}`,
+			);
+		}
 	}
 
 	return instructions.length

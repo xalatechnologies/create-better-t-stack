@@ -8,7 +8,7 @@ import { gatherConfig } from "./prompts/config-prompts";
 import type { ProjectAddons, ProjectConfig } from "./types";
 import { displayConfig } from "./utils/display-config";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
-import { getVersion } from "./utils/get-version";
+import { getLatestCLIVersion } from "./utils/get-latest-cli-version";
 import { renderTitle } from "./utils/render-title";
 
 process.on("SIGINT", () => {
@@ -22,7 +22,7 @@ async function main() {
 	program
 		.name("create-better-t-stack")
 		.description("Create a new Better-T Stack project")
-		.version(getVersion())
+		.version(getLatestCLIVersion())
 		.argument("[project-directory]", "Project name/directory")
 		.option("-y, --yes", "Use default configuration")
 		.option("--no-database", "Skip database setup")

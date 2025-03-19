@@ -4,7 +4,7 @@ import { $ } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
 import { PKG_ROOT } from "../constants";
-import type { ProjectConfig } from "../types";
+import type { ProjectConfig, ProjectDatabase, ProjectOrm } from "../types";
 import { setupAddons } from "./addons-setup";
 import { setupAuth } from "./auth-setup";
 import { createReadme } from "./create-readme";
@@ -142,7 +142,7 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 	}
 }
 
-function getOrmTemplateDir(orm: string, database: string): string {
+function getOrmTemplateDir(orm: ProjectOrm, database: ProjectDatabase): string {
 	if (orm === "drizzle") {
 		return database === "sqlite"
 			? "template/with-drizzle-sqlite"

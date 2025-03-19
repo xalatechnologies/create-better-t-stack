@@ -1,6 +1,6 @@
 import path from "node:path";
 import fs from "fs-extra";
-import type { ProjectConfig } from "../types";
+import type { ProjectConfig, ProjectDatabase, ProjectOrm } from "../types";
 
 export async function createReadme(projectDir: string, options: ProjectConfig) {
 	const readmePath = path.join(projectDir, "README.md");
@@ -110,10 +110,10 @@ function generateFeaturesList(
 }
 
 function generateDatabaseSetup(
-	database: string,
+	database: ProjectDatabase,
 	auth: boolean,
 	packageManagerRunCmd: string,
-	orm: string,
+	orm: ProjectOrm,
 ): string {
 	if (database === "none") {
 		return "";
@@ -167,8 +167,8 @@ ${packageManagerRunCmd} db:push
 
 function generateScriptsList(
 	packageManagerRunCmd: string,
-	database: string,
-	orm: string,
+	database: ProjectDatabase,
+	orm: ProjectOrm,
 	auth: boolean,
 ): string {
 	let scripts = `- \`${packageManagerRunCmd} dev\`: Start both client and server in development mode
