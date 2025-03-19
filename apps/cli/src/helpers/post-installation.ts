@@ -2,7 +2,6 @@ import { log } from "@clack/prompts";
 import pc from "picocolors";
 
 export function displayPostInstallInstructions(
-	hasAuth: boolean,
 	database: string,
 	projectName: string,
 	packageManager: string,
@@ -12,52 +11,56 @@ export function displayPostInstallInstructions(
 	const runCmd = packageManager === "npm" ? "npm run" : packageManager;
 	const cdCmd = `cd ${projectName}`;
 
-	const steps = [];
+	log.info(`${pc.cyan("Project created successfully!")}
 
-	if (!depsInstalled) {
-		steps.push(`${pc.cyan(packageManager)} install`);
-	}
+${pc.bold("Next steps:")}
+${pc.cyan("1.")} ${cdCmd}
+${!depsInstalled ? `${pc.cyan("2.")} ${packageManager} install\n` : ""}${pc.cyan(depsInstalled ? "2." : "3.")} ${runCmd} dev
 
-	if (hasAuth && database !== "none") {
-		steps.push(`${pc.yellow("Database Setup:")}`);
+${pc.bold("Your project will be available at:")}
+${pc.cyan("•")} Frontend: http://localhost:3001
+${pc.cyan("•")} API: http://localhost:3000
 
-		if (orm === "prisma") {
-			steps.push(
-				`${pc.cyan("1.")} Generate Prisma client: ${pc.green(`${runCmd} prisma:generate`)}`,
-			);
-			steps.push(
-				`${pc.cyan("2.")} Push schema to database: ${pc.green(`${runCmd} prisma:push`)}`,
-			);
-		} else if (orm === "drizzle") {
-			steps.push(
-				`${pc.cyan("1.")} Apply migrations: ${pc.green(`${runCmd} db:push`)}`,
+${database !== "none" ? getDatabaseInstructions(database, orm, runCmd) : ""}`);
+}
+
+function getDatabaseInstructions(
+	database: string,
+	orm?: string,
+	runCmd?: string,
+): string {
+	const instructions = [];
+
+	if (orm === "prisma") {
+		instructions.push(
+			`${pc.cyan("•")} Apply schema: ${pc.dim(`${runCmd} db:push`)}`,
+		);
+		instructions.push(
+			`${pc.cyan("•")} Database UI: ${pc.dim(`${runCmd} db:studio`)}`,
+		);
+
+		if (database === "turso") {
+			instructions.push(
+				`${pc.yellow("NOTE:")} Turso support with Prisma is in Early Access and requires additional setup.`,
+				`${pc.dim("Learn more at: https://www.prisma.io/docs/orm/overview/databases/turso")}`,
 			);
 		}
-	}
-
-	if (database === "postgres") {
-		steps.push(`${pc.yellow("PostgreSQL Configuration:")}`);
-		steps.push(
-			`Make sure to update ${pc.cyan("packages/server/.env")} with your PostgreSQL connection string.`,
+	} else if (orm === "drizzle") {
+		instructions.push(
+			`${pc.cyan("•")} Apply schema: ${pc.dim(`${runCmd} db:push`)}`,
 		);
-	} else if (database === "sqlite") {
-		steps.push(`${pc.yellow("Database Configuration:")}`);
-		steps.push(
-			`${pc.cyan("packages/server/.env")} contains your SQLite connection details. Update if needed.`,
-		);
-		steps.push(
-			`Start the local SQLite database with: ${pc.green(`${runCmd} db:local`)}`,
+		instructions.push(
+			`${pc.cyan("•")} Database UI: ${pc.dim(`${runCmd} db:studio`)}`,
 		);
 	}
 
-	steps.push(`${pc.yellow("Start Development:")}`);
-	steps.push(`${pc.green(`${runCmd} dev`)}`);
+	if (database === "sqlite") {
+		instructions.push(
+			`${pc.cyan("•")} Start local DB: ${pc.dim(`cd packages/server && ${runCmd} db:local`)}`,
+		);
+	}
 
-	log.info(`${pc.cyan("Installation completed!")} Here are some next steps:
-
-${cdCmd}
-${steps.join("\n")}
-
-The client application will be available at ${pc.cyan("http://localhost:3001")}
-The API server will be running at ${pc.cyan("http://localhost:3000")}`);
+	return instructions.length
+		? `${pc.bold("Database commands:")}\n${instructions.join("\n")}\n\n`
+		: "";
 }

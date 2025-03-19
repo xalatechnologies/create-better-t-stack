@@ -89,7 +89,7 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			const serverPackageJson = await fs.readJson(serverPackageJsonPath);
 
 			if (options.database !== "none") {
-				if (options.database === "sqlite" && options.turso) {
+				if (options.database === "sqlite") {
 					serverPackageJson.scripts["db:local"] =
 						"turso dev --db-file local.db";
 				}
@@ -99,19 +99,19 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 						"npx @better-auth/cli generate --output ./src/db/auth-schema.ts";
 
 					if (options.orm === "prisma") {
-						serverPackageJson.scripts["db:push"] = "npx prisma db push";
-						serverPackageJson.scripts["db:studio"] = "npx prisma studio";
+						serverPackageJson.scripts["db:push"] = "prisma db push";
+						serverPackageJson.scripts["db:studio"] = "prisma studio";
 					} else if (options.orm === "drizzle") {
-						serverPackageJson.scripts["db:push"] = "npx drizzle-kit push";
-						serverPackageJson.scripts["db:studio"] = "npx drizzle-kit studio";
+						serverPackageJson.scripts["db:push"] = "drizzle-kit push";
+						serverPackageJson.scripts["db:studio"] = "drizzle-kit studio";
 					}
 				} else {
 					if (options.orm === "prisma") {
-						serverPackageJson.scripts["db:push"] = "npx prisma db push";
-						serverPackageJson.scripts["db:studio"] = "npx prisma studio";
+						serverPackageJson.scripts["db:push"] = "prisma db push";
+						serverPackageJson.scripts["db:studio"] = "prisma studio";
 					} else if (options.orm === "drizzle") {
-						serverPackageJson.scripts["db:push"] = "npx drizzle-kit push";
-						serverPackageJson.scripts["db:studio"] = "npx drizzle-kit studio";
+						serverPackageJson.scripts["db:push"] = "drizzle-kit push";
+						serverPackageJson.scripts["db:studio"] = "drizzle-kit studio";
 					}
 				}
 			}
@@ -124,7 +124,6 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		await createReadme(projectDir, options);
 
 		displayPostInstallInstructions(
-			options.auth,
 			options.database,
 			options.projectName,
 			options.packageManager,

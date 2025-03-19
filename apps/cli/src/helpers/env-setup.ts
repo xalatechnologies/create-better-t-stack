@@ -10,7 +10,6 @@ export async function setupEnvironmentVariables(
 	const serverDir = path.join(projectDir, "packages/server");
 	const clientDir = path.join(projectDir, "packages/client");
 
-	// Set up server env variables
 	const envPath = path.join(serverDir, ".env");
 	let envContent = "";
 
@@ -18,7 +17,6 @@ export async function setupEnvironmentVariables(
 		envContent = await fs.readFile(envPath, "utf8");
 	}
 
-	// Auth environment variables
 	if (options.auth) {
 		if (!envContent.includes("BETTER_AUTH_SECRET")) {
 			envContent += `\nBETTER_AUTH_SECRET=${generateAuthSecret()}`;
@@ -33,12 +31,11 @@ export async function setupEnvironmentVariables(
 		}
 	}
 
-	// Database environment variables
 	if (options.database !== "none") {
 		if (options.orm === "prisma" && !envContent.includes("DATABASE_URL")) {
 			const databaseUrlLine =
 				options.database === "sqlite"
-					? `\nDATABASE_URL="file:./dev.db"`
+					? ""
 					: `\nDATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"`;
 			envContent += databaseUrlLine;
 		}
@@ -54,7 +51,6 @@ export async function setupEnvironmentVariables(
 
 	await fs.writeFile(envPath, envContent.trim());
 
-	// Set up client env variables
 	if (options.auth) {
 		const clientEnvPath = path.join(clientDir, ".env");
 		if (!(await fs.pathExists(clientEnvPath))) {

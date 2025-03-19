@@ -79,7 +79,7 @@ services:
 						- "3000:3000"
 				environment:
 						- NODE_ENV=production
-						- TURSO_DATABASE_URL=\${TURSO_DATABASE_URL}
+						- TURSO_CONNECTION_URL=\${TURSO_CONNECTION_URL}
 						- TURSO_AUTH_TOKEN=\${TURSO_AUTH_TOKEN}
 						- CORS_ORIGIN=\${CORS_ORIGIN}
 				restart: always

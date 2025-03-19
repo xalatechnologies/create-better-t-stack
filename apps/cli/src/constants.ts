@@ -31,7 +31,6 @@ export const dependencyVersionMap = {
 
 	// Database - Prisma
 	"@prisma/client": "^5.7.1",
-	"@prisma/adapter-libsql": "^5.7.1",
 	prisma: "^5.7.1",
 } as const;
 

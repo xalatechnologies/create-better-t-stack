@@ -32,11 +32,7 @@ export async function setupDatabase(
 				}
 			} else if (orm === "prisma") {
 				addPackageDependency({
-					dependencies: [
-						"@prisma/client",
-						"@prisma/adapter-libsql",
-						"@libsql/client",
-					],
+					dependencies: ["@prisma/client"],
 					devDependencies: false,
 					projectDir: serverDir,
 				});

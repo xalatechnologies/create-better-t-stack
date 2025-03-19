@@ -43,7 +43,7 @@ export async function gatherConfig(
 			auth: ({ results }) =>
 				getAuthChoice(flags.auth, results.database !== "none"),
 			turso: ({ results }) =>
-				results.database === "sqlite"
+				results.database === "sqlite" && results.orm !== "prisma"
 					? getTursoSetupChoice(flags.turso)
 					: Promise.resolve(false),
 			addons: () => getAddonsChoice(flags.addons),
