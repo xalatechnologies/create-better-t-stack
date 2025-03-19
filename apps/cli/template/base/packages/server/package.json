@@ -6,12 +6,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "dev:bun": "bun run --hot src/index.ts",
-    "db:local": "turso dev --db-file local.db",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
     "check-types": "tsc --noEmit",
-    "wrangler:dev": "wrangler dev",
-    "wrangler:deploy": "wrangler deploy --minify",
     "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server"
   },
   "dependencies": {

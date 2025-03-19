@@ -74,43 +74,6 @@ export async function setupDatabase(
 				});
 			}
 		}
-
-		const packageJsonPath = path.join(serverDir, "package.json");
-		if (await fs.pathExists(packageJsonPath)) {
-			const packageJson = await fs.readJSON(packageJsonPath);
-
-			if (orm === "drizzle") {
-				packageJson.scripts = {
-					...packageJson.scripts,
-					"db:generate": "drizzle-kit generate",
-					"db:migrate": "drizzle-kit push",
-					"db:studio": "drizzle-kit studio",
-				};
-			} else if (orm === "prisma") {
-				packageJson.scripts = {
-					...packageJson.scripts,
-					"prisma:generate": "prisma generate",
-					"prisma:push": "prisma db push",
-					"prisma:studio": "prisma studio",
-				};
-			}
-
-			await fs.writeJSON(packageJsonPath, packageJson, { spaces: 2 });
-		}
-
-		if (orm === "prisma") {
-			const envPath = path.join(serverDir, ".env");
-			if (await fs.pathExists(envPath)) {
-				const envContent = await fs.readFile(envPath, "utf8");
-				if (!envContent.includes("DATABASE_URL")) {
-					const databaseUrlLine =
-						databaseType === "sqlite"
-							? `\nDATABASE_URL="file:./dev.db"`
-							: `\nDATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"`;
-					await fs.appendFile(envPath, databaseUrlLine);
-				}
-			}
-		}
 	} catch (error) {
 		s.stop(pc.red("Failed to set up database"));
 		if (error instanceof Error) {

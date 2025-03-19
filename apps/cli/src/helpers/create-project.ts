@@ -9,6 +9,7 @@ import { setupAddons } from "./addons-setup";
 import { setupAuth } from "./auth-setup";
 import { createReadme } from "./create-readme";
 import { setupDatabase } from "./db-setup";
+import { setupEnvironmentVariables } from "./env-setup";
 import { displayPostInstallInstructions } from "./post-installation";
 
 export async function createProject(options: ProjectConfig): Promise<string> {
@@ -49,7 +50,9 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			options.turso ?? options.database === "sqlite",
 		);
 
-		await setupAuth(projectDir, options.auth, options);
+		await setupAuth(projectDir, options.auth);
+
+		await setupEnvironmentVariables(projectDir, options);
 
 		if (options.git) {
 			await $({ cwd: projectDir })`git init`;
@@ -59,51 +62,63 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			await setupAddons(projectDir, options.addons);
 		}
 
-		const packageJsonPath = path.join(projectDir, "package.json");
-		if (await fs.pathExists(packageJsonPath)) {
-			const packageJson = await fs.readJson(packageJsonPath);
+		const rootPackageJsonPath = path.join(projectDir, "package.json");
+		if (await fs.pathExists(rootPackageJsonPath)) {
+			const packageJson = await fs.readJson(rootPackageJsonPath);
 			packageJson.name = options.projectName;
 
 			if (options.packageManager !== "bun") {
 				packageJson.packageManager =
 					options.packageManager === "npm"
-						? "npm@10.2.4"
+						? "npm@10.9.2"
 						: options.packageManager === "pnpm"
-							? "pnpm@8.15.4"
+							? "pnpm@10.6.4"
 							: options.packageManager === "yarn"
 								? "yarn@4.1.0"
-								: "bun@1.2.4";
+								: "bun@1.2.5";
 			}
 
+			await fs.writeJson(rootPackageJsonPath, packageJson, { spaces: 2 });
+		}
+
+		const serverPackageJsonPath = path.join(
+			projectDir,
+			"packages/server/package.json",
+		);
+		if (await fs.pathExists(serverPackageJsonPath)) {
+			const serverPackageJson = await fs.readJson(serverPackageJsonPath);
+
 			if (options.database !== "none") {
-				if (options.database === "sqlite") {
-					packageJson.scripts["db:local"] =
-						"cd packages/server && turso dev --db-file local.db";
+				if (options.database === "sqlite" && options.turso) {
+					serverPackageJson.scripts["db:local"] =
+						"turso dev --db-file local.db";
 				}
 
 				if (options.auth) {
-					packageJson.scripts["auth:generate"] =
-						"cd packages/server && npx @better-auth/cli generate --output ./src/db/auth-schema.ts";
+					serverPackageJson.scripts["auth:generate"] =
+						"npx @better-auth/cli generate --output ./src/db/auth-schema.ts";
 
 					if (options.orm === "prisma") {
-						packageJson.scripts["prisma:generate"] =
-							"cd packages/server && npx prisma generate";
-						packageJson.scripts["prisma:push"] =
-							"cd packages/server && npx prisma db push";
-						packageJson.scripts["prisma:studio"] =
-							"cd packages/server && npx prisma studio";
-						packageJson.scripts["db:setup"] =
-							"npm run auth:generate && npm run prisma:generate && npm run prisma:push";
+						serverPackageJson.scripts["db:push"] = "npx prisma db push";
+						serverPackageJson.scripts["db:studio"] = "npx prisma studio";
 					} else if (options.orm === "drizzle") {
-						packageJson.scripts["drizzle:migrate"] =
-							"cd packages/server && npx @better-auth/cli migrate";
-						packageJson.scripts["db:setup"] =
-							"npm run auth:generate && npm run drizzle:migrate";
+						serverPackageJson.scripts["db:push"] = "npx drizzle-kit push";
+						serverPackageJson.scripts["db:studio"] = "npx drizzle-kit studio";
+					}
+				} else {
+					if (options.orm === "prisma") {
+						serverPackageJson.scripts["db:push"] = "npx prisma db push";
+						serverPackageJson.scripts["db:studio"] = "npx prisma studio";
+					} else if (options.orm === "drizzle") {
+						serverPackageJson.scripts["db:push"] = "npx drizzle-kit push";
+						serverPackageJson.scripts["db:studio"] = "npx drizzle-kit studio";
 					}
 				}
 			}
 
-			await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
+			await fs.writeJson(serverPackageJsonPath, serverPackageJson, {
+				spaces: 2,
+			});
 		}
 
 		await createReadme(projectDir, options);

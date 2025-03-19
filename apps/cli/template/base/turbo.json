@@ -17,10 +17,10 @@
       "cache": false,
       "persistent": true
     },
-    "db:local": {
+    "db:push": {
       "cache": false
     },
-    "db:push": {
+    "db:studio": {
       "cache": false
     }
   }

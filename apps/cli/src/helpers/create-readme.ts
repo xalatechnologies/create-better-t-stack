@@ -126,10 +126,10 @@ function generateDatabaseSetup(
 
 1. Start the local SQLite database:
 \`\`\`bash
-${packageManagerRunCmd} db:local
+cd packages/server && ${packageManagerRunCmd} db:local
 \`\`\`
 
-2. Update your \`.env\` file with the appropriate connection details if needed.
+2. Update your \`.env\` file in the \`packages/server\` directory with the appropriate connection details if needed.
 `;
 	} else if (database === "postgres") {
 		setup += `This project uses PostgreSQL${orm === "drizzle" ? " with Drizzle ORM" : " with Prisma"}.
@@ -143,23 +143,24 @@ ${packageManagerRunCmd} db:local
 		setup += `
 3. Generate the authentication schema:
 \`\`\`bash
-${packageManagerRunCmd} auth:generate
+cd packages/server && ${packageManagerRunCmd} auth:generate
 \`\`\`
-
-4. ${
-			orm === "prisma"
-				? `Generate the Prisma client and push the schema:
-\`\`\`bash
-${packageManagerRunCmd} prisma:generate
-${packageManagerRunCmd} db:push
-\`\`\``
-				: `Apply the Drizzle migrations:
-\`\`\`bash
-${packageManagerRunCmd} db:push
-\`\`\``
-		}
 `;
 	}
+
+	setup += `
+${auth ? "4" : "3"}. ${
+		orm === "prisma"
+			? `Generate the Prisma client and push the schema:
+\`\`\`bash
+${packageManagerRunCmd} db:push
+\`\`\``
+			: `Apply the schema to your database:
+\`\`\`bash
+${packageManagerRunCmd} db:push
+\`\`\``
+	}
+`;
 
 	return setup;
 }
@@ -173,32 +174,21 @@ function generateScriptsList(
 	let scripts = `- \`${packageManagerRunCmd} dev\`: Start both client and server in development mode
 - \`${packageManagerRunCmd} build\`: Build both client and server
 - \`${packageManagerRunCmd} dev:client\`: Start only the client
-- \`${packageManagerRunCmd} dev:server\`: Start only the server`;
+- \`${packageManagerRunCmd} dev:server\`: Start only the server
+- \`${packageManagerRunCmd} check-types\`: Check TypeScript types across all packages`;
 
 	if (database !== "none") {
-		if (database === "sqlite") {
-			scripts += `\n- \`${packageManagerRunCmd} db:local\`: Start the local SQLite database`;
-		}
+		scripts += `
+- \`${packageManagerRunCmd} db:push\`: Push schema changes to database
+- \`${packageManagerRunCmd} db:studio\`: Open database studio UI`;
 
-		if (orm === "prisma") {
-			scripts += `
-- \`${packageManagerRunCmd} prisma:generate\`: Generate Prisma client
-- \`${packageManagerRunCmd} db:push\`: Push schema changes to database
-- \`${packageManagerRunCmd} prisma:studio\`: Open Prisma Studio`;
-		} else if (orm === "drizzle") {
-			scripts += `
-- \`${packageManagerRunCmd} db:generate\`: Generate database schema
-- \`${packageManagerRunCmd} db:push\`: Push schema changes to database
-- \`${packageManagerRunCmd} db:studio\`: Open Drizzle Studio`;
+		if (database === "sqlite" && orm === "drizzle") {
+			scripts += `\n- \`cd packages/server && ${packageManagerRunCmd} db:local\`: Start the local SQLite database`;
 		}
 	}
 
 	if (auth) {
-		scripts += `\n- \`${packageManagerRunCmd} auth:generate\`: Generate authentication schema`;
-	}
-
-	if (auth && database !== "none") {
-		scripts += `\n- \`${packageManagerRunCmd} db:setup\`: Complete database setup for auth`;
+		scripts += `\n- \`cd packages/server && ${packageManagerRunCmd} auth:generate\`: Generate authentication schema`;
 	}
 
 	return scripts;
