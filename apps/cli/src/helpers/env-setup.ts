@@ -29,6 +29,12 @@ export async function setupEnvironmentVariables(
 		if (!envContent.includes("CORS_ORIGIN")) {
 			envContent += "\nCORS_ORIGIN=http://localhost:3001";
 		}
+
+		const clientEnvPath = path.join(clientDir, ".env");
+		if (!(await fs.pathExists(clientEnvPath))) {
+			const clientEnvContent = "VITE_SERVER_URL=http://localhost:3000\n";
+			await fs.writeFile(clientEnvPath, clientEnvContent);
+		}
 	}
 
 	if (options.database !== "none") {
@@ -40,22 +46,12 @@ export async function setupEnvironmentVariables(
 			envContent += databaseUrlLine;
 		}
 
-		if (options.database === "sqlite") {
+		if (options.database === "sqlite" && !options.turso) {
 			if (!envContent.includes("TURSO_CONNECTION_URL")) {
-				if (!options.turso) {
-					envContent += "\nTURSO_CONNECTION_URL=http://127.0.0.1:8080";
-				}
+				envContent += "\nTURSO_CONNECTION_URL=http://127.0.0.1:8080";
 			}
 		}
 	}
 
 	await fs.writeFile(envPath, envContent.trim());
-
-	if (options.auth) {
-		const clientEnvPath = path.join(clientDir, ".env");
-		if (!(await fs.pathExists(clientEnvPath))) {
-			const clientEnvContent = "VITE_SERVER_URL=http://localhost:3000\n";
-			await fs.writeFile(clientEnvPath, clientEnvContent);
-		}
-	}
 }

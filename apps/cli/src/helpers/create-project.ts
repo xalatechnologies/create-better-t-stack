@@ -62,64 +62,7 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			await setupAddons(projectDir, options.addons);
 		}
 
-		const rootPackageJsonPath = path.join(projectDir, "package.json");
-		if (await fs.pathExists(rootPackageJsonPath)) {
-			const packageJson = await fs.readJson(rootPackageJsonPath);
-			packageJson.name = options.projectName;
-
-			if (options.packageManager !== "bun") {
-				packageJson.packageManager =
-					options.packageManager === "npm"
-						? "npm@10.9.2"
-						: options.packageManager === "pnpm"
-							? "pnpm@10.6.4"
-							: options.packageManager === "yarn"
-								? "yarn@4.1.0"
-								: "bun@1.2.5";
-			}
-
-			await fs.writeJson(rootPackageJsonPath, packageJson, { spaces: 2 });
-		}
-
-		const serverPackageJsonPath = path.join(
-			projectDir,
-			"packages/server/package.json",
-		);
-		if (await fs.pathExists(serverPackageJsonPath)) {
-			const serverPackageJson = await fs.readJson(serverPackageJsonPath);
-
-			if (options.database !== "none") {
-				if (options.database === "sqlite") {
-					serverPackageJson.scripts["db:local"] =
-						"turso dev --db-file local.db";
-				}
-
-				if (options.auth) {
-					serverPackageJson.scripts["auth:generate"] =
-						"npx @better-auth/cli generate --output ./src/db/auth-schema.ts";
-
-					if (options.orm === "prisma") {
-						serverPackageJson.scripts["db:push"] = "prisma db push";
-						serverPackageJson.scripts["db:studio"] = "prisma studio";
-					} else if (options.orm === "drizzle") {
-						serverPackageJson.scripts["db:push"] = "drizzle-kit push";
-						serverPackageJson.scripts["db:studio"] = "drizzle-kit studio";
-					}
-				} else {
-					if (options.orm === "prisma") {
-						serverPackageJson.scripts["db:push"] = "prisma db push";
-						serverPackageJson.scripts["db:studio"] = "prisma studio";
-					} else if (options.orm === "drizzle") {
-						serverPackageJson.scripts["db:push"] = "drizzle-kit push";
-						serverPackageJson.scripts["db:studio"] = "drizzle-kit studio";
-					}
-				}
-			}
-
-			await fs.writeJson(serverPackageJsonPath, serverPackageJson, {
-				spaces: 2,
-			});
-		}
+		await updatePackageConfigurations(projectDir, options);
 
 		await createReadme(projectDir, options);
 
@@ -139,6 +82,61 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			process.exit(1);
 		}
 		throw error;
+	}
+}
+
+async function updatePackageConfigurations(
+	projectDir: string,
+	options: ProjectConfig,
+) {
+	const rootPackageJsonPath = path.join(projectDir, "package.json");
+	if (await fs.pathExists(rootPackageJsonPath)) {
+		const packageJson = await fs.readJson(rootPackageJsonPath);
+		packageJson.name = options.projectName;
+
+		if (options.packageManager !== "bun") {
+			packageJson.packageManager =
+				options.packageManager === "npm"
+					? "npm@10.9.2"
+					: options.packageManager === "pnpm"
+						? "pnpm@10.6.4"
+						: options.packageManager === "yarn"
+							? "yarn@4.1.0"
+							: "bun@1.2.5";
+		}
+
+		await fs.writeJson(rootPackageJsonPath, packageJson, { spaces: 2 });
+	}
+
+	const serverPackageJsonPath = path.join(
+		projectDir,
+		"packages/server/package.json",
+	);
+	if (await fs.pathExists(serverPackageJsonPath)) {
+		const serverPackageJson = await fs.readJson(serverPackageJsonPath);
+
+		if (options.database !== "none") {
+			if (options.database === "sqlite") {
+				serverPackageJson.scripts["db:local"] = "turso dev --db-file local.db";
+			}
+
+			if (options.auth) {
+				serverPackageJson.scripts["auth:generate"] =
+					"npx @better-auth/cli generate --output ./src/db/auth-schema.ts";
+			}
+
+			if (options.orm === "prisma") {
+				serverPackageJson.scripts["db:push"] = "prisma db push";
+				serverPackageJson.scripts["db:studio"] = "prisma studio";
+			} else if (options.orm === "drizzle") {
+				serverPackageJson.scripts["db:push"] = "drizzle-kit push";
+				serverPackageJson.scripts["db:studio"] = "drizzle-kit studio";
+			}
+		}
+
+		await fs.writeJson(serverPackageJsonPath, serverPackageJson, {
+			spaces: 2,
+		});
 	}
 }
 

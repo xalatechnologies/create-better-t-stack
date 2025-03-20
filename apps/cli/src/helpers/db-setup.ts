@@ -2,13 +2,14 @@ import path from "node:path";
 import { log, spinner } from "@clack/prompts";
 import fs from "fs-extra";
 import pc from "picocolors";
+import type { ProjectDatabase, ProjectOrm } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 import { setupTurso } from "./turso-setup";
 
 export async function setupDatabase(
 	projectDir: string,
-	databaseType: string,
-	orm: string,
+	databaseType: ProjectDatabase,
+	orm: ProjectOrm,
 	setupTursoDb = true,
 ): Promise<void> {
 	const s = spinner();
@@ -23,49 +24,32 @@ export async function setupDatabase(
 		if (databaseType === "sqlite") {
 			if (orm === "drizzle") {
 				addPackageDependency({
-					dependencies: ["drizzle-orm", "drizzle-kit", "@libsql/client"],
-					devDependencies: false,
+					dependencies: ["drizzle-orm", "@libsql/client"],
+					devDependencies: ["drizzle-kit"],
 					projectDir: serverDir,
 				});
-				if (setupTursoDb) {
-					await setupTurso(projectDir, true);
-				}
 			} else if (orm === "prisma") {
 				addPackageDependency({
 					dependencies: ["@prisma/client"],
-					devDependencies: false,
+					devDependencies: ["prisma"],
 					projectDir: serverDir,
 				});
-				addPackageDependency({
-					dependencies: ["prisma"],
-					devDependencies: true,
-					projectDir: serverDir,
-				});
-				if (setupTursoDb) {
-					await setupTurso(projectDir, true);
-				}
+			}
+
+			if (setupTursoDb) {
+				await setupTurso(projectDir, true);
 			}
 		} else if (databaseType === "postgres") {
 			if (orm === "drizzle") {
 				addPackageDependency({
 					dependencies: ["drizzle-orm", "postgres"],
-					devDependencies: false,
-					projectDir: serverDir,
-				});
-				addPackageDependency({
-					dependencies: ["drizzle-kit"],
-					devDependencies: true,
+					devDependencies: ["drizzle-kit"],
 					projectDir: serverDir,
 				});
 			} else if (orm === "prisma") {
 				addPackageDependency({
 					dependencies: ["@prisma/client"],
-					devDependencies: false,
-					projectDir: serverDir,
-				});
-				addPackageDependency({
-					dependencies: ["prisma"],
-					devDependencies: true,
+					devDependencies: ["prisma"],
 					projectDir: serverDir,
 				});
 			}

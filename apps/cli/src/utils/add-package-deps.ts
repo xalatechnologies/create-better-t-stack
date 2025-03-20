@@ -4,25 +4,29 @@ import fs from "fs-extra";
 import { type AvailableDependencies, dependencyVersionMap } from "../constants";
 
 export const addPackageDependency = (opts: {
-	dependencies: AvailableDependencies[];
-	devDependencies: boolean;
+	dependencies?: AvailableDependencies[];
+	devDependencies?: AvailableDependencies[];
 	projectDir: string;
 }) => {
-	const { dependencies, devDependencies, projectDir } = opts;
+	const { dependencies = [], devDependencies = [], projectDir } = opts;
 
-	const pkgJson = fs.readJSONSync(path.join(projectDir, "package.json"));
+	const pkgJsonPath = path.join(projectDir, "package.json");
+	const pkgJson = fs.readJSONSync(pkgJsonPath);
+
+	if (!pkgJson.dependencies) pkgJson.dependencies = {};
+	if (!pkgJson.devDependencies) pkgJson.devDependencies = {};
 
 	for (const pkgName of dependencies) {
 		const version = dependencyVersionMap[pkgName];
-
-		if (devDependencies && pkgJson.devDependencies) {
-			pkgJson.devDependencies[pkgName] = version;
-		} else if (pkgJson.dependencies) {
-			pkgJson.dependencies[pkgName] = version;
-		}
+		pkgJson.dependencies[pkgName] = version;
 	}
 
-	fs.writeJSONSync(path.join(projectDir, "package.json"), pkgJson, {
+	for (const pkgName of devDependencies) {
+		const version = dependencyVersionMap[pkgName];
+		pkgJson.devDependencies[pkgName] = version;
+	}
+
+	fs.writeJSONSync(pkgJsonPath, pkgJson, {
 		spaces: 2,
 	});
 };

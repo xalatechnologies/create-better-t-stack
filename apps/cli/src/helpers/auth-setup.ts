@@ -27,12 +27,10 @@ export async function setupAuth(
 		}
 		addPackageDependency({
 			dependencies: ["better-auth"],
-			devDependencies: false,
 			projectDir: serverDir,
 		});
 		addPackageDependency({
 			dependencies: ["better-auth"],
-			devDependencies: false,
 			projectDir: clientDir,
 		});
 	} catch (error) {

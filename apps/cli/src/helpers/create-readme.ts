@@ -69,10 +69,10 @@ ${generateScriptsList(packageManagerRunCmd, database, orm, auth)}
 }
 
 function generateFeaturesList(
-	database: string,
+	database: ProjectDatabase,
 	auth: boolean,
 	features: string[],
-	orm: string,
+	orm: ProjectOrm,
 ): string {
 	const featuresList = [
 		"- **TypeScript** - For type safety and improved developer experience",
