@@ -40,12 +40,12 @@ export async function setupEnvironmentVariables(
 			envContent += databaseUrlLine;
 		}
 
-		if (
-			options.database === "sqlite" &&
-			options.turso &&
-			!envContent.includes("TURSO_CONNECTION_URL")
-		) {
-			envContent += "\nTURSO_CONNECTION_URL=http://127.0.0.1:8080";
+		if (options.database === "sqlite") {
+			if (!envContent.includes("TURSO_CONNECTION_URL")) {
+				if (!options.turso) {
+					envContent += "\nTURSO_CONNECTION_URL=http://127.0.0.1:8080";
+				}
+			}
 		}
 	}
 
