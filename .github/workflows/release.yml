@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'packages/cli/**'
+      - '.changeset/**'
+      - 'package.json'
+      - 'bun.lock'
 
 jobs:
   release:
@@ -20,6 +25,11 @@ jobs:
 
       - name: Install Dependencies
         run: bun install
+
+      - name: Configure Git
+        run: |
+              git config --global user.name 'Aman Varshney'
+              git config --global user.email 'amanvarshney.work@gmail.com'
 
       - name: Create Release Pull Request or Publish
         uses: changesets/action@v1
