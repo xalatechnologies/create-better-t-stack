@@ -19,11 +19,11 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 
 export const dependencyVersionMap = {
 	// Authentication
-	"better-auth": "^1.1.16",
+	"better-auth": "^1.2.4",
 
 	// Database - Drizzle
 	"drizzle-orm": "^0.38.4",
-	"drizzle-kit": "^0.30.4",
+	"drizzle-kit": "^0.30.5",
 
 	// Database - SQLite/PostgreSQL
 	"@libsql/client": "^0.14.0",

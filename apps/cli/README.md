@@ -42,8 +42,6 @@ Options:
   --auth                Include authentication
   --no-auth             Disable authentication
   --docker              Include Docker setup
-  --github-actions      Add GitHub Actions workflows
-  --seo                 Configure SEO optimizations
   --git                 Initialize a new git repo (default)
   --no-git              Skip git initialization
   --npm                 Use npm as package manager

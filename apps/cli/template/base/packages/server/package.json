@@ -14,12 +14,12 @@
     "@hono/trpc-server": "^0.3.4",
     "@trpc/server": "^11.0.0-rc.748",
     "dotenv": "^16.4.7",
-    "hono": "^4.7.0",
+    "hono": "^4.7.5",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "tsx": "^4.19.2",
     "@types/node": "^22.13.4",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.2"
   }
 }

@@ -99,10 +99,6 @@ function generateFeaturesList(
 	for (const feature of features) {
 		if (feature === "docker") {
 			featuresList.push("- **Docker** - Containerized deployment");
-		} else if (feature === "github-actions") {
-			featuresList.push("- **GitHub Actions** - CI/CD workflows");
-		} else if (feature === "SEO") {
-			featuresList.push("- **SEO** - Search engine optimization tools");
 		}
 	}
 

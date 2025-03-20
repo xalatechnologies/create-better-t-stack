@@ -1,7 +1,7 @@
 export type ProjectDatabase = "sqlite" | "postgres" | "none";
 export type ProjectOrm = "drizzle" | "prisma" | "none";
 export type PackageManager = "npm" | "pnpm" | "yarn" | "bun";
-export type ProjectAddons = "docker" | "github-actions" | "SEO";
+export type ProjectAddons = "docker";
 
 export interface ProjectConfig {
 	projectName: string;

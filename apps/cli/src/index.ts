@@ -31,8 +31,6 @@ async function main() {
 		.option("--auth", "Include authentication")
 		.option("--no-auth", "Exclude authentication")
 		.option("--docker", "Include Docker setup")
-		.option("--github-actions", "Include GitHub Actions")
-		.option("--seo", "Include SEO setup")
 		.option("--no-addons", "Skip all additional addons")
 		.option("--git", "Include git setup")
 		.option("--no-git", "Skip git initialization")
@@ -72,18 +70,11 @@ async function main() {
 			...("git" in options && { git: options.git }),
 			...("install" in options && { noInstall: !options.install }),
 			...("turso" in options && { turso: options.turso }),
-			...((options.docker ||
-				options.githubActions ||
-				options.seo ||
-				options.addons === false) && {
+			...((options.docker || options.addons === false) && {
 				addons:
 					options.addons === false
 						? []
-						: ([
-								...(options.docker ? ["docker"] : []),
-								...(options.githubActions ? ["github-actions"] : []),
-								...(options.seo ? ["SEO"] : []),
-							] as ProjectAddons[]),
+						: ([...(options.docker ? ["docker"] : [])] as ProjectAddons[]),
 			}),
 		};
 

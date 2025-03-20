@@ -15,16 +15,6 @@ export async function getAddonsChoice(
 				label: "Docker setup",
 				hint: "Containerize your application",
 			},
-			{
-				value: "github-actions",
-				label: "GitHub Actions",
-				hint: "CI/CD workflows",
-			},
-			{
-				value: "SEO",
-				label: "Basic SEO setup",
-				hint: "Search engine optimization configuration",
-			},
 		],
 		required: false,
 	});
