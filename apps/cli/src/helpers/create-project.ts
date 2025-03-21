@@ -24,9 +24,17 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		}
 		await fs.copy(templateDir, projectDir);
 
-		const gitignorePath = path.join(projectDir, "_gitignore");
-		if (await fs.pathExists(gitignorePath)) {
-			await fs.move(gitignorePath, path.join(projectDir, ".gitignore"));
+		const gitignorePaths = [
+			path.join(projectDir, "_gitignore"),
+			path.join(projectDir, "packages/client/_gitignore"),
+			path.join(projectDir, "packages/server/_gitignore"),
+		];
+
+		for (const gitignorePath of gitignorePaths) {
+			if (await fs.pathExists(gitignorePath)) {
+				const targetPath = path.join(path.dirname(gitignorePath), ".gitignore");
+				await fs.move(gitignorePath, targetPath);
+			}
 		}
 
 		if (options.auth) {

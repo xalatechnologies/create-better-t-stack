@@ -5,11 +5,6 @@ import { useEffect } from "react";
 
 export const Route = createFileRoute("/dashboard")({
   component: RouteComponent,
-  loader: async ({ context: { trpcQueryUtils } }) => {
-    await trpcQueryUtils.healthCheck.ensureData();
-    await trpcQueryUtils.privateData.ensureData();
-    return;
-  },
 });
 
 function RouteComponent() {
