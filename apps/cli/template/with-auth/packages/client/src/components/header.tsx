@@ -17,6 +17,15 @@ export default function Header() {
             Home
           </Link>
           <Link
+            to="/todos"
+            activeProps={{
+              className: "font-bold",
+            }}
+            activeOptions={{ exact: true }}
+          >
+            Todos
+          </Link>
+          <Link
             to="/dashboard"
             activeProps={{
               className: "font-bold",

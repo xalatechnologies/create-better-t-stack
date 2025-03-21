@@ -15,6 +15,15 @@ export default function Header() {
           >
             Home
           </Link>
+          <Link
+            to="/todos"
+            activeProps={{
+              className: "font-bold",
+            }}
+            activeOptions={{ exact: true }}
+          >
+            Todos
+          </Link>
         </div>
         <div className="flex flex-row items-center gap-2">
           <ModeToggle />
