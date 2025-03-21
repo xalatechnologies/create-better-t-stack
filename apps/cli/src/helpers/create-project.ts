@@ -40,6 +40,65 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 
 			if (await fs.pathExists(ormTemplateDir)) {
 				await fs.copy(ormTemplateDir, projectDir, { overwrite: true });
+
+				const serverSrcPath = path.join(projectDir, "packages/server/src");
+				const baseLibPath = path.join(serverSrcPath, "lib");
+				const withAuthLibPath = path.join(serverSrcPath, "with-auth-lib");
+
+				if (options.auth) {
+					await fs.remove(baseLibPath);
+					await fs.move(withAuthLibPath, baseLibPath);
+
+					if (options.orm === "prisma") {
+						const schemaPath = path.join(
+							projectDir,
+							"packages/server/prisma/schema.prisma",
+						);
+						const withAuthSchemaPath = path.join(
+							projectDir,
+							"packages/server/prisma/with-auth-schema.prisma",
+						);
+
+						if (await fs.pathExists(withAuthSchemaPath)) {
+							await fs.remove(schemaPath);
+							await fs.move(withAuthSchemaPath, schemaPath);
+						}
+					} else if (options.orm === "drizzle") {
+						const schemaPath = path.join(
+							projectDir,
+							"packages/server/src/db/schema.ts",
+						);
+						const withAuthSchemaPath = path.join(
+							projectDir,
+							"packages/server/src/db/with-auth-schema.ts",
+						);
+
+						if (await fs.pathExists(withAuthSchemaPath)) {
+							await fs.remove(schemaPath);
+							await fs.move(withAuthSchemaPath, schemaPath);
+						}
+					}
+				} else {
+					await fs.remove(withAuthLibPath);
+
+					if (options.orm === "prisma") {
+						const withAuthSchema = path.join(
+							projectDir,
+							"packages/server/prisma/with-auth-schema.prisma",
+						);
+						if (await fs.pathExists(withAuthSchema)) {
+							await fs.remove(withAuthSchema);
+						}
+					} else if (options.orm === "drizzle") {
+						const withAuthSchema = path.join(
+							projectDir,
+							"packages/server/src/db/with-auth-schema.ts",
+						);
+						if (await fs.pathExists(withAuthSchema)) {
+							await fs.remove(withAuthSchema);
+						}
+					}
+				}
 			}
 		}
 
@@ -51,7 +110,6 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		);
 
 		await setupAuth(projectDir, options.auth);
-
 		await setupEnvironmentVariables(projectDir, options);
 
 		if (options.git) {
@@ -63,7 +121,6 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		}
 
 		await updatePackageConfigurations(projectDir, options);
-
 		await createReadme(projectDir, options);
 
 		displayPostInstallInstructions(

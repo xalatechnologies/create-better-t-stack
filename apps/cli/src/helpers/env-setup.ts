@@ -17,6 +17,10 @@ export async function setupEnvironmentVariables(
 		envContent = await fs.readFile(envPath, "utf8");
 	}
 
+	if (!envContent.includes("CORS_ORIGIN")) {
+		envContent += "\nCORS_ORIGIN=http://localhost:3001";
+	}
+
 	if (options.auth) {
 		if (!envContent.includes("BETTER_AUTH_SECRET")) {
 			envContent += `\nBETTER_AUTH_SECRET=${generateAuthSecret()}`;
@@ -24,16 +28,6 @@ export async function setupEnvironmentVariables(
 
 		if (!envContent.includes("BETTER_AUTH_URL")) {
 			envContent += "\nBETTER_AUTH_URL=http://localhost:3000";
-		}
-
-		if (!envContent.includes("CORS_ORIGIN")) {
-			envContent += "\nCORS_ORIGIN=http://localhost:3001";
-		}
-
-		const clientEnvPath = path.join(clientDir, ".env");
-		if (!(await fs.pathExists(clientEnvPath))) {
-			const clientEnvContent = "VITE_SERVER_URL=http://localhost:3000\n";
-			await fs.writeFile(clientEnvPath, clientEnvContent);
 		}
 	}
 
@@ -54,4 +48,17 @@ export async function setupEnvironmentVariables(
 	}
 
 	await fs.writeFile(envPath, envContent.trim());
+
+	const clientEnvPath = path.join(clientDir, ".env");
+	let clientEnvContent = "";
+
+	if (await fs.pathExists(clientEnvPath)) {
+		clientEnvContent = await fs.readFile(clientEnvPath, "utf8");
+	}
+
+	if (!clientEnvContent.includes("VITE_SERVER_URL")) {
+		clientEnvContent += "VITE_SERVER_URL=http://localhost:3000\n";
+	}
+
+	await fs.writeFile(clientEnvPath, clientEnvContent.trim());
 }

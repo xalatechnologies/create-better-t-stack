@@ -33,32 +33,30 @@ function getDatabaseInstructions(
 	const instructions = [];
 
 	if (orm === "prisma") {
-		instructions.push(
-			`${pc.cyan("•")} Apply schema: ${pc.dim(`${runCmd} db:push`)}`,
-		);
-		instructions.push(
-			`${pc.cyan("•")} Database UI: ${pc.dim(`${runCmd} db:studio`)}`,
-		);
-
 		if (database === "sqlite") {
 			instructions.push(
 				`${pc.yellow("NOTE:")} Turso support with Prisma is in Early Access and requires additional setup.`,
 				`${pc.dim("Learn more at: https://www.prisma.io/docs/orm/overview/databases/turso")}`,
 			);
 		}
-	} else if (orm === "drizzle") {
 		instructions.push(
 			`${pc.cyan("•")} Apply schema: ${pc.dim(`${runCmd} db:push`)}`,
 		);
 		instructions.push(
 			`${pc.cyan("•")} Database UI: ${pc.dim(`${runCmd} db:studio`)}`,
 		);
-
+	} else if (orm === "drizzle") {
 		if (database === "sqlite") {
 			instructions.push(
 				`${pc.cyan("•")} Start local DB: ${pc.dim(`cd packages/server && ${runCmd} db:local`)}`,
 			);
 		}
+		instructions.push(
+			`${pc.cyan("•")} Apply schema: ${pc.dim(`${runCmd} db:push`)}`,
+		);
+		instructions.push(
+			`${pc.cyan("•")} Database UI: ${pc.dim(`${runCmd} db:studio`)}`,
+		);
 	}
 
 	return instructions.length

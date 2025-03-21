@@ -18,13 +18,14 @@ export async function setupAuth(
 	projectDir: string,
 	enableAuth: boolean,
 ): Promise<void> {
+	if (!enableAuth) {
+		return;
+	}
+
 	const serverDir = path.join(projectDir, "packages/server");
 	const clientDir = path.join(projectDir, "packages/client");
 
 	try {
-		if (!enableAuth) {
-			return;
-		}
 		addPackageDependency({
 			dependencies: ["better-auth"],
 			projectDir: serverDir,
