@@ -18,12 +18,16 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 
 	try {
 		await fs.ensureDir(projectDir);
-
 		const templateDir = path.join(PKG_ROOT, "template/base");
 		if (!(await fs.pathExists(templateDir))) {
 			throw new Error(`Template directory not found: ${templateDir}`);
 		}
 		await fs.copy(templateDir, projectDir);
+
+		const gitignorePath = path.join(projectDir, "_gitignore");
+		if (await fs.pathExists(gitignorePath)) {
+			await fs.move(gitignorePath, path.join(projectDir, ".gitignore"));
+		}
 
 		if (options.auth) {
 			const authTemplateDir = path.join(PKG_ROOT, "template/with-auth");
@@ -40,7 +44,6 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 
 			if (await fs.pathExists(ormTemplateDir)) {
 				await fs.copy(ormTemplateDir, projectDir, { overwrite: true });
-
 				const serverSrcPath = path.join(projectDir, "packages/server/src");
 				const baseLibPath = path.join(serverSrcPath, "lib");
 				const withAuthLibPath = path.join(serverSrcPath, "with-auth-lib");
@@ -80,7 +83,6 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 					}
 				} else {
 					await fs.remove(withAuthLibPath);
-
 					if (options.orm === "prisma") {
 						const withAuthSchema = path.join(
 							projectDir,
@@ -108,7 +110,6 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			options.orm,
 			options.turso ?? options.database === "sqlite",
 		);
-
 		await setupAuth(projectDir, options.auth);
 		await setupEnvironmentVariables(projectDir, options);
 
