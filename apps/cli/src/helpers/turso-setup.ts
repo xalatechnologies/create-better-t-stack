@@ -1,20 +1,35 @@
 import os from "node:os";
 import path from "node:path";
-import { cancel, confirm, isCancel, log, spinner, text } from "@clack/prompts";
+import {
+	cancel,
+	confirm,
+	isCancel,
+	log,
+	select,
+	spinner,
+	text,
+} from "@clack/prompts";
 import { $ } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
 
-interface TursoConfig {
+type TursoConfig = {
 	dbUrl: string;
 	authToken: string;
-}
+};
+
+type TursoGroup = {
+	name: string;
+	locations: string;
+	version: string;
+	status: string;
+};
 
 async function isTursoInstalled() {
 	try {
-		await $`turso --version`;
-		return true;
-	} catch {
+		const result = await $`turso --version`;
+		return result.exitCode === 0;
+	} catch (error) {
 		return false;
 	}
 }
@@ -67,9 +82,66 @@ async function installTursoCLI(isMac: boolean) {
 	}
 }
 
-async function createTursoDatabase(dbName: string): Promise<TursoConfig> {
+async function getTursoGroups(): Promise<TursoGroup[]> {
 	try {
-		await $`turso db create ${dbName}`;
+		const { stdout } = await $`turso group list`;
+		const lines = stdout.trim().split("\n");
+
+		if (lines.length <= 1) {
+			return [];
+		}
+
+		const groups = lines.slice(1).map((line) => {
+			const [name, locations, version, status] = line.trim().split(/\s{2,}/);
+			return { name, locations, version, status };
+		});
+
+		return groups;
+	} catch (error) {
+		console.error("Error fetching Turso groups:", error);
+		return [];
+	}
+}
+
+async function selectTursoGroup(): Promise<string | null> {
+	const groups = await getTursoGroups();
+
+	if (groups.length === 0) {
+		return null;
+	}
+
+	if (groups.length === 1) {
+		return groups[0].name;
+	}
+
+	const groupOptions = groups.map((group) => ({
+		value: group.name,
+		label: `${group.name} (${group.locations})`,
+	}));
+
+	const selectedGroup = await select({
+		message: "Select a Turso database group:",
+		options: groupOptions,
+	});
+
+	if (isCancel(selectedGroup)) {
+		cancel(pc.red("Operation cancelled"));
+		process.exit(0);
+	}
+
+	return selectedGroup as string;
+}
+
+async function createTursoDatabase(
+	dbName: string,
+	groupName: string | null,
+): Promise<TursoConfig> {
+	try {
+		if (groupName) {
+			await $`turso db create ${dbName} --group ${groupName}`;
+		} else {
+			await $`turso db create ${dbName}`;
+		}
 	} catch (error) {
 		if (error instanceof Error && error.message.includes("already exists")) {
 			throw new Error("DATABASE_EXISTS");
@@ -159,6 +231,8 @@ export async function setupTurso(
 			await loginToTurso();
 		}
 
+		const selectedGroup = await selectTursoGroup();
+
 		let success = false;
 		let dbName = "";
 		let suggestedName = path.basename(projectDir);
@@ -180,8 +254,10 @@ export async function setupTurso(
 			const s = spinner();
 
 			try {
-				s.start(`Creating Turso database "${dbName}"...`);
-				const config = await createTursoDatabase(dbName);
+				s.start(
+					`Creating Turso database "${dbName}"${selectedGroup ? ` in group "${selectedGroup}"` : ""}...`,
+				);
+				const config = await createTursoDatabase(dbName, selectedGroup);
 				await writeEnvFile(projectDir, config);
 				s.stop("Turso database configured successfully!");
 				success = true;

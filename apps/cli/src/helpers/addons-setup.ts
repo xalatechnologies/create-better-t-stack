@@ -56,7 +56,6 @@ EXPOSE 3000
 CMD ["node", "packages/server/dist/index.js"]
 `;
 
-	// Create docker-compose.yml
 	const dockerComposeContent = `version: '3'
 
 services:
