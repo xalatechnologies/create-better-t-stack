@@ -62,7 +62,7 @@ const Navbar = () => {
 			<div className="flex justify-center">
 				<div
 					className={`flex items-center backdrop-blur-md bg-black/40 rounded-md border border-blue-500/30 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
-						scrolled ? "w-[420px]" : "sm:w-[280px] w-[350px]"
+						scrolled ? "w-[180px]" : "sm:w-[180px] w-[180px]"
 					}`}
 				>
 					<div
@@ -79,7 +79,7 @@ const Navbar = () => {
 					>
 						<span className="text-blue-500">~/</span>home
 					</Link>
-					<Link
+					{/* <Link
 						href="https://www.github.com/better-t-stack/create-better-t-stack"
 						target="_blank"
 						ref={(ref) => {
@@ -91,7 +91,7 @@ const Navbar = () => {
 					>
 						<PackageIcon pm="github" className="w-4 h-4" />{" "}
 						<span className="max-sm:hidden">github</span>
-					</Link>
+					</Link> */}
 					<Link
 						href="https://www.npmjs.com/package/create-better-t-stack"
 						target="_blank"
@@ -103,9 +103,9 @@ const Navbar = () => {
 						className="text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono"
 					>
 						<PackageIcon pm="npm" className="w-4 h-4 rounded-full" />{" "}
-						<span className="max-sm:hidden">npm</span>
+						<span>npm</span>
 					</Link>
-					<span
+					{/* <span
 						className="text-blue-500 transition-all duration-300"
 						style={{
 							opacity: scrolled ? 1 : 0,
@@ -131,7 +131,7 @@ const Navbar = () => {
 						}`}
 					>
 						documentation
-					</Link>
+					</Link> */}
 				</div>
 			</div>
 
@@ -141,12 +141,13 @@ const Navbar = () => {
 				}`}
 			>
 				<Link
-					href="/docs"
+					href="https://www.github.com/better-t-stack/create-better-t-stack"
+					target="_blank"
 					className="relative max-sm:hidden inline-flex h-12 overflow-hidden rounded-md p-[1px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-black"
 				>
 					<span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#3b82f6_0%,#6366f1_50%,#3b82f6_100%)]" />
 					<span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-md bg-black px-6 py-px text-sm font-medium text-blue-400 backdrop-blur-3xl font-mono">
-						<span className="text-blue-500 mr-1">$</span> ./docs
+						<PackageIcon pm="github" className="w-4 h-4 mr-2" /> github
 					</span>
 				</Link>
 			</div>
