@@ -32,6 +32,7 @@ async function main() {
 		.option("--no-auth", "Exclude authentication")
 		.option("--docker", "Include Docker setup")
 		.option("--pwa", "Include Progressive Web App support")
+		.option("--tauri", "Include Tauri desktop app support")
 		.option("--no-addons", "Skip all additional addons")
 		.option("--git", "Include git setup")
 		.option("--no-git", "Skip git initialization")
@@ -71,13 +72,17 @@ async function main() {
 			...("git" in options && { git: options.git }),
 			...("install" in options && { noInstall: !options.install }),
 			...("turso" in options && { turso: options.turso }),
-			...((options.docker || options.pwa || options.addons === false) && {
+			...((options.docker ||
+				options.pwa ||
+				options.tauri ||
+				options.addons === false) && {
 				addons:
 					options.addons === false
 						? []
 						: ([
 								...(options.docker ? ["docker"] : []),
 								...(options.pwa ? ["pwa"] : []),
+								...(options.tauri ? ["tauri"] : []),
 							] as ProjectAddons[]),
 			}),
 		};

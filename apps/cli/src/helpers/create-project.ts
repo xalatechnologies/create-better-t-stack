@@ -126,7 +126,7 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		}
 
 		if (options.addons.length > 0) {
-			await setupAddons(projectDir, options.addons);
+			await setupAddons(projectDir, options.addons, options.packageManager);
 		}
 
 		await updatePackageConfigurations(projectDir, options);
@@ -138,6 +138,7 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			options.packageManager,
 			!options.noInstall,
 			options.orm,
+			options.addons,
 		);
 
 		return projectDir;

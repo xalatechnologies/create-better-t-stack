@@ -1,15 +1,23 @@
 import path from "node:path";
 import fs from "fs-extra";
 import { PKG_ROOT } from "../constants";
-import type { ProjectAddons } from "../types";
+import type { PackageManager, ProjectAddons } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
+import { setupTauri } from "./tauri-setup";
 
-export async function setupAddons(projectDir: string, addons: ProjectAddons[]) {
+export async function setupAddons(
+	projectDir: string,
+	addons: ProjectAddons[],
+	packageManager: PackageManager,
+) {
 	if (addons.includes("docker")) {
 		await setupDocker(projectDir);
 	}
 	if (addons.includes("pwa")) {
 		await setupPwa(projectDir);
+	}
+	if (addons.includes("tauri")) {
+		await setupTauri(projectDir, packageManager);
 	}
 }
 

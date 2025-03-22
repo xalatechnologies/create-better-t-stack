@@ -20,6 +20,11 @@ export async function getAddonsChoice(
 				label: "PWA (Progressive Web App)",
 				hint: "Make your app installable and work offline",
 			},
+			{
+				value: "tauri",
+				label: "Tauri Desktop App",
+				hint: "Build native desktop apps from your web frontend",
+			},
 		],
 		required: false,
 	});

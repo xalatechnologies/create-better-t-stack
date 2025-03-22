@@ -1,6 +1,11 @@
 import { log } from "@clack/prompts";
 import pc from "picocolors";
-import type { PackageManager, ProjectDatabase, ProjectOrm } from "../types";
+import type {
+	PackageManager,
+	ProjectAddons,
+	ProjectDatabase,
+	ProjectOrm,
+} from "../types";
 
 export function displayPostInstallInstructions(
 	database: ProjectDatabase,
@@ -8,6 +13,7 @@ export function displayPostInstallInstructions(
 	packageManager: PackageManager,
 	depsInstalled: boolean,
 	orm?: ProjectOrm,
+	addons?: ProjectAddons[],
 ) {
 	const runCmd = packageManager === "npm" ? "npm run" : packageManager;
 	const cdCmd = `cd ${projectName}`;
@@ -22,7 +28,8 @@ ${pc.bold("Your project will be available at:")}
 ${pc.cyan("•")} Frontend: http://localhost:3001
 ${pc.cyan("•")} API: http://localhost:3000
 
-${database !== "none" ? getDatabaseInstructions(database, orm, runCmd) : ""}`);
+${database !== "none" ? getDatabaseInstructions(database, orm, runCmd) : ""}
+${addons?.includes("tauri") ? getTauriInstructions(runCmd) : ""}`);
 }
 
 function getDatabaseInstructions(
@@ -62,4 +69,8 @@ function getDatabaseInstructions(
 	return instructions.length
 		? `${pc.bold("Database commands:")}\n${instructions.join("\n")}\n\n`
 		: "";
+}
+
+function getTauriInstructions(runCmd?: string): string {
+	return `${pc.bold("Desktop app with Tauri:")}\n${pc.cyan("•")} Start desktop app: ${pc.dim(`cd packages/client && ${runCmd} desktop:dev`)}\n${pc.cyan("•")} Build desktop app: ${pc.dim(`cd packages/client && ${runCmd} desktop:build`)}\n${pc.yellow("NOTE:")} Tauri requires Rust and platform-specific dependencies. See: ${pc.dim("https://v2.tauri.app/start/prerequisites/")}\n\n`;
 }
