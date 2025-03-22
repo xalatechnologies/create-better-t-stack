@@ -4,7 +4,7 @@ import React from "react";
 import CodeContainer from "./_components/CodeContainer";
 import CustomizableSection from "./_components/CustomizableSection";
 import NpmPackage from "./_components/NpmPackage";
-import TechConstellation from "./_components/TechConstellation";
+import TechShowcase from "./_components/TechShowcase";
 // import TerminalDisplay from "./_components/Terminal";
 import Testimonials from "./_components/Testimonials";
 
@@ -86,7 +86,7 @@ export default function HomePage() {
 					{/* <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/10 to-transparent -z-10" /> */}
 				</div>
 			</div>
-			<TechConstellation />
+			<TechShowcase />
 			<CustomizableSection />
 			<div className="w-full pt-16 relative overflow-hidden">
 				<div className="max-w-6xl mx-auto relative">
