@@ -4,65 +4,75 @@ import React, { useState } from "react";
 interface TechItem {
 	name: string;
 	description: string;
-	category: "frontend" | "backend" | "database" | "tooling" | "deployment";
+	category:
+		| "frontend"
+		| "backend"
+		| "database"
+		| "tooling"
+		| "deployment"
+		| "core";
 }
 
 const techStack: TechItem[] = [
 	{
-		name: "Next.js",
-		description: "React framework for production",
-		category: "frontend",
+		name: "Bun",
+		description: "Fast all-in-one JavaScript runtime",
+		category: "core",
 	},
 	{
 		name: "TypeScript",
-		description: "Strongly typed programming language",
-		category: "frontend",
+		description: "Type safety across the stack",
+		category: "core",
 	},
 	{
 		name: "tRPC",
-		description: "End-to-end typesafe APIs",
-		category: "backend",
+		description: "End-to-end type-safe APIs",
+		category: "core",
+	},
+	{
+		name: "React (Vite)",
+		description: "JavaScript library for user interfaces",
+		category: "frontend",
+	},
+	{
+		name: "TanStack Router",
+		description: "Type-safe routing",
+		category: "frontend",
 	},
 	{
 		name: "Tailwind CSS",
 		description: "Utility-first CSS framework",
 		category: "frontend",
 	},
-	{ name: "Prisma", description: "Next-generation ORM", category: "database" },
 	{
-		name: "PostgreSQL",
-		description: "Advanced open source database",
+		name: "shadcn/ui",
+		description: "Re-usable components",
+		category: "frontend",
+	},
+	{
+		name: "Hono",
+		description: "Ultrafast web framework",
+		category: "backend",
+	},
+	{
+		name: "Better-Auth",
+		description: "Modern authentication solution",
+		category: "backend",
+	},
+	{
+		name: "Drizzle ORM",
+		description: "TypeScript ORM",
 		category: "database",
 	},
 	{
-		name: "Zod",
-		description: "TypeScript-first schema validation",
-		category: "backend",
+		name: "Prisma",
+		description: "Next-generation ORM",
+		category: "database",
 	},
 	{
-		name: "Auth.js",
-		description: "Authentication for the web",
-		category: "backend",
-	},
-	{
-		name: "Turborepo",
-		description: "High-performance build system",
-		category: "tooling",
-	},
-	{
-		name: "Docker",
-		description: "Containerization platform",
-		category: "deployment",
-	},
-	{
-		name: "ESLint",
-		description: "Pluggable JavaScript linter",
-		category: "tooling",
-	},
-	{
-		name: "Prettier",
-		description: "Opinionated code formatter",
-		category: "tooling",
+		name: "libSQL",
+		description: "SQLite-compatible database engine",
+		category: "database",
 	},
 ];
 
@@ -72,6 +82,7 @@ const categoryIcons = {
 	database: "🗄️",
 	tooling: "🔧",
 	deployment: "🚀",
+	core: "🔑",
 };
 
 export default function TechShowcase() {
