@@ -25,6 +25,16 @@ export async function getAddonsChoice(
 				label: "Tauri Desktop App",
 				hint: "Build native desktop apps from your web frontend",
 			},
+			{
+				value: "biome",
+				label: "Biome",
+				hint: "Add Biome for linting and formatting",
+			},
+			{
+				value: "husky",
+				label: "Husky",
+				hint: "Add Git hooks with Husky, lint-staged (requires Biome)",
+			},
 		],
 		required: false,
 	});
@@ -32,6 +42,10 @@ export async function getAddonsChoice(
 	if (isCancel(response)) {
 		cancel(pc.red("Operation cancelled"));
 		process.exit(0);
+	}
+
+	if (response.includes("husky") && !response.includes("biome")) {
+		response.push("biome");
 	}
 
 	return response;

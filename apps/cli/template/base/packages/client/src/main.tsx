@@ -1,7 +1,7 @@
 import {
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
+	QueryCache,
+	QueryClient,
+	QueryClientProvider,
 } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { httpBatchLink } from "@trpc/client";
@@ -13,59 +13,60 @@ import { routeTree } from "./routeTree.gen";
 import { trpc } from "./utils/trpc";
 
 const queryClient = new QueryClient({
-  queryCache: new QueryCache({
-    onError: (error) => {
-      toast.error(error.message, {
-        action: {
-          label: "retry",
-          onClick: () => {
-            queryClient.invalidateQueries();
-          },
-        },
-      });
-    },
-  }),
+	queryCache: new QueryCache({
+		onError: (error) => {
+			toast.error(error.message, {
+				action: {
+					label: "retry",
+					onClick: () => {
+						queryClient.invalidateQueries();
+					},
+				},
+			});
+		},
+	}),
 });
 
 const trpcClient = trpc.createClient({
-  links: [
-    httpBatchLink({
-      url: `${import.meta.env.VITE_SERVER_URL}/trpc`,
-    }),
-  ],
+	links: [
+		httpBatchLink({
+			url: `${import.meta.env.VITE_SERVER_URL}/trpc`,
+		}),
+	],
 });
 
 export const trpcQueryUtils = createTRPCQueryUtils({
-  queryClient,
-  client: trpcClient,
+	queryClient,
+	client: trpcClient,
 });
 
 const router = createRouter({
-  routeTree,
-  defaultPreload: "intent",
-  context: { trpcQueryUtils },
-  defaultPendingComponent: () => <Loader />,
-  Wrap: function WrapComponent({ children }) {
-    return (
-      <trpc.Provider client={trpcClient} queryClient={queryClient}>
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      </trpc.Provider>
-    );
-  },
+	routeTree,
+	defaultPreload: "intent",
+	context: { trpcQueryUtils },
+	defaultPendingComponent: () => <Loader />,
+	Wrap: function WrapComponent({ children }) {
+		return (
+			<trpc.Provider client={trpcClient} queryClient={queryClient}>
+				<QueryClientProvider client={queryClient}>
+					{children}
+				</QueryClientProvider>
+			</trpc.Provider>
+		);
+	},
 });
 
 // Register things for typesafety
 declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
+	interface Register {
+		router: typeof router;
+	}
 }
 
-const rootElement = document.getElementById("app")!;
+const rootElement = document.getElementById("app");
+if (!rootElement) throw new Error("Root element not found");
 
 if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(<RouterProvider router={router} />);
+	const root = ReactDOM.createRoot(rootElement);
+	root.render(<RouterProvider router={router} />);
 }

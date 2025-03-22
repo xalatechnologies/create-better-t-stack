@@ -19,6 +19,66 @@ export async function setupAddons(
 	if (addons.includes("tauri")) {
 		await setupTauri(projectDir, packageManager);
 	}
+	if (addons.includes("biome")) {
+		await setupBiome(projectDir);
+	}
+	if (addons.includes("husky")) {
+		await setupHusky(projectDir);
+	}
+}
+
+async function setupBiome(projectDir: string) {
+	const biomeTemplateDir = path.join(PKG_ROOT, "template/with-biome");
+	if (await fs.pathExists(biomeTemplateDir)) {
+		await fs.copy(biomeTemplateDir, projectDir, { overwrite: true });
+	}
+
+	addPackageDependency({
+		devDependencies: ["@biomejs/biome"],
+		projectDir,
+	});
+
+	const packageJsonPath = path.join(projectDir, "package.json");
+	if (await fs.pathExists(packageJsonPath)) {
+		const packageJson = await fs.readJson(packageJsonPath);
+
+		packageJson.scripts = {
+			...packageJson.scripts,
+			check: "biome check --write .",
+		};
+
+		await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
+	}
+}
+
+async function setupHusky(projectDir: string) {
+	const huskyTemplateDir = path.join(PKG_ROOT, "template/with-husky");
+	if (await fs.pathExists(huskyTemplateDir)) {
+		await fs.copy(huskyTemplateDir, projectDir, { overwrite: true });
+	}
+
+	addPackageDependency({
+		devDependencies: ["husky", "lint-staged"],
+		projectDir,
+	});
+
+	const packageJsonPath = path.join(projectDir, "package.json");
+	if (await fs.pathExists(packageJsonPath)) {
+		const packageJson = await fs.readJson(packageJsonPath);
+
+		packageJson.scripts = {
+			...packageJson.scripts,
+			prepare: "husky",
+		};
+
+		packageJson["lint-staged"] = {
+			"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+				"biome check --no-errors-on-unmatched --files-ignore-unknown=true",
+			],
+		};
+
+		await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
+	}
 }
 
 async function setupDocker(projectDir: string) {

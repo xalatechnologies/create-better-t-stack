@@ -33,6 +33,11 @@ export const dependencyVersionMap = {
 	"@vite-pwa/assets-generator": "^0.2.6",
 
 	"@tauri-apps/cli": "^2.4.0",
+
+	"@biomejs/biome": "1.9.4",
+
+	husky: "^9.1.7",
+	"lint-staged": "^15.5.0",
 } as const;
 
 export type AvailableDependencies = keyof typeof dependencyVersionMap;

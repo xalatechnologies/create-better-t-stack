@@ -6,7 +6,7 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "sqlite",
   }),
-  trustedOrigins: [process.env.CORS_ORIGIN!],
+  trustedOrigins: [process.env.CORS_ORIGIN || ""],
   emailAndPassword: { enabled: true },
   advanced: {
     defaultCookieAttributes: {

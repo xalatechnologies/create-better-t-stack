@@ -17,6 +17,17 @@ export function displayPostInstallInstructions(
 ) {
 	const runCmd = packageManager === "npm" ? "npm run" : packageManager;
 	const cdCmd = `cd ${projectName}`;
+	const hasHuskyOrBiome =
+		addons?.includes("husky") || addons?.includes("biome");
+
+	const databaseInstructions =
+		database !== "none" ? getDatabaseInstructions(database, orm, runCmd) : "";
+	const tauriInstructions = addons?.includes("tauri")
+		? getTauriInstructions(runCmd)
+		: "";
+	const lintingInstructions = hasHuskyOrBiome
+		? getLintingInstructions(runCmd)
+		: "";
 
 	log.info(`${pc.cyan("Project created successfully!")}
 
@@ -27,9 +38,11 @@ ${!depsInstalled ? `${pc.cyan("2.")} ${packageManager} install\n` : ""}${pc.cyan
 ${pc.bold("Your project will be available at:")}
 ${pc.cyan("•")} Frontend: http://localhost:3001
 ${pc.cyan("•")} API: http://localhost:3000
+${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}`);
+}
 
-${database !== "none" ? getDatabaseInstructions(database, orm, runCmd) : ""}
-${addons?.includes("tauri") ? getTauriInstructions(runCmd) : ""}`);
+function getLintingInstructions(runCmd?: string): string {
+	return `${pc.bold("Linting and formatting:")}\n${pc.cyan("•")} Format and lint fix: ${pc.dim(`${runCmd} check`)}\n\n`;
 }
 
 function getDatabaseInstructions(

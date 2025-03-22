@@ -1,32 +1,28 @@
-name: Release
+name: Publish
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'packages/cli/**'
+      - 'apps/cli/**'
       - '.changeset/**'
       - 'package.json'
       - 'bun.lock'
 
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
-  release:
-    name: Release
+  publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-
-      - name: Install Dependencies
-        run: bun install
-
-      - name: Create Release Pull Request or Publish
+      - run: bun install --frozen-lockfile
+      - name: Create Release Pull Request
+        id: changesets
         uses: changesets/action@v1
         with:
           publish: bun run publish-packages

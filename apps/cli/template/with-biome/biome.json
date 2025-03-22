@@ -7,7 +7,16 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": [".next", "dist", ".source", "out", "template", ".turbo"]
+		"ignore": [
+			".next",
+			"dist",
+			".turbo",
+			"dev-dist",
+			".zed",
+			".vscode",
+			"routeTree.gen.ts",
+			"src-tauri"
+		]
 	},
 	"formatter": {
 		"enabled": true,
@@ -19,9 +28,11 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
-		},
-		"ignore": ["template"]
+			"recommended": true,
+			"correctness": {
+				"useExhaustiveDependencies": "info"
+			}
+		}
 	},
 	"javascript": {
 		"formatter": {

@@ -33,6 +33,8 @@ async function main() {
 		.option("--docker", "Include Docker setup")
 		.option("--pwa", "Include Progressive Web App support")
 		.option("--tauri", "Include Tauri desktop app support")
+		.option("--biome", "Include Biome for linting and formatting")
+		.option("--husky", "Include Husky, lint-staged for Git hooks")
 		.option("--no-addons", "Skip all additional addons")
 		.option("--git", "Include git setup")
 		.option("--no-git", "Skip git initialization")
@@ -75,6 +77,8 @@ async function main() {
 			...((options.docker ||
 				options.pwa ||
 				options.tauri ||
+				options.biome ||
+				options.husky ||
 				options.addons === false) && {
 				addons:
 					options.addons === false
@@ -83,6 +87,8 @@ async function main() {
 								...(options.docker ? ["docker"] : []),
 								...(options.pwa ? ["pwa"] : []),
 								...(options.tauri ? ["tauri"] : []),
+								...(options.biome ? ["biome"] : []),
+								...(options.husky ? ["husky"] : []),
 							] as ProjectAddons[]),
 			}),
 		};
@@ -141,6 +147,7 @@ async function main() {
 			await installDependencies({
 				projectDir,
 				packageManager: config.packageManager,
+				addons: config.addons,
 			});
 		}
 
