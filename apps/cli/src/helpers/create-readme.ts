@@ -135,15 +135,6 @@ cd packages/server && ${packageManagerRunCmd} db:local
 `;
 	}
 
-	if (auth) {
-		setup += `
-3. Generate the authentication schema:
-\`\`\`bash
-cd packages/server && ${packageManagerRunCmd} auth:generate
-\`\`\`
-`;
-	}
-
 	setup += `
 ${auth ? "4" : "3"}. ${
 		orm === "prisma"

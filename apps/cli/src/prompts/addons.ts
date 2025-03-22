@@ -15,6 +15,11 @@ export async function getAddonsChoice(
 				label: "Docker setup",
 				hint: "Containerize your application",
 			},
+			{
+				value: "pwa",
+				label: "PWA (Progressive Web App)",
+				hint: "Make your app installable and work offline",
+			},
 		],
 		required: false,
 	});

@@ -31,6 +31,7 @@ async function main() {
 		.option("--auth", "Include authentication")
 		.option("--no-auth", "Exclude authentication")
 		.option("--docker", "Include Docker setup")
+		.option("--pwa", "Include Progressive Web App support")
 		.option("--no-addons", "Skip all additional addons")
 		.option("--git", "Include git setup")
 		.option("--no-git", "Skip git initialization")
@@ -64,17 +65,20 @@ async function main() {
 			...(options.prisma && { orm: "prisma" }),
 			...("auth" in options && { auth: options.auth }),
 			...(options.npm && { packageManager: "npm" }),
-			...(options.pnpm && { packageManager: "pnpm" }),
+			...(options.pnpm && { packageManager: "  pnpm" }),
 			...(options.yarn && { packageManager: "yarn" }),
 			...(options.bun && { packageManager: "bun" }),
 			...("git" in options && { git: options.git }),
 			...("install" in options && { noInstall: !options.install }),
 			...("turso" in options && { turso: options.turso }),
-			...((options.docker || options.addons === false) && {
+			...((options.docker || options.pwa || options.addons === false) && {
 				addons:
 					options.addons === false
 						? []
-						: ([...(options.docker ? ["docker"] : [])] as ProjectAddons[]),
+						: ([
+								...(options.docker ? ["docker"] : []),
+								...(options.pwa ? ["pwa"] : []),
+							] as ProjectAddons[]),
 			}),
 		};
 

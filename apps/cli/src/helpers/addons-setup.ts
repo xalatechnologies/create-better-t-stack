@@ -1,10 +1,15 @@
 import path from "node:path";
 import fs from "fs-extra";
+import { PKG_ROOT } from "../constants";
 import type { ProjectAddons } from "../types";
+import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupAddons(projectDir: string, addons: ProjectAddons[]) {
 	if (addons.includes("docker")) {
 		await setupDocker(projectDir);
+	}
+	if (addons.includes("pwa")) {
+		await setupPwa(projectDir);
 	}
 }
 
@@ -88,4 +93,31 @@ node_modules
 		path.join(projectDir, ".dockerignore"),
 		dockerignoreContent,
 	);
+}
+
+async function setupPwa(projectDir: string) {
+	const pwaTemplateDir = path.join(PKG_ROOT, "template/with-pwa");
+	if (await fs.pathExists(pwaTemplateDir)) {
+		await fs.copy(pwaTemplateDir, projectDir, { overwrite: true });
+	}
+
+	const clientPackageDir = path.join(projectDir, "packages/client");
+
+	addPackageDependency({
+		dependencies: ["vite-plugin-pwa"],
+		devDependencies: ["@vite-pwa/assets-generator"],
+		projectDir: clientPackageDir,
+	});
+
+	const clientPackageJsonPath = path.join(clientPackageDir, "package.json");
+	if (await fs.pathExists(clientPackageJsonPath)) {
+		const packageJson = await fs.readJson(clientPackageJsonPath);
+
+		packageJson.scripts = {
+			...packageJson.scripts,
+			"generate-pwa-assets": "pwa-assets-generator",
+		};
+
+		await fs.writeJson(clientPackageJsonPath, packageJson, { spaces: 2 });
+	}
 }
