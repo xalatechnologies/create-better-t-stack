@@ -4,7 +4,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "tsx watch src/index.ts",
-		"build": "tsc",
+		"start": "node dist/src/index.js",
+		"build": "tsc && tsc-alias",
 		"dev:bun": "bun run --hot src/index.ts",
 		"check-types": "tsc --noEmit",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server"
@@ -18,6 +19,7 @@
 		"zod": "^3.24.2"
 	},
 	"devDependencies": {
+	  "tsc-alias": "^1.8.11",
 		"tsx": "^4.19.2",
 		"@types/node": "^22.13.11",
 		"typescript": "^5.8.2"

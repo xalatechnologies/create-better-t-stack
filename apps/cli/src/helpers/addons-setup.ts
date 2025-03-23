@@ -73,7 +73,7 @@ async function setupHusky(projectDir: string) {
 
 		packageJson["lint-staged"] = {
 			"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
-				"biome check --no-errors-on-unmatched --files-ignore-unknown=true",
+				"biome check --write .",
 			],
 		};
 
