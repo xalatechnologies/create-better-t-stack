@@ -18,6 +18,9 @@ export default function Layout({ children }: { children: ReactNode }) {
 							type: "static",
 						},
 					}}
+					theme={{
+						enableSystem: true,
+					}}
 				>
 					{children}
 				</RootProvider>

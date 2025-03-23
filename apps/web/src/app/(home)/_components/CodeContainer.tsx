@@ -52,15 +52,17 @@ const CodeContainer = () => {
 
 	return (
 		<div className="w-full max-w-3xl mx-auto mt-8">
-			<div className="rounded-md bg-gray-950/50 backdrop-blur-3xl border border-blue-500/30 overflow-hidden">
-				<div className="flex items-center justify-between bg-blue-900/10 px-4 py-2 border-b border-blue-800/30">
+			<div className="rounded-md bg-gray-50/90 dark:bg-gray-950/50 backdrop-blur-3xl border border-gray-300 dark:border-blue-500/30 overflow-hidden">
+				<div className="flex items-center justify-between bg-gray-200/80 dark:bg-blue-900/10 px-4 py-2 border-b border-gray-300 dark:border-blue-800/30">
 					<div className="flex items-center">
 						<div className="flex space-x-2">
 							<div className="w-3 h-3 rounded-full bg-red-500/60" />
 							<div className="w-3 h-3 rounded-full bg-yellow-500/60" />
 							<div className="w-3 h-3 rounded-full bg-green-500/60" />
 						</div>
-						<div className="ml-4 text-sm text-blue-300 font-mono">terminal</div>
+						<div className="ml-4 text-sm text-gray-700 dark:text-blue-300 font-mono">
+							terminal
+						</div>
 					</div>
 
 					{/* Package Manager Selector */}
@@ -68,11 +70,13 @@ const CodeContainer = () => {
 						<button
 							type="button"
 							onClick={() => setIsOpen(!isOpen)}
-							className="flex items-center px-2 py-1 text-sm bg-black/50 rounded border border-blue-500/30 hover:bg-blue-900/20"
+							className="flex items-center px-2 py-1 text-sm bg-white/50 dark:bg-black/50 rounded border border-gray-300 dark:border-blue-500/30 hover:bg-gray-200/80 dark:hover:bg-blue-900/20"
 						>
-							<span className="text-blue-400 mr-2">{selectedPM}</span>
+							<span className="text-gray-700 dark:text-blue-400 mr-2">
+								{selectedPM}
+							</span>
 							<svg
-								className="w-4 h-4 text-blue-400"
+								className="w-4 h-4 text-gray-700 dark:text-blue-400"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -88,7 +92,7 @@ const CodeContainer = () => {
 						</button>
 
 						{isOpen && (
-							<div className="absolute right-0 mt-2 w-36 bg-black border border-blue-500/30 rounded-md shadow-lg z-50">
+							<div className="absolute right-0 mt-2 w-36 bg-white dark:bg-black border border-gray-300 dark:border-blue-500/30 rounded-md shadow-lg z-50">
 								<ul>
 									{(Object.keys(commands) as Array<"npm" | "pnpm" | "bun">).map(
 										(pm) => (
@@ -97,8 +101,8 @@ const CodeContainer = () => {
 													type="button"
 													className={`block w-full text-left px-4 py-2 text-sm ${
 														selectedPM === pm
-															? "bg-blue-900/30 text-blue-400"
-															: "text-gray-300 hover:bg-blue-900/20"
+															? "bg-gray-200 dark:bg-blue-900/30 text-gray-800 dark:text-blue-400"
+															: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-blue-900/20"
 													}`}
 													onClick={() => copyToClipboard(pm)}
 												>
@@ -113,14 +117,18 @@ const CodeContainer = () => {
 					</div>
 				</div>
 
-				<div className="p-4 font-mono text-sm">
+				<div className="p-4 font-mono text-sm bg-white dark:bg-transparent">
 					<div className="flex items-center">
 						<div className="flex-grow">
-							<span className="text-blue-500 mr-2">$</span>
-							<span className="text-white">{commands[selectedPM]}</span>
+							<span className="text-blue-600 dark:text-blue-500 mr-2">$</span>
+							<span className="text-gray-800 dark:text-white">
+								{commands[selectedPM]}
+							</span>
 							<span
 								className={
-									typingComplete ? "hidden" : "text-blue-500 animate-pulse ml-1"
+									typingComplete
+										? "hidden"
+										: "text-blue-600 dark:text-blue-500 animate-pulse ml-1"
 								}
 							>
 								▌
@@ -129,7 +137,7 @@ const CodeContainer = () => {
 						<button
 							type="button"
 							onClick={() => copyToClipboard(selectedPM)}
-							className="text-blue-400 hover:text-blue-300"
+							className="text-gray-600 dark:text-blue-400 hover:text-gray-800 dark:hover:text-blue-300"
 							title="Copy to clipboard"
 						>
 							{copied ? (
@@ -142,7 +150,7 @@ const CodeContainer = () => {
 
 					{typingComplete && (
 						<>
-							<div className="mt-2 pl-4 text-yellow-400">
+							<div className="mt-2 pl-4 text-amber-600 dark:text-yellow-400">
 								{currentStep >= 1 && (
 									<p
 										className={`transition-opacity duration-300 ${
@@ -154,24 +162,33 @@ const CodeContainer = () => {
 								)}
 								{currentStep >= 2 && (
 									<div className="mt-2">
-										<p className="text-white">
+										<p className="text-gray-800 dark:text-white">
 											Project name:{" "}
-											<span className="text-yellow-400">my-t-stack</span>
+											<span className="text-amber-600 dark:text-yellow-400">
+												my-t-stack
+											</span>
 										</p>
-										<p className="text-white">
+										<p className="text-gray-800 dark:text-white">
 											Database:{" "}
-											<span className="text-yellow-400">postgres</span>
+											<span className="text-amber-600 dark:text-yellow-400">
+												postgres
+											</span>
 										</p>
-										<p className="text-white">
-											ORM: <span className="text-yellow-400">drizzle</span>
+										<p className="text-gray-800 dark:text-white">
+											ORM:{" "}
+											<span className="text-amber-600 dark:text-yellow-400">
+												drizzle
+											</span>
 										</p>
-										<p className="text-white">
+										<p className="text-gray-800 dark:text-white">
 											Authentication:{" "}
-											<span className="text-yellow-400">yes</span>
+											<span className="text-amber-600 dark:text-yellow-400">
+												yes
+											</span>
 										</p>
-										<p className="text-white">
+										<p className="text-gray-800 dark:text-white">
 											Addons:{" "}
-											<span className="text-yellow-400">
+											<span className="text-amber-600 dark:text-yellow-400">
 												docker, github-actions, SEO
 											</span>
 										</p>
@@ -181,17 +198,23 @@ const CodeContainer = () => {
 
 							{currentStep >= 3 && (
 								<div className="mt-3 pl-4">
-									<p className="text-blue-400">✓ Creating project structure</p>
+									<p className="text-blue-600 dark:text-blue-400">
+										✓ Creating project structure
+									</p>
 									{currentStep >= 4 && (
-										<p className="text-blue-400">✓ Installing dependencies</p>
+										<p className="text-blue-600 dark:text-blue-400">
+											✓ Installing dependencies
+										</p>
 									)}
 									{currentStep >= 5 && (
 										<>
-											<p className="text-blue-400">✓ Setting up database</p>
-											<p className="text-blue-400">
+											<p className="text-blue-600 dark:text-blue-400">
+												✓ Setting up database
+											</p>
+											<p className="text-blue-600 dark:text-blue-400">
 												✓ Configuring authentication
 											</p>
-											<p className="text-white mt-2">
+											<p className="text-gray-800 dark:text-white mt-2">
 												Project ready! Happy coding!
 											</p>
 										</>
@@ -202,8 +225,10 @@ const CodeContainer = () => {
 					)}
 
 					<div className={`flex mt-4 ${typingComplete ? "" : "hidden"}`}>
-						<span className="text-blue-500 mr-2">$</span>
-						<span className="text-blue-500 animate-pulse">▌</span>
+						<span className="text-blue-600 dark:text-blue-500 mr-2">$</span>
+						<span className="text-blue-600 dark:text-blue-500 animate-pulse">
+							▌
+						</span>
 					</div>
 				</div>
 			</div>

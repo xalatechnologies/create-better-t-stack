@@ -148,7 +148,7 @@ export default function TechMatrix() {
 					<div
 						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 						key={i}
-						className="absolute rounded-full bg-blue-500/10 blur-xl"
+						className="absolute rounded-full bg-blue-500/10 dark:bg-blue-500/10 blur-xl"
 						style={{
 							width: `${Math.random() * 200 + 50}px`,
 							height: `${Math.random() * 200 + 50}px`,
@@ -163,7 +163,7 @@ export default function TechMatrix() {
 
 			{/* Main container */}
 			<motion.div
-				className="relative border border-gray-700/50 rounded-lg overflow-hidden bg-black/60 backdrop-blur-sm shadow-lg"
+				className="relative border border-gray-200/50 dark:border-gray-700/50 rounded-lg overflow-hidden bg-white/60 dark:bg-black/60 backdrop-blur-sm shadow-lg"
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.6 }}
@@ -178,27 +178,33 @@ export default function TechMatrix() {
 				</div>
 
 				{/* Terminal header */}
-				<div className="flex items-center justify-between p-3 bg-gray-900/80 border-b border-gray-700/50">
+				<div className="flex items-center justify-between p-3 bg-gray-100/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50">
 					<div className="flex space-x-2">
 						<div className="w-3 h-3 rounded-full bg-red-500" />
 						<div className="w-3 h-3 rounded-full bg-yellow-500" />
 						<div className="w-3 h-3 rounded-full bg-green-500" />
 					</div>
-					<div className="font-mono text-sm text-gray-400 flex items-center space-x-1">
-						<span className="text-green-400">user@better-t-stack</span>
+					<div className="font-mono text-sm text-gray-600 dark:text-gray-400 flex items-center space-x-1">
+						<span className="text-green-600 dark:text-green-400">
+							user@better-t-stack
+						</span>
 						<span>:</span>
-						<span className="text-blue-400">~/tech-matrix</span>
+						<span className="text-blue-600 dark:text-blue-400">
+							~/tech-matrix
+						</span>
 						<span>$</span>
 					</div>
-					<div className="text-xs text-gray-500 font-mono">v1.0.0</div>
+					<div className="text-xs text-gray-500 dark:text-gray-500 font-mono">
+						v1.0.0
+					</div>
 				</div>
 
 				<div className="p-6 relative">
 					{/* Command line interface effect */}
-					<div className="font-mono text-sm text-gray-300 mb-6 flex items-center">
-						<span className="text-green-400 mr-2">$</span>
+					<div className="font-mono text-sm text-gray-700 dark:text-gray-300 mb-6 flex items-center">
+						<span className="text-green-600 dark:text-green-400 mr-2">$</span>
 						<span>{typedCommand}</span>
-						<span className="h-4 w-2 bg-gray-400 animate-blink ml-1" />
+						<span className="h-4 w-2 bg-gray-600 dark:bg-gray-400 animate-blink ml-1" />
 					</div>
 
 					{/* Category filters */}
@@ -213,8 +219,8 @@ export default function TechMatrix() {
 							type="button"
 							className={`px-3 py-1 text-xs font-mono rounded-md transition-all duration-300 ${
 								!selectedCategory
-									? "bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.3)]"
-									: "bg-gray-800/60 border border-gray-700/50 text-gray-400 hover:bg-gray-700/30 hover:text-gray-300"
+									? "bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.3)]"
+									: "bg-gray-200/60 dark:bg-gray-800/60 border border-gray-300/50 dark:border-gray-700/50 text-gray-600 dark:text-gray-400 hover:bg-gray-300/30 dark:hover:bg-gray-700/30 hover:text-gray-700 dark:hover:text-gray-300"
 							}`}
 							onClick={() => setSelectedCategory(null)}
 						>
@@ -227,8 +233,8 @@ export default function TechMatrix() {
 								key={category}
 								className={`px-3 py-1 text-xs font-mono rounded-md transition-all duration-300 ${
 									selectedCategory === category
-										? "bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.3)]"
-										: "bg-gray-800/60 border border-gray-700/50 text-gray-400 hover:bg-gray-700/30 hover:text-gray-300"
+										? "bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.3)]"
+										: "bg-gray-200/60 dark:bg-gray-800/60 border border-gray-300/50 dark:border-gray-700/50 text-gray-600 dark:text-gray-400 hover:bg-gray-300/30 dark:hover:bg-gray-700/30 hover:text-gray-700 dark:hover:text-gray-300"
 								}`}
 								onClick={() => setSelectedCategory(category)}
 							>
@@ -238,7 +244,7 @@ export default function TechMatrix() {
 					</motion.div>
 
 					{/* Tech stack display */}
-					<div className="font-mono text-sm text-gray-300 relative">
+					<div className="font-mono text-sm text-gray-700 dark:text-gray-300 relative">
 						<div
 							className="absolute inset-0 -z-10 opacity-30"
 							style={{
@@ -246,10 +252,12 @@ export default function TechMatrix() {
 							}}
 						/>
 
-						<div className="text-blue-400 mb-4">
+						<div className="text-blue-600 dark:text-blue-400 mb-4">
 							{"// Better-T Stack Tech Matrix"}
 						</div>
-						<div className="text-purple-400">{"const techStack = {"}</div>
+						<div className="text-purple-600 dark:text-purple-400">
+							{"const techStack = {"}
+						</div>
 
 						<AnimatePresence mode="wait">
 							<motion.div
@@ -277,7 +285,7 @@ export default function TechMatrix() {
 											show: { y: 0, opacity: 1 },
 										}}
 									>
-										<div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-2 py-3 px-2 rounded-md transition-colors duration-300 hover:bg-gray-800/30 border border-transparent hover:border-gray-700/40">
+										<div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-2 py-3 px-2 rounded-md transition-colors duration-300 hover:bg-gray-100/30 dark:hover:bg-gray-800/30 border border-transparent hover:border-gray-300/40 dark:hover:border-gray-700/40">
 											<div className="flex items-center">
 												<div className="w-5 h-5 mr-2 relative overflow-hidden flex-shrink-0">
 													{tech.logo && (
@@ -300,21 +308,25 @@ export default function TechMatrix() {
 													)}
 												</div>
 												<div>
-													<span className="text-yellow-400 font-semibold">
+													<span className="text-yellow-600 dark:text-yellow-400 font-semibold">
 														{tech.name}
 													</span>
-													<span className="text-white">: </span>
-													<span className="text-green-400 group-hover:text-green-300 transition-colors">
+													<span className="text-gray-900 dark:text-white">
+														:{" "}
+													</span>
+													<span className="text-green-600 group-hover:text-green-700 dark:text-green-400 dark:group-hover:text-green-300 transition-colors">
 														&quot;{tech.description}&quot;
 													</span>
 													{index < filteredTech.length - 1 && (
-														<span className="text-white">,</span>
+														<span className="text-gray-900 dark:text-white">
+															,
+														</span>
 													)}
 												</div>
 											</div>
-											<div className="hidden md:flex items-center justify-between text-gray-500 group-hover:text-gray-400 transition-colors">
+											<div className="hidden md:flex items-center justify-between text-gray-500 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors">
 												<span>{`// ${tech.category}`}</span>
-												<span className="text-gray-600 text-xs">
+												<span className="text-gray-400 dark:text-gray-600 text-xs">
 													[installed]
 												</span>
 											</div>
@@ -326,15 +338,15 @@ export default function TechMatrix() {
 							</motion.div>
 						</AnimatePresence>
 
-						<div className="text-purple-400">{"};"}</div>
+						<div className="text-purple-600 dark:text-purple-400">{"};"}</div>
 
 						{/* Terminal footer */}
-						<div className="mt-6 text-gray-400 border-t border-gray-800/50 pt-4 flex items-center justify-between">
+						<div className="mt-6 text-gray-600 dark:text-gray-400 border-t border-gray-200/50 dark:border-gray-800/50 pt-4 flex items-center justify-between">
 							<div>
-								<span className="text-green-400">$</span> run better-t-stack
-								--with-typesafety
+								<span className="text-green-600 dark:text-green-400">$</span>{" "}
+								run better-t-stack --with-typesafety
 							</div>
-							<div className="text-xs text-gray-600 animate-pulse">
+							<div className="text-xs text-gray-400 dark:text-gray-600 animate-pulse">
 								Ready for deployment...
 							</div>
 						</div>
@@ -344,32 +356,32 @@ export default function TechMatrix() {
 
 			{/* Add animated style tag for custom animations */}
 			<style jsx>{`
-        @keyframes float {
-          0% { transform: translate(0, 0) rotate(0deg); }
-          50% { transform: translate(20px, 20px) rotate(5deg); }
-          100% { transform: translate(0, 0) rotate(0deg); }
-        }
+								@keyframes float {
+										0% { transform: translate(0, 0) rotate(0deg); }
+										50% { transform: translate(20px, 20px) rotate(5deg); }
+										100% { transform: translate(0, 0) rotate(0deg); }
+								}
 
-        @keyframes animate-gradient-x {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
+								@keyframes animate-gradient-x {
+										0% { background-position: 0% 50%; }
+										50% { background-position: 100% 50%; }
+										100% { background-position: 0% 50%; }
+								}
 
-        .animate-gradient-x {
-          background-size: 200% 200%;
-          animation: animate-gradient-x 15s linear infinite;
-        }
+								.animate-gradient-x {
+										background-size: 200% 200%;
+										animation: animate-gradient-x 15s linear infinite;
+								}
 
-        .animate-blink {
-          animation: blink 1s step-end infinite;
-        }
+								.animate-blink {
+										animation: blink 1s step-end infinite;
+								}
 
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
-        }
-      `}</style>
+								@keyframes blink {
+										0%, 100% { opacity: 1; }
+										50% { opacity: 0; }
+								}
+						`}</style>
 		</div>
 	);
 }

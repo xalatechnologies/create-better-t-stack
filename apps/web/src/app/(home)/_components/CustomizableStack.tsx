@@ -411,21 +411,21 @@ const CustomizableStack = () => {
 				<CommandDisplay command={command} />
 			</div>
 
-			<div className="relative rounded-xl border border-gray-800 overflow-hidden">
-				<div className="absolute inset-0 backdrop-blur-3xl bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10" />
+			<div className="relative rounded-xl border border-gray-800 dark:border-gray-800 border-gray-300 overflow-hidden">
+				<div className="absolute inset-0 backdrop-blur-3xl bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 dark:from-blue-500/10 dark:via-purple-500/10 dark:to-pink-500/10 from-blue-500/5 via-purple-500/5 to-pink-500/5" />
 
-				<div className="absolute left-0 top-0 bottom-0 lg:w-52 md:w-44 w-36 z-50 bg-gray-950/30 border-r border-gray-800/50">
+				<div className="absolute left-0 top-0 bottom-0 lg:w-52 md:w-44 w-36 z-50 bg-white/70 dark:bg-gray-950/30 border-r border-gray-300/50 dark:border-gray-800/50">
 					<TechSelector onSelect={handleTechSelect} activeNodes={activeNodes} />
 				</div>
 
-				<div className="max-sm:hidden bg-gray-950/30 lg:p-4 p-1 absolute lg:top-4 top-2 lg:right-4 right-2 z-50 w-80 rounded-xl border border-gray-800 backdrop-blur-3xl">
-					<div className="lg:text-sm text-xs text-gray-300 text-center">
+				<div className="max-sm:hidden bg-white/70 dark:bg-gray-950/30 lg:p-4 p-1 absolute lg:top-4 top-2 lg:right-4 right-2 z-50 w-80 rounded-xl border border-gray-300 dark:border-gray-800 backdrop-blur-3xl">
+					<div className="lg:text-sm text-xs text-gray-700 dark:text-gray-300 text-center">
 						Select technologies from the left panel to customize your stack. The
 						graph will automatically update connections.
 					</div>
 				</div>
 
-				<div className="h-[600px] lg:pl-52 md:pl-44 pl-36 relative backdrop-blur-sm bg-gray-950/50">
+				<div className="h-[600px] lg:pl-52 md:pl-44 pl-36 relative backdrop-blur-sm bg-white/50 dark:bg-gray-950/50">
 					<ReactFlow
 						nodes={nodes}
 						edges={edges}
@@ -448,8 +448,8 @@ const CustomizableStack = () => {
 						}}
 					>
 						<Background
-							className="bg-gray-950/5"
-							color="#1e293b"
+							className="bg-gray-100/30 dark:bg-gray-950/5"
+							color="currentColor"
 							gap={12}
 							size={1}
 						/>

@@ -1,4 +1,5 @@
 "use client";
+import { Github } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import PackageIcon from "./Icons";
@@ -43,7 +44,7 @@ const Navbar = () => {
 			className={`fixed top-0 right-0 z-[100] w-screen px-8 py-5 grid grid-cols-1 md:grid-cols-3 items-center transition-all duration-300 ${
 				scrolled
 					? "bg-transparent border-transparent"
-					: "sm:bg-black/40 sm:backdrop-blur-xl sm:border-b border-blue-500/20"
+					: " dark:sm:bg-black/40 sm:backdrop-blur-xl sm:border-b sm:bg-white/40 border-blue-400/20"
 			}`}
 		>
 			<div
@@ -52,21 +53,21 @@ const Navbar = () => {
 				}`}
 			>
 				<div className="w-4 h-4 rounded-sm flex items-center justify-center">
-					<span className="text-blue-500 text-md">$_</span>
+					<span className=" dark:text-blue-500 text-blue-600 text-md">$_</span>
 				</div>
-				<span className="text-blue-400 font-semibold text-md">
+				<span className=" dark:text-blue-400 text-blue-500 font-semibold text-md">
 					Better-T Stack
 				</span>
 			</div>
 
 			<div className="flex justify-center">
 				<div
-					className={`flex items-center backdrop-blur-md bg-black/40 rounded-md border border-blue-500/30 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
+					className={`flex items-center backdrop-blur-md dark:bg-black/40 bg-white/40 rounded-md border dark:border-blue-500/30 border-blue-400/30 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
 						scrolled ? "w-[342px]" : "sm:w-[240px] w-[280px]"
 					}`}
 				>
 					<div
-						className="absolute transition-all duration-300 ease-in-out bg-blue-900/20 border border-blue-500/20 rounded-md py-2"
+						className="absolute transition-all duration-300 ease-in-out  dark:bg-blue-900/20 bg-blue-200/40 border  dark:border-blue-500/20 border-blue-400/20 rounded-md py-2"
 						style={bgStyles}
 					/>
 					<Link
@@ -75,9 +76,10 @@ const Navbar = () => {
 							linkRefs.current.home = ref;
 						}}
 						onMouseOver={() => setActiveLink("home")}
-						className="text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative font-mono"
+						className=" dark:text-gray-300 text-gray-700  dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative font-mono"
 					>
-						<span className="text-blue-500">~/</span>home
+						<span className=" dark:text-blue-500 text-blue-600">~/</span>
+						home
 					</Link>
 					{/* <Link
 						href="https://www.github.com/better-t-stack/create-better-t-stack"
@@ -100,7 +102,7 @@ const Navbar = () => {
 						}}
 						onMouseOver={() => setActiveLink("demo")}
 						onMouseLeave={() => setActiveLink("home")}
-						className="text-gray-300 hidden hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative sm:flex gap-2 items-center font-mono"
+						className=" dark:text-gray-300 text-gray-700 hidden  dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative sm:flex gap-2 items-center font-mono"
 					>
 						<span>demo</span>
 					</Link>
@@ -112,7 +114,7 @@ const Navbar = () => {
 						}}
 						onMouseOver={() => setActiveLink("npm")}
 						onMouseLeave={() => setActiveLink("home")}
-						className="text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono"
+						className=" dark:text-gray-300 text-gray-700 dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono"
 					>
 						<PackageIcon pm="npm" className="w-4 h-4 rounded-full" />{" "}
 						<span>npm</span>
@@ -155,14 +157,13 @@ const Navbar = () => {
 						}}
 						onMouseOver={() => setActiveLink("github")}
 						onMouseLeave={() => setActiveLink("home")}
-						className={`text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono ${
+						className={` dark:text-gray-300 text-gray-700  dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono ${
 							scrolled
 								? "sm:opacity-100 sm:translate-y-0"
 								: "sm:opacity-0 sm:pointer-events-none"
 						}`}
 					>
-						<PackageIcon pm="github" className="w-4 h-4" />{" "}
-						<span className="">github</span>
+						<Github className="size-4 mr-2" /> Github
 					</Link>
 				</div>
 			</div>
@@ -175,11 +176,11 @@ const Navbar = () => {
 				<Link
 					href="https://www.github.com/better-t-stack/create-better-t-stack"
 					target="_blank"
-					className="relative max-sm:hidden inline-flex h-12 overflow-hidden rounded-md p-[1px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-black"
+					className="relative max-sm:hidden inline-flex h-12 overflow-hidden rounded-md p-[1px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-black focus:ring-offset-white"
 				>
 					<span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#3b82f6_0%,#6366f1_50%,#3b82f6_100%)]" />
-					<span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-md bg-black px-6 py-px text-sm font-medium text-blue-400 backdrop-blur-3xl font-mono">
-						<PackageIcon pm="github" className="w-4 h-4 mr-2" /> github
+					<span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-md  dark:bg-black bg-white px-6 py-px text-sm font-medium  dark:text-blue-400 text-blue-600 backdrop-blur-3xl font-mono">
+						<Github className="size-5 mr-2" /> Github
 					</span>
 				</Link>
 			</div>

@@ -49,11 +49,10 @@ interface TechSelectorProps {
 	onSelect: (category: string, techId: string) => void;
 	activeNodes: ActiveNodes;
 }
-
 export function TechSelector({ onSelect, activeNodes }: TechSelectorProps) {
 	return (
-		<div className="h-full overflow-y-auto p-3 space-y-5">
-			<div className="text-sm font-medium text-gray-200 border-b border-gray-700 pb-2">
+		<div className="h-full overflow-y-auto p-3 space-y-5 dark:bg-gray-900 bg-white">
+			<div className="text-sm font-medium dark:text-gray-200 text-gray-800 border-b dark:border-gray-700 border-gray-200 pb-2">
 				Options
 			</div>
 
@@ -61,16 +60,18 @@ export function TechSelector({ onSelect, activeNodes }: TechSelectorProps) {
 				.filter(([category]) => category !== "addons")
 				.map(([category, options]) => (
 					<div key={category} className="space-y-2">
-						<div className="text-xs text-gray-400 capitalize">{category}</div>
+						<div className="text-xs dark:text-gray-400 text-gray-500 capitalize">
+							{category}
+						</div>
 						<div className="flex flex-wrap gap-1">
 							{options.map((option) => (
 								<Badge
 									key={option.id}
 									variant="secondary"
-									className={`cursor-pointer hover:bg-gray-700 text-gray-300 ${
+									className={`cursor-pointer dark:hover:bg-gray-700 hover:bg-gray-200 dark:text-gray-300 text-gray-700 ${
 										activeNodes[
 											category as keyof Omit<ActiveNodes, "addons">
-										] === option.id && "bg-blue-600 text-white"
+										] === option.id && "bg-blue-600 dark:text-white text-white"
 									}`}
 									onClick={() => onSelect(category, option.id)}
 								>
@@ -82,16 +83,16 @@ export function TechSelector({ onSelect, activeNodes }: TechSelectorProps) {
 				))}
 
 			<div className="space-y-2">
-				<div className="text-xs text-gray-400">Addons</div>
+				<div className="text-xs dark:text-gray-400 text-gray-500">Addons</div>
 				<div className="flex flex-wrap gap-1">
 					{techOptions.addons.map((option) => (
 						<Badge
 							key={option.id}
 							variant="secondary"
-							className={`cursor-pointer hover:bg-gray-700 text-gray-300 ${
+							className={`cursor-pointer dark:hover:bg-gray-700 hover:bg-gray-200 dark:text-gray-300 text-gray-700 ${
 								activeNodes.addons[
 									option.id as keyof typeof activeNodes.addons
-								] === true && "bg-blue-600 text-white"
+								] === true && "bg-blue-600 dark:text-white text-white"
 							}`}
 							onClick={() => onSelect("addons", option.id)}
 						>
@@ -117,9 +118,9 @@ const Badge = ({
 	return (
 		<span
 			className={`
-        px-2 rounded-full py-1 text-xs font-medium
-        ${className}
-      `}
+								px-2 rounded-full py-1 text-xs font-medium
+								${className}
+						`}
 			{...props}
 			onClick={props.onClick}
 		>

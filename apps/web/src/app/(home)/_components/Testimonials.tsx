@@ -27,15 +27,16 @@ const testimonials = [
 
 const Testimonials = () => {
 	return (
-		<section className="py-20 relative">
+		<section className="py-20 relative dark:bg-black">
 			<div className="absolute inset-0 opacity-90 z-0" />
 
 			<div className="max-w-6xl mx-auto relative z-10">
 				<div className="text-center mb-16">
-					<h2 className="text-4xl font-bold text-white">
-						<span className="text-gray-400">$</span> cat testimonials.log
+					<h2 className="text-4xl font-bold text-gray-900 dark:text-white">
+						<span className="text-gray-600 dark:text-gray-400">$</span> cat
+						testimonials.log
 					</h2>
-					<p className="text-gray-400 mt-4 text-lg font-mono">
+					<p className="text-gray-600 dark:text-gray-400 mt-4 text-lg font-mono">
 						<span className="text-gray-500">Output:</span> Users reporting
 						success with Better-T Stack
 					</p>
@@ -45,24 +46,30 @@ const Testimonials = () => {
 					{testimonials.map((testimonial) => (
 						<div
 							key={testimonial.name}
-							className="group rounded-md border border-gray-800 bg-black/30 p-6 hover:border-blue-500/30 transition-colors duration-200"
+							className="group rounded-md border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-black/30 p-6 hover:border-blue-500/30 transition-colors duration-200"
 						>
 							<div className="flex items-center space-x-4 mb-4">
 								<div className="shrink-0">
-									<div className="w-10 h-10 rounded-sm bg-gradient-to-r from-gray-900 to-gray-800 flex items-center justify-center text-gray-300 font-mono">
+									<div className="w-10 h-10 rounded-sm bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center text-gray-700 dark:text-gray-300 font-mono">
 										{testimonial.avatar}
 									</div>
 								</div>
 								<div>
-									<h3 className="text-white font-mono">{testimonial.name}</h3>
+									<h3 className="text-gray-900 dark:text-white font-mono">
+										{testimonial.name}
+									</h3>
 									<p className="text-sm font-mono">
-										<span className="text-gray-400">{testimonial.role}</span>
+										<span className="text-gray-600 dark:text-gray-400">
+											{testimonial.role}
+										</span>
 										<span className="text-gray-500 mx-1">@</span>
-										<span className="text-gray-400">{testimonial.company}</span>
+										<span className="text-gray-600 dark:text-gray-400">
+											{testimonial.company}
+										</span>
 									</p>
 								</div>
 							</div>
-							<p className="text-gray-300 leading-relaxed font-mono border-l-2 border-blue-700 pl-4">
+							<p className="text-gray-700 dark:text-gray-300 leading-relaxed font-mono border-l-2 border-blue-700 pl-4">
 								{testimonial.content}
 							</p>
 						</div>
@@ -70,9 +77,9 @@ const Testimonials = () => {
 				</div>
 
 				<div className="text-center mt-12">
-					<div className="inline-block py-2 px-4 bg-black border border-gray-800 rounded-md">
+					<div className="inline-block py-2 px-4 bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-md">
 						<span className="text-blue-500 font-bold mr-2">$</span>
-						<span className="text-white font-mono">
+						<span className="text-gray-900 dark:text-white font-mono">
 							Join the growing community of developers
 						</span>
 					</div>
