@@ -174,9 +174,5 @@ function generateScriptsList(
 		}
 	}
 
-	if (auth) {
-		scripts += `\n- \`cd packages/server && ${packageManagerRunCmd} auth:generate\`: Generate authentication schema`;
-	}
-
 	return scripts;
 }

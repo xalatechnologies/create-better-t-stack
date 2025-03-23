@@ -30,7 +30,6 @@ async function main() {
 		.option("--postgres", "Use PostgreSQL database")
 		.option("--auth", "Include authentication")
 		.option("--no-auth", "Exclude authentication")
-		.option("--docker", "Include Docker setup")
 		.option("--pwa", "Include Progressive Web App support")
 		.option("--tauri", "Include Tauri desktop app support")
 		.option("--biome", "Include Biome for linting and formatting")
@@ -74,8 +73,7 @@ async function main() {
 			...("git" in options && { git: options.git }),
 			...("install" in options && { noInstall: !options.install }),
 			...("turso" in options && { turso: options.turso }),
-			...((options.docker ||
-				options.pwa ||
+			...((options.pwa ||
 				options.tauri ||
 				options.biome ||
 				options.husky ||
@@ -84,7 +82,6 @@ async function main() {
 					options.addons === false
 						? []
 						: ([
-								...(options.docker ? ["docker"] : []),
 								...(options.pwa ? ["pwa"] : []),
 								...(options.tauri ? ["tauri"] : []),
 								...(options.biome ? ["biome"] : []),

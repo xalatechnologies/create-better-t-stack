@@ -11,11 +11,6 @@ export async function getAddonsChoice(
 		message: "Which Addons would you like to add?",
 		options: [
 			{
-				value: "docker",
-				label: "Docker setup",
-				hint: "Containerize your application",
-			},
-			{
 				value: "pwa",
 				label: "PWA (Progressive Web App)",
 				hint: "Make your app installable and work offline",

@@ -26,8 +26,8 @@ export const dependencyVersionMap = {
 	"@libsql/client": "^0.14.0",
 	postgres: "^3.4.5",
 
-	"@prisma/client": "^5.7.1",
-	prisma: "^5.7.1",
+	"@prisma/client": "^6.5.0",
+	prisma: "^6.5.0",
 
 	"vite-plugin-pwa": "^0.21.2",
 	"@vite-pwa/assets-generator": "^0.2.6",

@@ -187,11 +187,6 @@ async function updatePackageConfigurations(
 				serverPackageJson.scripts["db:local"] = "turso dev --db-file local.db";
 			}
 
-			if (options.auth) {
-				serverPackageJson.scripts["auth:generate"] =
-					"npx @better-auth/cli generate --output ./src/db/auth-schema.ts";
-			}
-
 			if (options.orm === "prisma") {
 				serverPackageJson.scripts["db:push"] = "prisma db push";
 				serverPackageJson.scripts["db:studio"] = "prisma studio";
