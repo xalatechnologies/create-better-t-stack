@@ -4,39 +4,28 @@ import React, { useState } from "react";
 interface TechItem {
 	name: string;
 	description: string;
-	category:
-		| "frontend"
-		| "backend"
-		| "database"
-		| "tooling"
-		| "deployment"
-		| "core";
+	category: "frontend" | "backend" | "database" | "tooling" | "core";
 }
 
 const techStack: TechItem[] = [
 	{
-		name: "Bun",
-		description: "Fast all-in-one JavaScript runtime",
-		category: "core",
-	},
-	{
 		name: "TypeScript",
-		description: "Type safety across the stack",
+		description: "Type safety across the entire stack",
 		category: "core",
 	},
 	{
-		name: "tRPC",
-		description: "End-to-end type-safe APIs",
-		category: "core",
-	},
-	{
-		name: "React (Vite)",
+		name: "React",
 		description: "JavaScript library for user interfaces",
 		category: "frontend",
 	},
 	{
 		name: "TanStack Router",
-		description: "Type-safe routing",
+		description: "Type-safe routing with file-based routes",
+		category: "frontend",
+	},
+	{
+		name: "TanStack Query",
+		description: "Powerful data synchronization",
 		category: "frontend",
 	},
 	{
@@ -46,12 +35,17 @@ const techStack: TechItem[] = [
 	},
 	{
 		name: "shadcn/ui",
-		description: "Re-usable components",
+		description: "Re-usable UI components",
 		category: "frontend",
 	},
 	{
 		name: "Hono",
 		description: "Ultrafast web framework",
+		category: "backend",
+	},
+	{
+		name: "tRPC",
+		description: "End-to-end type-safe APIs",
 		category: "backend",
 	},
 	{
@@ -61,7 +55,7 @@ const techStack: TechItem[] = [
 	},
 	{
 		name: "Drizzle ORM",
-		description: "TypeScript ORM",
+		description: "TypeScript-first ORM",
 		category: "database",
 	},
 	{
@@ -70,9 +64,44 @@ const techStack: TechItem[] = [
 		category: "database",
 	},
 	{
-		name: "libSQL",
-		description: "SQLite-compatible database engine",
+		name: "SQLite + Turso",
+		description: "Serverless SQLite with edge replication",
 		category: "database",
+	},
+	{
+		name: "PostgreSQL",
+		description: "Advanced open-source relational database",
+		category: "database",
+	},
+	{
+		name: "Biome",
+		description: "Fast formatter and linter",
+		category: "tooling",
+	},
+	{
+		name: "Husky",
+		description: "Git hooks made easy",
+		category: "tooling",
+	},
+	{
+		name: "PWA",
+		description: "Progressive Web App support",
+		category: "tooling",
+	},
+	{
+		name: "Tauri",
+		description: "Build desktop and mobile apps with web tech",
+		category: "tooling",
+	},
+	{
+		name: "Docker",
+		description: "Containerized deployments",
+		category: "tooling",
+	},
+	{
+		name: "Turborepo",
+		description: "Optimized build system for monorepos",
+		category: "core",
 	},
 ];
 
@@ -81,8 +110,7 @@ const categoryIcons = {
 	backend: "⚙️",
 	database: "🗄️",
 	tooling: "🔧",
-	deployment: "🚀",
-	core: "🔑",
+	core: "⚡",
 };
 
 export default function TechShowcase() {
@@ -106,8 +134,8 @@ export default function TechShowcase() {
 	return (
 		<section className="w-full max-w-6xl mx-auto py-16 px-4">
 			<div className="mb-8 flex flex-wrap justify-center gap-3">
-				{/* biome-ignore lint/a11y/useButtonType: <explanation> */}
 				<button
+					type="button"
 					className={`px-4 py-2 rounded-md font-mono text-sm transition-colors ${
 						activeCategory === null
 							? "bg-blue-500 text-white"
@@ -119,9 +147,9 @@ export default function TechShowcase() {
 				</button>
 
 				{categories.map((category) => (
-					// biome-ignore lint/a11y/useButtonType: <explanation>
 					<button
 						key={category}
+						type="button"
 						className={`px-4 py-2 rounded-md font-mono text-sm transition-colors ${
 							activeCategory === category
 								? "bg-blue-500 text-white"
@@ -149,7 +177,20 @@ export default function TechShowcase() {
 							</h3>
 							<p className="text-gray-400 text-sm">{tech.description}</p>
 							<div className="mt-3 text-xs text-gray-500 font-mono">
-								<code>--package={tech.name.toLowerCase()}</code>
+								{tech.category === "tooling" || tech.category === "database" ? (
+									<span>
+										{tech.name === "Drizzle ORM" ||
+										tech.name === "Prisma" ||
+										tech.name === "SQLite + Turso" ||
+										tech.name === "PostgreSQL" ? (
+											<code>--{tech.name.toLowerCase().split(" ")[0]}</code>
+										) : (
+											<code>--{tech.name.toLowerCase()}</code>
+										)}
+									</span>
+								) : (
+									<span>Included by default</span>
+								)}
 							</div>
 						</motion.div>
 					))}
@@ -183,7 +224,10 @@ export default function TechShowcase() {
 													{tech.name}
 												</h3>
 												<div className="bg-gray-800 px-2 py-1 rounded text-xs font-mono text-gray-400">
-													core
+													{group.category === "tooling" ||
+													tech.category === "database"
+														? "optional"
+														: "core"}
 												</div>
 											</div>
 											<p className="text-gray-400 text-sm mt-2">
@@ -191,10 +235,19 @@ export default function TechShowcase() {
 											</p>
 											<div className="mt-3 pt-2 border-t border-gray-800 flex items-center justify-between">
 												<span className="text-xs text-gray-500 font-mono">
-													include: true
+													{group.category === "tooling" ||
+													tech.category === "database"
+														? tech.name === "Drizzle ORM" ||
+															tech.name === "Prisma" ||
+															tech.name === "SQLite + Turso" ||
+															tech.name === "PostgreSQL"
+															? `--${tech.name.toLowerCase().split(" ")[0]}`
+															: `--${tech.name.toLowerCase()}`
+														: "included by default"}
 												</span>
-												{/* biome-ignore lint/style/useSelfClosingElements: <explanation> */}
-												<span className="h-2 w-2 bg-green-500 rounded-full"></span>
+												<span
+													className={`h-2 w-2 ${group.category === "tooling" || tech.category === "database" ? "bg-yellow-500" : "bg-green-500"} rounded-full`}
+												/>
 											</div>
 										</motion.div>
 									))}
@@ -207,9 +260,8 @@ export default function TechShowcase() {
 
 			<div className="mt-10 text-center">
 				<div className="inline-block bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-md px-5 py-3 font-mono text-sm text-gray-400">
-					<span className="text-green-400">$</span> The perfect tech stack,
-					carefully selected for{" "}
-					<span className="text-blue-400">maximum developer happiness</span>
+					<span className="text-green-400">$</span> npx create-better-t-stack
+					<span className="text-blue-400"> —your-options</span>
 				</div>
 			</div>
 		</section>

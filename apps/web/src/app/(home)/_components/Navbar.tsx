@@ -62,7 +62,7 @@ const Navbar = () => {
 			<div className="flex justify-center">
 				<div
 					className={`flex items-center backdrop-blur-md bg-black/40 rounded-md border border-blue-500/30 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
-						scrolled ? "w-[280px]" : "sm:w-[180px] w-[180px]"
+						scrolled ? "w-[342px]" : "sm:w-[240px] w-[280px]"
 					}`}
 				>
 					<div
@@ -93,6 +93,18 @@ const Navbar = () => {
 						<span className="max-sm:hidden">github</span>
 					</Link> */}
 					<Link
+						href="https://my-better-t-app-client.pages.dev/"
+						target="_blank"
+						ref={(ref) => {
+							linkRefs.current.demo = ref;
+						}}
+						onMouseOver={() => setActiveLink("demo")}
+						onMouseLeave={() => setActiveLink("home")}
+						className="text-gray-300 hidden hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative sm:flex gap-2 items-center font-mono"
+					>
+						<span>demo</span>
+					</Link>
+					<Link
 						href="https://www.npmjs.com/package/create-better-t-stack"
 						target="_blank"
 						ref={(ref) => {
@@ -105,6 +117,7 @@ const Navbar = () => {
 						<PackageIcon pm="npm" className="w-4 h-4 rounded-full" />{" "}
 						<span>npm</span>
 					</Link>
+
 					{/* <span
 						className="text-blue-500 transition-all duration-300"
 						style={{
@@ -149,7 +162,7 @@ const Navbar = () => {
 						}`}
 					>
 						<PackageIcon pm="github" className="w-4 h-4" />{" "}
-						<span className="max-sm:hidden">github</span>
+						<span className="">github</span>
 					</Link>
 				</div>
 			</div>

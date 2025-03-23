@@ -103,7 +103,6 @@ export default function TechMatrix() {
 	const [isTyping, setIsTyping] = useState(false);
 	const fullCommand = "show tech-stack --category all";
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (isTyping) return;
 
@@ -120,7 +119,7 @@ export default function TechMatrix() {
 		}, 80);
 
 		return () => clearInterval(typeInterval);
-	}, []);
+	}, [isTyping]);
 
 	const categories = Array.from(
 		new Set(techStack.map((item) => item.category)),
@@ -199,8 +198,7 @@ export default function TechMatrix() {
 					<div className="font-mono text-sm text-gray-300 mb-6 flex items-center">
 						<span className="text-green-400 mr-2">$</span>
 						<span>{typedCommand}</span>
-						{/* biome-ignore lint/style/useSelfClosingElements: <explanation> */}
-						<span className="h-4 w-2 bg-gray-400 animate-blink ml-1"></span>
+						<span className="h-4 w-2 bg-gray-400 animate-blink ml-1" />
 					</div>
 
 					{/* Category filters */}
@@ -210,10 +208,9 @@ export default function TechMatrix() {
 						animate={{ opacity: 1 }}
 						transition={{ delay: 0.3, duration: 0.5 }}
 					>
-						{/* biome-ignore lint/style/useSelfClosingElements: <explanation> */}
-						<div className="absolute inset-0 -m-2 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-purple-500/0 rounded-lg blur-md -z-10"></div>
-						{/* biome-ignore lint/a11y/useButtonType: <explanation> */}
+						<div className="absolute inset-0 -m-2 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-purple-500/0 rounded-lg blur-md -z-10" />
 						<button
+							type="button"
 							className={`px-3 py-1 text-xs font-mono rounded-md transition-all duration-300 ${
 								!selectedCategory
 									? "bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.3)]"
@@ -225,8 +222,8 @@ export default function TechMatrix() {
 						</button>
 
 						{categories.map((category) => (
-							// biome-ignore lint/a11y/useButtonType: <explanation>
 							<button
+								type="button"
 								key={category}
 								className={`px-3 py-1 text-xs font-mono rounded-md transition-all duration-300 ${
 									selectedCategory === category
@@ -249,10 +246,10 @@ export default function TechMatrix() {
 							}}
 						/>
 
-						{/* biome-ignore lint/style/noUnusedTemplateLiteral: <explanation> */}
-						<div className="text-blue-400 mb-4">{`// Better-T Stack Tech Matrix`}</div>
-						{/* biome-ignore lint/style/noUnusedTemplateLiteral: <explanation> */}
-						<div className="text-purple-400">{`const techStack = {`}</div>
+						<div className="text-blue-400 mb-4">
+							{"// Better-T Stack Tech Matrix"}
+						</div>
+						<div className="text-purple-400">{"const techStack = {"}</div>
 
 						<AnimatePresence mode="wait">
 							<motion.div
@@ -329,8 +326,7 @@ export default function TechMatrix() {
 							</motion.div>
 						</AnimatePresence>
 
-						{/* biome-ignore lint/style/noUnusedTemplateLiteral: <explanation> */}
-						<div className="text-purple-400">{`};`}</div>
+						<div className="text-purple-400">{"};"}</div>
 
 						{/* Terminal footer */}
 						<div className="mt-6 text-gray-400 border-t border-gray-800/50 pt-4 flex items-center justify-between">

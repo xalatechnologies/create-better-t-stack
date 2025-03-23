@@ -25,7 +25,6 @@ export async function setupTauri(
 		if (await fs.pathExists(clientPackageJsonPath)) {
 			const packageJson = await fs.readJson(clientPackageJsonPath);
 
-			// Add Tauri scripts
 			packageJson.scripts = {
 				...packageJson.scripts,
 				tauri: "tauri",
@@ -35,9 +34,6 @@ export async function setupTauri(
 
 			await fs.writeJson(clientPackageJsonPath, packageJson, { spaces: 2 });
 		}
-
-		// Initialize Tauri in the client directory
-		// This creates the src-tauri folder structure with necessary config files
 
 		await execa(
 			"npx",

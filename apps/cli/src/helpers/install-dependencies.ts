@@ -36,7 +36,6 @@ export async function installDependencies({
 
 		s.stop("Dependencies installed successfully");
 
-		// Run Biome check if Biome or Husky is enabled
 		if (addons.includes("biome") || addons.includes("husky")) {
 			await runBiomeCheck(projectDir, packageManager);
 		}
