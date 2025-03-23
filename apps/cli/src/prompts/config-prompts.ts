@@ -50,7 +50,8 @@ export async function gatherConfig(
 					? getTursoSetupChoice(flags.turso)
 					: Promise.resolve(false),
 			addons: () => getAddonsChoice(flags.addons),
-			examples: () => getExamplesChoice(flags.examples),
+			examples: ({ results }) =>
+				getExamplesChoice(flags.examples, results.database),
 			git: () => getGitChoice(flags.git),
 			packageManager: () => getPackageManagerChoice(flags.packageManager),
 			noInstall: () => getNoInstallChoice(flags.noInstall),

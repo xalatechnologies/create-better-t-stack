@@ -67,15 +67,7 @@ function HomeComponent() {
             />
           </ul>
         </section>
-
-        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
-          <Button asChild>
-            <Link to="/todos" className="flex items-center">
-              View Todo Demo
-              <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
+        <div id="buttons"></div>
       </div>
     </div>
   );

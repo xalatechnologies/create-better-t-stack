@@ -19,6 +19,8 @@ process.on("SIGINT", () => {
 const program = new Command();
 
 async function main() {
+	const startTime = Date.now();
+
 	program
 		.name("create-better-t-stack")
 		.description("Create a new Better-T Stack project")
@@ -169,7 +171,12 @@ async function main() {
 			),
 		);
 
-		outro(pc.magenta("Project created successfully!"));
+		const elapsedTimeInSeconds = ((Date.now() - startTime) / 1000).toFixed(2);
+		outro(
+			pc.magenta(
+				`Project created successfully in ${pc.bold(elapsedTimeInSeconds)} seconds!`,
+			),
+		);
 	} catch (error) {
 		s.stop(pc.red("Failed"));
 		if (error instanceof Error) {

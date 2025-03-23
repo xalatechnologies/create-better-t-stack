@@ -48,6 +48,7 @@ async function setupTodoExample(
 		}
 
 		await updateHeaderWithTodoLink(projectDir, auth);
+		await addTodoButtonToHomepage(projectDir);
 	}
 }
 
@@ -126,5 +127,30 @@ async function updateRouterIndex(projectDir: string): Promise<void> {
 		);
 		routerContent = routerContent.replace(/todo: todoRouter,/, "");
 		await fs.writeFile(routerFile, routerContent);
+	}
+}
+
+async function addTodoButtonToHomepage(projectDir: string): Promise<void> {
+	const indexPath = path.join(
+		projectDir,
+		"packages/client/src/routes/index.tsx",
+	);
+
+	if (await fs.pathExists(indexPath)) {
+		let indexContent = await fs.readFile(indexPath, "utf8");
+
+		indexContent = indexContent.replace(
+			/<div id="buttons"><\/div>/,
+			`<div id="buttons" className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <Button asChild>
+          <Link to="/todos" className="flex items-center">
+            View Todo Demo
+            <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>`,
+		);
+
+		await fs.writeFile(indexPath, indexContent);
 	}
 }
