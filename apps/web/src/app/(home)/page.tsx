@@ -1,6 +1,5 @@
 "use client";
 import ShinyText from "@/app/(home)/_components/ShinyText";
-import { useTheme } from "next-themes";
 import React from "react";
 import CodeContainer from "./_components/CodeContainer";
 import CustomizableSection from "./_components/CustomizableSection";
@@ -10,8 +9,6 @@ import TechShowcase from "./_components/TechShowcase";
 import Testimonials from "./_components/Testimonials";
 
 export default function HomePage() {
-	const { theme } = useTheme();
-
 	return (
 		<main className="flex flex-col items-center justify-start sm:p-8 p-4 !pt-40 dark:bg-gray-950 bg-gray-50 transition-colors duration-300">
 			<div className="max-w-6xl mx-auto text-center mb-16 relative z-50 ">
