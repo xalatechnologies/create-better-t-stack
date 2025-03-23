@@ -1,8 +1,7 @@
 import { log, spinner } from "@clack/prompts";
 import { $ } from "execa";
 import pc from "picocolors";
-import type { ProjectAddons } from "../types";
-import type { PackageManager } from "../utils/get-package-manager";
+import type { PackageManager, ProjectAddons } from "../types";
 
 export async function installDependencies({
 	projectDir,
@@ -26,7 +25,6 @@ export async function installDependencies({
 				})`${packageManager} install`;
 				break;
 			case "pnpm":
-			case "yarn":
 			case "bun":
 				await $({
 					cwd: projectDir,

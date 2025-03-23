@@ -15,6 +15,7 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 	git: true,
 	packageManager: "npm",
 	noInstall: false,
+	examples: ["todo"],
 };
 
 export const dependencyVersionMap = {

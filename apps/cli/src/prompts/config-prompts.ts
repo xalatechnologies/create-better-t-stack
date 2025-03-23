@@ -5,11 +5,13 @@ import type {
 	ProjectAddons,
 	ProjectConfig,
 	ProjectDatabase,
+	ProjectExamples,
 	ProjectOrm,
 } from "../types";
 import { getAddonsChoice } from "./addons";
 import { getAuthChoice } from "./auth";
 import { getDatabaseChoice } from "./database";
+import { getExamplesChoice } from "./examples";
 import { getGitChoice } from "./git";
 import { getNoInstallChoice } from "./install";
 import { getORMChoice } from "./orm";
@@ -23,6 +25,7 @@ interface PromptGroupResults {
 	orm: ProjectOrm;
 	auth: boolean;
 	addons: ProjectAddons[];
+	examples: ProjectExamples[];
 	git: boolean;
 	packageManager: PackageManager;
 	noInstall: boolean;
@@ -47,6 +50,7 @@ export async function gatherConfig(
 					? getTursoSetupChoice(flags.turso)
 					: Promise.resolve(false),
 			addons: () => getAddonsChoice(flags.addons),
+			examples: () => getExamplesChoice(flags.examples),
 			git: () => getGitChoice(flags.git),
 			packageManager: () => getPackageManagerChoice(flags.packageManager),
 			noInstall: () => getNoInstallChoice(flags.noInstall),
@@ -65,6 +69,7 @@ export async function gatherConfig(
 		orm: result.orm,
 		auth: result.auth,
 		addons: result.addons,
+		examples: result.examples,
 		git: result.git,
 		packageManager: result.packageManager,
 		noInstall: result.noInstall,

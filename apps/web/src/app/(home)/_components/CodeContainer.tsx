@@ -3,9 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 const CodeContainer = () => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedPM, setSelectedPM] = useState<"npm" | "yarn" | "pnpm" | "bun">(
-		"npm",
-	);
+	const [selectedPM, setSelectedPM] = useState<"npm" | "pnpm" | "bun">("npm");
 	const [copied, setCopied] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const [typingComplete, setTypingComplete] = useState(false);
@@ -24,12 +22,11 @@ const CodeContainer = () => {
 
 	const commands = {
 		npm: "npx create-better-t-stack@latest",
-		yarn: "yarn dlx create-better-t-stack",
 		pnpm: "pnpm dlx create-better-t-stack",
 		bun: "bunx create-better-t-stack",
 	};
 
-	const copyToClipboard = async (pm: "npm" | "yarn" | "pnpm" | "bun") => {
+	const copyToClipboard = async (pm: "npm" | "pnpm" | "bun") => {
 		await navigator.clipboard.writeText(commands[pm]);
 		setSelectedPM(pm);
 		setCopied(true);
@@ -93,25 +90,23 @@ const CodeContainer = () => {
 						{isOpen && (
 							<div className="absolute right-0 mt-2 w-36 bg-black border border-blue-500/30 rounded-md shadow-lg z-50">
 								<ul>
-									{(
-										Object.keys(commands) as Array<
-											"npm" | "yarn" | "pnpm" | "bun"
-										>
-									).map((pm) => (
-										<li key={pm}>
-											<button
-												type="button"
-												className={`block w-full text-left px-4 py-2 text-sm ${
-													selectedPM === pm
-														? "bg-blue-900/30 text-blue-400"
-														: "text-gray-300 hover:bg-blue-900/20"
-												}`}
-												onClick={() => copyToClipboard(pm)}
-											>
-												{pm}
-											</button>
-										</li>
-									))}
+									{(Object.keys(commands) as Array<"npm" | "pnpm" | "bun">).map(
+										(pm) => (
+											<li key={pm}>
+												<button
+													type="button"
+													className={`block w-full text-left px-4 py-2 text-sm ${
+														selectedPM === pm
+															? "bg-blue-900/30 text-blue-400"
+															: "text-gray-300 hover:bg-blue-900/20"
+													}`}
+													onClick={() => copyToClipboard(pm)}
+												>
+													{pm}
+												</button>
+											</li>
+										),
+									)}
 								</ul>
 							</div>
 						)}

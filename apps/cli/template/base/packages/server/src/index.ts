@@ -29,7 +29,7 @@ app.use(
   }),
 );
 
-app.get("/healthCheck", (c) => {
+app.get("/", (c) => {
   return c.text("OK");
 });
 

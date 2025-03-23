@@ -35,7 +35,6 @@ const techOptions: Record<string, TechOption[]> = {
 	packageManager: [
 		{ id: "npm", label: "NPM", category: "packageManager" },
 		{ id: "pnpm", label: "PNPM", category: "packageManager" },
-		{ id: "yarn", label: "Yarn", category: "packageManager" },
 		{ id: "bun", label: "Bun", category: "packageManager" },
 	],
 	addons: [

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { router, publicProcedure } from "../lib/trpc";
-import { todo } from "../db/schema";
+import { todo } from "../db/schema/todo";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 

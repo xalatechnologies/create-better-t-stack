@@ -1,8 +1,6 @@
 # Create Better-T-Stack CLI
 
-> **Note:** This CLI is currently a work in progress (WIP).
-
-An interactive CLI tool to quickly scaffold full-stack TypeScript applications using the Better-T-Stack framework.
+An interactive CLI tool to quickly scaffold full-stack TypeScript applications with React, Hono, and tRPC. The Better-T-Stack provides a modern, type-safe development experience with the best tools from the TypeScript ecosystem.
 
 ## Quick Start
 
@@ -24,9 +22,12 @@ Follow the prompts to configure your project.
 - **Database Options**: SQLite (via Turso), PostgreSQL, or no database
 - **ORM Selection**: Choose between Drizzle ORM or Prisma
 - **Authentication**: Optional auth setup with Better-Auth
-- **Developer Experience**: Git initialization, various package manager support (npm, pnpm, yarn, bun)
-- **Deployment**: Optional Docker configuration
-- **CI/CD**: Optional GitHub Actions workflows
+- **Progressive Web App**: Add PWA support with service workers and installable apps
+- **Desktop Apps**: Build native desktop apps with Tauri integration
+- **Code Quality**: Biome for linting and formatting
+- **Git Hooks**: Husky with lint-staged for pre-commit checks
+- **Examples**: Todo app with full CRUD functionality
+- **Developer Experience**: Git initialization, various package manager support (npm, pnpm, bun)
 
 ## Usage
 
@@ -41,12 +42,17 @@ Options:
   --postgres            Use PostgreSQL database
   --auth                Include authentication
   --no-auth             Disable authentication
-  --docker              Include Docker setup
+  --pwa                 Include Progressive Web App support
+  --tauri               Include Tauri desktop app support
+  --biome               Include Biome for linting and formatting
+  --husky               Include Husky, lint-staged for Git hooks
+  --no-addons           Skip all additional addons
+  --examples <examples> Include specified examples
+  --no-examples         Skip all examples
   --git                 Initialize a new git repo (default)
   --no-git              Skip git initialization
   --npm                 Use npm as package manager
   --pnpm                Use pnpm as package manager
-  --yarn                Use yarn as package manager
   --bun                 Use bun as package manager
   --drizzle             Use Drizzle ORM
   --prisma              Use Prisma ORM
@@ -66,28 +72,11 @@ npx create-better-t-stack my-app -y
 
 Create a project with specific options:
 ```bash
-npx create-better-t-stack my-app --postgres --prisma --auth --docker
+npx create-better-t-stack my-app --postgres --prisma --auth --pwa --biome
 ```
-
-## Project Structure
-
-The generated project follows a Turborepo monorepo structure:
-
-```
-my-app/
-├── packages/
-│   ├── client/         # Frontend application (React, TanStack Router)
-│   └── server/         # Backend API (Hono, tRPC)
-├── package.json        # Root package.json with Turborepo configuration
-└── README.md           # Project documentation
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
 MIT
 
-Created by [Nitish Singh](https://github.com/FgrReloaded) & [Aman Varshney](https://github.com/AmanVarshney01)
+Created by [Aman Varshney](https://github.com/AmanVarshney01) & [Nitish Singh](https://github.com/FgrReloaded)

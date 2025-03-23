@@ -5,7 +5,7 @@ import { DEFAULT_CONFIG } from "./constants";
 import { createProject } from "./helpers/create-project";
 import { installDependencies } from "./helpers/install-dependencies";
 import { gatherConfig } from "./prompts/config-prompts";
-import type { ProjectAddons, ProjectConfig } from "./types";
+import type { ProjectAddons, ProjectConfig, ProjectExamples } from "./types";
 import { displayConfig } from "./utils/display-config";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
 import { getLatestCLIVersion } from "./utils/get-latest-cli-version";
@@ -35,11 +35,12 @@ async function main() {
 		.option("--biome", "Include Biome for linting and formatting")
 		.option("--husky", "Include Husky, lint-staged for Git hooks")
 		.option("--no-addons", "Skip all additional addons")
+		.option("--examples <examples>", "Include specified examples")
+		.option("--no-examples", "Skip all examples")
 		.option("--git", "Include git setup")
 		.option("--no-git", "Skip git initialization")
 		.option("--npm", "Use npm package manager")
 		.option("--pnpm", "Use pnpm package manager")
-		.option("--yarn", "Use yarn package manager")
 		.option("--bun", "Use bun package manager")
 		.option("--drizzle", "Use Drizzle ORM")
 		.option("--prisma", "Use Prisma ORM (coming soon)")
@@ -68,7 +69,6 @@ async function main() {
 			...("auth" in options && { auth: options.auth }),
 			...(options.npm && { packageManager: "npm" }),
 			...(options.pnpm && { packageManager: "  pnpm" }),
-			...(options.yarn && { packageManager: "yarn" }),
 			...(options.bun && { packageManager: "bun" }),
 			...("git" in options && { git: options.git }),
 			...("install" in options && { noInstall: !options.install }),
@@ -87,6 +87,16 @@ async function main() {
 								...(options.biome ? ["biome"] : []),
 								...(options.husky ? ["husky"] : []),
 							] as ProjectAddons[]),
+			}),
+			...((options.examples || options.examples === false) && {
+				examples:
+					options.examples === false
+						? []
+						: typeof options.examples === "string"
+							? (options.examples
+									.split(",")
+									.filter((e) => e === "todo") as ProjectExamples[])
+							: [],
 			}),
 		};
 
@@ -123,6 +133,9 @@ async function main() {
 					addons: flagConfig.addons?.length
 						? flagConfig.addons
 						: DEFAULT_CONFIG.addons,
+					examples: flagConfig.examples?.length
+						? flagConfig.examples
+						: DEFAULT_CONFIG.examples,
 					turso:
 						"turso" in options
 							? options.turso

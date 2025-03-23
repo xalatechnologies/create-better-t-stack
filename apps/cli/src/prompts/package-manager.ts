@@ -24,11 +24,6 @@ export async function getPackageManagerChoice(
 				label: "pnpm",
 				hint: "Fast, disk space efficient package manager",
 			},
-			{
-				value: "yarn",
-				label: "yarn",
-				hint: "Fast, reliable, and secure dependency management",
-			},
 		],
 		initialValue: detectedPackageManager,
 	});

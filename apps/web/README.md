@@ -1,26 +1,47 @@
-# web
+# Better-T-Stack Website
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+This is the official documentation website for Better-T-Stack, built with Next.js and Fumadocs.
 
-Run development server:
+## Getting Started
+
+To run the development server:
 
 ```bash
+# Install dependencies
+npm install
+# or
+pnpm install
+# or
+bun install
+
+# Start development server
 npm run dev
 # or
 pnpm dev
 # or
-yarn dev
+bun dev
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the site.
+
+## Project Structure
+
+- `/src/app` - Next.js application routes
+- `/src/content` - Documentation content in MDX format
+- `/public` - Static assets
+
+## Contributing to Documentation
+
+To add or modify documentation:
+
+1. Edit the appropriate MDX files in the `src/content` directory
+2. Run the development server to preview your changes
+3. Submit a pull request with your updates
 
 ## Learn More
 
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
+To learn more about the technologies used in this website:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.vercel.app) - learn about Fumadocs
+- [Next.js Documentation](https://nextjs.org/docs) - Next.js features and API
+- [Fumadocs](https://fumadocs.vercel.app) - The documentation framework used
+- [Better-T-Stack](https://better-t-stack.pages.dev) - Main project site

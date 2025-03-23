@@ -1,10 +1,4 @@
-import { pgTable, text, integer, timestamp, boolean } from "drizzle-orm/pg-core";
-
-export const todo = pgTable("todo", {
-  id: serial("id").primaryKey(),
-  text: text("text").notNull(),
-  completed: boolean("completed").default(false).notNull()
-});
+import { pgTable, text, timestamp, boolean, serial } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
 					id: text("id").primaryKey(),

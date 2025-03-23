@@ -49,6 +49,20 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		flags.push("--no-addons");
 	}
 
+	if (config.examples && config.examples.length > 0) {
+		flags.push(`--examples ${config.examples.join(",")}`);
+	} else {
+		flags.push("--no-examples");
+	}
+
+	if (config.database === "sqlite") {
+		if (config.turso) {
+			flags.push("--turso");
+		} else {
+			flags.push("--no-turso");
+		}
+	}
+
 	const baseCommand = "npx create-better-t-stack";
 	const projectName = config.projectName ? ` ${config.projectName}` : "";
 	const flagString = flags.length > 0 ? ` ${flags.join(" ")}` : "";
