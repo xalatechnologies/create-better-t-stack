@@ -33,10 +33,9 @@ app.get("/healthCheck", (c) => {
   return c.text("OK");
 });
 
-const port = 3000;
-console.log(`Server is running on http://localhost:${port}`);
-
 serve({
   fetch: app.fetch,
-  port,
+  port: 3000,
+}, (info) => {
+  console.log(`Server is running on http://localhost:${info.port}`)
 });
