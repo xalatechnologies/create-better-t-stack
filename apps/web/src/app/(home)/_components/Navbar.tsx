@@ -62,7 +62,7 @@ const Navbar = () => {
 			<div className="flex justify-center">
 				<div
 					className={`flex items-center backdrop-blur-md bg-black/40 rounded-md border border-blue-500/30 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
-						scrolled ? "w-[180px]" : "sm:w-[180px] w-[180px]"
+						scrolled ? "w-[280px]" : "sm:w-[180px] w-[180px]"
 					}`}
 				>
 					<div
@@ -113,7 +113,8 @@ const Navbar = () => {
 						}}
 					>
 						|
-					</span>
+					</span> */}
+					{/*
 					<Link
 						href="/docs"
 						ref={(ref) => {
@@ -131,7 +132,25 @@ const Navbar = () => {
 						}`}
 					>
 						documentation
-					</Link> */}
+					</Link>
+							*/}
+					<Link
+						href="https://www.github.com/better-t-stack/create-better-t-stack"
+						target="_blank"
+						ref={(ref) => {
+							linkRefs.current.github = ref;
+						}}
+						onMouseOver={() => setActiveLink("github")}
+						onMouseLeave={() => setActiveLink("home")}
+						className={`text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono ${
+							scrolled
+								? "sm:opacity-100 sm:translate-y-0"
+								: "sm:opacity-0 sm:pointer-events-none"
+						}`}
+					>
+						<PackageIcon pm="github" className="w-4 h-4" />{" "}
+						<span className="max-sm:hidden">github</span>
+					</Link>
 				</div>
 			</div>
 
