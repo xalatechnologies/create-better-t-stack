@@ -67,7 +67,7 @@ function HomeComponent() {
             />
           </ul>
         </section>
-        <div id="buttons"></div>
+        <div id="buttons" />
       </div>
     </div>
   );
