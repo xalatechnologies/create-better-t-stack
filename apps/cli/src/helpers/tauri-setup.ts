@@ -35,25 +35,45 @@ export async function setupTauri(
 			await fs.writeJson(clientPackageJsonPath, packageJson, { spaces: 2 });
 		}
 
-		await execa(
-			"npx",
-			[
-				"@tauri-apps/cli@latest",
-				"init",
-				`--app-name=${path.basename(projectDir)}`,
-				`--window-title=${path.basename(projectDir)}`,
-				"--frontend-dist=dist",
-				"--dev-url=http://localhost:3001",
-				`--before-dev-command=${packageManager} run dev`,
-				`--before-build-command=${packageManager} run build`,
-			],
-			{
-				cwd: clientPackageDir,
-				env: {
-					CI: "true",
-				},
+		let cmd: string;
+		let args: string[];
+
+		switch (packageManager) {
+			case "npm":
+				cmd = "npx";
+				args = ["@tauri-apps/cli@latest"];
+				break;
+			case "pnpm":
+				cmd = "pnpm";
+				args = ["dlx", "@tauri-apps/cli@latest"];
+				break;
+			case "bun":
+				cmd = "bunx";
+				args = ["@tauri-apps/cli@latest"];
+				break;
+			default:
+				cmd = "npx";
+				args = ["@tauri-apps/cli@latest"];
+		}
+
+		args = [
+			...args,
+			"init",
+			`--app-name=${path.basename(projectDir)}`,
+			`--window-title=${path.basename(projectDir)}`,
+			"--frontend-dist=dist",
+			"--dev-url=http://localhost:3001",
+			`--before-dev-command=${packageManager} run dev`,
+			`--before-build-command=${packageManager} run build`,
+		];
+
+		await execa(cmd, args, {
+			cwd: clientPackageDir,
+			env: {
+				CI: "true",
 			},
-		);
+		});
+
 		s.stop("Tauri desktop app support configured successfully!");
 	} catch (error) {
 		s.stop(pc.red("Failed to set up Tauri"));
