@@ -22,8 +22,8 @@ const CodeContainer = () => {
 
 	const commands = {
 		npm: "npx create-better-t-stack@latest",
-		pnpm: "pnpm dlx create-better-t-stack",
-		bun: "bunx create-better-t-stack",
+		pnpm: "pnpm create better-t-stack@latest",
+		bun: "bun create better-t-stack@latest",
 	};
 
 	const copyToClipboard = async (pm: "npm" | "pnpm" | "bun") => {
