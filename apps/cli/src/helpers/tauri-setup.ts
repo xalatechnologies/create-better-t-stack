@@ -11,7 +11,7 @@ export async function setupTauri(
 	packageManager: PackageManager,
 ): Promise<void> {
 	const s = spinner();
-	const clientPackageDir = path.join(projectDir, "packages/client");
+	const clientPackageDir = path.join(projectDir, "apps/client");
 
 	try {
 		s.start("Setting up Tauri desktop app support...");

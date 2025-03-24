@@ -57,7 +57,7 @@ The API is running at [http://localhost:3000](http://localhost:3000).
 
 \`\`\`
 ${projectName}/
-├── packages/
+├── apps/
 │   ├── client/         # Frontend application (React, TanStack Router)
 │   └── server/         # Backend API (Hono, tRPC)
 \`\`\`
@@ -122,16 +122,16 @@ function generateDatabaseSetup(
 
 1. Start the local SQLite database:
 \`\`\`bash
-cd packages/server && ${packageManagerRunCmd} db:local
+cd apps/server && ${packageManagerRunCmd} db:local
 \`\`\`
 
-2. Update your \`.env\` file in the \`packages/server\` directory with the appropriate connection details if needed.
+2. Update your \`.env\` file in the \`apps/server\` directory with the appropriate connection details if needed.
 `;
 	} else if (database === "postgres") {
 		setup += `This project uses PostgreSQL${orm === "drizzle" ? " with Drizzle ORM" : " with Prisma"}.
 
 1. Make sure you have a PostgreSQL database set up.
-2. Update your \`packages/server/.env\` file with your PostgreSQL connection details.
+2. Update your \`apps/server/.env\` file with your PostgreSQL connection details.
 `;
 	}
 
@@ -162,7 +162,7 @@ function generateScriptsList(
 - \`${packageManagerRunCmd} build\`: Build both client and server
 - \`${packageManagerRunCmd} dev:client\`: Start only the client
 - \`${packageManagerRunCmd} dev:server\`: Start only the server
-- \`${packageManagerRunCmd} check-types\`: Check TypeScript types across all packages`;
+- \`${packageManagerRunCmd} check-types\`: Check TypeScript types across all apps`;
 
 	if (database !== "none") {
 		scripts += `
@@ -170,7 +170,7 @@ function generateScriptsList(
 - \`${packageManagerRunCmd} db:studio\`: Open database studio UI`;
 
 		if (database === "sqlite" && orm === "drizzle") {
-			scripts += `\n- \`cd packages/server && ${packageManagerRunCmd} db:local\`: Start the local SQLite database`;
+			scripts += `\n- \`cd apps/server && ${packageManagerRunCmd} db:local\`: Start the local SQLite database`;
 		}
 	}
 

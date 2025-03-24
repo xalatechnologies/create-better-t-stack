@@ -13,7 +13,7 @@ export async function setupDatabase(
 	setupTursoDb = true,
 ): Promise<void> {
 	const s = spinner();
-	const serverDir = path.join(projectDir, "packages/server");
+	const serverDir = path.join(projectDir, "apps/server");
 
 	if (databaseType === "none") {
 		await fs.remove(path.join(serverDir, "src/db"));

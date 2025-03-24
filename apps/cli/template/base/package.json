@@ -1,7 +1,7 @@
 {
 	"name": "better-t-stack",
 	"private": true,
-	"workspaces": ["packages/*"],
+	"workspaces": ["apps/*"],
 	"scripts": {
 		"dev": "turbo dev",
 		"build": "turbo build",

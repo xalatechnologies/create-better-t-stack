@@ -87,7 +87,7 @@ async function setupPwa(projectDir: string) {
 		await fs.copy(pwaTemplateDir, projectDir, { overwrite: true });
 	}
 
-	const clientPackageDir = path.join(projectDir, "packages/client");
+	const clientPackageDir = path.join(projectDir, "apps/client");
 
 	addPackageDependency({
 		dependencies: ["vite-plugin-pwa"],

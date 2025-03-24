@@ -7,8 +7,8 @@ export async function setupEnvironmentVariables(
 	projectDir: string,
 	options: ProjectConfig,
 ): Promise<void> {
-	const serverDir = path.join(projectDir, "packages/server");
-	const clientDir = path.join(projectDir, "packages/client");
+	const serverDir = path.join(projectDir, "apps/server");
+	const clientDir = path.join(projectDir, "apps/client");
 
 	const envPath = path.join(serverDir, ".env");
 	let envContent = "";

@@ -36,7 +36,7 @@ export async function setupOrmTemplate(
 	if (await fs.pathExists(ormTemplateDir)) {
 		await fs.copy(ormTemplateDir, projectDir, { overwrite: true });
 
-		const serverSrcPath = path.join(projectDir, "packages/server/src");
+		const serverSrcPath = path.join(projectDir, "apps/server/src");
 		const libPath = path.join(serverSrcPath, "lib");
 		const withAuthLibPath = path.join(serverSrcPath, "with-auth-lib");
 
@@ -54,8 +54,8 @@ export async function setupOrmTemplate(
 export async function fixGitignoreFiles(projectDir: string): Promise<void> {
 	const gitignorePaths = [
 		path.join(projectDir, "_gitignore"),
-		path.join(projectDir, "packages/client/_gitignore"),
-		path.join(projectDir, "packages/server/_gitignore"),
+		path.join(projectDir, "apps/client/_gitignore"),
+		path.join(projectDir, "apps/server/_gitignore"),
 	];
 
 	for (const gitignorePath of gitignorePaths) {

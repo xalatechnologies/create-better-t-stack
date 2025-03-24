@@ -23,21 +23,18 @@ async function setupTodoExample(
 ): Promise<void> {
 	const todoExampleDir = path.join(PKG_ROOT, "template/examples/todo");
 	if (await fs.pathExists(todoExampleDir)) {
-		const todoRouteDir = path.join(
-			todoExampleDir,
-			"packages/client/src/routes",
-		);
-		const targetRouteDir = path.join(projectDir, "packages/client/src/routes");
+		const todoRouteDir = path.join(todoExampleDir, "apps/client/src/routes");
+		const targetRouteDir = path.join(projectDir, "apps/client/src/routes");
 		await fs.copy(todoRouteDir, targetRouteDir, { overwrite: true });
 
 		if (orm !== "none") {
 			const todoRouterSourceFile = path.join(
 				todoExampleDir,
-				`packages/server/src/routers/with-${orm}-todo.ts`,
+				`apps/server/src/routers/with-${orm}-todo.ts`,
 			);
 			const todoRouterTargetFile = path.join(
 				projectDir,
-				"packages/server/src/routers/todo.ts",
+				"apps/server/src/routers/todo.ts",
 			);
 
 			if (await fs.pathExists(todoRouterSourceFile)) {
@@ -58,7 +55,7 @@ async function updateHeaderWithTodoLink(
 ): Promise<void> {
 	const headerPath = path.join(
 		projectDir,
-		"packages/client/src/components/header.tsx",
+		"apps/client/src/components/header.tsx",
 	);
 
 	if (await fs.pathExists(headerPath)) {
@@ -87,7 +84,7 @@ async function cleanupTodoFiles(
 	if (orm === "drizzle") {
 		const todoSchemaFile = path.join(
 			projectDir,
-			"packages/server/src/db/schema/todo.ts",
+			"apps/server/src/db/schema/todo.ts",
 		);
 		if (await fs.pathExists(todoSchemaFile)) {
 			await fs.remove(todoSchemaFile);
@@ -95,7 +92,7 @@ async function cleanupTodoFiles(
 	} else if (orm === "prisma") {
 		const todoPrismaFile = path.join(
 			projectDir,
-			"packages/server/prisma/schema/todo.prisma",
+			"apps/server/prisma/schema/todo.prisma",
 		);
 		if (await fs.pathExists(todoPrismaFile)) {
 			await fs.remove(todoPrismaFile);
@@ -104,7 +101,7 @@ async function cleanupTodoFiles(
 
 	const todoRouterFile = path.join(
 		projectDir,
-		"packages/server/src/routers/todo.ts",
+		"apps/server/src/routers/todo.ts",
 	);
 	if (await fs.pathExists(todoRouterFile)) {
 		await fs.remove(todoRouterFile);
@@ -114,10 +111,7 @@ async function cleanupTodoFiles(
 }
 
 async function updateRouterIndex(projectDir: string): Promise<void> {
-	const routerFile = path.join(
-		projectDir,
-		"packages/server/src/routers/index.ts",
-	);
+	const routerFile = path.join(projectDir, "apps/server/src/routers/index.ts");
 
 	if (await fs.pathExists(routerFile)) {
 		let routerContent = await fs.readFile(routerFile, "utf8");
@@ -131,10 +125,7 @@ async function updateRouterIndex(projectDir: string): Promise<void> {
 }
 
 async function addTodoButtonToHomepage(projectDir: string): Promise<void> {
-	const indexPath = path.join(
-		projectDir,
-		"packages/client/src/routes/index.tsx",
-	);
+	const indexPath = path.join(projectDir, "apps/client/src/routes/index.tsx");
 
 	if (await fs.pathExists(indexPath)) {
 		let indexContent = await fs.readFile(indexPath, "utf8");

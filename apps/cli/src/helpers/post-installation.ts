@@ -68,7 +68,7 @@ function getDatabaseInstructions(
 	} else if (orm === "drizzle") {
 		if (database === "sqlite") {
 			instructions.push(
-				`${pc.cyan("•")} Start local DB: ${pc.dim(`cd packages/server && ${runCmd} db:local`)}`,
+				`${pc.cyan("•")} Start local DB: ${pc.dim(`cd apps/server && ${runCmd} db:local`)}`,
 			);
 		}
 		instructions.push(
@@ -85,5 +85,5 @@ function getDatabaseInstructions(
 }
 
 function getTauriInstructions(runCmd?: string): string {
-	return `${pc.bold("Desktop app with Tauri:")}\n${pc.cyan("•")} Start desktop app: ${pc.dim(`cd packages/client && ${runCmd} desktop:dev`)}\n${pc.cyan("•")} Build desktop app: ${pc.dim(`cd packages/client && ${runCmd} desktop:build`)}\n${pc.yellow("NOTE:")} Tauri requires Rust and platform-specific dependencies. See: ${pc.dim("https://v2.tauri.app/start/prerequisites/")}\n\n`;
+	return `${pc.bold("Desktop app with Tauri:")}\n${pc.cyan("•")} Start desktop app: ${pc.dim(`cd apps/client && ${runCmd} desktop:dev`)}\n${pc.cyan("•")} Build desktop app: ${pc.dim(`cd apps/client && ${runCmd} desktop:build`)}\n${pc.yellow("NOTE:")} Tauri requires Rust and platform-specific dependencies. See: ${pc.dim("https://v2.tauri.app/start/prerequisites/")}\n\n`;
 }

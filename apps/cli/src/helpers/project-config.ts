@@ -52,7 +52,7 @@ async function updateServerPackageJson(
 ): Promise<void> {
 	const serverPackageJsonPath = path.join(
 		projectDir,
-		"packages/server/package.json",
+		"apps/server/package.json",
 	);
 
 	if (await fs.pathExists(serverPackageJsonPath)) {
