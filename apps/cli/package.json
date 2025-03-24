@@ -7,16 +7,13 @@
 	"bin": {
 		"create-better-t-stack": "dist/index.js"
 	},
+	"files": ["dist", "template"],
 	"keywords": [],
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/better-t-stack/create-better-t-stack.git",
 		"directory": "apps/cli"
 	},
-	"files": [
-		"dist",
-		"template"
-	],
 	"homepage": "https://better-t-stack.pages.dev/",
 	"scripts": {
 		"build": "tsup",
