@@ -1,7 +1,8 @@
 import path from "node:path";
 import { $ } from "execa";
 import fs from "fs-extra";
-import type { ProjectConfig, ProjectDatabase, ProjectOrm } from "../types";
+import { PKG_ROOT } from "../constants";
+import type { ProjectConfig } from "../types";
 
 export async function updatePackageConfigurations(
 	projectDir: string,
@@ -30,6 +31,18 @@ async function updateRootPackageJson(
 		}
 
 		await fs.writeJson(rootPackageJsonPath, packageJson, { spaces: 2 });
+
+		if (options.packageManager === "pnpm") {
+			const pnpmWorkspaceTemplatePath = path.join(
+				PKG_ROOT,
+				"template/with-pnpm/pnpm-workspace.yaml",
+			);
+			const targetWorkspacePath = path.join(projectDir, "pnpm-workspace.yaml");
+
+			if (await fs.pathExists(pnpmWorkspaceTemplatePath)) {
+				await fs.copy(pnpmWorkspaceTemplatePath, targetWorkspacePath);
+			}
+		}
 	}
 }
 
