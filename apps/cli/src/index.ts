@@ -5,7 +5,12 @@ import { DEFAULT_CONFIG } from "./constants";
 import { createProject } from "./helpers/create-project";
 import { installDependencies } from "./helpers/install-dependencies";
 import { gatherConfig } from "./prompts/config-prompts";
-import type { ProjectAddons, ProjectConfig, ProjectExamples } from "./types";
+import type {
+	ProjectAddons,
+	ProjectConfig,
+	ProjectExamples,
+	Runtime,
+} from "./types";
 import { displayConfig } from "./utils/display-config";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
 import { getLatestCLIVersion } from "./utils/get-latest-cli-version";
@@ -50,6 +55,8 @@ async function main() {
 		.option("--no-install", "Skip installing dependencies")
 		.option("--turso", "Set up Turso for SQLite database")
 		.option("--no-turso", "Skip Turso setup for SQLite database")
+		.option("--hono", "Use Hono backend framework")
+		.option("--runtime <runtime>", "Specify runtime (bun or node)")
 		.parse();
 
 	const s = spinner();
@@ -70,11 +77,13 @@ async function main() {
 			...(options.prisma && { orm: "prisma" }),
 			...("auth" in options && { auth: options.auth }),
 			...(options.npm && { packageManager: "npm" }),
-			...(options.pnpm && { packageManager: "  pnpm" }),
+			...(options.pnpm && { packageManager: "pnpm" }),
 			...(options.bun && { packageManager: "bun" }),
 			...("git" in options && { git: options.git }),
 			...("install" in options && { noInstall: !options.install }),
 			...("turso" in options && { turso: options.turso }),
+			...(options.hono && { backendFramework: "hono" }),
+			...(options.runtime && { runtime: options.runtime as Runtime }),
 			...((options.pwa ||
 				options.tauri ||
 				options.biome ||
@@ -144,6 +153,12 @@ async function main() {
 							: flagConfig.database === "sqlite"
 								? DEFAULT_CONFIG.turso
 								: false,
+					backendFramework: options.hono
+						? "hono"
+						: DEFAULT_CONFIG.backendFramework,
+					runtime: options.runtime
+						? (options.runtime as Runtime)
+						: DEFAULT_CONFIG.runtime,
 				}
 			: await gatherConfig(flagConfig);
 

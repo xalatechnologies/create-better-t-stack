@@ -19,6 +19,7 @@ Follow the prompts to configure your project.
 - **Monorepo**: Turborepo for optimized build system and workspace management
 - **Frontend**: React, TanStack Router, TanStack Query, Tailwind CSS with shadcn/ui components
 - **Backend**: Hono, tRPC
+- **Runtime Options**: Choose between Bun or Node.js for your server
 - **Database Options**: SQLite (via Turso), PostgreSQL, or no database
 - **ORM Selection**: Choose between Drizzle ORM or Prisma
 - **Authentication**: Optional auth setup with Better-Auth
@@ -60,6 +61,7 @@ Options:
   --no-install          Skip installing dependencies
   --turso               Set up Turso for SQLite database (default with sqlite)
   --no-turso            Skip Turso setup for SQLite database
+  --runtime <runtime>   Specify runtime (bun or node)
   -h, --help            Display help
 ```
 
@@ -73,6 +75,11 @@ npx create-better-t-stack my-app -y
 Create a project with specific options:
 ```bash
 npx create-better-t-stack my-app --postgres --prisma --auth --pwa --biome
+```
+
+Create a project with Node.js runtime:
+```bash
+npx create-better-t-stack my-app --runtime node
 ```
 
 ## License

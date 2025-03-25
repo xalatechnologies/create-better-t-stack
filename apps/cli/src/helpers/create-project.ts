@@ -11,6 +11,7 @@ import { setupEnvironmentVariables } from "./env-setup";
 import { setupExamples } from "./examples-setup";
 import { displayPostInstallInstructions } from "./post-installation";
 import { initializeGit, updatePackageConfigurations } from "./project-config";
+import { setupRuntime } from "./runtime-setup";
 import {
 	copyBaseTemplate,
 	fixGitignoreFiles,
@@ -37,6 +38,8 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			options.database,
 			options.auth,
 		);
+
+		await setupRuntime(projectDir, options.runtime);
 
 		await setupExamples(
 			projectDir,
@@ -73,6 +76,7 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			!options.noInstall,
 			options.orm,
 			options.addons,
+			options.runtime,
 		);
 
 		return projectDir;

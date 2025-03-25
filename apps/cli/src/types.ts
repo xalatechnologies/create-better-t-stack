@@ -3,6 +3,8 @@ export type ProjectOrm = "drizzle" | "prisma" | "none";
 export type PackageManager = "npm" | "pnpm" | "bun";
 export type ProjectAddons = "pwa" | "tauri" | "biome" | "husky";
 export type ProjectExamples = "todo";
+export type BackendFramework = "hono";
+export type Runtime = "bun" | "node";
 
 export interface ProjectConfig {
 	projectName: string;
@@ -15,4 +17,6 @@ export interface ProjectConfig {
 	packageManager: PackageManager;
 	noInstall?: boolean;
 	turso?: boolean;
+	backendFramework: BackendFramework;
+	runtime: Runtime;
 }

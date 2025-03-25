@@ -31,10 +31,10 @@ export default function SignInForm({
 				},
 				{
 					onSuccess: () => {
-						toast.success("Sign in successful");
 						navigate({
 							to: "/dashboard",
 						});
+						toast.success("Sign in successful");
 					},
 					onError: (error) => {
 						toast.error(error.error.message);

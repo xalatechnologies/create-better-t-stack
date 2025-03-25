@@ -1,15 +1,18 @@
 import { cancel, group } from "@clack/prompts";
 import pc from "picocolors";
 import type {
+	BackendFramework,
 	PackageManager,
 	ProjectAddons,
 	ProjectConfig,
 	ProjectDatabase,
 	ProjectExamples,
 	ProjectOrm,
+	Runtime,
 } from "../types";
 import { getAddonsChoice } from "./addons";
 import { getAuthChoice } from "./auth";
+import { getBackendFrameworkChoice } from "./backend-framework";
 import { getDatabaseChoice } from "./database";
 import { getExamplesChoice } from "./examples";
 import { getGitChoice } from "./git";
@@ -17,9 +20,10 @@ import { getNoInstallChoice } from "./install";
 import { getORMChoice } from "./orm";
 import { getPackageManagerChoice } from "./package-manager";
 import { getProjectName } from "./project-name";
+import { getRuntimeChoice } from "./runtime";
 import { getTursoSetupChoice } from "./turso";
 
-interface PromptGroupResults {
+type PromptGroupResults = {
 	projectName: string;
 	database: ProjectDatabase;
 	orm: ProjectOrm;
@@ -30,7 +34,9 @@ interface PromptGroupResults {
 	packageManager: PackageManager;
 	noInstall: boolean;
 	turso: boolean;
-}
+	backendFramework: BackendFramework;
+	runtime: Runtime;
+};
 
 export async function gatherConfig(
 	flags: Partial<ProjectConfig>,
@@ -40,6 +46,8 @@ export async function gatherConfig(
 			projectName: async () => {
 				return getProjectName(flags.projectName);
 			},
+			runtime: () => getRuntimeChoice(flags.runtime),
+			backendFramework: () => getBackendFrameworkChoice(flags.backendFramework),
 			database: () => getDatabaseChoice(flags.database),
 			orm: ({ results }) =>
 				getORMChoice(flags.orm, results.database !== "none"),
@@ -75,5 +83,7 @@ export async function gatherConfig(
 		packageManager: result.packageManager,
 		noInstall: result.noInstall,
 		turso: result.turso,
+		backendFramework: result.backendFramework,
+		runtime: result.runtime,
 	};
 }

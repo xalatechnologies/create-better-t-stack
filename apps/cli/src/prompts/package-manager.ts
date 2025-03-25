@@ -1,6 +1,6 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
-import type { PackageManager } from "../types";
+import type { PackageManager, Runtime } from "../types";
 import { getUserPkgManager } from "../utils/get-package-manager";
 
 export async function getPackageManagerChoice(

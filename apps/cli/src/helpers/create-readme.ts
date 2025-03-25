@@ -1,6 +1,12 @@
 import path from "node:path";
 import fs from "fs-extra";
-import type { ProjectConfig, ProjectDatabase, ProjectOrm } from "../types";
+import type {
+	ProjectAddons,
+	ProjectConfig,
+	ProjectDatabase,
+	ProjectOrm,
+	Runtime,
+} from "../types";
 
 export async function createReadme(projectDir: string, options: ProjectConfig) {
 	const readmePath = path.join(projectDir, "README.md");
@@ -21,6 +27,7 @@ function generateReadmeContent(options: ProjectConfig): string {
 		auth,
 		addons = [],
 		orm = "drizzle",
+		runtime = "bun",
 	} = options;
 
 	const packageManagerRunCmd =
@@ -32,7 +39,7 @@ This project was created with [Better-T-Stack](https://github.com/better-t-stack
 
 ## Features
 
-${generateFeaturesList(database, auth, addons, orm)}
+${generateFeaturesList(database, auth, addons, orm, runtime)}
 
 ## Getting Started
 
@@ -71,38 +78,46 @@ ${generateScriptsList(packageManagerRunCmd, database, orm, auth)}
 function generateFeaturesList(
 	database: ProjectDatabase,
 	auth: boolean,
-	features: string[],
+	addons: ProjectAddons[],
 	orm: ProjectOrm,
+	runtime: Runtime,
 ): string {
-	const featuresList = [
+	const addonsList = [
 		"- **TypeScript** - For type safety and improved developer experience",
 		"- **TanStack Router** - File-based routing with full type safety",
 		"- **TailwindCSS** - Utility-first CSS for rapid UI development",
 		"- **shadcn/ui** - Reusable UI components",
 		"- **Hono** - Lightweight, performant server framework",
 		"- **tRPC** - End-to-end type-safe APIs",
+		`- **${runtime === "bun" ? "Bun" : "Node.js"}** - Runtime environment`,
 	];
 
 	if (database !== "none") {
-		featuresList.push(
+		addonsList.push(
 			`- **${orm === "drizzle" ? "Drizzle" : "Prisma"}** - TypeScript-first ORM`,
 			`- **${database === "sqlite" ? "SQLite/Turso" : "PostgreSQL"}** - Database engine`,
 		);
 	}
 
 	if (auth) {
-		featuresList.push(
+		addonsList.push(
 			"- **Authentication** - Email & password authentication with Better Auth",
 		);
 	}
 
-	for (const feature of features) {
-		if (feature === "docker") {
-			featuresList.push("- **Docker** - Containerized deployment");
+	for (const addon of addons) {
+		if (addon === "pwa") {
+			addonsList.push("- **PWA** - Progressive Web App support");
+		} else if (addon === "tauri") {
+			addonsList.push("- **Tauri** - Build native desktop applications");
+		} else if (addon === "biome") {
+			addonsList.push("- **Biome** - Linting and formatting");
+		} else if (addon === "husky") {
+			addonsList.push("- **Husky** - Git hooks for code quality");
 		}
 	}
 
-	return featuresList.join("\n");
+	return addonsList.join("\n");
 }
 
 function generateDatabaseSetup(

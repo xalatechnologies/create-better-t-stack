@@ -16,6 +16,9 @@ export function displayConfig(config: Partial<ProjectConfig>) {
 	if (config.auth !== undefined) {
 		configDisplay.push(`${pc.blue("Authentication:")} ${config.auth}`);
 	}
+	if (config.runtime) {
+		configDisplay.push(`${pc.blue("Runtime:")} ${config.runtime}`);
+	}
 	if (config.addons?.length) {
 		configDisplay.push(`${pc.blue("Addons:")} ${config.addons.join(", ")}`);
 	}

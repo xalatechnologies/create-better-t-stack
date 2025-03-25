@@ -12,10 +12,13 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 	orm: "drizzle",
 	auth: true,
 	addons: [],
+	examples: [],
 	git: true,
 	packageManager: "npm",
 	noInstall: false,
-	examples: ["todo"],
+	turso: false,
+	backendFramework: "hono",
+	runtime: "bun",
 };
 
 export const dependencyVersionMap = {
@@ -39,6 +42,12 @@ export const dependencyVersionMap = {
 
 	husky: "^9.1.7",
 	"lint-staged": "^15.5.0",
+
+	"@hono/node-server": "^1.14.0",
+	tsx: "^4.19.2",
+	"@types/node": "^22.13.11",
+
+	"@types/bun": "^1.2.6",
 } as const;
 
 export type AvailableDependencies = keyof typeof dependencyVersionMap;

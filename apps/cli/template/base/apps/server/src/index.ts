@@ -1,4 +1,3 @@
-import { serve } from "@hono/node-server";
 import { trpcServer } from "@hono/trpc-server";
 import "dotenv/config";
 import { Hono } from "hono";
@@ -12,30 +11,23 @@ const app = new Hono();
 app.use(logger());
 
 app.use(
-  "/*",
-  cors({
-    origin: process.env.CORS_ORIGIN || "",
-    allowMethods: ["GET", "POST", "OPTIONS"],
-  }),
+	"/*",
+	cors({
+		origin: process.env.CORS_ORIGIN || "",
+		allowMethods: ["GET", "POST", "OPTIONS"],
+	}),
 );
 
 app.use(
-  "/trpc/*",
-  trpcServer({
-    router: appRouter,
-    createContext: (_opts, hono) => {
-      return createContext({ hono });
-    },
-  }),
+	"/trpc/*",
+	trpcServer({
+		router: appRouter,
+		createContext: (_opts, hono) => {
+			return createContext({ hono });
+		},
+	}),
 );
 
 app.get("/", (c) => {
-  return c.text("OK");
-});
-
-serve({
-  fetch: app.fetch,
-  port: 3000,
-}, (info) => {
-  console.log(`Server is running on http://localhost:${info.port}`)
+	return c.text("OK");
 });

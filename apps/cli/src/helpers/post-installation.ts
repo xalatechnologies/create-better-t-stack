@@ -5,6 +5,7 @@ import type {
 	ProjectAddons,
 	ProjectDatabase,
 	ProjectOrm,
+	Runtime,
 } from "../types";
 
 export function displayPostInstallInstructions(
@@ -14,6 +15,7 @@ export function displayPostInstallInstructions(
 	depsInstalled: boolean,
 	orm?: ProjectOrm,
 	addons?: ProjectAddons[],
+	runtime?: Runtime,
 ) {
 	const runCmd = packageManager === "npm" ? "npm run" : packageManager;
 	const cdCmd = `cd ${projectName}`;
@@ -21,7 +23,9 @@ export function displayPostInstallInstructions(
 		addons?.includes("husky") || addons?.includes("biome");
 
 	const databaseInstructions =
-		database !== "none" ? getDatabaseInstructions(database, orm, runCmd) : "";
+		database !== "none"
+			? getDatabaseInstructions(database, orm, runCmd, runtime)
+			: "";
 	const tauriInstructions = addons?.includes("tauri")
 		? getTauriInstructions(runCmd)
 		: "";
@@ -49,6 +53,7 @@ function getDatabaseInstructions(
 	database: ProjectDatabase,
 	orm?: ProjectOrm,
 	runCmd?: string,
+	runtime?: Runtime,
 ): string {
 	const instructions = [];
 
@@ -59,6 +64,13 @@ function getDatabaseInstructions(
 				`${pc.dim("Learn more at: https://www.prisma.io/docs/orm/overview/databases/turso")}`,
 			);
 		}
+
+		if (runtime === "bun") {
+			instructions.push(
+				`${pc.yellow("NOTE:")} Prisma with Bun may require additional configuration. If you encounter errors, follow the guidance provided in the error messages`,
+			);
+		}
+
 		instructions.push(
 			`${pc.cyan("•")} Apply schema: ${pc.dim(`${runCmd} db:push`)}`,
 		);

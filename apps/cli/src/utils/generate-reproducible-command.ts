@@ -63,6 +63,10 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		}
 	}
 
+	if (config.runtime) {
+		flags.push(`--runtime ${config.runtime}`);
+	}
+
 	const baseCommand = "npx create-better-t-stack";
 	const projectName = config.projectName ? ` ${config.projectName}` : "";
 	const flagString = flags.length > 0 ? ` ${flags.join(" ")}` : "";
