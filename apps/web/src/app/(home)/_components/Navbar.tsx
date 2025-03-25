@@ -63,7 +63,7 @@ const Navbar = () => {
 			<div className="flex justify-center">
 				<div
 					className={`flex items-center backdrop-blur-md dark:bg-black/40 bg-white/40 rounded-md border dark:border-blue-500/30 border-blue-400/30 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
-						scrolled ? "w-[342px]" : "sm:w-[240px] w-[280px]"
+						scrolled ? "w-[350px]" : "sm:w-[240px] w-[280px]"
 					}`}
 				>
 					<div
