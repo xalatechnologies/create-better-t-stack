@@ -5,8 +5,7 @@ import CodeContainer from "./_components/CodeContainer";
 import CustomizableSection from "./_components/CustomizableSection";
 import NpmPackage from "./_components/NpmPackage";
 import TechShowcase from "./_components/TechShowcase";
-// import TerminalDisplay from "./_components/Terminal";
-// import Testimonials from "./_components/Testimonials";
+import Testimonials from "./_components/Testimonials";
 
 export default function HomePage() {
 	return (
@@ -126,7 +125,7 @@ export default function HomePage() {
 					</div>
 				</div>
 			</div>
-			{/* <Testimonials /> */}
+			<Testimonials />
 		</main>
 	);
 }
