@@ -11,7 +11,6 @@
 		"db:push": "turbo -F server db:push",
 		"db:studio": "turbo -F server db:studio"
 	},
-	"packageManager": "bun@1.2.4",
 	"devDependencies": {
 		"turbo": "^2.4.2"
 	}

@@ -1,5 +1,5 @@
 import path from "node:path";
-import { $ } from "execa";
+import { $, execa } from "execa";
 import fs from "fs-extra";
 import { PKG_ROOT } from "../constants";
 import type { ProjectConfig } from "../types";
@@ -21,14 +21,10 @@ async function updateRootPackageJson(
 		const packageJson = await fs.readJson(rootPackageJsonPath);
 		packageJson.name = options.projectName;
 
-		if (options.packageManager !== "bun") {
-			packageJson.packageManager =
-				options.packageManager === "npm"
-					? "npm@10.9.2"
-					: options.packageManager === "pnpm"
-						? "pnpm@10.6.4"
-						: "bun@1.2.5";
-		}
+		const { stdout } = await execa(options.packageManager, ["-v"], {
+			cwd: projectDir,
+		});
+		packageJson.packageManager = `${options.packageManager}@${stdout.trim()}`;
 
 		await fs.writeJson(rootPackageJsonPath, packageJson, { spaces: 2 });
 
