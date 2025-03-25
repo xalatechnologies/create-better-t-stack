@@ -4,7 +4,7 @@ import CustomizableStack from "./CustomizableStack";
 export default function CustomizableSection() {
 	return (
 		<section className="w-full max-w-6xl mx-auto space-y-12 mt-24 relative z-50">
-			<div className="text-center space-y-6 relative z-10 border  dark:border-gray-700/30 border-gray-300/30 p-6 rounded-md bg-white/80 dark:bg-gray-950/30 backdrop-blur-sm">
+			<div className="text-center space-y-6 relative z-10 border dark:border-gray-700/30 border-gray-500/30 p-6 rounded-md bg-white/80 dark:bg-gray-950/30 backdrop-blur-sm">
 				<div className="relative">
 					<motion.h2
 						initial={{ opacity: 0, y: 20 }}
@@ -15,7 +15,7 @@ export default function CustomizableSection() {
 						<span className="text-blue-500 dark:text-blue-400 font-mono mr-1 animate-pulse">
 							{">"}
 						</span>
-						<span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 hover:from-purple-500 hover:to-blue-600 dark:hover:from-purple-400 dark:hover:to-blue-500 transition-all duration-300">
+						<span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 transition-all duration-300">
 							Your Stack, Your Choice
 						</span>
 					</motion.h2>

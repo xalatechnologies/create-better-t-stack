@@ -28,7 +28,7 @@ export function TechNodeComponent({ data }: { data: TechNodeData }) {
 		`;
 
 	const activeStyles = data.isActive
-		? "opacity-100 dark:bg-gradient-to-br dark:from-indigo-900/10 dark:to-violet-900/10 bg-gradient-to-br from-indigo-100/40 to-violet-100/40"
+		? "opacity-100 dark:bg-gradient-to-br dark:from-indigo-900/30 dark:to-violet-900/30 bg-gradient-to-br from-indigo-50 to-violet-50"
 		: "opacity-80 hover:opacity-95 dark:bg-slate-800 bg-slate-100";
 
 	return (

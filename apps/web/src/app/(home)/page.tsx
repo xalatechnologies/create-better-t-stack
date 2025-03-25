@@ -39,24 +39,24 @@ export default function HomePage() {
 						<ShinyText
 							text="Be the safest developer with typesafe Typescript"
 							speed={3}
-							className="sm:text-lg text-md"
+							className="sm:text-lg text-md text-gray-600 dark:text-[#b5b5b5a4]"
 						/>
 					</div>
 				</div>
 				<div className="absolute inset-0 -z-10">
-					<div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 dark:blur-3xl blur-2xl transform -skew-y-12" />
+					<div className="absolute inset-0 bg-gradient-to-r dark:from-purple-500/20 dark:to-indigo-500/20 from-blue-300/20 to-indigo-300/20 dark:blur-3xl blur-2xl transform -skew-y-12" />
 				</div>
 			</div>
 			{/* <TerminalDisplay /> */}
 
 			<div className="w-full max-w-6xl mx-auto space-y-12 mt-12 relative z-50">
-				<div className="text-center space-y-6 relative z-10 border dark:border-gray-700/30 border-gray-300/50 p-6 rounded-md dark:bg-gray-950/30 bg-white/70 backdrop-blur-3xl">
+				<div className="text-center space-y-6 relative z-10 border dark:border-gray-700/30 border-gray-500/50 p-6 rounded-md dark:bg-gray-950/30 bg-white/70 backdrop-blur-3xl">
 					<div className="relative">
 						<h2 className="relative sm:text-4xl text-3xl md:text-5xl font-bold pb-3 group">
 							<span className="text-blue-400 font-mono mr-1 animate-pulse">
 								{">"}
 							</span>
-							<span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-indigo-400 hover:to-blue-500 transition-all duration-300 dark:via-white via-gray-800">
+							<span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-400 dark:to-indigo-500 hover:from-indigo-500 hover:to-blue-600 dark:hover:from-indigo-400 dark:hover:to-blue-500 transition-all duration-300">
 								A Symphony of Modern Tech
 							</span>
 						</h2>
