@@ -8,10 +8,8 @@
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server"
 	},
 	"dependencies": {
-		"@hono/trpc-server": "^0.3.4",
 		"@trpc/server": "^11.0.0",
 		"dotenv": "^16.4.7",
-		"hono": "^4.7.5",
 		"zod": "^3.24.2"
 	},
 	"devDependencies": {

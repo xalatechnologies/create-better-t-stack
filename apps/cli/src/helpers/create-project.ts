@@ -5,6 +5,7 @@ import pc from "picocolors";
 import type { ProjectConfig } from "../types";
 import { setupAddons } from "./addons-setup";
 import { setupAuth } from "./auth-setup";
+import { setupBackendDependencies } from "./backend-framework-setup";
 import { createReadme } from "./create-readme";
 import { setupDatabase } from "./db-setup";
 import { setupEnvironmentVariables } from "./env-setup";
@@ -16,6 +17,7 @@ import {
 	copyBaseTemplate,
 	fixGitignoreFiles,
 	setupAuthTemplate,
+	setupBackendFramework,
 	setupOrmTemplate,
 } from "./template-manager";
 
@@ -27,24 +29,19 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		await fs.ensureDir(projectDir);
 
 		await copyBaseTemplate(projectDir);
-
 		await fixGitignoreFiles(projectDir);
 
-		await setupAuthTemplate(projectDir, options.auth);
+		await setupBackendFramework(projectDir, options.backendFramework);
+		await setupBackendDependencies(
+			projectDir,
+			options.backendFramework,
+			options.runtime,
+		);
 
 		await setupOrmTemplate(
 			projectDir,
 			options.orm,
 			options.database,
-			options.auth,
-		);
-
-		await setupRuntime(projectDir, options.runtime);
-
-		await setupExamples(
-			projectDir,
-			options.examples,
-			options.orm,
 			options.auth,
 		);
 
@@ -55,7 +52,23 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			options.turso ?? options.database === "sqlite",
 		);
 
+		await setupAuthTemplate(
+			projectDir,
+			options.auth,
+			options.backendFramework,
+			options.orm,
+			options.database,
+		);
 		await setupAuth(projectDir, options.auth);
+
+		await setupRuntime(projectDir, options.runtime, options.backendFramework);
+
+		await setupExamples(
+			projectDir,
+			options.examples,
+			options.orm,
+			options.auth,
+		);
 
 		await setupEnvironmentVariables(projectDir, options);
 
@@ -66,7 +79,6 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		}
 
 		await updatePackageConfigurations(projectDir, options);
-
 		await createReadme(projectDir, options);
 
 		displayPostInstallInstructions(

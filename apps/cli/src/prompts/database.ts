@@ -1,5 +1,6 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
+import { DEFAULT_CONFIG } from "../constants";
 import type { ProjectDatabase } from "../types";
 
 export async function getDatabaseChoice(
@@ -26,7 +27,7 @@ export async function getDatabaseChoice(
 				hint: "Traditional relational database",
 			},
 		],
-		initialValue: "sqlite",
+		initialValue: DEFAULT_CONFIG.database,
 	});
 
 	if (isCancel(response)) {

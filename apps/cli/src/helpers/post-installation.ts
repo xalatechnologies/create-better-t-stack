@@ -33,9 +33,7 @@ export function displayPostInstallInstructions(
 		? getLintingInstructions(runCmd)
 		: "";
 
-	log.info(`${pc.cyan("Project created successfully!")}
-
-${pc.bold("Next steps:")}
+	log.info(`${pc.bold("Next steps:")}
 ${pc.cyan("1.")} ${cdCmd}
 ${!depsInstalled ? `${pc.cyan("2.")} ${packageManager} install\n` : ""}${pc.cyan(depsInstalled ? "2." : "3.")} ${runCmd} dev
 

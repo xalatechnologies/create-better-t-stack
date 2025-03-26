@@ -46,8 +46,8 @@ export async function gatherConfig(
 			projectName: async () => {
 				return getProjectName(flags.projectName);
 			},
-			runtime: () => getRuntimeChoice(flags.runtime),
 			backendFramework: () => getBackendFrameworkChoice(flags.backendFramework),
+			runtime: () => getRuntimeChoice(flags.runtime),
 			database: () => getDatabaseChoice(flags.database),
 			orm: ({ results }) =>
 				getORMChoice(flags.orm, results.database !== "none"),

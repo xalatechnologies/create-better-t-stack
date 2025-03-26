@@ -1,13 +1,13 @@
-import type { Context as HonoContext } from "hono";
+import type { Context as ElysiaContext } from "elysia";
 import { auth } from "./auth";
 
 export type CreateContextOptions = {
-  hono: HonoContext;
+  context: ElysiaContext;
 };
 
-export async function createContext({ hono }: CreateContextOptions) {
+export async function createContext({ context }: CreateContextOptions) {
   const session = await auth.api.getSession({
-    headers: hono.req.raw.headers,
+    headers: context.request.headers,
   });
 
   return {

@@ -5,40 +5,34 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 
 	if (config.database === "none") {
 		flags.push("--no-database");
-	} else if (config.database === "sqlite") {
-		flags.push("--sqlite");
-	} else if (config.database === "postgres") {
-		flags.push("--postgres");
-	}
+	} else {
+		flags.push(`--${config.database}`);
 
-	if (config.database !== "none") {
-		if (config.orm === "drizzle") {
-			flags.push("--drizzle");
-		} else if (config.orm === "prisma") {
-			flags.push("--prisma");
+		if (config.orm) {
+			flags.push(`--${config.orm}`);
+		}
+
+		if (config.database === "sqlite") {
+			flags.push(config.turso ? "--turso" : "--no-turso");
 		}
 	}
 
-	if (config.auth) {
-		flags.push("--auth");
-	} else {
-		flags.push("--no-auth");
-	}
+	flags.push(config.auth ? "--auth" : "--no-auth");
 
-	if (config.git) {
-		flags.push("--git");
-	} else {
-		flags.push("--no-git");
-	}
+	flags.push(config.git ? "--git" : "--no-git");
 
-	if (config.noInstall) {
-		flags.push("--no-install");
-	} else {
-		flags.push("--install");
-	}
+	flags.push(config.noInstall ? "--no-install" : "--install");
 
 	if (config.packageManager) {
 		flags.push(`--${config.packageManager}`);
+	}
+
+	if (config.backendFramework) {
+		flags.push(`--${config.backendFramework}`);
+	}
+
+	if (config.runtime) {
+		flags.push(`--runtime ${config.runtime}`);
 	}
 
 	if (config.addons.length > 0) {
@@ -55,21 +49,8 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		flags.push("--no-examples");
 	}
 
-	if (config.database === "sqlite") {
-		if (config.turso) {
-			flags.push("--turso");
-		} else {
-			flags.push("--no-turso");
-		}
-	}
-
-	if (config.runtime) {
-		flags.push(`--runtime ${config.runtime}`);
-	}
-
 	const baseCommand = "npx create-better-t-stack";
 	const projectName = config.projectName ? ` ${config.projectName}` : "";
-	const flagString = flags.length > 0 ? ` ${flags.join(" ")}` : "";
 
-	return `${baseCommand}${projectName}${flagString}`;
+	return `${baseCommand}${projectName} ${flags.join(" ")}`;
 }

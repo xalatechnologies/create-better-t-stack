@@ -1,6 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ProjectConfig } from "./types";
+import { getUserPkgManager } from "./utils/get-package-manager";
 
 const __filename = fileURLToPath(import.meta.url);
 const distPath = path.dirname(__filename);
@@ -14,7 +15,7 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 	addons: [],
 	examples: [],
 	git: true,
-	packageManager: "npm",
+	packageManager: getUserPkgManager(),
 	noInstall: false,
 	turso: false,
 	backendFramework: "hono",
@@ -48,6 +49,15 @@ export const dependencyVersionMap = {
 	"@types/node": "^22.13.11",
 
 	"@types/bun": "^1.2.6",
+
+	"@elysiajs/node": "^1.2.6",
+
+	"@elysiajs/cors": "^1.2.0",
+	"@elysiajs/trpc": "^1.1.0",
+	elysia: "^1.2.25",
+
+	"@hono/trpc-server": "^0.3.4",
+	hono: "^4.7.5",
 } as const;
 
 export type AvailableDependencies = keyof typeof dependencyVersionMap;

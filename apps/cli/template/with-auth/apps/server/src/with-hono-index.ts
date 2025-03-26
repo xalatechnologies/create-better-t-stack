@@ -1,3 +1,4 @@
+
 import { trpcServer } from "@hono/trpc-server";
 import "dotenv/config";
 import { Hono } from "hono";
@@ -27,8 +28,8 @@ app.use(
 	"/trpc/*",
 	trpcServer({
 		router: appRouter,
-		createContext: (_opts, hono) => {
-			return createContext({ hono });
+		createContext: (_opts, context) => {
+			return createContext({ context });
 		},
 	}),
 );

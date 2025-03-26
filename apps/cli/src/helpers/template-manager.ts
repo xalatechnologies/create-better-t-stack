@@ -1,7 +1,7 @@
 import path from "node:path";
 import fs from "fs-extra";
 import { PKG_ROOT } from "../constants";
-import type { ProjectDatabase, ProjectOrm } from "../types";
+import type { BackendFramework, ProjectDatabase, ProjectOrm } from "../types";
 
 export async function copyBaseTemplate(projectDir: string): Promise<void> {
 	const templateDir = path.join(PKG_ROOT, "template/base");
@@ -11,15 +11,13 @@ export async function copyBaseTemplate(projectDir: string): Promise<void> {
 	await fs.copy(templateDir, projectDir);
 }
 
-export async function setupAuthTemplate(
+export async function setupBackendFramework(
 	projectDir: string,
-	auth: boolean,
+	framework: BackendFramework,
 ): Promise<void> {
-	if (!auth) return;
-
-	const authTemplateDir = path.join(PKG_ROOT, "template/with-auth");
-	if (await fs.pathExists(authTemplateDir)) {
-		await fs.copy(authTemplateDir, projectDir, { overwrite: true });
+	const frameworkDir = path.join(PKG_ROOT, `template/with-${framework}`);
+	if (await fs.pathExists(frameworkDir)) {
+		await fs.copy(frameworkDir, projectDir, { overwrite: true });
 	}
 }
 
@@ -36,17 +34,83 @@ export async function setupOrmTemplate(
 	if (await fs.pathExists(ormTemplateDir)) {
 		await fs.copy(ormTemplateDir, projectDir, { overwrite: true });
 
-		const serverSrcPath = path.join(projectDir, "apps/server/src");
-		const libPath = path.join(serverSrcPath, "lib");
-		const withAuthLibPath = path.join(serverSrcPath, "with-auth-lib");
-
-		if (auth) {
-			if (await fs.pathExists(withAuthLibPath)) {
-				await fs.remove(libPath);
-				await fs.move(withAuthLibPath, libPath);
+		if (!auth) {
+			if (orm === "prisma") {
+				const authSchemaPath = path.join(
+					projectDir,
+					"apps/server/prisma/schema/auth.prisma",
+				);
+				if (await fs.pathExists(authSchemaPath)) {
+					await fs.remove(authSchemaPath);
+				}
+			} else if (orm === "drizzle") {
+				const authSchemaPath = path.join(
+					projectDir,
+					"apps/server/src/db/schema/auth.ts",
+				);
+				if (await fs.pathExists(authSchemaPath)) {
+					await fs.remove(authSchemaPath);
+				}
 			}
-		} else {
-			await fs.remove(withAuthLibPath);
+		}
+	}
+}
+
+export async function setupAuthTemplate(
+	projectDir: string,
+	auth: boolean,
+	framework: BackendFramework,
+	orm: ProjectOrm,
+	database: ProjectDatabase,
+): Promise<void> {
+	if (!auth) return;
+
+	const authTemplateDir = path.join(PKG_ROOT, "template/with-auth");
+	if (await fs.pathExists(authTemplateDir)) {
+		const clientAuthDir = path.join(authTemplateDir, "apps/client");
+		const projectClientDir = path.join(projectDir, "apps/client");
+		await fs.copy(clientAuthDir, projectClientDir, { overwrite: true });
+
+		const serverAuthDir = path.join(authTemplateDir, "apps/server/src");
+		const projectServerDir = path.join(projectDir, "apps/server/src");
+
+		await fs.copy(
+			path.join(serverAuthDir, "lib/trpc.ts"),
+			path.join(projectServerDir, "lib/trpc.ts"),
+			{ overwrite: true },
+		);
+
+		await fs.copy(
+			path.join(serverAuthDir, "routers/index.ts"),
+			path.join(projectServerDir, "routers/index.ts"),
+			{ overwrite: true },
+		);
+
+		const contextFileName = `with-${framework}-context.ts`;
+		await fs.copy(
+			path.join(serverAuthDir, "lib", contextFileName),
+			path.join(projectServerDir, "lib/context.ts"),
+			{ overwrite: true },
+		);
+
+		const indexFileName = `with-${framework}-index.ts`;
+		await fs.copy(
+			path.join(serverAuthDir, indexFileName),
+			path.join(projectServerDir, "index.ts"),
+			{ overwrite: true },
+		);
+
+		const authLibFileName = getAuthLibDir(orm, database);
+		const authLibSourceDir = path.join(serverAuthDir, authLibFileName);
+		if (await fs.pathExists(authLibSourceDir)) {
+			const files = await fs.readdir(authLibSourceDir);
+			for (const file of files) {
+				await fs.copy(
+					path.join(authLibSourceDir, file),
+					path.join(projectServerDir, "lib", file),
+					{ overwrite: true },
+				);
+			}
 		}
 	}
 }
@@ -80,4 +144,20 @@ function getOrmTemplateDir(orm: ProjectOrm, database: ProjectDatabase): string {
 	}
 
 	return "template/base";
+}
+
+function getAuthLibDir(orm: ProjectOrm, database: ProjectDatabase): string {
+	if (orm === "drizzle") {
+		return database === "sqlite"
+			? "with-drizzle-sqlite-lib"
+			: "with-drizzle-postgres-lib";
+	}
+
+	if (orm === "prisma") {
+		return database === "sqlite"
+			? "with-prisma-sqlite-lib"
+			: "with-prisma-postgres-lib";
+	}
+
+	throw new Error("Invalid ORM or database configuration for auth setup");
 }

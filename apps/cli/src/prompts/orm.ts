@@ -1,5 +1,6 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
+import { DEFAULT_CONFIG } from "../constants";
 import type { ProjectOrm } from "../types";
 
 export async function getORMChoice(
@@ -23,7 +24,7 @@ export async function getORMChoice(
 				hint: "Powerful, feature-rich ORM with schema migrations",
 			},
 		],
-		initialValue: "drizzle",
+		initialValue: DEFAULT_CONFIG.orm,
 	});
 
 	if (isCancel(response)) {

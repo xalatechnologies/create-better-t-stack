@@ -1,5 +1,6 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
+import { DEFAULT_CONFIG } from "../constants";
 import type { Runtime } from "../types";
 
 export async function getRuntimeChoice(runtime?: Runtime): Promise<Runtime> {
@@ -19,7 +20,7 @@ export async function getRuntimeChoice(runtime?: Runtime): Promise<Runtime> {
 				hint: "Traditional Node.js runtime",
 			},
 		],
-		initialValue: "bun",
+		initialValue: DEFAULT_CONFIG.runtime,
 	});
 
 	if (isCancel(response)) {

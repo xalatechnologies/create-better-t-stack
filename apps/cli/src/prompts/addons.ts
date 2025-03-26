@@ -1,5 +1,6 @@
 import { cancel, isCancel, multiselect } from "@clack/prompts";
 import pc from "picocolors";
+import { DEFAULT_CONFIG } from "../constants";
 import type { ProjectAddons } from "../types";
 
 export async function getAddonsChoice(
@@ -31,6 +32,7 @@ export async function getAddonsChoice(
 				hint: "Add Git hooks with Husky, lint-staged (requires Biome)",
 			},
 		],
+		initialValues: DEFAULT_CONFIG.addons,
 		required: false,
 	});
 

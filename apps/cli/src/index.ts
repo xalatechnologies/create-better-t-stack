@@ -6,6 +6,7 @@ import { createProject } from "./helpers/create-project";
 import { installDependencies } from "./helpers/install-dependencies";
 import { gatherConfig } from "./prompts/config-prompts";
 import type {
+	BackendFramework,
 	ProjectAddons,
 	ProjectConfig,
 	ProjectExamples,
@@ -56,6 +57,7 @@ async function main() {
 		.option("--turso", "Set up Turso for SQLite database")
 		.option("--no-turso", "Skip Turso setup for SQLite database")
 		.option("--hono", "Use Hono backend framework")
+		.option("--elysia", "Use Elysia backend framework")
 		.option("--runtime <runtime>", "Specify runtime (bun or node)")
 		.parse();
 
@@ -67,6 +69,10 @@ async function main() {
 
 		const options = program.opts();
 		const projectDirectory = program.args[0];
+
+		let backendFramework: BackendFramework | undefined;
+		if (options.hono) backendFramework = "hono";
+		if (options.elysia) backendFramework = "elysia";
 
 		const flagConfig: Partial<ProjectConfig> = {
 			...(projectDirectory && { projectName: projectDirectory }),
@@ -82,7 +88,7 @@ async function main() {
 			...("git" in options && { git: options.git }),
 			...("install" in options && { noInstall: !options.install }),
 			...("turso" in options && { turso: options.turso }),
-			...(options.hono && { backendFramework: "hono" }),
+			...(backendFramework && { backendFramework }),
 			...(options.runtime && { runtime: options.runtime as Runtime }),
 			...((options.pwa ||
 				options.tauri ||
@@ -124,7 +130,11 @@ async function main() {
 					database:
 						options.database === false
 							? "none"
-							: (options.database ?? DEFAULT_CONFIG.database),
+							: options.sqlite
+								? "sqlite"
+								: options.postgres
+									? "postgres"
+									: DEFAULT_CONFIG.database,
 					orm:
 						options.database === false
 							? "none"
@@ -133,12 +143,10 @@ async function main() {
 								: options.prisma
 									? "prisma"
 									: DEFAULT_CONFIG.orm,
-					auth: options.auth ?? DEFAULT_CONFIG.auth,
-					git: options.git ?? DEFAULT_CONFIG.git,
+					auth: "auth" in options ? options.auth : DEFAULT_CONFIG.auth,
+					git: "git" in options ? options.git : DEFAULT_CONFIG.git,
 					noInstall:
-						"noInstall" in options
-							? options.noInstall
-							: DEFAULT_CONFIG.noInstall,
+						"install" in options ? !options.install : DEFAULT_CONFIG.noInstall,
 					packageManager:
 						flagConfig.packageManager ?? DEFAULT_CONFIG.packageManager,
 					addons: flagConfig.addons?.length
@@ -153,9 +161,7 @@ async function main() {
 							: flagConfig.database === "sqlite"
 								? DEFAULT_CONFIG.turso
 								: false,
-					backendFramework: options.hono
-						? "hono"
-						: DEFAULT_CONFIG.backendFramework,
+					backendFramework: backendFramework ?? DEFAULT_CONFIG.backendFramework,
 					runtime: options.runtime
 						? (options.runtime as Runtime)
 						: DEFAULT_CONFIG.runtime,
