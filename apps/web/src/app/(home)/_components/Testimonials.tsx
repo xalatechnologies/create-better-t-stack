@@ -30,11 +30,7 @@ const testimonials = [
 const Testimonials = () => {
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-	const duplicatedTestimonials = [
-		...testimonials,
-		...testimonials,
-		...testimonials,
-	];
+	const duplicatedTestimonials = [...testimonials];
 
 	return (
 		<section className="py-20 relative overflow-hidden w-screen">

@@ -1,9 +1,10 @@
-import { motion } from "motion/react";
-import CustomizableStack from "./CustomizableStack";
+import { motion } from "framer-motion";
+import { Code, Sliders, Terminal, TerminalSquare } from "lucide-react";
+import StackArchitect from "./StackArchitech";
 
 export default function CustomizableSection() {
 	return (
-		<section className="w-full max-w-6xl mx-auto space-y-12 mt-24 relative z-50">
+		<section className="w-full max-w-7xl mx-auto space-y-12 mt-24 relative z-50 px-4">
 			<div className="text-center space-y-6 relative z-10 border dark:border-gray-700/30 border-gray-500/30 p-6 rounded-md bg-white/80 dark:bg-gray-950/30 backdrop-blur-sm">
 				<div className="relative">
 					<motion.h2
@@ -39,32 +40,78 @@ export default function CustomizableSection() {
 					</p>
 
 					<div className="flex flex-wrap justify-center sm:gap-4 gap-2 sm:text-sm text-xs text-gray-600 dark:text-gray-400">
-						<span className="px-3 py-1 bg-gray-100 dark:bg-black border border-gray-300 dark:border-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-900/50 transition-colors">
-							--multiple-database-options
-						</span>
-						<span className="px-3 py-1 bg-gray-100 dark:bg-black border border-gray-300 dark:border-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-900/50 transition-colors">
-							--flexible-authentication
-						</span>
-						<span className="px-3 py-1 bg-gray-100 dark:bg-black border border-gray-300 dark:border-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-900/50 transition-colors">
-							--alternative-orms
-						</span>
-						<span className="px-3 py-1 bg-gray-100 dark:bg-black border border-gray-300 dark:border-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-900/50 transition-colors">
-							--framework-choices
-						</span>
+						<div className="px-3 py-1 bg-gray-100 dark:bg-black/30 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-900/50 transition-colors flex items-center gap-1.5">
+							<Terminal className="h-3.5 w-3.5" />
+							<span>--multiple-runtimes</span>
+						</div>
+						<div className="px-3 py-1 bg-gray-100 dark:bg-black/30 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-900/50 transition-colors flex items-center gap-1.5">
+							<Code className="h-3.5 w-3.5" />
+							<span>--framework-choices</span>
+						</div>
+						<div className="px-3 py-1 bg-gray-100 dark:bg-black/30 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-900/50 transition-colors flex items-center gap-1.5">
+							<TerminalSquare className="h-3.5 w-3.5" />
+							<span>--database-options</span>
+						</div>
+						<div className="px-3 py-1 bg-gray-100 dark:bg-black/30 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-900/50 transition-colors flex items-center gap-1.5">
+							<Sliders className="h-3.5 w-3.5" />
+							<span>--customizable-addons</span>
+						</div>
 					</div>
 				</motion.div>
+
+				<motion.div
+					initial={{ opacity: 0, y: 10 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.3, delay: 0.3 }}
+					className="flex flex-wrap justify-center gap-3 pt-2"
+				>
+					<Badge color="amber">Bun or Node</Badge>
+					<Badge color="blue">Hono or Elysia</Badge>
+					<Badge color="indigo">SQLite or PostgreSQL</Badge>
+					<Badge color="cyan">Drizzle or Prisma</Badge>
+					<Badge color="green">Authentication Options</Badge>
+					<Badge color="violet">Optional Addons</Badge>
+				</motion.div>
+
 				<div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 -z-10" />
 			</div>
 
 			<motion.div
-				initial={{ opacity: 0, scale: 0.95 }}
-				whileInView={{ opacity: 1, scale: 1 }}
+				initial={{ opacity: 0, y: 30 }}
+				whileInView={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5, delay: 0.4 }}
 				className="relative"
 			>
-				<div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-3xl" />
-				<CustomizableStack />
+				<div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-3xl -z-10" />
+				<StackArchitect />
 			</motion.div>
 		</section>
+	);
+}
+
+// Helper component for colored badge pills
+function Badge({
+	children,
+	color,
+}: { children: React.ReactNode; color: string }) {
+	const colorMap = {
+		amber:
+			"bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+		blue: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+		indigo:
+			"bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
+		cyan: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
+		green:
+			"bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+		violet:
+			"bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
+	};
+
+	return (
+		<span
+			className={`px-2.5 py-1 rounded-full text-xs font-medium ${colorMap[color as keyof typeof colorMap]}`}
+		>
+			{children}
+		</span>
 	);
 }
