@@ -1,24 +1,30 @@
 # Create Better-T-Stack CLI
 
-An interactive CLI tool to quickly scaffold full-stack TypeScript applications with React, Hono, and tRPC. The Better-T-Stack provides a modern, type-safe development experience with the best tools from the TypeScript ecosystem.
+An interactive CLI tool to quickly scaffold full-stack TypeScript applications with a choice of modern backend frameworks (Hono or Elysia) and tRPC. The Better-T-Stack provides a type-safe development experience with the best tools from the TypeScript ecosystem.
 
 ## Quick Start
 
 Run without installing globally:
 
 ```bash
+# Using npm
 npx create-better-t-stack@latest
-# OR
-bunx create-better-t-stack
+
+# Using bun
+bun create better-t-stack@latest
+
+# Using pnpm
+pnpm create better-t-stack@latest
 ```
 
-Follow the prompts to configure your project.
+Follow the prompts to configure your project or use the `-y` flag for defaults.
 
 ## Features
 
 - **Monorepo**: Turborepo for optimized build system and workspace management
 - **Frontend**: React, TanStack Router, TanStack Query, Tailwind CSS with shadcn/ui components
-- **Backend**: Hono, tRPC
+- **Backend Frameworks**: Choose between Hono or Elysia
+- **API Layer**: End-to-end type safety with tRPC
 - **Runtime Options**: Choose between Bun or Node.js for your server
 - **Database Options**: SQLite (via Turso), PostgreSQL, or no database
 - **ORM Selection**: Choose between Drizzle ORM or Prisma
@@ -36,33 +42,35 @@ Follow the prompts to configure your project.
 Usage: create-better-t-stack [project-directory] [options]
 
 Options:
-  -V, --version         Output the version number
-  -y, --yes             Use default configuration
-  --no-database         Skip database setup
-  --sqlite              Use SQLite database
-  --postgres            Use PostgreSQL database
-  --auth                Include authentication
-  --no-auth             Disable authentication
-  --pwa                 Include Progressive Web App support
-  --tauri               Include Tauri desktop app support
-  --biome               Include Biome for linting and formatting
-  --husky               Include Husky, lint-staged for Git hooks
-  --no-addons           Skip all additional addons
-  --examples <examples> Include specified examples
-  --no-examples         Skip all examples
-  --git                 Initialize a new git repo (default)
-  --no-git              Skip git initialization
-  --npm                 Use npm as package manager
-  --pnpm                Use pnpm as package manager
-  --bun                 Use bun as package manager
-  --drizzle             Use Drizzle ORM
-  --prisma              Use Prisma ORM
-  --install             Install dependencies (default)
-  --no-install          Skip installing dependencies
-  --turso               Set up Turso for SQLite database (default with sqlite)
-  --no-turso            Skip Turso setup for SQLite database
-  --runtime <runtime>   Specify runtime (bun or node)
-  -h, --help            Display help
+  -V, --version          Output the version number
+  -y, --yes              Use default configuration
+  --no-database          Skip database setup
+  --sqlite               Use SQLite database
+  --postgres             Use PostgreSQL database
+  --auth                 Include authentication
+  --no-auth              Exclude authentication
+  --pwa                  Include Progressive Web App support
+  --tauri                Include Tauri desktop app support
+  --biome                Include Biome for linting and formatting
+  --husky                Include Husky, lint-staged for Git hooks
+  --no-addons            Skip all additional addons
+  --examples <examples>  Include specified examples
+  --no-examples          Skip all examples
+  --git                  Include git setup (default)
+  --no-git               Skip git initialization
+  --npm                  Use npm as package manager
+  --pnpm                 Use pnpm as package manager
+  --bun                  Use bun as package manager
+  --drizzle              Use Drizzle ORM
+  --prisma               Use Prisma ORM
+  --install              Install dependencies (default)
+  --no-install           Skip installing dependencies
+  --turso                Set up Turso for SQLite database
+  --no-turso             Skip Turso setup for SQLite database
+  --hono                 Use Hono backend framework (default)
+  --elysia               Use Elysia backend framework
+  --runtime <runtime>    Specify runtime (bun or node)
+  -h, --help             Display help
 ```
 
 ## Examples
@@ -74,16 +82,17 @@ npx create-better-t-stack my-app -y
 
 Create a project with specific options:
 ```bash
-npx create-better-t-stack my-app --postgres --prisma --auth --pwa --biome
+npx create-better-t-stack my-app --postgres --drizzle --auth --pwa --biome
 ```
 
-Create a project with Node.js runtime:
+Create a project with Elysia and Node.js runtime:
 ```bash
-npx create-better-t-stack my-app --runtime node
+npx create-better-t-stack my-app --elysia --runtime node
 ```
 
-## License
-
-MIT
+Create a project using Hono with no addons:
+```bash
+npx create-better-t-stack my-app --hono --no-addons
+```
 
 Created by [Aman Varshney](https://github.com/AmanVarshney01) & [Nitish Singh](https://github.com/FgrReloaded)
