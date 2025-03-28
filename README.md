@@ -54,8 +54,10 @@ bun dev:cli
 bun dev:web
 ```
 
-## Contributing
+## Contributors
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+<a href="https://github.com/better-t-stack/create-better-t-stack/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=better-t-stack/create-better-t-stack" />
+</a>
 
-Created by [Aman Varshney](https://github.com/AmanVarshney01) & [Nitish Singh](https://github.com/FgrReloaded)
+Made with [contrib.rocks](https://contrib.rocks).
