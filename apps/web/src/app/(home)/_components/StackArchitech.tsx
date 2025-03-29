@@ -342,7 +342,7 @@ const DEFAULT_STACK: StackState = {
 const StackArchitect = () => {
 	const [stack, setStack] = useState<StackState>(DEFAULT_STACK);
 	const [command, setCommand] = useState("npx create-better-t-stack my-app -y");
-	const [activeTab, setActiveTab] = useState("database");
+	const [activeTab, setActiveTab] = useState("frontend");
 	const [copied, setCopied] = useState(false);
 
 	useEffect(() => {
@@ -453,13 +453,32 @@ const StackArchitect = () => {
 						return {
 							...prev,
 							frontend: [],
+							auth: "false",
 						};
 					}
 
 					if (currentSelection.includes(techId)) {
+						if (
+							techId === "web" &&
+							currentSelection.filter((id) => id !== techId).length === 0
+						) {
+							return {
+								...prev,
+								frontend: currentSelection.filter((id) => id !== techId),
+								auth: "false",
+							};
+						}
 						return {
 							...prev,
 							frontend: currentSelection.filter((id) => id !== techId),
+						};
+					}
+
+					if (techId === "web") {
+						return {
+							...prev,
+							frontend: [...currentSelection, techId],
+							auth: "true",
 						};
 					}
 
@@ -598,7 +617,8 @@ const StackArchitect = () => {
 
 									const isDisabled =
 										(activeTab === "orm" && stack.database === "none") ||
-										(activeTab === "turso" && stack.database !== "sqlite");
+										(activeTab === "turso" && stack.database !== "sqlite") ||
+										(activeTab === "auth" && !stack.frontend.includes("web"));
 
 									return (
 										<motion.div
