@@ -1,15 +1,20 @@
 import path from "node:path";
 import fs from "fs-extra";
 import { PKG_ROOT } from "../constants";
-import type { ProjectOrm } from "../types";
+import type { ProjectFrontend, ProjectOrm } from "../types";
 
 export async function setupExamples(
 	projectDir: string,
 	examples: string[],
 	orm: ProjectOrm,
 	auth: boolean,
+	frontend: ProjectFrontend[] = ["web"],
 ): Promise<void> {
-	if (examples.includes("todo")) {
+	const hasWebFrontend = frontend.includes("web");
+
+	const webAppExists = await fs.pathExists(path.join(projectDir, "apps/web"));
+
+	if (examples.includes("todo") && hasWebFrontend && webAppExists) {
 		await setupTodoExample(projectDir, orm, auth);
 	} else {
 		await cleanupTodoFiles(projectDir, orm);

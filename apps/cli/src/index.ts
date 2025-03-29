@@ -122,13 +122,13 @@ async function main() {
 			}),
 			...((options.web !== undefined || options.native !== undefined) && {
 				frontend: [
-					...(options.web === false ? [] : options.web === true ? ["web"] : []),
+					...(options.web === false ? [] : ["web"]),
 					...(options.native === false
 						? []
 						: options.native === true
 							? ["native"]
 							: []),
-				] as ProjectFrontend[],
+				].filter(Boolean) as ProjectFrontend[],
 			}),
 		};
 
@@ -137,7 +137,6 @@ async function main() {
 			log.message(displayConfig(flagConfig));
 			log.message("");
 		}
-
 		const config = options.yes
 			? {
 					...DEFAULT_CONFIG,
@@ -180,6 +179,13 @@ async function main() {
 					runtime: options.runtime
 						? (options.runtime as Runtime)
 						: DEFAULT_CONFIG.runtime,
+					frontend:
+						options.web === false || options.native === true
+							? ([
+									...(options.web === false ? [] : ["web"]),
+									...(options.native ? ["native"] : []),
+								] as ProjectFrontend[])
+							: DEFAULT_CONFIG.frontend,
 				}
 			: await gatherConfig(flagConfig);
 

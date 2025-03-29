@@ -65,9 +65,9 @@ export async function gatherConfig(
 				results.database === "sqlite" && results.orm !== "prisma"
 					? getTursoSetupChoice(flags.turso)
 					: Promise.resolve(false),
-			addons: () => getAddonsChoice(flags.addons),
+			addons: ({ results }) => getAddonsChoice(flags.addons, results.frontend),
 			examples: ({ results }) =>
-				getExamplesChoice(flags.examples, results.database),
+				getExamplesChoice(flags.examples, results.database, results.frontend),
 			git: () => getGitChoice(flags.git),
 			packageManager: () => getPackageManagerChoice(flags.packageManager),
 			noInstall: () => getNoInstallChoice(flags.noInstall),

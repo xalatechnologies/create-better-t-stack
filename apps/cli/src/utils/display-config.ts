@@ -8,6 +8,12 @@ export function displayConfig(config: Partial<ProjectConfig>) {
 		configDisplay.push(`${pc.blue("Project Name:")} ${config.projectName}`);
 	}
 
+	if (config.frontend !== undefined) {
+		const frontendText =
+			config.frontend.length > 0 ? config.frontend.join(", ") : "none";
+		configDisplay.push(`${pc.blue("Frontend:")} ${frontendText}`);
+	}
+
 	if (config.backendFramework !== undefined) {
 		configDisplay.push(
 			`${pc.blue("Backend Framework:")} ${config.backendFramework}`,

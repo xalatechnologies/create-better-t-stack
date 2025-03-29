@@ -71,6 +71,7 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			options.examples,
 			options.orm,
 			options.auth,
+			options.frontend,
 		);
 
 		await setupEnvironmentVariables(projectDir, options);
@@ -78,7 +79,12 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		await initializeGit(projectDir, options.git);
 
 		if (options.addons.length > 0) {
-			await setupAddons(projectDir, options.addons, options.packageManager);
+			await setupAddons(
+				projectDir,
+				options.addons,
+				options.packageManager,
+				options.frontend,
+			);
 		}
 
 		await updatePackageConfigurations(projectDir, options);

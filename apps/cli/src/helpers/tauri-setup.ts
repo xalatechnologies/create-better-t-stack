@@ -13,6 +13,10 @@ export async function setupTauri(
 	const s = spinner();
 	const clientPackageDir = path.join(projectDir, "apps/web");
 
+	if (!(await fs.pathExists(clientPackageDir))) {
+		return;
+	}
+
 	try {
 		s.start("Setting up Tauri desktop app support...");
 

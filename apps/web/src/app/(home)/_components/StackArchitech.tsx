@@ -6,6 +6,7 @@ import {
 	Circle,
 	CircleCheck,
 	ClipboardCopy,
+	InfoIcon,
 	Terminal,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -41,7 +42,7 @@ const triggerConfetti = () => {
 		const animate = () => {
 			posX += vx;
 			posY += vy;
-			vy += 0.1; // Gravity
+			vy += 0.1;
 			opacity -= 0.01;
 			rotation += 5;
 
@@ -66,6 +67,31 @@ const triggerConfetti = () => {
 			createConfettiElement(colors[Math.floor(Math.random() * colors.length)]);
 		}, Math.random() * 500);
 	}
+};
+
+const validateProjectName = (name: string): string | undefined => {
+	const INVALID_CHARS = ["<", ">", ":", '"', "|", "?", "*"];
+	const MAX_LENGTH = 255;
+
+	if (name === ".") return undefined;
+
+	if (!name) return "Project name cannot be empty";
+	if (name.length > MAX_LENGTH) {
+		return `Project name must be less than ${MAX_LENGTH} characters`;
+	}
+	if (INVALID_CHARS.some((char) => name.includes(char))) {
+		return "Project name contains invalid characters";
+	}
+	if (name.startsWith(".") || name.startsWith("-")) {
+		return "Project name cannot start with a dot or dash";
+	}
+	if (
+		name.toLowerCase() === "node_modules" ||
+		name.toLowerCase() === "favicon.ico"
+	) {
+		return "Project name is reserved";
+	}
+	return undefined;
 };
 
 const TECH_OPTIONS = {
@@ -310,6 +336,7 @@ const TECH_OPTIONS = {
 };
 
 interface StackState {
+	projectName: string;
 	frontend: string[];
 	runtime: string;
 	backendFramework: string;
@@ -325,6 +352,7 @@ interface StackState {
 }
 
 const DEFAULT_STACK: StackState = {
+	projectName: "my-better-t-app",
 	frontend: ["web"],
 	runtime: "bun",
 	backendFramework: "hono",
@@ -341,13 +369,65 @@ const DEFAULT_STACK: StackState = {
 
 const StackArchitect = () => {
 	const [stack, setStack] = useState<StackState>(DEFAULT_STACK);
-	const [command, setCommand] = useState("npx create-better-t-stack my-app -y");
+	const [command, setCommand] = useState(
+		"npx create-better-t-stack my-better-t-app --yes",
+	);
 	const [activeTab, setActiveTab] = useState("frontend");
 	const [copied, setCopied] = useState(false);
+	const [compatNotes, setCompatNotes] = useState<Record<string, string[]>>({});
+	const [projectNameError, setProjectNameError] = useState<string | undefined>(
+		undefined,
+	);
+
+	useEffect(() => {
+		if (!stack.frontend.includes("web") && stack.auth === "true") {
+			setStack((prev) => ({
+				...prev,
+				auth: "false",
+			}));
+		}
+	}, [stack.frontend, stack.auth]);
 
 	useEffect(() => {
 		const cmd = generateCommand(stack);
 		setCommand(cmd);
+
+		const notes: Record<string, string[]> = {};
+
+		notes.frontend = [];
+
+		notes.auth = [];
+		if (!stack.frontend.includes("web") && stack.auth === "true") {
+			notes.auth.push("Authentication is only available with React Web.");
+		}
+
+		notes.addons = [];
+		if (!stack.frontend.includes("web")) {
+			notes.addons.push("PWA and Tauri are only available with React Web.");
+		}
+
+		notes.database = [];
+
+		notes.orm = [];
+		if (stack.database === "none") {
+			notes.orm.push(
+				"ORM options are only available when a database is selected.",
+			);
+		}
+
+		notes.turso = [];
+		if (stack.database !== "sqlite") {
+			notes.turso.push(
+				"Turso integration is only available with SQLite database.",
+			);
+		}
+
+		notes.examples = [];
+		if (!stack.frontend.includes("web")) {
+			notes.examples.push("Todo example is only available with React Web.");
+		}
+
+		setCompatNotes(notes);
 	}, [stack]);
 
 	const generateCommand = useCallback((stackState: StackState) => {
@@ -360,7 +440,7 @@ const StackArchitect = () => {
 			base = "bun create better-t-stack@latest";
 		}
 
-		const projectName = "my-better-t-app";
+		const projectName = stackState.projectName || "my-better-t-app";
 		const flags: string[] = [];
 
 		const isAllDefault =
@@ -452,39 +532,80 @@ const StackArchitect = () => {
 					if (techId === "none") {
 						return {
 							...prev,
-							frontend: [],
+							frontend: ["none"],
 							auth: "false",
+							examples: prev.examples.filter((ex) => ex !== "todo"),
+							addons: prev.addons.filter(
+								(addon) => addon !== "pwa" && addon !== "tauri",
+							),
 						};
 					}
 
 					if (currentSelection.includes(techId)) {
-						if (
-							techId === "web" &&
-							currentSelection.filter((id) => id !== techId).length === 0
-						) {
+						if (techId === "web") {
+							const newFrontend = currentSelection.filter(
+								(id) => id !== techId,
+							);
+
+							if (newFrontend.length === 0) {
+								return {
+									...prev,
+									frontend: ["none"],
+									auth: "false",
+									examples: prev.examples.filter((ex) => ex !== "todo"),
+									addons: prev.addons.filter(
+										(addon) => addon !== "pwa" && addon !== "tauri",
+									),
+								};
+							}
+
 							return {
 								...prev,
-								frontend: currentSelection.filter((id) => id !== techId),
+								frontend: newFrontend,
 								auth: "false",
+								examples: prev.examples.filter((ex) => ex !== "todo"),
+								addons: prev.addons.filter(
+									(addon) => addon !== "pwa" && addon !== "tauri",
+								),
 							};
 						}
+
+						const newFrontend = currentSelection.filter((id) => id !== techId);
+
+						if (newFrontend.length === 0) {
+							return {
+								...prev,
+								frontend: ["none"],
+								auth: "false",
+								addons: prev.addons.filter(
+									(addon) => addon !== "pwa" && addon !== "tauri",
+								),
+							};
+						}
+
 						return {
 							...prev,
-							frontend: currentSelection.filter((id) => id !== techId),
+							frontend: newFrontend,
 						};
 					}
 
 					if (techId === "web") {
+						const cleanedSelection = currentSelection.filter(
+							(id) => id !== "none",
+						);
 						return {
 							...prev,
-							frontend: [...currentSelection, techId],
+							frontend: [...cleanedSelection, techId],
 							auth: "true",
 						};
 					}
 
+					const cleanedSelection = currentSelection.filter(
+						(id) => id !== "none",
+					);
 					return {
 						...prev,
-						frontend: [...currentSelection, techId],
+						frontend: [...cleanedSelection, techId],
 					};
 				}
 
@@ -495,6 +616,20 @@ const StackArchitect = () => {
 					if (index >= 0) {
 						currentArray.splice(index, 1);
 					} else {
+						if (
+							category === "examples" &&
+							techId === "todo" &&
+							!prev.frontend.includes("web")
+						) {
+							return prev;
+						}
+						if (
+							category === "addons" &&
+							(techId === "pwa" || techId === "tauri") &&
+							!prev.frontend.includes("web")
+						) {
+							return prev;
+						}
 						currentArray.push(techId);
 					}
 
@@ -510,6 +645,7 @@ const StackArchitect = () => {
 							...prev,
 							database: techId,
 							orm: null,
+							turso: "false",
 						};
 					}
 
@@ -520,22 +656,24 @@ const StackArchitect = () => {
 							orm: "drizzle",
 						};
 					}
-				}
 
-				if (category === "database" && techId === "sqlite") {
-					return {
-						...prev,
-						database: techId,
-						turso: prev.turso,
-					};
-				}
+					if (techId === "sqlite") {
+						return {
+							...prev,
+							database: techId,
+							turso: prev.turso,
+						};
+					}
 
-				if (category === "database" && techId !== "sqlite") {
 					return {
 						...prev,
 						database: techId,
 						turso: "false",
 					};
+				}
+
+				if (category === "turso" && prev.database !== "sqlite") {
+					return prev;
 				}
 
 				return {
@@ -582,8 +720,34 @@ const StackArchitect = () => {
 						</button>
 					</div>
 				</div>
-
 				<div className="p-4 font-mono">
+					<div className="mb-4">
+						<label className="flex flex-col mb-2">
+							<span className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+								Project Name:
+							</span>
+							<div className="flex items-center">
+								<input
+									type="text"
+									value={stack.projectName || ""}
+									onChange={(e) => {
+										const newValue = e.target.value;
+										setStack((prev) => ({ ...prev, projectName: newValue }));
+										setProjectNameError(validateProjectName(newValue));
+									}}
+									className={`bg-gray-200 dark:bg-gray-800 border ${
+										projectNameError
+											? "border-red-500 dark:border-red-500"
+											: "border-gray-300 dark:border-gray-700"
+									} rounded px-2 py-1 font-mono text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400`}
+									placeholder="my-better-t-app"
+								/>
+							</div>
+							{projectNameError && (
+								<p className="text-red-500 text-xs mt-1">{projectNameError}</p>
+							)}
+						</label>
+					</div>
 					<div className="mb-4">
 						<div className="flex">
 							<span className="text-green-600 dark:text-green-400 mr-2">$</span>
@@ -592,7 +756,19 @@ const StackArchitect = () => {
 							</code>
 						</div>
 					</div>
-
+					{compatNotes[activeTab] && compatNotes[activeTab].length > 0 && (
+						<div className="mb-4 p-3 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+							<div className="flex items-center gap-2 mb-2 text-sm font-medium text-blue-800 dark:text-blue-300">
+								<InfoIcon className="h-4 w-4" />
+								<span>Compatibility Notes</span>
+							</div>
+							<ul className="list-disc list-inside text-xs text-blue-700 dark:text-blue-400 space-y-1">
+								{compatNotes[activeTab].map((note) => (
+									<li key={note}>{note}</li>
+								))}
+							</ul>
+						</div>
+					)}
 					<div className="border-t border-gray-300 dark:border-gray-700 pt-4 mt-4">
 						<div className="mb-3 text-gray-600 dark:text-gray-400 flex items-center">
 							<Terminal className="w-4 h-4 mr-2" />
@@ -618,7 +794,13 @@ const StackArchitect = () => {
 									const isDisabled =
 										(activeTab === "orm" && stack.database === "none") ||
 										(activeTab === "turso" && stack.database !== "sqlite") ||
-										(activeTab === "auth" && !stack.frontend.includes("web"));
+										(activeTab === "auth" && !stack.frontend.includes("web")) ||
+										(activeTab === "examples" &&
+											tech.id === "todo" &&
+											!stack.frontend.includes("web")) ||
+										(activeTab === "addons" &&
+											(tech.id === "pwa" || tech.id === "tauri") &&
+											!stack.frontend.includes("web"));
 
 									return (
 										<motion.div
@@ -768,7 +950,6 @@ const StackArchitect = () => {
 						</div>
 					</div>
 				</div>
-
 				<div className="bg-gray-200 dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 flex overflow-x-auto">
 					{Object.keys(TECH_OPTIONS).map((category) => (
 						<button

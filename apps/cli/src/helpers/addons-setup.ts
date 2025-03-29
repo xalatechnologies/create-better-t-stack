@@ -1,7 +1,7 @@
 import path from "node:path";
 import fs from "fs-extra";
 import { PKG_ROOT } from "../constants";
-import type { PackageManager, ProjectAddons } from "../types";
+import type { PackageManager, ProjectAddons, ProjectFrontend } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 import { setupTauri } from "./tauri-setup";
 
@@ -9,14 +9,17 @@ export async function setupAddons(
 	projectDir: string,
 	addons: ProjectAddons[],
 	packageManager: PackageManager,
+	frontends: ProjectFrontend[],
 ) {
+	const hasWebFrontend = frontends.includes("web");
+
 	// if (addons.includes("docker")) {
 	// 	await setupDocker(projectDir);
 	// }
-	if (addons.includes("pwa")) {
+	if (addons.includes("pwa") && hasWebFrontend) {
 		await setupPwa(projectDir);
 	}
-	if (addons.includes("tauri")) {
+	if (addons.includes("tauri") && hasWebFrontend) {
 		await setupTauri(projectDir, packageManager);
 	}
 	if (addons.includes("biome")) {
@@ -88,6 +91,10 @@ async function setupPwa(projectDir: string) {
 	}
 
 	const clientPackageDir = path.join(projectDir, "apps/web");
+
+	if (!(await fs.pathExists(clientPackageDir))) {
+		return;
+	}
 
 	addPackageDependency({
 		dependencies: ["vite-plugin-pwa"],
