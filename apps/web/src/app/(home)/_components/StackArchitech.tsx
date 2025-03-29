@@ -69,6 +69,32 @@ const triggerConfetti = () => {
 };
 
 const TECH_OPTIONS = {
+	frontend: [
+		{
+			id: "web",
+			name: "React Web",
+			description: "React with TanStack Router",
+			icon: "🌐",
+			color: "from-blue-400 to-blue-600",
+			default: true,
+		},
+		{
+			id: "native",
+			name: "React Native",
+			description: "Expo with NativeWind",
+			icon: "📱",
+			color: "from-purple-400 to-purple-600",
+			default: false,
+		},
+		{
+			id: "none",
+			name: "No Frontend",
+			description: "API-only backend",
+			icon: "⚙️",
+			color: "from-gray-400 to-gray-600",
+			default: false,
+		},
+	],
 	runtime: [
 		{
 			id: "bun",
@@ -284,6 +310,7 @@ const TECH_OPTIONS = {
 };
 
 interface StackState {
+	frontend: string[];
 	runtime: string;
 	backendFramework: string;
 	database: string;
@@ -298,6 +325,7 @@ interface StackState {
 }
 
 const DEFAULT_STACK: StackState = {
+	frontend: ["web"],
 	runtime: "bun",
 	backendFramework: "hono",
 	database: "sqlite",
@@ -323,11 +351,21 @@ const StackArchitect = () => {
 	}, [stack]);
 
 	const generateCommand = useCallback((stackState: StackState) => {
-		const base = "npx create-better-t-stack";
-		const projectName = "my-better-t-app";
-		const flags: string[] = ["-y"];
+		let base: string;
+		if (stackState.packageManager === "npm") {
+			base = "npx create-better-t-stack@latest";
+		} else if (stackState.packageManager === "pnpm") {
+			base = "pnpm create better-t-stack@latest";
+		} else {
+			base = "bun create better-t-stack@latest";
+		}
 
-		const isDefault =
+		const projectName = "my-better-t-app";
+		const flags: string[] = [];
+
+		const isAllDefault =
+			stackState.frontend.length === 1 &&
+			stackState.frontend[0] === "web" &&
 			stackState.runtime === "bun" &&
 			stackState.backendFramework === "hono" &&
 			stackState.database === "sqlite" &&
@@ -340,14 +378,26 @@ const StackArchitect = () => {
 			stackState.git === "true" &&
 			stackState.install === "true";
 
-		if (isDefault) return `${base} ${projectName} -y`;
-
-		if (stackState.runtime === "node") {
-			flags.push("--runtime node");
+		if (isAllDefault) {
+			return `${base} ${projectName} -y`;
 		}
 
-		if (stackState.backendFramework === "elysia") {
-			flags.push("--elysia");
+		flags.push("-y");
+
+		if (!stackState.frontend.includes("web")) {
+			flags.push("--no-web");
+		}
+
+		if (stackState.frontend.includes("native")) {
+			flags.push("--native");
+		}
+
+		if (stackState.runtime !== "bun") {
+			flags.push(`--runtime ${stackState.runtime}`);
+		}
+
+		if (stackState.backendFramework !== "hono") {
+			flags.push(`--${stackState.backendFramework}`);
 		}
 
 		if (stackState.database === "postgres") {
@@ -356,7 +406,7 @@ const StackArchitect = () => {
 			flags.push("--no-database");
 		}
 
-		if (stackState.orm === "prisma") {
+		if (stackState.orm === "prisma" && stackState.database !== "none") {
 			flags.push("--prisma");
 		}
 
@@ -364,7 +414,7 @@ const StackArchitect = () => {
 			flags.push("--no-auth");
 		}
 
-		if (stackState.turso === "true") {
+		if (stackState.turso === "true" && stackState.database === "sqlite") {
 			flags.push("--turso");
 		}
 
@@ -390,14 +440,35 @@ const StackArchitect = () => {
 			flags.push("--no-install");
 		}
 
-		return flags.length > 0
-			? `${base} ${projectName} ${flags.join(" ")}`
-			: `${base} ${projectName}`;
+		return `${base} ${projectName} ${flags.join(" ")}`;
 	}, []);
 
 	const handleTechSelect = useCallback(
 		(category: keyof typeof TECH_OPTIONS, techId: string) => {
 			setStack((prev) => {
+				if (category === "frontend") {
+					const currentSelection = [...prev.frontend];
+
+					if (techId === "none") {
+						return {
+							...prev,
+							frontend: [],
+						};
+					}
+
+					if (currentSelection.includes(techId)) {
+						return {
+							...prev,
+							frontend: currentSelection.filter((id) => id !== techId),
+						};
+					}
+
+					return {
+						...prev,
+						frontend: [...currentSelection, techId],
+					};
+				}
+
 				if (category === "addons" || category === "examples") {
 					const currentArray = [...(prev[category] || [])];
 					const index = currentArray.indexOf(techId);
@@ -518,6 +589,8 @@ const StackArchitect = () => {
 									let isSelected = false;
 									if (activeTab === "addons" || activeTab === "examples") {
 										isSelected = stack[activeTab].includes(tech.id);
+									} else if (activeTab === "frontend") {
+										isSelected = stack.frontend.includes(tech.id);
 									} else {
 										isSelected =
 											stack[activeTab as keyof StackState] === tech.id;
@@ -591,6 +664,19 @@ const StackArchitect = () => {
 								Selected Stack
 							</div>
 							<div className="flex flex-wrap gap-1">
+								{stack.frontend.map((frontendId) => {
+									const frontend = TECH_OPTIONS.frontend.find(
+										(f) => f.id === frontendId,
+									);
+									return frontend ? (
+										<span
+											key={frontendId}
+											className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-700/30"
+										>
+											{frontend.icon} {frontend.name}
+										</span>
+									) : null;
+								})}
 								<span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/30">
 									{
 										TECH_OPTIONS.runtime.find((t) => t.id === stack.runtime)
