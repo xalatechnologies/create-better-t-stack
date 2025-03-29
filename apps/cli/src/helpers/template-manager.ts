@@ -1,7 +1,12 @@
 import path from "node:path";
 import fs from "fs-extra";
 import { PKG_ROOT } from "../constants";
-import type { BackendFramework, ProjectDatabase, ProjectOrm } from "../types";
+import type {
+	BackendFramework,
+	ProjectDatabase,
+	ProjectFrontend,
+	ProjectOrm,
+} from "../types";
 
 export async function copyBaseTemplate(projectDir: string): Promise<void> {
 	const templateDir = path.join(PKG_ROOT, "template/base");
@@ -9,6 +14,30 @@ export async function copyBaseTemplate(projectDir: string): Promise<void> {
 		throw new Error(`Template directory not found: ${templateDir}`);
 	}
 	await fs.copy(templateDir, projectDir);
+}
+
+export async function setupFrontendTemplates(
+	projectDir: string,
+	frontends: ProjectFrontend[],
+): Promise<void> {
+	if (!frontends.includes("web")) {
+		const webDir = path.join(projectDir, "apps/web");
+		if (await fs.pathExists(webDir)) {
+			await fs.remove(webDir);
+		}
+	}
+
+	if (!frontends.includes("native")) {
+		const nativeDir = path.join(projectDir, "apps/native");
+		if (await fs.pathExists(nativeDir)) {
+			await fs.remove(nativeDir);
+		}
+	} else {
+		await fs.writeFile(
+			path.join(projectDir, ".npmrc"),
+			"node-linker=hoisted\n",
+		);
+	}
 }
 
 export async function setupBackendFramework(
@@ -67,8 +96,8 @@ export async function setupAuthTemplate(
 
 	const authTemplateDir = path.join(PKG_ROOT, "template/with-auth");
 	if (await fs.pathExists(authTemplateDir)) {
-		const clientAuthDir = path.join(authTemplateDir, "apps/client");
-		const projectClientDir = path.join(projectDir, "apps/client");
+		const clientAuthDir = path.join(authTemplateDir, "apps/web");
+		const projectClientDir = path.join(projectDir, "apps/web");
 		await fs.copy(clientAuthDir, projectClientDir, { overwrite: true });
 
 		const serverAuthDir = path.join(authTemplateDir, "apps/server/src");
@@ -118,7 +147,8 @@ export async function setupAuthTemplate(
 export async function fixGitignoreFiles(projectDir: string): Promise<void> {
 	const gitignorePaths = [
 		path.join(projectDir, "_gitignore"),
-		path.join(projectDir, "apps/client/_gitignore"),
+		path.join(projectDir, "apps/web/_gitignore"),
+		path.join(projectDir, "apps/native/_gitignore"),
 		path.join(projectDir, "apps/server/_gitignore"),
 	];
 

@@ -21,7 +21,7 @@ export async function getORMChoice(
 			{
 				value: "prisma",
 				label: "Prisma",
-				hint: "Powerful, feature-rich ORM with schema migrations",
+				hint: "Powerful, feature-rich ORM",
 			},
 		],
 		initialValue: DEFAULT_CONFIG.orm,

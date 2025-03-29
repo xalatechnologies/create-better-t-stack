@@ -18,6 +18,7 @@ import {
 	fixGitignoreFiles,
 	setupAuthTemplate,
 	setupBackendFramework,
+	setupFrontendTemplates,
 	setupOrmTemplate,
 } from "./template-manager";
 
@@ -29,6 +30,8 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		await fs.ensureDir(projectDir);
 
 		await copyBaseTemplate(projectDir);
+		await setupFrontendTemplates(projectDir, options.frontend);
+
 		await fixGitignoreFiles(projectDir);
 
 		await setupBackendFramework(projectDir, options.backendFramework);
@@ -89,6 +92,7 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			options.orm,
 			options.addons,
 			options.runtime,
+			options.frontend,
 		);
 
 		return projectDir;

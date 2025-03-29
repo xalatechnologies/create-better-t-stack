@@ -7,6 +7,7 @@ import type {
 	ProjectConfig,
 	ProjectDatabase,
 	ProjectExamples,
+	ProjectFrontend,
 	ProjectOrm,
 	Runtime,
 } from "../types";
@@ -15,6 +16,7 @@ import { getAuthChoice } from "./auth";
 import { getBackendFrameworkChoice } from "./backend-framework";
 import { getDatabaseChoice } from "./database";
 import { getExamplesChoice } from "./examples";
+import { getFrontendChoice } from "./frontend-option";
 import { getGitChoice } from "./git";
 import { getNoInstallChoice } from "./install";
 import { getORMChoice } from "./orm";
@@ -36,6 +38,7 @@ type PromptGroupResults = {
 	turso: boolean;
 	backendFramework: BackendFramework;
 	runtime: Runtime;
+	frontend: ProjectFrontend[];
 };
 
 export async function gatherConfig(
@@ -46,13 +49,18 @@ export async function gatherConfig(
 			projectName: async () => {
 				return getProjectName(flags.projectName);
 			},
+			frontend: () => getFrontendChoice(flags.frontend),
 			backendFramework: () => getBackendFrameworkChoice(flags.backendFramework),
 			runtime: () => getRuntimeChoice(flags.runtime),
 			database: () => getDatabaseChoice(flags.database),
 			orm: ({ results }) =>
 				getORMChoice(flags.orm, results.database !== "none"),
 			auth: ({ results }) =>
-				getAuthChoice(flags.auth, results.database !== "none"),
+				getAuthChoice(
+					flags.auth,
+					results.database !== "none",
+					results.frontend,
+				),
 			turso: ({ results }) =>
 				results.database === "sqlite" && results.orm !== "prisma"
 					? getTursoSetupChoice(flags.turso)
@@ -74,6 +82,7 @@ export async function gatherConfig(
 
 	return {
 		projectName: result.projectName,
+		frontend: result.frontend,
 		database: result.database,
 		orm: result.orm,
 		auth: result.auth,

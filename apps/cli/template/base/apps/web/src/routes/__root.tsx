@@ -2,19 +2,19 @@ import Header from "@/components/header";
 import Loader from "@/components/loader";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { trpcQueryUtils } from "@/main";
+import type { trpcClient } from "@/utils/trpc";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
+  HeadContent,
   Outlet,
   createRootRouteWithContext,
   useRouterState,
-  HeadContent,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import "../index.css";
 
 export interface RouterAppContext {
-  trpcQueryUtils: typeof trpcQueryUtils;
+  trpcClient: typeof trpcClient;
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({

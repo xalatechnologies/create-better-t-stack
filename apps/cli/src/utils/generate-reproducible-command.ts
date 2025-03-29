@@ -35,6 +35,20 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		flags.push(`--runtime ${config.runtime}`);
 	}
 
+	if (config.frontend) {
+		if (config.frontend.includes("web")) {
+			flags.push("--web");
+		} else {
+			flags.push("--no-web");
+		}
+
+		if (config.frontend.includes("native")) {
+			flags.push("--native");
+		} else {
+			flags.push("--no-native");
+		}
+	}
+
 	if (config.addons.length > 0) {
 		for (const addon of config.addons) {
 			flags.push(`--${addon}`);

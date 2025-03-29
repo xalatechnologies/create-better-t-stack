@@ -1,7 +1,8 @@
-import { trpc } from "@/utils/trpc";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trpc } from "@/utils/trpc";
+import { useQuery } from "@tanstack/react-query";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -24,7 +25,7 @@ const TITLE_TEXT = `
  `;
 
 function HomeComponent() {
-  const healthCheck = trpc.healthCheck.useQuery();
+  const healthCheck = useQuery(trpc.healthCheck.queryOptions());
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-2">
@@ -33,9 +34,9 @@ function HomeComponent() {
         <section className="rounded-lg border p-4">
           <h2 className="mb-2 font-medium">API Status</h2>
           <div className="flex items-center gap-2">
-           	<div
-							className={`h-2 w-2 rounded-full ${healthCheck.data ? "bg-green-500" : "bg-red-500"}`}
-						/>
+            <div
+              className={`h-2 w-2 rounded-full ${healthCheck.data ? "bg-green-500" : "bg-red-500"}`}
+            />
             <span className="text-sm text-muted-foreground">
               {healthCheck.isLoading
                 ? "Checking..."

@@ -57,7 +57,7 @@ Then, run the development server:
 ${packageManagerRunCmd} dev
 \`\`\`
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the client application.
+Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
 The API is running at [http://localhost:3000](http://localhost:3000).
 
 ## Project Structure
@@ -65,7 +65,7 @@ The API is running at [http://localhost:3000](http://localhost:3000).
 \`\`\`
 ${projectName}/
 ├── apps/
-│   ├── client/         # Frontend application (React, TanStack Router)
+│   ├── web/         # Frontend application (React, TanStack Router)
 │   └── server/         # Backend API (Hono, tRPC)
 \`\`\`
 
@@ -173,9 +173,9 @@ function generateScriptsList(
 	orm: ProjectOrm,
 	auth: boolean,
 ): string {
-	let scripts = `- \`${packageManagerRunCmd} dev\`: Start both client and server in development mode
-- \`${packageManagerRunCmd} build\`: Build both client and server
-- \`${packageManagerRunCmd} dev:client\`: Start only the client
+	let scripts = `- \`${packageManagerRunCmd} dev\`: Start both web and server in development mode
+- \`${packageManagerRunCmd} build\`: Build both web and server
+- \`${packageManagerRunCmd} dev:web\`: Start only the web application
 - \`${packageManagerRunCmd} dev:server\`: Start only the server
 - \`${packageManagerRunCmd} check-types\`: Check TypeScript types across all apps`;
 

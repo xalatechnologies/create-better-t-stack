@@ -23,8 +23,8 @@ async function setupTodoExample(
 ): Promise<void> {
 	const todoExampleDir = path.join(PKG_ROOT, "template/examples/todo");
 	if (await fs.pathExists(todoExampleDir)) {
-		const todoRouteDir = path.join(todoExampleDir, "apps/client/src/routes");
-		const targetRouteDir = path.join(projectDir, "apps/client/src/routes");
+		const todoRouteDir = path.join(todoExampleDir, "apps/web/src/routes");
+		const targetRouteDir = path.join(projectDir, "apps/web/src/routes");
 		await fs.copy(todoRouteDir, targetRouteDir, { overwrite: true });
 
 		if (orm !== "none") {
@@ -55,7 +55,7 @@ async function updateHeaderWithTodoLink(
 ): Promise<void> {
 	const headerPath = path.join(
 		projectDir,
-		"apps/client/src/components/header.tsx",
+		"apps/web/src/components/header.tsx",
 	);
 
 	if (await fs.pathExists(headerPath)) {
@@ -125,7 +125,7 @@ async function updateRouterIndex(projectDir: string): Promise<void> {
 }
 
 async function addTodoButtonToHomepage(projectDir: string): Promise<void> {
-	const indexPath = path.join(projectDir, "apps/client/src/routes/index.tsx");
+	const indexPath = path.join(projectDir, "apps/web/src/routes/index.tsx");
 
 	if (await fs.pathExists(indexPath)) {
 		let indexContent = await fs.readFile(indexPath, "utf8");

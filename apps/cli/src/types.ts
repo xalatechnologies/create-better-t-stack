@@ -5,6 +5,7 @@ export type ProjectAddons = "pwa" | "biome" | "tauri" | "husky";
 export type BackendFramework = "hono" | "elysia";
 export type Runtime = "node" | "bun";
 export type ProjectExamples = "todo";
+export type ProjectFrontend = "web" | "native";
 
 export interface ProjectConfig {
 	projectName: string;
@@ -19,4 +20,5 @@ export interface ProjectConfig {
 	packageManager: PackageManager;
 	noInstall?: boolean;
 	turso?: boolean;
+	frontend: ProjectFrontend[];
 }

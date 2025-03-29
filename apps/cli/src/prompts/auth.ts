@@ -1,12 +1,26 @@
-import { cancel, confirm, isCancel } from "@clack/prompts";
+import { cancel, confirm, isCancel, log } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
+import type { ProjectFrontend } from "../types";
 
 export async function getAuthChoice(
 	auth: boolean | undefined,
 	hasDatabase: boolean,
+	frontends?: ProjectFrontend[],
 ): Promise<boolean> {
 	if (!hasDatabase) return false;
+
+	const hasNative = frontends?.includes("native");
+	const hasWeb = frontends?.includes("web");
+
+	if (hasNative) {
+		log.warn(
+			pc.yellow("Note: Authentication is not yet available with native"),
+		);
+	}
+
+	if (!hasWeb) return false;
+
 	if (auth !== undefined) return auth;
 
 	const response = await confirm({

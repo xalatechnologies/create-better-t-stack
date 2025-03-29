@@ -20,10 +20,11 @@ pnpm create better-t-stack@latest
 - ⚡️ **Zero-config setup** with interactive CLI wizard
 - 🔄 **End-to-end type safety** from database to frontend via tRPC
 - 🧱 **Modern stack** with React, Hono/Elysia, and TanStack libraries
+- 📱 **Multi-platform** supporting web, mobile (Expo), and desktop applications
 - 🗃️ **Database flexibility** with SQLite (Turso) or PostgreSQL options
 - 🛠️ **ORM choice** between Drizzle or Prisma
 - 🔒 **Built-in authentication** with Better-Auth
-- 📱 **Optional PWA support** for mobile-friendly applications
+- 📱 **Optional PWA support** for installable web applications
 - 🖥️ **Desktop app capabilities** with Tauri integration
 - 📦 **Monorepo architecture** powered by Turborepo
 

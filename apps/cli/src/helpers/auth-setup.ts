@@ -23,7 +23,7 @@ export async function setupAuth(
 	}
 
 	const serverDir = path.join(projectDir, "apps/server");
-	const clientDir = path.join(projectDir, "apps/client");
+	const clientDir = path.join(projectDir, "apps/web");
 
 	try {
 		addPackageDependency({

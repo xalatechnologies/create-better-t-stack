@@ -4,6 +4,7 @@ import type {
 	PackageManager,
 	ProjectAddons,
 	ProjectDatabase,
+	ProjectFrontend,
 	ProjectOrm,
 	Runtime,
 } from "../types";
@@ -13,9 +14,10 @@ export function displayPostInstallInstructions(
 	projectName: string,
 	packageManager: PackageManager,
 	depsInstalled: boolean,
-	orm?: ProjectOrm,
-	addons?: ProjectAddons[],
-	runtime?: Runtime,
+	orm: ProjectOrm,
+	addons: ProjectAddons[],
+	runtime: Runtime,
+	frontends: ProjectFrontend[],
 ) {
 	const runCmd = packageManager === "npm" ? "npm run" : packageManager;
 	const cdCmd = `cd ${projectName}`;
@@ -32,15 +34,29 @@ export function displayPostInstallInstructions(
 	const lintingInstructions = hasHuskyOrBiome
 		? getLintingInstructions(runCmd)
 		: "";
+	const nativeInstructions = frontends?.includes("native")
+		? getNativeInstructions()
+		: "";
+
+	const hasWebFrontend = frontends?.includes("web");
+	const hasNativeFrontend = frontends?.includes("native");
+	const hasFrontend = hasWebFrontend || hasNativeFrontend;
 
 	log.info(`${pc.bold("Next steps:")}
 ${pc.cyan("1.")} ${cdCmd}
 ${!depsInstalled ? `${pc.cyan("2.")} ${packageManager} install\n` : ""}${pc.cyan(depsInstalled ? "2." : "3.")} ${runCmd} dev
 
 ${pc.bold("Your project will be available at:")}
-${pc.cyan("•")} Frontend: http://localhost:3001
-${pc.cyan("•")} API: http://localhost:3000
-${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}`);
+${
+	hasFrontend
+		? `${hasWebFrontend ? `${pc.cyan("•")} Frontend: http://localhost:3001\n` : ""}`
+		: `${pc.yellow("NOTE:")} You are creating a backend-only app (no frontend selected)\n`
+}${pc.cyan("•")} API: http://localhost:3000
+${nativeInstructions ? `\n${nativeInstructions.trim()}` : ""}${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}`);
+}
+
+function getNativeInstructions(): string {
+	return `${pc.yellow("NOTE:")} If the Expo app cannot connect to the server, update the EXPO_PUBLIC_SERVER_URL in apps/native/.env to use your local IP address instead of localhost:\n${pc.dim("EXPO_PUBLIC_SERVER_URL=http://192.168.0.103:3000")}\n`;
 }
 
 function getLintingInstructions(runCmd?: string): string {
@@ -95,5 +111,5 @@ function getDatabaseInstructions(
 }
 
 function getTauriInstructions(runCmd?: string): string {
-	return `${pc.bold("Desktop app with Tauri:")}\n${pc.cyan("•")} Start desktop app: ${pc.dim(`cd apps/client && ${runCmd} desktop:dev`)}\n${pc.cyan("•")} Build desktop app: ${pc.dim(`cd apps/client && ${runCmd} desktop:build`)}\n${pc.yellow("NOTE:")} Tauri requires Rust and platform-specific dependencies. See: ${pc.dim("https://v2.tauri.app/start/prerequisites/")}\n\n`;
+	return `${pc.bold("Desktop app with Tauri:")}\n${pc.cyan("•")} Start desktop app: ${pc.dim(`cd apps/web && ${runCmd} desktop:dev`)}\n${pc.cyan("•")} Build desktop app: ${pc.dim(`cd apps/web && ${runCmd} desktop:build`)}\n${pc.yellow("NOTE:")} Tauri requires Rust and platform-specific dependencies. See: ${pc.dim("https://v2.tauri.app/start/prerequisites/")}\n\n`;
 }

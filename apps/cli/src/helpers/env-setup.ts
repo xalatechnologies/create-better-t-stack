@@ -8,7 +8,6 @@ export async function setupEnvironmentVariables(
 	options: ProjectConfig,
 ): Promise<void> {
 	const serverDir = path.join(projectDir, "apps/server");
-	const clientDir = path.join(projectDir, "apps/client");
 
 	const envPath = path.join(serverDir, ".env");
 	let envContent = "";
@@ -49,16 +48,35 @@ export async function setupEnvironmentVariables(
 
 	await fs.writeFile(envPath, envContent.trim());
 
-	const clientEnvPath = path.join(clientDir, ".env");
-	let clientEnvContent = "";
+	if (options.frontend.includes("web")) {
+		const clientDir = path.join(projectDir, "apps/web");
+		const clientEnvPath = path.join(clientDir, ".env");
+		let clientEnvContent = "";
 
-	if (await fs.pathExists(clientEnvPath)) {
-		clientEnvContent = await fs.readFile(clientEnvPath, "utf8");
+		if (await fs.pathExists(clientEnvPath)) {
+			clientEnvContent = await fs.readFile(clientEnvPath, "utf8");
+		}
+
+		if (!clientEnvContent.includes("VITE_SERVER_URL")) {
+			clientEnvContent += "VITE_SERVER_URL=http://localhost:3000\n";
+		}
+
+		await fs.writeFile(clientEnvPath, clientEnvContent.trim());
 	}
 
-	if (!clientEnvContent.includes("VITE_SERVER_URL")) {
-		clientEnvContent += "VITE_SERVER_URL=http://localhost:3000\n";
-	}
+	if (options.frontend.includes("native")) {
+		const nativeDir = path.join(projectDir, "apps/native");
+		const nativeEnvPath = path.join(nativeDir, ".env");
+		let nativeEnvContent = "";
 
-	await fs.writeFile(clientEnvPath, clientEnvContent.trim());
+		if (await fs.pathExists(nativeEnvPath)) {
+			nativeEnvContent = await fs.readFile(nativeEnvPath, "utf8");
+		}
+
+		if (!nativeEnvContent.includes("EXPO_PUBLIC_SERVER_URL")) {
+			nativeEnvContent += "EXPO_PUBLIC_SERVER_URL=http://localhost:3000\n";
+		}
+
+		await fs.writeFile(nativeEnvPath, nativeEnvContent.trim());
+	}
 }

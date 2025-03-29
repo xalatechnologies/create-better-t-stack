@@ -10,6 +10,7 @@ import type {
 	ProjectAddons,
 	ProjectConfig,
 	ProjectExamples,
+	ProjectFrontend,
 	Runtime,
 } from "./types";
 import { displayConfig } from "./utils/display-config";
@@ -59,6 +60,10 @@ async function main() {
 		.option("--hono", "Use Hono backend framework")
 		.option("--elysia", "Use Elysia backend framework")
 		.option("--runtime <runtime>", "Specify runtime (bun or node)")
+		.option("--web", "Include web frontend")
+		.option("--native", "Include Expo frontend")
+		.option("--no-web", "Exclude web frontend")
+		.option("--no-native", "Exclude Expo frontend")
 		.parse();
 
 	const s = spinner();
@@ -114,6 +119,16 @@ async function main() {
 									.split(",")
 									.filter((e) => e === "todo") as ProjectExamples[])
 							: [],
+			}),
+			...((options.web !== undefined || options.native !== undefined) && {
+				frontend: [
+					...(options.web === false ? [] : options.web === true ? ["web"] : []),
+					...(options.native === false
+						? []
+						: options.native === true
+							? ["native"]
+							: []),
+				] as ProjectFrontend[],
 			}),
 		};
 

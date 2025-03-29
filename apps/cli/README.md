@@ -1,6 +1,6 @@
 # Create Better-T-Stack CLI
 
-An interactive CLI tool to quickly scaffold full-stack TypeScript applications with a choice of modern backend frameworks (Hono or Elysia) and tRPC. The Better-T-Stack provides a type-safe development experience with the best tools from the TypeScript ecosystem.
+A CLI tool for scaffolding type-safe full-stack apps with Hono/Elysia backends, React web frontends, and Expo native apps, all connected through tRPC.
 
 ## Quick Start
 
@@ -23,6 +23,7 @@ Follow the prompts to configure your project or use the `-y` flag for defaults.
 
 - **Monorepo**: Turborepo for optimized build system and workspace management
 - **Frontend**: React, TanStack Router, TanStack Query, Tailwind CSS with shadcn/ui components
+- **Native Apps**: Create React Native apps with Expo for iOS and Android
 - **Backend Frameworks**: Choose between Hono or Elysia
 - **API Layer**: End-to-end type safety with tRPC
 - **Runtime Options**: Choose between Bun or Node.js for your server
@@ -70,6 +71,10 @@ Options:
   --hono                 Use Hono backend framework (default)
   --elysia               Use Elysia backend framework
   --runtime <runtime>    Specify runtime (bun or node)
+  --web                  Include web frontend (default)
+  --native               Include Expo frontend
+  --no-web               Exclude web frontend
+  --no-native            Exclude Expo frontend
   -h, --help             Display help
 ```
 
