@@ -379,10 +379,10 @@ const StackArchitect = () => {
 			stackState.install === "true";
 
 		if (isAllDefault) {
-			return `${base} ${projectName} -y`;
+			return `${base} ${projectName} --yes`;
 		}
 
-		flags.push("-y");
+		flags.push("--yes");
 
 		if (!stackState.frontend.includes("web")) {
 			flags.push("--no-web");
