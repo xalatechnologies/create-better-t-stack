@@ -158,7 +158,7 @@ const Navbar = () => {
 					type="button"
 					onClick={toggleMobileMenu}
 					className="md:hidden flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 focus:outline-none"
-					aria-expanded="false"
+					aria-expanded={mobileMenuOpen}
 				>
 					{mobileMenuOpen ? (
 						<X className="size-5" aria-hidden="true" />
@@ -169,61 +169,114 @@ const Navbar = () => {
 				</button>
 			</nav>
 
-			{mobileMenuOpen && (
-				<div className="md:hidden fixed inset-0 z-[99] pt-16 bg-gray-50/95 dark:bg-gray-950/95 backdrop-blur-sm">
-					<div className="p-4 space-y-4">
-						<Link
-							href="/"
-							className="flex items-center w-full px-4 py-3 font-mono text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-							onClick={() => setMobileMenuOpen(false)}
-						>
-							<span className="text-blue-600 dark:text-blue-400 mr-2">~/</span>
-							Home
-						</Link>
+			{/* Mobile Menu - Terminal Style */}
+			<div
+				className={`md:hidden fixed inset-0 z-[99] pt-16 backdrop-blur-md transition-all duration-300 ease-in-out ${
+					mobileMenuOpen
+						? "opacity-100 pointer-events-auto"
+						: "opacity-0 pointer-events-none"
+				}`}
+			>
+				<div className="mx-4 mt-4 bg-gray-100/95 dark:bg-gray-900/95 border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden shadow-lg">
+					{/* Terminal Header */}
+					<div className="bg-gray-200 dark:bg-gray-800 px-4 py-2 flex items-center">
+						<div className="flex space-x-2 mr-4">
+							<div className="w-3 h-3 bg-red-500 rounded-full" />
+							<div className="w-3 h-3 bg-yellow-500 rounded-full" />
+							<div className="w-3 h-3 bg-green-500 rounded-full" />
+						</div>
+						<div className="text-sm font-mono text-gray-600 dark:text-gray-300">
+							better-t-stack:~
+						</div>
+					</div>
 
-						<Link
-							href="https://my-better-t-app-client.pages.dev/"
-							target="_blank"
-							className="flex items-center w-full px-4 py-3 font-mono text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-							onClick={() => setMobileMenuOpen(false)}
-						>
-							Demo
-						</Link>
+					{/* Terminal Body */}
+					<div className="p-4 font-mono text-sm">
+						<div className="pb-3">
+							<span className="text-green-600 dark:text-green-500">
+								user@better-t-stack
+							</span>
+							<span className="text-gray-600 dark:text-gray-400">:~$</span>
+							<span className="ml-2 text-gray-800 dark:text-gray-200">
+								ls -la
+							</span>
+						</div>
 
-						<Link
-							href="https://www.npmjs.com/package/create-better-t-stack"
-							target="_blank"
-							className="flex items-center w-full px-4 py-3 font-mono text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-							onClick={() => setMobileMenuOpen(false)}
-						>
-							<PackageIcon pm="npm" className="w-5 h-5 mr-3" />
-							NPM Package
-						</Link>
+						<div className="space-y-2 pl-4 border-l-2 border-gray-300 dark:border-gray-700">
+							<Link
+								href="/"
+								className="block text-blue-600 dark:text-blue-400 hover:underline"
+								onClick={() => setMobileMenuOpen(false)}
+							>
+								~/home
+							</Link>
 
-						<Link
-							href="https://www.github.com/better-t-stack/create-better-t-stack"
-							target="_blank"
-							className="flex items-center w-full px-4 py-3 font-mono text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-							onClick={() => setMobileMenuOpen(false)}
-						>
-							<Github className="size-5 mr-3" />
-							GitHub Repository
-						</Link>
+							<Link
+								href="https://my-better-t-app-client.pages.dev/"
+								target="_blank"
+								className="block text-blue-600 dark:text-blue-400 hover:underline"
+								onClick={() => setMobileMenuOpen(false)}
+							>
+								~/demo
+							</Link>
 
-						<div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
+							<div className="flex items-center">
+								<PackageIcon pm="npm" className="w-4 h-4 mr-2" />
+								<Link
+									href="https://www.npmjs.com/package/create-better-t-stack"
+									target="_blank"
+									className="block text-blue-600 dark:text-blue-400 hover:underline"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									~/npm
+								</Link>
+							</div>
+
+							<div className="flex items-center">
+								<Github className="size-4 mr-2 text-gray-700 dark:text-gray-300" />
+								<Link
+									href="https://www.github.com/better-t-stack/create-better-t-stack"
+									target="_blank"
+									className="block text-blue-600 dark:text-blue-400 hover:underline"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									~/github
+								</Link>
+							</div>
+						</div>
+
+						<div className="mt-6 pb-3">
+							<span className="text-green-600 dark:text-green-500">
+								user@better-t-stack
+							</span>
+							<span className="text-gray-600 dark:text-gray-400">:~$</span>
+							<span className="ml-2 text-gray-800 dark:text-gray-200">
+								star-repo
+							</span>
+						</div>
+
+						<div className="pl-4 border-l-2 border-gray-300 dark:border-gray-700 pb-2">
 							<Link
 								href="https://www.github.com/better-t-stack/create-better-t-stack"
 								target="_blank"
-								className="flex items-center justify-center w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-lg font-medium text-gray-900 dark:text-gray-100"
+								className="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded-md text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
 								onClick={() => setMobileMenuOpen(false)}
 							>
 								<Github className="size-5 mr-2" />
 								Star on GitHub
 							</Link>
 						</div>
+
+						<div className="mt-4">
+							<span className="text-green-600 dark:text-green-500">
+								user@better-t-stack
+							</span>
+							<span className="text-gray-600 dark:text-gray-400">:~$</span>
+							<span className="animate-pulse ml-2">█</span>
+						</div>
 					</div>
 				</div>
-			)}
+			</div>
 		</>
 	);
 };

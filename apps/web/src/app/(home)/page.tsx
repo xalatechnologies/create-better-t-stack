@@ -9,7 +9,7 @@ import Testimonials from "./_components/Testimonials";
 
 export default function HomePage() {
 	return (
-		<main className="flex flex-col items-center justify-start px-2 sm:px-4 md:px-8 pt-16 sm:pt-20 md:pt-28 pb-10 sm:pb-16">
+		<main className="flex flex-col items-center justify-start px-2 sm:px-4 md:px-8 pt-24 md:pt-28 pb-10 sm:pb-16">
 			<BackgroundGradients />
 			<div className="max-w-5xl mx-auto text-center mb-10 sm:mb-16 relative z-10">
 				<div className="px-1 sm:px-6 lg:px-8">
