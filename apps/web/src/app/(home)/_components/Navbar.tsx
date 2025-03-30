@@ -1,5 +1,5 @@
 "use client";
-import { Github } from "lucide-react";
+import { Github, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import PackageIcon from "./Icons";
@@ -8,6 +8,7 @@ const Navbar = () => {
 	const [activeLink, setActiveLink] = useState("home");
 	const [bgStyles, setBgStyles] = useState({});
 	const [scrolled, setScrolled] = useState(false);
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const linkRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
 
 	useEffect(() => {
@@ -15,7 +16,7 @@ const Navbar = () => {
 			const linkElement = linkRefs.current[linkId];
 			if (linkElement) {
 				setBgStyles({
-					padding: "1rem 0rem",
+					padding: "0.75rem 0rem",
 					width: `${linkElement.clientWidth - 12}px`,
 					transform: `translateX(${linkElement.offsetLeft}px)`,
 					opacity: 1,
@@ -39,152 +40,191 @@ const Navbar = () => {
 		};
 	}, [activeLink]);
 
+	const toggleMobileMenu = () => {
+		setMobileMenuOpen(!mobileMenuOpen);
+	};
+
 	return (
-		<nav
-			className={`fixed top-0 right-0 z-[100] w-screen px-8 py-5 grid grid-cols-1 md:grid-cols-3 items-center transition-all duration-300 ${
-				scrolled
-					? "bg-transparent border-transparent"
-					: " dark:sm:bg-black/40 sm:backdrop-blur-xl sm:border-b sm:bg-white/40 border-blue-400/20"
-			}`}
-		>
-			<div
-				className={`max-md:hidden flex flex-row items-center space-x-2 transition-opacity duration-300 ${
-					scrolled ? "opacity-0" : "opacity-100"
+		<>
+			<nav
+				className={`fixed top-0 right-0 z-[100] w-screen px-4 sm:px-8 py-4 flex justify-between items-center transition-all duration-300 ${
+					scrolled
+						? "bg-transparent border-transparent"
+						: "dark:bg-gray-950/80 bg-gray-50/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800/50"
 				}`}
 			>
-				<div className="w-4 h-4 rounded-sm flex items-center justify-center">
-					<span className=" dark:text-blue-500 text-blue-600 text-md">$_</span>
-				</div>
-				<span className=" dark:text-blue-400 text-blue-500 font-semibold text-md">
-					Better-T Stack
-				</span>
-			</div>
-
-			<div className="flex justify-center">
 				<div
-					className={`flex items-center backdrop-blur-md dark:bg-black/40 bg-white/40 rounded-md border dark:border-blue-500/30 border-blue-400/30 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
-						scrolled ? "w-[350px]" : "sm:w-[240px] w-[280px]"
+					className={`flex flex-row items-center space-x-3 transition-opacity duration-300 ${
+						scrolled ? "opacity-0" : "opacity-100"
 					}`}
 				>
-					<div
-						className="absolute transition-all duration-300 ease-in-out  dark:bg-blue-900/20 bg-blue-200/40 border  dark:border-blue-500/20 border-blue-400/20 rounded-md py-2"
-						style={bgStyles}
-					/>
-					<Link
-						href="/"
-						ref={(ref) => {
-							linkRefs.current.home = ref;
-						}}
-						onMouseOver={() => setActiveLink("home")}
-						className=" dark:text-gray-300 text-gray-700  dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative font-mono"
-					>
-						<span className=" dark:text-blue-500 text-blue-600">~/</span>
-						home
-					</Link>
-					{/* <Link
-						href="https://www.github.com/better-t-stack/create-better-t-stack"
-						target="_blank"
-						ref={(ref) => {
-							linkRefs.current.github = ref;
-						}}
-						onMouseOver={() => setActiveLink("github")}
-						onMouseLeave={() => setActiveLink("home")}
-						className="text-gray-300 hover:text-blue-300 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono"
-					>
-						<PackageIcon pm="github" className="w-4 h-4" />{" "}
-						<span className="max-sm:hidden">github</span>
-					</Link> */}
-					<Link
-						href="https://my-better-t-app-client.pages.dev/"
-						target="_blank"
-						ref={(ref) => {
-							linkRefs.current.demo = ref;
-						}}
-						onMouseOver={() => setActiveLink("demo")}
-						onMouseLeave={() => setActiveLink("home")}
-						className=" dark:text-gray-300 text-gray-700 hidden  dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative sm:flex gap-2 items-center font-mono"
-					>
-						<span>demo</span>
-					</Link>
-					<Link
-						href="https://www.npmjs.com/package/create-better-t-stack"
-						target="_blank"
-						ref={(ref) => {
-							linkRefs.current.npm = ref;
-						}}
-						onMouseOver={() => setActiveLink("npm")}
-						onMouseLeave={() => setActiveLink("home")}
-						className=" dark:text-gray-300 text-gray-700 dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono"
-					>
-						<PackageIcon pm="npm" className="w-4 h-4 rounded-full" />{" "}
-						<span>npm</span>
-					</Link>
+					<div className="w-4 h-4 rounded-sm flex items-center justify-center">
+						<span className="dark:text-blue-500 text-blue-600 text-md">$_</span>
+					</div>
+					<span className="text-gray-600 dark:text-gray-100 font-semibold text-md">
+						Better-T Stack
+					</span>
+				</div>
 
-					{/* <span
-						className="text-blue-500 transition-all duration-300"
-						style={{
-							opacity: scrolled ? 1 : 0,
-							transform: scrolled ? "translateY(0)" : "translateY(-8px)",
-						}}
-					>
-						|
-					</span> */}
-					{/*
-					<Link
-						href="/docs"
-						ref={(ref) => {
-							linkRefs.current.documentation = ref;
-						}}
-						onMouseOver={() => setActiveLink("documentation")}
-						onMouseLeave={() => setActiveLink("home")}
-						style={{
-							transform: scrolled ? "translateY(0)" : "sm:translateY(-8px)",
-						}}
-						className={`hover:text-blue-300 text-gray-300 transition-all duration-300 py-2 px-4 rounded-md font-mono ${
-							scrolled
-								? "sm:opacity-100 sm:translate-y-0"
-								: "sm:opacity-0 sm:pointer-events-none"
+				<div className="hidden md:flex justify-center">
+					<div
+						className={`flex items-center backdrop-blur-sm bg-gray-100/90 dark:bg-gray-900/90 rounded-lg border border-gray-200 dark:border-gray-800 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
+							scrolled ? "w-[350px]" : "w-[240px]"
 						}`}
 					>
-						documentation
-					</Link>
-							*/}
+						<div
+							className="absolute transition-all duration-200 ease-in-out bg-white dark:bg-gray-800 rounded-md shadow-sm"
+							style={bgStyles}
+						/>
+						<Link
+							href="/"
+							ref={(ref) => {
+								linkRefs.current.home = ref;
+							}}
+							onMouseOver={() => setActiveLink("home")}
+							className="text-gray-700 dark:text-gray-300 dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative font-mono"
+						>
+							<span className="text-blue-600 dark:text-blue-400">~/</span>
+							home
+						</Link>
+
+						<Link
+							href="https://my-better-t-app-client.pages.dev/"
+							target="_blank"
+							ref={(ref) => {
+								linkRefs.current.demo = ref;
+							}}
+							onMouseOver={() => setActiveLink("demo")}
+							onMouseLeave={() => setActiveLink("home")}
+							className="text-gray-700 dark:text-gray-300 dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono"
+						>
+							<span>demo</span>
+						</Link>
+
+						<Link
+							href="https://www.npmjs.com/package/create-better-t-stack"
+							target="_blank"
+							ref={(ref) => {
+								linkRefs.current.npm = ref;
+							}}
+							onMouseOver={() => setActiveLink("npm")}
+							onMouseLeave={() => setActiveLink("home")}
+							className="text-gray-700 dark:text-gray-300 dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono"
+						>
+							<PackageIcon pm="npm" className="w-4 h-4 rounded-full" />{" "}
+							<span>npm</span>
+						</Link>
+
+						<Link
+							href="https://www.github.com/better-t-stack/create-better-t-stack"
+							target="_blank"
+							ref={(ref) => {
+								linkRefs.current.github = ref;
+							}}
+							onMouseOver={() => setActiveLink("github")}
+							onMouseLeave={() => setActiveLink("home")}
+							className={`text-gray-700 dark:text-gray-300 dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono ${
+								scrolled
+									? "opacity-100 translate-y-0"
+									: "opacity-0 pointer-events-none"
+							}`}
+						>
+							<Github className="size-4 mr-1">
+								<title>GitHub</title>
+							</Github>{" "}
+							Github
+						</Link>
+					</div>
+				</div>
+
+				<div
+					className={`hidden md:flex justify-end transition-opacity duration-300 ${
+						scrolled ? "opacity-0 pointer-events-none" : "opacity-100"
+					}`}
+				>
 					<Link
 						href="https://www.github.com/better-t-stack/create-better-t-stack"
 						target="_blank"
-						ref={(ref) => {
-							linkRefs.current.github = ref;
-						}}
-						onMouseOver={() => setActiveLink("github")}
-						onMouseLeave={() => setActiveLink("home")}
-						className={` dark:text-gray-300 text-gray-700  dark:hover:text-blue-300 hover:text-blue-600 transition-colors py-2 px-4 rounded-md relative flex gap-2 items-center font-mono ${
-							scrolled
-								? "sm:opacity-100 sm:translate-y-0"
-								: "sm:opacity-0 sm:pointer-events-none"
-						}`}
+						className="inline-flex items-center backdrop-blur-sm bg-gray-100/90 dark:bg-gray-900/90 rounded-lg border border-gray-200 dark:border-gray-800 py-1 px-4 text-sm font-mono text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
 					>
-						<Github className="size-4 mr-2" /> Github
+						<Github className="size-4 mr-2">
+							<title>GitHub</title>
+						</Github>
+						Star on GitHub
 					</Link>
 				</div>
-			</div>
 
-			<div
-				className={`flex justify-end transition-opacity duration-300 ${
-					scrolled ? "opacity-0 pointer-events-none" : "opacity-100"
-				}`}
-			>
-				<Link
-					href="https://www.github.com/better-t-stack/create-better-t-stack"
-					target="_blank"
-					className="relative max-sm:hidden inline-flex h-12 overflow-hidden rounded-md p-[1px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-black focus:ring-offset-white"
+				<button
+					type="button"
+					onClick={toggleMobileMenu}
+					className="md:hidden flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 focus:outline-none"
+					aria-expanded="false"
 				>
-					<span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#3b82f6_0%,#6366f1_50%,#3b82f6_100%)]" />
-					<span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-md  dark:bg-black bg-white px-6 py-px text-sm font-medium  dark:text-blue-400 text-blue-600 backdrop-blur-3xl font-mono">
-						<Github className="size-5 mr-2" /> Github
-					</span>
-				</Link>
-			</div>
-		</nav>
+					{mobileMenuOpen ? (
+						<X className="size-5" aria-hidden="true" />
+					) : (
+						<Menu className="size-5" aria-hidden="true" />
+					)}
+					<span className="sr-only">Toggle menu</span>
+				</button>
+			</nav>
+
+			{mobileMenuOpen && (
+				<div className="md:hidden fixed inset-0 z-[99] pt-16 bg-gray-50/95 dark:bg-gray-950/95 backdrop-blur-sm">
+					<div className="p-4 space-y-4">
+						<Link
+							href="/"
+							className="flex items-center w-full px-4 py-3 font-mono text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+							onClick={() => setMobileMenuOpen(false)}
+						>
+							<span className="text-blue-600 dark:text-blue-400 mr-2">~/</span>
+							Home
+						</Link>
+
+						<Link
+							href="https://my-better-t-app-client.pages.dev/"
+							target="_blank"
+							className="flex items-center w-full px-4 py-3 font-mono text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+							onClick={() => setMobileMenuOpen(false)}
+						>
+							Demo
+						</Link>
+
+						<Link
+							href="https://www.npmjs.com/package/create-better-t-stack"
+							target="_blank"
+							className="flex items-center w-full px-4 py-3 font-mono text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+							onClick={() => setMobileMenuOpen(false)}
+						>
+							<PackageIcon pm="npm" className="w-5 h-5 mr-3" />
+							NPM Package
+						</Link>
+
+						<Link
+							href="https://www.github.com/better-t-stack/create-better-t-stack"
+							target="_blank"
+							className="flex items-center w-full px-4 py-3 font-mono text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+							onClick={() => setMobileMenuOpen(false)}
+						>
+							<Github className="size-5 mr-3" />
+							GitHub Repository
+						</Link>
+
+						<div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
+							<Link
+								href="https://www.github.com/better-t-stack/create-better-t-stack"
+								target="_blank"
+								className="flex items-center justify-center w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-lg font-medium text-gray-900 dark:text-gray-100"
+								onClick={() => setMobileMenuOpen(false)}
+							>
+								<Github className="size-5 mr-2" />
+								Star on GitHub
+							</Link>
+						</div>
+					</div>
+				</div>
+			)}
+		</>
 	);
 };
 

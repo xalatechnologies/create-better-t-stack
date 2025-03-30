@@ -1,6 +1,7 @@
 "use client";
 import ShinyText from "@/app/(home)/_components/ShinyText";
 import React from "react";
+import BackgroundGradients from "./_components/BackgroundGradients";
 import CodeContainer from "./_components/CodeContainer";
 import CustomizableSection from "./_components/CustomizableSection";
 import NpmPackage from "./_components/NpmPackage";
@@ -8,80 +9,76 @@ import NpmPackage from "./_components/NpmPackage";
 
 export default function HomePage() {
 	return (
-		<main className="flex flex-col items-center justify-start sm:p-8 p-4 !pt-40 dark:bg-gray-950 bg-gray-50 transition-colors duration-300">
-			<div className="max-w-6xl mx-auto text-center mb-16 relative z-50 ">
-				<div className="relative z-10">
+		<main className="flex flex-col items-center justify-start px-4 sm:px-8 pt-28 pb-16">
+			<BackgroundGradients />
+			<div className="max-w-5xl mx-auto text-center mb-16 relative z-10">
+				<div className="px-4 sm:px-6 lg:px-8">
 					<div className="flex flex-col items-center justify-center space-y-4 text-center">
-						<h1 className="text-6xl font-extrabold dark:text-white text-gray-900">
-							<span className="block sm:text-7xl text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">
+						<h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-gray-900 dark:text-white">
+							<span className="block bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-600 pb-1">
 								Better-T Stack
 							</span>
-							<span className="relative">
-								<span className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-indigo-500 transform origin-left transition-transform duration-300 ease-out scale-x-0 group-hover:scale-x-100" />
-							</span>
 						</h1>
-						<NpmPackage />
 
-						<p className="sm:text-2xl text-xl font-medium dark:text-gray-300 text-gray-700 max-w-2xl">
-							<span className="inline-block transform hover:scale-105 transition-transform duration-200">
-								Scaffold
-							</span>{" "}
-							<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">
-								production-ready
-							</span>{" "}
-							<span className="inline-block transition-transform duration-200">
-								Better-T projects in seconds
-							</span>
+						<div className="mb-2">
+							<NpmPackage />
+						</div>
+
+						<p className="text-xl font-medium text-gray-600 dark:text-gray-300 max-w-2xl">
+							A modern CLI tool for scaffolding end-to-end type-safe TypeScript
+							projects with best practices and customizable configurations
 						</p>
-						<CodeContainer />
+
+						<div className="w-full max-w-3xl mx-auto mt-2">
+							<CodeContainer />
+						</div>
+
 						<ShinyText
-							text="Be the safest developer with typesafe Typescript"
+							text="Type-safe. Modern. Minimal. Fast."
 							speed={3}
-							className="sm:text-lg text-md text-gray-600 dark:text-[#b5b5b5a4]"
+							className="text-sm sm:text-base text-gray-600 dark:text-gray-400"
 						/>
 					</div>
 				</div>
+
 				<div className="absolute inset-0 -z-10">
 					<div className="absolute inset-0 bg-gradient-to-r dark:from-purple-500/20 dark:to-indigo-500/20 from-blue-300/20 to-indigo-300/20 dark:blur-3xl blur-2xl transform -skew-y-12" />
 				</div>
 			</div>
 			<CustomizableSection />
-			<div className="w-full pt-16 relative overflow-hidden">
-				<div className="max-w-6xl mx-auto relative">
+			<div className="w-full pt-12 relative">
+				<div className="max-w-5xl mx-auto relative">
 					<div className="flex items-center justify-center">
 						<div className="hidden sm:flex items-center w-1/3">
-							<div className="h-px flex-grow bg-gradient-to-r from-transparent to-blue-500/70" />
-							<div className="h-8 w-8 rounded-full dark:bg-gray-900 bg-gray-100 dark:border-gray-700 border-gray-300 flex items-center justify-center relative">
-								<div
-									className="h-2 w-2 bg-blue-400 rounded-full animate-ping absolute"
-									style={{ animationDuration: "2.5s" }}
-								/>
-							</div>
+							<div className="h-px flex-grow bg-gradient-to-r from-transparent to-blue-500/40" />
+							<div className="h-2 w-2 rounded-full bg-blue-500/50" />
 						</div>
 
-						<div className="relative flex flex-col items-center justify-center px-6 z-10">
-							<div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 blur-xl -z-10" />
+						<div className="px-6">
+							<div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									className="h-4 w-4 text-white"
+									viewBox="0 0 20 20"
+									fill="currentColor"
+								>
+									<title>Code Icon</title>
+									<path
+										fillRule="evenodd"
+										d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z"
+										clipRule="evenodd"
+									/>
+								</svg>
+							</div>
 						</div>
 
 						<div className="hidden sm:flex items-center w-1/3">
-							<div className="h-8 w-8 rounded-full dark:bg-gray-900 bg-gray-100 dark:border-gray-700 border-gray-300 flex items-center justify-center relative">
-								<div
-									className="h-2 w-2 bg-indigo-400 rounded-full animate-ping absolute"
-									style={{ animationDuration: "2.5s" }}
-								/>
-							</div>
-							<div className="h-px flex-grow bg-gradient-to-l from-transparent to-indigo-500/70" />
+							<div className="h-2 w-2 rounded-full bg-indigo-500/50" />
+							<div className="h-px flex-grow bg-gradient-to-l from-transparent to-indigo-500/40" />
 						</div>
 					</div>
 
-					<div className="sm:hidden h-px w-full mt-4 bg-gradient-to-r from-blue-500/30 via-indigo-500 to-blue-500/30" />
-
-					<div className="absolute -top-10 left-1/4 text-6xl dark:text-gray-800/10 text-gray-300/20 font-mono transform rotate-12">
-						{"{"}
-					</div>
-					<div className="absolute -bottom-10 right-1/4 text-6xl dark:text-gray-800/10 text-gray-300/20 font-mono transform -rotate-12">
-						{"}"}
-					</div>
+					<div className="sm:hidden h-px w-full mt-6 bg-gradient-to-r from-blue-500/20 via-indigo-500/40 to-blue-500/20" />
 				</div>
 			</div>
 			{/* <Testimonials /> */}

@@ -4,15 +4,18 @@ import Footer from "./_components/Footer";
 import Navbar from "./_components/Navbar";
 
 export const metadata: Metadata = {
-	title: "Better-T-Stack | TypeScript Project Scaffolding",
+	title: "Better-T-Stack",
 	description:
-		"Create modern TypeScript applications with complete type safety from frontend to backend. Features support for multiple databases, ORMs, authentication, and more.",
+		"A modern CLI tool for scaffolding end-to-end type-safe TypeScript projects with best practices and customizable configurations",
 	keywords: [
 		"TypeScript",
 		"project scaffolding",
 		"type safety",
 		"Drizzle",
 		"Prisma",
+		"hono",
+		"elysia",
+		"turborepo",
 		"libSQL",
 		"PostgreSQL",
 		"Better-Auth",
@@ -74,7 +77,7 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: { children: ReactNode }) {
 	return (
-		<main className="relative z-10 min-h-svh bg-zinc-50 dark:bg-slate-950 transition-colors duration-300 overflow-hidden">
+		<main className="relative z-10 min-h-svh bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-black transition-color duration-300 overflow-hidden">
 			<Navbar />
 			{children}
 			<Footer />

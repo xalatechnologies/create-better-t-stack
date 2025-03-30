@@ -695,7 +695,7 @@ const StackArchitect = () => {
 
 	return (
 		<div className="w-full mx-auto">
-			<div className="rounded-xl overflow-hidden shadow-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-black text-gray-800 dark:text-white">
+			<div className="rounded-xl overflow-hidden shadow-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white">
 				<div className="bg-gray-200 dark:bg-gray-800 px-4 py-2 flex items-center justify-between">
 					<div className="flex space-x-2">
 						<div className="w-3 h-3 rounded-full bg-red-500" />

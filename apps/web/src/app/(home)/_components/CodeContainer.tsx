@@ -1,9 +1,11 @@
 "use client";
+import { motion } from "framer-motion";
+import { Check, CircleCheck, ClipboardCopy, Terminal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const CodeContainer = () => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedPM, setSelectedPM] = useState<"npm" | "pnpm" | "bun">("npm");
+	const [selectedPM, setSelectedPM] = useState<"npm" | "pnpm" | "bun">("bun");
 	const [copied, setCopied] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const [typingComplete, setTypingComplete] = useState(false);
@@ -21,9 +23,9 @@ const CodeContainer = () => {
 	}, []);
 
 	const commands = {
-		npm: "npx create-better-t-stack@latest",
-		pnpm: "pnpm create better-t-stack@latest",
-		bun: "bun create better-t-stack@latest",
+		npm: "npx create-better-t-stack@latest my-better-t-app --yes",
+		pnpm: "pnpm create better-t-stack@latest my-better-t-app --yes",
+		bun: "bun create better-t-stack@latest my-better-t-app --yes",
 	};
 
 	const copyToClipboard = async (pm: "npm" | "pnpm" | "bun") => {
@@ -52,31 +54,31 @@ const CodeContainer = () => {
 
 	return (
 		<div className="w-full max-w-3xl mx-auto mt-8">
-			<div className="rounded-md bg-gray-50/90 dark:bg-gray-950/50 backdrop-blur-3xl border border-gray-300 dark:border-blue-500/30 overflow-hidden">
-				<div className="flex items-center justify-between bg-gray-200/80 dark:bg-blue-900/10 px-4 py-2 border-b border-gray-300 dark:border-blue-800/30">
-					<div className="flex items-center">
-						<div className="flex space-x-2">
-							<div className="w-3 h-3 rounded-full bg-red-500/60" />
-							<div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-							<div className="w-3 h-3 rounded-full bg-green-500/60" />
-						</div>
-						<div className="ml-4 text-sm text-gray-700 dark:text-blue-300 font-mono">
-							terminal
-						</div>
+			<div className="rounded-xl overflow-hidden shadow-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-black text-gray-800 dark:text-white">
+				<div className="bg-gray-200 dark:bg-gray-800 px-4 py-2 flex items-center justify-between">
+					<div className="flex space-x-2">
+						<div className="w-3 h-3 rounded-full bg-red-500" />
+						<div className="w-3 h-3 rounded-full bg-yellow-500" />
+						<div className="w-3 h-3 rounded-full bg-green-500" />
+					</div>
+					<div className="font-mono text-xs text-gray-600 dark:text-gray-400">
+						Quick Install Terminal
 					</div>
 
-					{/* Package Manager Selector */}
 					<div className="relative" ref={menuRef}>
 						<button
 							type="button"
 							onClick={() => setIsOpen(!isOpen)}
-							className="flex items-center px-2 py-1 text-sm bg-white/50 dark:bg-black/50 rounded border border-gray-300 dark:border-blue-500/30 hover:bg-gray-200/80 dark:hover:bg-blue-900/20"
+							className="flex items-center px-2 py-1 text-xs bg-gray-300/50 dark:bg-gray-800/50 rounded border border-gray-300 dark:border-gray-700 hover:bg-gray-300/80 dark:hover:bg-gray-700/50"
 						>
-							<span className="text-gray-700 dark:text-blue-400 mr-2">
+							<Terminal className="w-3 h-3 mr-1 text-gray-600 dark:text-gray-400">
+								<title>Package Manager</title>
+							</Terminal>
+							<span className="text-gray-700 dark:text-gray-300 mr-1">
 								{selectedPM}
 							</span>
 							<svg
-								className="w-4 h-4 text-gray-700 dark:text-blue-400"
+								className="w-3 h-3 text-gray-700 dark:text-gray-400"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -92,36 +94,46 @@ const CodeContainer = () => {
 						</button>
 
 						{isOpen && (
-							<div className="absolute right-0 mt-2 w-36 bg-white dark:bg-black border border-gray-300 dark:border-blue-500/30 rounded-md shadow-lg z-50">
+							<motion.div
+								initial={{ opacity: 0, y: -5 }}
+								animate={{ opacity: 1, y: 0 }}
+								className="absolute right-0 mt-1 w-36 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-lg z-50"
+							>
 								<ul>
 									{(Object.keys(commands) as Array<"npm" | "pnpm" | "bun">).map(
 										(pm) => (
 											<li key={pm}>
 												<button
 													type="button"
-													className={`block w-full text-left px-4 py-2 text-sm ${
+													className={`block w-full text-left px-3 py-1.5 text-xs ${
 														selectedPM === pm
-															? "bg-gray-200 dark:bg-blue-900/30 text-gray-800 dark:text-blue-400"
-															: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-blue-900/20"
+															? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-l-2 border-blue-500"
+															: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
 													}`}
 													onClick={() => copyToClipboard(pm)}
 												>
-													{pm}
+													{pm === "npm" && "npm"}
+													{pm === "pnpm" && "pnpm"}
+													{pm === "bun" && (
+														<span className="flex items-center">
+															<span className="mr-1">🥟</span> bun
+														</span>
+													)}
 												</button>
 											</li>
 										),
 									)}
 								</ul>
-							</div>
+							</motion.div>
 						)}
 					</div>
 				</div>
 
-				<div className="p-4 font-mono text-sm bg-white dark:bg-transparent">
+				<div className="p-4 font-mono text-sm bg-gray-50 dark:bg-gray-900">
 					<div className="flex items-center">
 						<div className="flex-grow">
-							<span className="text-blue-600 dark:text-blue-500 mr-2">$</span>
-							<span className="text-gray-800 dark:text-white">
+							<span className="text-green-600 dark:text-green-400 mr-2">$</span>
+							<span className="text-gray-700 dark:text-gray-300">
 								{commands[selectedPM]}
 							</span>
 							<span
@@ -134,100 +146,199 @@ const CodeContainer = () => {
 								▌
 							</span>
 						</div>
-						<button
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
 							type="button"
 							onClick={() => copyToClipboard(selectedPM)}
-							className="text-gray-600 dark:text-blue-400 hover:text-gray-800 dark:hover:text-blue-300"
-							title="Copy to clipboard"
+							className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+							title="Copy command"
 						>
 							{copied ? (
-								<CheckIcon className="w-5 h-5" />
+								<Check className="w-4 h-4">
+									<title>Copied!</title>
+								</Check>
 							) : (
-								<CopyIcon className="w-5 h-5" />
+								<ClipboardCopy className="w-4 h-4">
+									<title>Copy to clipboard</title>
+								</ClipboardCopy>
 							)}
-						</button>
+						</motion.button>
 					</div>
 
 					{typingComplete && (
-						<>
-							<div className="mt-2 pl-4 text-amber-600 dark:text-yellow-400">
+						<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+							<div className="mt-3 pl-4 text-amber-600 dark:text-amber-400">
 								{currentStep >= 1 && (
-									<p
-										className={`transition-opacity duration-300 ${
-											currentStep >= 1 ? "opacity-100" : "opacity-0"
-										}`}
+									<motion.p
+										initial={{ opacity: 0, y: -5 }}
+										animate={{ opacity: 1, y: 0 }}
+										transition={{ delay: 0.1 }}
 									>
 										Creating a new Better-T-Stack project
-									</p>
+									</motion.p>
 								)}
 								{currentStep >= 2 && (
-									<div className="mt-2">
-										<p className="text-gray-800 dark:text-white">
+									<motion.div
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1 }}
+										transition={{ delay: 0.2 }}
+										className="mt-2"
+									>
+										<p className="text-gray-700 dark:text-gray-300">
 											Project name:{" "}
-											<span className="text-amber-600 dark:text-yellow-400">
-												my-t-stack
+											<span className="text-amber-600 dark:text-amber-400">
+												my-better-t-app
 											</span>
 										</p>
-										<p className="text-gray-800 dark:text-white">
+										<p className="text-gray-700 dark:text-gray-300">
+											Frontend:{" "}
+											<span className="text-amber-600 dark:text-amber-400">
+												React Web
+											</span>
+										</p>
+										<p className="text-gray-700 dark:text-gray-300">
+											Runtime:{" "}
+											<span className="text-amber-600 dark:text-amber-400">
+												Bun
+											</span>
+										</p>
+										<p className="text-gray-700 dark:text-gray-300">
+											Backend:{" "}
+											<span className="text-amber-600 dark:text-amber-400">
+												Hono
+											</span>
+										</p>
+										<p className="text-gray-700 dark:text-gray-300">
 											Database:{" "}
-											<span className="text-amber-600 dark:text-yellow-400">
-												postgres
+											<span className="text-amber-600 dark:text-amber-400">
+												SQLite + Drizzle
 											</span>
 										</p>
-										<p className="text-gray-800 dark:text-white">
-											ORM:{" "}
-											<span className="text-amber-600 dark:text-yellow-400">
-												drizzle
-											</span>
-										</p>
-										<p className="text-gray-800 dark:text-white">
-											Authentication:{" "}
-											<span className="text-amber-600 dark:text-yellow-400">
-												yes
-											</span>
-										</p>
-										<p className="text-gray-800 dark:text-white">
-											Addons:{" "}
-											<span className="text-amber-600 dark:text-yellow-400">
-												docker, github-actions, SEO
-											</span>
-										</p>
-									</div>
+									</motion.div>
 								)}
 							</div>
 
-							{currentStep >= 3 && (
-								<div className="mt-3 pl-4">
-									<p className="text-blue-600 dark:text-blue-400">
-										✓ Creating project structure
-									</p>
-									{currentStep >= 4 && (
-										<p className="text-blue-600 dark:text-blue-400">
-											✓ Installing dependencies
-										</p>
-									)}
-									{currentStep >= 5 && (
-										<>
-											<p className="text-blue-600 dark:text-blue-400">
-												✓ Setting up database
-											</p>
-											<p className="text-blue-600 dark:text-blue-400">
-												✓ Configuring authentication
-											</p>
-											<p className="text-gray-800 dark:text-white mt-2">
-												Project ready! Happy coding!
-											</p>
-										</>
-									)}
-								</div>
-							)}
-						</>
+							<motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ delay: 0.3 }}
+								className="mt-3 pl-4"
+							>
+								{currentStep >= 3 && (
+									<motion.p
+										initial={{ opacity: 0, x: -5 }}
+										animate={{ opacity: 1, x: 0 }}
+										transition={{ delay: 0.4 }}
+										className="text-blue-600 dark:text-blue-400 flex items-center"
+									>
+										<CircleCheck className="w-4 h-4 mr-1">
+											<title>Completed</title>
+										</CircleCheck>
+										Creating project structure
+									</motion.p>
+								)}
+								{currentStep >= 4 && (
+									<motion.p
+										initial={{ opacity: 0, x: -5 }}
+										animate={{ opacity: 1, x: 0 }}
+										transition={{ delay: 0.5 }}
+										className="text-blue-600 dark:text-blue-400 flex items-center"
+									>
+										<CircleCheck className="w-4 h-4 mr-1">
+											<title>Completed</title>
+										</CircleCheck>
+										Installing dependencies
+									</motion.p>
+								)}
+								{currentStep >= 5 && (
+									<motion.div
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1 }}
+										transition={{ delay: 0.6 }}
+									>
+										<motion.p
+											initial={{ opacity: 0, x: -5 }}
+											animate={{ opacity: 1, x: 0 }}
+											transition={{ delay: 0.7 }}
+											className="text-blue-600 dark:text-blue-400 flex items-center"
+										>
+											<CircleCheck className="w-4 h-4 mr-1">
+												<title>Completed</title>
+											</CircleCheck>
+											Setting up database schema
+										</motion.p>
+										<motion.p
+											initial={{ opacity: 0, x: -5 }}
+											animate={{ opacity: 1, x: 0 }}
+											transition={{ delay: 0.8 }}
+											className="text-blue-600 dark:text-blue-400 flex items-center"
+										>
+											<CircleCheck className="w-4 h-4 mr-1">
+												<title>Completed</title>
+											</CircleCheck>
+											Configuring authentication
+										</motion.p>
+										<motion.div
+											initial={{ opacity: 0 }}
+											animate={{ opacity: 1 }}
+											transition={{ delay: 0.9 }}
+											className="mt-4 flex items-center px-2 py-2 rounded bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800/30"
+										>
+											<svg
+												className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="2"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+											>
+												<title>Success</title>
+												<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+												<polyline points="22 4 12 14.01 9 11.01" />
+											</svg>
+											<span>
+												Project ready! Run{" "}
+												<code className="px-1.5 py-0.5 bg-blue-200 dark:bg-blue-800/50 rounded">
+													cd my-better-t-app
+												</code>{" "}
+												and{" "}
+												<code className="px-1.5 py-0.5 bg-blue-200 dark:bg-blue-800/50 rounded">
+													{selectedPM === "npm" && "npm run dev"}
+													{selectedPM === "pnpm" && "pnpm dev"}
+													{selectedPM === "bun" && "bun dev"}
+												</code>
+											</span>
+										</motion.div>
+									</motion.div>
+								)}
+							</motion.div>
+						</motion.div>
 					)}
 
-					<div className={`flex mt-4 ${typingComplete ? "" : "hidden"}`}>
-						<span className="text-blue-600 dark:text-blue-500 mr-2">$</span>
+					<div
+						className={`flex mt-4 ${
+							currentStep >= 5 && typingComplete ? "" : "hidden"
+						}`}
+					>
+						<span className="text-green-600 dark:text-green-400 mr-2">$</span>
 						<span className="text-blue-600 dark:text-blue-500 animate-pulse">
 							▌
+						</span>
+					</div>
+				</div>
+
+				<div className="bg-gray-200 dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 px-4 py-2">
+					<div className="flex items-center justify-center text-xs text-gray-600 dark:text-gray-400">
+						<span className="inline-flex items-center gap-1.5">
+							<span>For custom options, use</span>
+							<code className="px-1.5 py-0.5 bg-gray-300 dark:bg-gray-700 rounded">
+								{selectedPM === "npm" && "npx"}
+								{selectedPM === "pnpm" && "pnpm dlx"}
+								{selectedPM === "bun" && "bunx"} create-better-t-stack
+							</code>
+							<span>without flags</span>
 						</span>
 					</div>
 				</div>
@@ -235,41 +346,5 @@ const CodeContainer = () => {
 		</div>
 	);
 };
-
-const CopyIcon = ({ className = "" }) => (
-	<svg
-		className={className}
-		fill="none"
-		stroke="currentColor"
-		viewBox="0 0 24 24"
-		xmlns="http://www.w3.org/2000/svg"
-	>
-		<title>copy</title>
-		<path
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			strokeWidth={2}
-			d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-		/>
-	</svg>
-);
-
-const CheckIcon = ({ className = "" }) => (
-	<svg
-		className={className}
-		fill="none"
-		stroke="currentColor"
-		viewBox="0 0 24 24"
-		xmlns="http://www.w3.org/2000/svg"
-	>
-		<title>check</title>
-		<path
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			strokeWidth={2}
-			d="M5 13l4 4L19 7"
-		/>
-	</svg>
-);
 
 export default CodeContainer;
