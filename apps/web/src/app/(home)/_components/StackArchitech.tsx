@@ -11,64 +11,6 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
-const triggerConfetti = () => {
-	const createConfettiElement = (color: string) => {
-		const confetti = document.createElement("div");
-		confetti.style.position = "fixed";
-		confetti.style.width = `${Math.random() * 10 + 5}px`;
-		confetti.style.height = `${Math.random() * 10 + 5}px`;
-		confetti.style.backgroundColor = color;
-		confetti.style.borderRadius = "50%";
-		confetti.style.zIndex = "9999";
-
-		const startX = window.innerWidth / 2 + (Math.random() - 0.5) * 200;
-		const startY = window.innerHeight / 2;
-
-		confetti.style.left = `${startX}px`;
-		confetti.style.top = `${startY}px`;
-
-		document.body.appendChild(confetti);
-
-		const angle = Math.random() * Math.PI * 2;
-		const velocity = Math.random() * 5 + 3;
-		const vx = Math.cos(angle) * velocity;
-		let vy = Math.sin(angle) * velocity - 2;
-
-		let posX = startX;
-		let posY = startY;
-		let opacity = 1;
-		let rotation = 0;
-
-		const animate = () => {
-			posX += vx;
-			posY += vy;
-			vy += 0.1;
-			opacity -= 0.01;
-			rotation += 5;
-
-			confetti.style.left = `${posX}px`;
-			confetti.style.top = `${posY}px`;
-			confetti.style.opacity = `${opacity}`;
-			confetti.style.transform = `rotate(${rotation}deg)`;
-
-			if (opacity > 0 && posY < window.innerHeight) {
-				requestAnimationFrame(animate);
-			} else {
-				confetti.remove();
-			}
-		};
-
-		requestAnimationFrame(animate);
-	};
-
-	const colors = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#ffd166", "#f8a5c2"];
-	for (let i = 0; i < 30; i++) {
-		setTimeout(() => {
-			createConfettiElement(colors[Math.floor(Math.random() * colors.length)]);
-		}, Math.random() * 500);
-	}
-};
-
 const validateProjectName = (name: string): string | undefined => {
 	const INVALID_CHARS = ["<", ">", ":", '"', "|", "?", "*"];
 	const MAX_LENGTH = 255;
@@ -298,6 +240,14 @@ const TECH_OPTIONS = {
 			color: "from-indigo-500 to-indigo-700",
 			default: false,
 		},
+		{
+			id: "ai",
+			name: "AI Example",
+			description: "AI integration example",
+			icon: "🤖",
+			color: "from-purple-500 to-purple-700",
+			default: false,
+		},
 	],
 	git: [
 		{
@@ -370,7 +320,7 @@ const DEFAULT_STACK: StackState = {
 const StackArchitect = () => {
 	const [stack, setStack] = useState<StackState>(DEFAULT_STACK);
 	const [command, setCommand] = useState(
-		"npx create-better-t-stack my-better-t-app --yes",
+		"npx create-better-t-stack@latest my-better-t-app --yes",
 	);
 	const [activeTab, setActiveTab] = useState("frontend");
 	const [copied, setCopied] = useState(false);
@@ -424,7 +374,9 @@ const StackArchitect = () => {
 
 		notes.examples = [];
 		if (!stack.frontend.includes("web")) {
-			notes.examples.push("Todo example is only available with React Web.");
+			notes.examples.push(
+				"Todo and Ai example are only available with React Web.",
+			);
 		}
 
 		setCompatNotes(notes);
@@ -441,83 +393,72 @@ const StackArchitect = () => {
 		}
 
 		const projectName = stackState.projectName || "my-better-t-app";
-		const flags: string[] = [];
+		const flags: string[] = ["--yes"]; // Start with yes flag
 
-		const isAllDefault =
-			stackState.frontend.length === 1 &&
-			stackState.frontend[0] === "web" &&
-			stackState.runtime === "bun" &&
-			stackState.backendFramework === "hono" &&
-			stackState.database === "sqlite" &&
-			stackState.orm === "drizzle" &&
-			stackState.auth === "true" &&
-			stackState.turso === "false" &&
-			stackState.packageManager === "bun" &&
-			stackState.addons.length === 0 &&
-			stackState.examples.length === 0 &&
-			stackState.git === "true" &&
-			stackState.install === "true";
+		// Only add flags that differ from defaults
 
-		if (isAllDefault) {
-			return `${base} ${projectName} --yes`;
+		// Frontend (default is web)
+		if (stackState.frontend.length === 1 && stackState.frontend[0] === "none") {
+			flags.push("--frontend none");
+		} else if (
+			!(stackState.frontend.length === 1 && stackState.frontend[0] === "web")
+		) {
+			flags.push(`--frontend ${stackState.frontend.join(",")}`);
 		}
 
-		flags.push("--yes");
-
-		if (!stackState.frontend.includes("web")) {
-			flags.push("--no-web");
+		// Database (default is sqlite)
+		if (stackState.database !== "sqlite") {
+			flags.push(`--database ${stackState.database}`);
 		}
 
-		if (stackState.frontend.includes("native")) {
-			flags.push("--native");
+		// ORM (default is drizzle)
+		if (stackState.database !== "none" && stackState.orm !== "drizzle") {
+			flags.push(`--orm ${stackState.orm}`);
 		}
 
-		if (stackState.runtime !== "bun") {
-			flags.push(`--runtime ${stackState.runtime}`);
-		}
-
-		if (stackState.backendFramework !== "hono") {
-			flags.push(`--${stackState.backendFramework}`);
-		}
-
-		if (stackState.database === "postgres") {
-			flags.push("--postgres");
-		} else if (stackState.database === "none") {
-			flags.push("--no-database");
-		}
-
-		if (stackState.orm === "prisma" && stackState.database !== "none") {
-			flags.push("--prisma");
-		}
-
+		// Auth (default is true)
 		if (stackState.auth === "false") {
 			flags.push("--no-auth");
 		}
 
-		if (stackState.turso === "true" && stackState.database === "sqlite") {
+		// Turso (default is false)
+		if (stackState.turso === "true") {
 			flags.push("--turso");
 		}
 
+		// Backend (default is hono)
+		if (stackState.backendFramework !== "hono") {
+			flags.push(`--backend ${stackState.backendFramework}`);
+		}
+
+		// Runtime (default is bun)
+		if (stackState.runtime !== "bun") {
+			flags.push(`--runtime ${stackState.runtime}`);
+		}
+
+		// Package manager (default is bun)
 		if (stackState.packageManager !== "bun") {
-			flags.push(`--${stackState.packageManager}`);
+			flags.push(`--package-manager ${stackState.packageManager}`);
 		}
 
-		if (stackState.addons.length > 0) {
-			for (const addon of stackState.addons) {
-				flags.push(`--${addon}`);
-			}
-		}
-
-		if (stackState.examples.length > 0) {
-			flags.push(`--examples ${stackState.examples.join(",")}`);
-		}
-
+		// Git (default is true)
 		if (stackState.git === "false") {
 			flags.push("--no-git");
 		}
 
+		// Install (default is true)
 		if (stackState.install === "false") {
 			flags.push("--no-install");
+		}
+
+		// Addons (default is none)
+		if (stackState.addons.length > 0) {
+			flags.push(`--addons ${stackState.addons.join(",")}`);
+		}
+
+		// Examples (default is none)
+		if (stackState.examples.length > 0) {
+			flags.push(`--examples ${stackState.examples.join(",")}`);
 		}
 
 		return `${base} ${projectName} ${flags.join(" ")}`;
@@ -534,7 +475,9 @@ const StackArchitect = () => {
 							...prev,
 							frontend: ["none"],
 							auth: "false",
-							examples: prev.examples.filter((ex) => ex !== "todo"),
+							examples: prev.examples.filter(
+								(ex) => ex !== "todo" && ex !== "ai",
+							),
 							addons: prev.addons.filter(
 								(addon) => addon !== "pwa" && addon !== "tauri",
 							),
@@ -542,41 +485,21 @@ const StackArchitect = () => {
 					}
 
 					if (currentSelection.includes(techId)) {
-						if (techId === "web") {
-							const newFrontend = currentSelection.filter(
-								(id) => id !== techId,
-							);
-
-							if (newFrontend.length === 0) {
-								return {
-									...prev,
-									frontend: ["none"],
-									auth: "false",
-									examples: prev.examples.filter((ex) => ex !== "todo"),
-									addons: prev.addons.filter(
-										(addon) => addon !== "pwa" && addon !== "tauri",
-									),
-								};
-							}
-
-							return {
-								...prev,
-								frontend: newFrontend,
-								auth: "false",
-								examples: prev.examples.filter((ex) => ex !== "todo"),
-								addons: prev.addons.filter(
-									(addon) => addon !== "pwa" && addon !== "tauri",
-								),
-							};
+						if (currentSelection.length === 1) {
+							// Don't remove the last frontend option
+							return prev;
 						}
 
 						const newFrontend = currentSelection.filter((id) => id !== techId);
 
-						if (newFrontend.length === 0) {
+						if (techId === "web") {
 							return {
 								...prev,
-								frontend: ["none"],
+								frontend: newFrontend,
 								auth: "false",
+								examples: prev.examples.filter(
+									(ex) => ex !== "todo" && ex !== "ai",
+								),
 								addons: prev.addons.filter(
 									(addon) => addon !== "pwa" && addon !== "tauri",
 								),
@@ -589,23 +512,19 @@ const StackArchitect = () => {
 						};
 					}
 
-					if (techId === "web") {
-						const cleanedSelection = currentSelection.filter(
-							(id) => id !== "none",
-						);
+					// Adding a frontend option
+					if (currentSelection.includes("none")) {
+						// Replace "none" with the selected option
 						return {
 							...prev,
-							frontend: [...cleanedSelection, techId],
-							auth: "true",
+							frontend: [techId],
+							...(techId === "web" && { auth: "true" }),
 						};
 					}
-
-					const cleanedSelection = currentSelection.filter(
-						(id) => id !== "none",
-					);
 					return {
 						...prev,
-						frontend: [...cleanedSelection, techId],
+						frontend: [...currentSelection, techId],
+						...(techId === "web" && { auth: "true" }),
 					};
 				}
 
@@ -681,8 +600,6 @@ const StackArchitect = () => {
 					[category]: techId,
 				};
 			});
-
-			triggerConfetti();
 		},
 		[],
 	);
@@ -796,8 +713,10 @@ const StackArchitect = () => {
 										(activeTab === "turso" && stack.database !== "sqlite") ||
 										(activeTab === "auth" && !stack.frontend.includes("web")) ||
 										(activeTab === "examples" &&
-											tech.id === "todo" &&
-											!stack.frontend.includes("web")) ||
+											((tech.id === "todo" &&
+												!stack.frontend.includes("web")) ||
+												(tech.id === "ai" &&
+													!stack.frontend.includes("web")))) ||
 										(activeTab === "addons" &&
 											(tech.id === "pwa" || tech.id === "tauri") &&
 											!stack.frontend.includes("web"));
@@ -806,14 +725,14 @@ const StackArchitect = () => {
 										<motion.div
 											key={tech.id}
 											className={`
-												p-2 px-3 rounded
-												${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-												${
-													isSelected
-														? "bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-500/50"
-														: "hover:bg-gray-200 dark:hover:bg-gray-800 border border-gray-300 dark:border-gray-700"
-												}
-											`}
+                      p-2 px-3 rounded
+                      ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                      ${
+												isSelected
+													? "bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-500/50"
+													: "hover:bg-gray-200 dark:hover:bg-gray-800 border border-gray-300 dark:border-gray-700"
+											}
+                    `}
 											whileHover={!isDisabled ? { scale: 1.02 } : undefined}
 											whileTap={!isDisabled ? { scale: 0.98 } : undefined}
 											onClick={() =>
@@ -946,6 +865,21 @@ const StackArchitect = () => {
 										</span>
 									) : null;
 								})}
+
+								{stack.examples.length > 0 &&
+									stack.examples.map((exampleId) => {
+										const example = TECH_OPTIONS.examples.find(
+											(e) => e.id === exampleId,
+										);
+										return example ? (
+											<span
+												key={exampleId}
+												className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-300 border border-teal-300 dark:border-teal-700/30"
+											>
+												{example.icon} {example.name}
+											</span>
+										) : null;
+									})}
 							</div>
 						</div>
 					</div>
@@ -956,13 +890,13 @@ const StackArchitect = () => {
 							type="button"
 							key={category}
 							className={`
-									py-2 px-4 text-xs font-mono whitespace-nowrap transition-colors
-									${
-										activeTab === category
-											? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-t-2 border-blue-500"
-											: "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-800"
-									}
-								`}
+              py-2 px-4 text-xs font-mono whitespace-nowrap transition-colors
+              ${
+								activeTab === category
+									? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-t-2 border-blue-500"
+									: "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-800"
+							}
+            `}
 							onClick={() => setActiveTab(category)}
 						>
 							{category}
