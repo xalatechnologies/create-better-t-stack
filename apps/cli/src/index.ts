@@ -6,12 +6,10 @@ import { createProject } from "./helpers/create-project";
 import { installDependencies } from "./helpers/install-dependencies";
 import { gatherConfig } from "./prompts/config-prompts";
 import type {
-	BackendFramework,
 	ProjectAddons,
 	ProjectConfig,
 	ProjectExamples,
 	ProjectFrontend,
-	Runtime,
 } from "./types";
 import { displayConfig } from "./utils/display-config";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
@@ -34,36 +32,36 @@ async function main() {
 		.version(getLatestCLIVersion())
 		.argument("[project-directory]", "Project name/directory")
 		.option("-y, --yes", "Use default configuration")
-		.option("--no-database", "Skip database setup")
-		.option("--sqlite", "Use SQLite database")
-		.option("--postgres", "Use PostgreSQL database")
+		.option("--database <type>", "Database type (none, sqlite, postgres)")
+		.option("--orm <type>", "ORM type (none, drizzle, prisma)")
 		.option("--auth", "Include authentication")
 		.option("--no-auth", "Exclude authentication")
-		.option("--pwa", "Include Progressive Web App support")
-		.option("--tauri", "Include Tauri desktop app support")
-		.option("--biome", "Include Biome for linting and formatting")
-		.option("--husky", "Include Husky, lint-staged for Git hooks")
+		.option(
+			"--frontend <types>",
+			"Frontend types (web,native or both)",
+			(val) => val.split(",") as ProjectFrontend[],
+		)
+		.option(
+			"--addons <types>",
+			"Additional addons (pwa,tauri,biome,husky)",
+			(val) => val.split(",") as ProjectAddons[],
+		)
 		.option("--no-addons", "Skip all additional addons")
-		.option("--examples <examples>", "Include specified examples")
+		.option(
+			"--examples <types>",
+			"Examples to include (todo,ai)",
+			(val) => val.split(",") as ProjectExamples[],
+		)
 		.option("--no-examples", "Skip all examples")
-		.option("--git", "Include git setup")
+		.option("--git", "Initialize git repository")
 		.option("--no-git", "Skip git initialization")
-		.option("--npm", "Use npm package manager")
-		.option("--pnpm", "Use pnpm package manager")
-		.option("--bun", "Use bun package manager")
-		.option("--drizzle", "Use Drizzle ORM")
-		.option("--prisma", "Use Prisma ORM (coming soon)")
+		.option("--package-manager <pm>", "Package manager (npm, pnpm, bun)")
 		.option("--install", "Install dependencies")
 		.option("--no-install", "Skip installing dependencies")
 		.option("--turso", "Set up Turso for SQLite database")
-		.option("--no-turso", "Skip Turso setup for SQLite database")
-		.option("--hono", "Use Hono backend framework")
-		.option("--elysia", "Use Elysia backend framework")
-		.option("--runtime <runtime>", "Specify runtime (bun or node)")
-		.option("--web", "Include web frontend")
-		.option("--native", "Include Expo frontend")
-		.option("--no-web", "Exclude web frontend")
-		.option("--no-native", "Exclude Expo frontend")
+		.option("--no-turso", "Skip Turso setup")
+		.option("--backend <framework>", "Backend framework (hono, elysia)")
+		.option("--runtime <runtime>", "Runtime (bun, node)")
 		.parse();
 
 	const s = spinner();
@@ -75,60 +73,88 @@ async function main() {
 		const options = program.opts();
 		const projectDirectory = program.args[0];
 
-		let backendFramework: BackendFramework | undefined;
-		if (options.hono) backendFramework = "hono";
-		if (options.elysia) backendFramework = "elysia";
+		if (
+			options.database &&
+			!["none", "sqlite", "postgres"].includes(options.database)
+		) {
+			cancel(
+				pc.red(
+					`Invalid database type: ${options.database}. Must be none, sqlite, or postgres.`,
+				),
+			);
+			process.exit(1);
+		}
+
+		if (options.orm && !["none", "drizzle", "prisma"].includes(options.orm)) {
+			cancel(
+				pc.red(
+					`Invalid ORM type: ${options.orm}. Must be none, drizzle, or prisma.`,
+				),
+			);
+			process.exit(1);
+		}
+
+		if (
+			options.packageManager &&
+			!["npm", "pnpm", "bun"].includes(options.packageManager)
+		) {
+			cancel(
+				pc.red(
+					`Invalid package manager: ${options.packageManager}. Must be npm, pnpm, or bun.`,
+				),
+			);
+			process.exit(1);
+		}
+
+		if (options.backend && !["hono", "elysia"].includes(options.backend)) {
+			cancel(
+				pc.red(
+					`Invalid backend framework: ${options.backend}. Must be hono or elysia.`,
+				),
+			);
+			process.exit(1);
+		}
+
+		if (options.runtime && !["bun", "node"].includes(options.runtime)) {
+			cancel(
+				pc.red(`Invalid runtime: ${options.runtime}. Must be bun or node.`),
+			);
+			process.exit(1);
+		}
+
+		if (options.examples && options.examples.length > 0) {
+			const validExamples = ["todo", "ai"];
+			const invalidExamples = options.examples.filter(
+				(example: ProjectExamples) => !validExamples.includes(example),
+			);
+
+			if (invalidExamples.length > 0) {
+				cancel(
+					pc.red(
+						`Invalid example(s): ${invalidExamples.join(", ")}. Valid options are: ${validExamples.join(", ")}.`,
+					),
+				);
+				process.exit(1);
+			}
+		}
 
 		const flagConfig: Partial<ProjectConfig> = {
 			...(projectDirectory && { projectName: projectDirectory }),
-			...(options.database === false && { database: "none" }),
-			...(options.sqlite && { database: "sqlite" }),
-			...(options.postgres && { database: "postgres" }),
-			...(options.drizzle && { orm: "drizzle" }),
-			...(options.prisma && { orm: "prisma" }),
+			...(options.database && { database: options.database }),
+			...(options.orm && { orm: options.orm }),
 			...("auth" in options && { auth: options.auth }),
-			...(options.npm && { packageManager: "npm" }),
-			...(options.pnpm && { packageManager: "pnpm" }),
-			...(options.bun && { packageManager: "bun" }),
+			...(options.packageManager && { packageManager: options.packageManager }),
 			...("git" in options && { git: options.git }),
 			...("install" in options && { noInstall: !options.install }),
 			...("turso" in options && { turso: options.turso }),
-			...(backendFramework && { backendFramework }),
-			...(options.runtime && { runtime: options.runtime as Runtime }),
-			...((options.pwa ||
-				options.tauri ||
-				options.biome ||
-				options.husky ||
-				options.addons === false) && {
-				addons:
-					options.addons === false
-						? []
-						: ([
-								...(options.pwa ? ["pwa"] : []),
-								...(options.tauri ? ["tauri"] : []),
-								...(options.biome ? ["biome"] : []),
-								...(options.husky ? ["husky"] : []),
-							] as ProjectAddons[]),
+			...(options.backend && { backend: options.backend }),
+			...(options.runtime && { runtime: options.runtime }),
+			...(options.frontend && { frontend: options.frontend }),
+			...((options.addons || options.addons === false) && {
+				addons: options.addons === false ? [] : options.addons,
 			}),
 			...((options.examples || options.examples === false) && {
-				examples:
-					options.examples === false
-						? []
-						: typeof options.examples === "string"
-							? (options.examples
-									.split(",")
-									.filter((e) => e === "todo") as ProjectExamples[])
-							: [],
-			}),
-			...((options.web !== undefined || options.native !== undefined) && {
-				frontend: [
-					...(options.web === false ? [] : ["web"]),
-					...(options.native === false
-						? []
-						: options.native === true
-							? ["native"]
-							: []),
-				].filter(Boolean) as ProjectFrontend[],
+				examples: options.examples === false ? [] : options.examples,
 			}),
 		};
 
@@ -137,55 +163,12 @@ async function main() {
 			log.message(displayConfig(flagConfig));
 			log.message("");
 		}
+
 		const config = options.yes
 			? {
 					...DEFAULT_CONFIG,
 					projectName: projectDirectory ?? DEFAULT_CONFIG.projectName,
-					database:
-						options.database === false
-							? "none"
-							: options.sqlite
-								? "sqlite"
-								: options.postgres
-									? "postgres"
-									: DEFAULT_CONFIG.database,
-					orm:
-						options.database === false
-							? "none"
-							: options.drizzle
-								? "drizzle"
-								: options.prisma
-									? "prisma"
-									: DEFAULT_CONFIG.orm,
-					auth: "auth" in options ? options.auth : DEFAULT_CONFIG.auth,
-					git: "git" in options ? options.git : DEFAULT_CONFIG.git,
-					noInstall:
-						"install" in options ? !options.install : DEFAULT_CONFIG.noInstall,
-					packageManager:
-						flagConfig.packageManager ?? DEFAULT_CONFIG.packageManager,
-					addons: flagConfig.addons?.length
-						? flagConfig.addons
-						: DEFAULT_CONFIG.addons,
-					examples: flagConfig.examples?.length
-						? flagConfig.examples
-						: DEFAULT_CONFIG.examples,
-					turso:
-						"turso" in options
-							? options.turso
-							: flagConfig.database === "sqlite"
-								? DEFAULT_CONFIG.turso
-								: false,
-					backendFramework: backendFramework ?? DEFAULT_CONFIG.backendFramework,
-					runtime: options.runtime
-						? (options.runtime as Runtime)
-						: DEFAULT_CONFIG.runtime,
-					frontend:
-						options.web === false || options.native === true
-							? ([
-									...(options.web === false ? [] : ["web"]),
-									...(options.native ? ["native"] : []),
-								] as ProjectFrontend[])
-							: DEFAULT_CONFIG.frontend,
+					...flagConfig,
 				}
 			: await gatherConfig(flagConfig);
 

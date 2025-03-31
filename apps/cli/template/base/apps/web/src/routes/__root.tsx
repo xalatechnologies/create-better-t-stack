@@ -46,9 +46,11 @@ function RootComponent() {
     <>
       <HeadContent />
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <Header />
-        {isFetching && <Loader />}
-        <Outlet />
+        <div className="grid grid-rows-[auto_1fr] h-svh">
+          <Header />
+          {isFetching && <Loader />}
+          <Outlet />
+        </div>
         <Toaster richColors />
       </ThemeProvider>
       <TanStackRouterDevtools position="bottom-left" />

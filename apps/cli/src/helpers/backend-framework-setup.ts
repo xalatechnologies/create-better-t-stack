@@ -1,12 +1,12 @@
 import path from "node:path";
 import type { AvailableDependencies } from "../constants";
-import type { BackendFramework, Runtime } from "../types";
+import type { ProjectBackend, ProjectRuntime } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupBackendDependencies(
 	projectDir: string,
-	framework: BackendFramework,
-	runtime: Runtime,
+	framework: ProjectBackend,
+	runtime: ProjectRuntime,
 ): Promise<void> {
 	const serverDir = path.join(projectDir, "apps/server");
 

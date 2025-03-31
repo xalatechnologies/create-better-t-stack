@@ -34,10 +34,10 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 
 		await fixGitignoreFiles(projectDir);
 
-		await setupBackendFramework(projectDir, options.backendFramework);
+		await setupBackendFramework(projectDir, options.backend);
 		await setupBackendDependencies(
 			projectDir,
-			options.backendFramework,
+			options.backend,
 			options.runtime,
 		);
 
@@ -58,19 +58,20 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 		await setupAuthTemplate(
 			projectDir,
 			options.auth,
-			options.backendFramework,
+			options.backend,
 			options.orm,
 			options.database,
 		);
 		await setupAuth(projectDir, options.auth);
 
-		await setupRuntime(projectDir, options.runtime, options.backendFramework);
+		await setupRuntime(projectDir, options.runtime, options.backend);
 
 		await setupExamples(
 			projectDir,
 			options.examples,
 			options.orm,
 			options.auth,
+			options.backend,
 			options.frontend,
 		);
 

@@ -2,7 +2,7 @@ import path from "node:path";
 import fs from "fs-extra";
 import { PKG_ROOT } from "../constants";
 import type {
-	BackendFramework,
+	ProjectBackend,
 	ProjectDatabase,
 	ProjectFrontend,
 	ProjectOrm,
@@ -42,7 +42,7 @@ export async function setupFrontendTemplates(
 
 export async function setupBackendFramework(
 	projectDir: string,
-	framework: BackendFramework,
+	framework: ProjectBackend,
 ): Promise<void> {
 	const frameworkDir = path.join(PKG_ROOT, `template/with-${framework}`);
 	if (await fs.pathExists(frameworkDir)) {
@@ -88,7 +88,7 @@ export async function setupOrmTemplate(
 export async function setupAuthTemplate(
 	projectDir: string,
 	auth: boolean,
-	framework: BackendFramework,
+	framework: ProjectBackend,
 	orm: ProjectOrm,
 	database: ProjectDatabase,
 ): Promise<void> {

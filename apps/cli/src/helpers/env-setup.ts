@@ -46,6 +46,13 @@ export async function setupEnvironmentVariables(
 		}
 	}
 
+	if (
+		options.examples?.includes("ai") &&
+		!envContent.includes("GOOGLE_GENERATIVE_AI_API_KEY")
+	) {
+		envContent += "\nGOOGLE_GENERATIVE_AI_API_KEY=";
+	}
+
 	await fs.writeFile(envPath, envContent.trim());
 
 	if (options.frontend.includes("web")) {

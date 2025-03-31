@@ -4,12 +4,12 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 	const flags: string[] = [];
 
 	if (config.database === "none") {
-		flags.push("--no-database");
+		flags.push("--database none");
 	} else {
-		flags.push(`--${config.database}`);
+		flags.push(`--database ${config.database}`);
 
 		if (config.orm) {
-			flags.push(`--${config.orm}`);
+			flags.push(`--orm ${config.orm}`);
 		}
 
 		if (config.database === "sqlite") {
@@ -23,36 +23,20 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 
 	flags.push(config.noInstall ? "--no-install" : "--install");
 
-	if (config.packageManager) {
-		flags.push(`--${config.packageManager}`);
-	}
-
-	if (config.backendFramework) {
-		flags.push(`--${config.backendFramework}`);
-	}
-
 	if (config.runtime) {
 		flags.push(`--runtime ${config.runtime}`);
 	}
 
-	if (config.frontend) {
-		if (config.frontend.includes("web")) {
-			flags.push("--web");
-		} else {
-			flags.push("--no-web");
-		}
-
-		if (config.frontend.includes("native")) {
-			flags.push("--native");
-		} else {
-			flags.push("--no-native");
-		}
+	if (config.backend) {
+		flags.push(`--backend ${config.backend}`);
 	}
 
-	if (config.addons.length > 0) {
-		for (const addon of config.addons) {
-			flags.push(`--${addon}`);
-		}
+	if (config.frontend && config.frontend.length > 0) {
+		flags.push(`--frontend ${config.frontend.join(",")}`);
+	}
+
+	if (config.addons && config.addons.length > 0) {
+		flags.push(`--addons ${config.addons.join(",")}`);
 	} else {
 		flags.push("--no-addons");
 	}
@@ -63,7 +47,21 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		flags.push("--no-examples");
 	}
 
-	const baseCommand = "npx create-better-t-stack";
+	if (config.packageManager) {
+		flags.push(`--package-manager ${config.packageManager}`);
+	}
+
+	let baseCommand = "";
+	const pkgManager = config.packageManager;
+
+	if (pkgManager === "npm") {
+		baseCommand = "npm create better-t-stack@latest";
+	} else if (pkgManager === "pnpm") {
+		baseCommand = "pnpm create better-t-stack@latest";
+	} else if (pkgManager === "bun") {
+		baseCommand = "bun create better-t-stack@latest";
+	}
+
 	const projectName = config.projectName ? ` ${config.projectName}` : "";
 
 	return `${baseCommand}${projectName} ${flags.join(" ")}`;

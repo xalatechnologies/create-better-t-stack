@@ -3,12 +3,12 @@ import { log, spinner } from "@clack/prompts";
 import { $, execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type { PackageManager } from "../types";
+import type { ProjectPackageManager } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupTauri(
 	projectDir: string,
-	packageManager: PackageManager,
+	packageManager: ProjectPackageManager,
 ): Promise<void> {
 	const s = spinner();
 	const clientPackageDir = path.join(projectDir, "apps/web");

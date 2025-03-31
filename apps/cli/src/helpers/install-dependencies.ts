@@ -1,7 +1,7 @@
 import { log, spinner } from "@clack/prompts";
 import { $ } from "execa";
 import pc from "picocolors";
-import type { PackageManager, ProjectAddons } from "../types";
+import type { ProjectAddons, ProjectPackageManager } from "../types";
 
 export async function installDependencies({
 	projectDir,
@@ -9,7 +9,7 @@ export async function installDependencies({
 	addons = [],
 }: {
 	projectDir: string;
-	packageManager: PackageManager;
+	packageManager: ProjectPackageManager;
 	addons?: ProjectAddons[];
 }) {
 	const s = spinner();
@@ -17,20 +17,10 @@ export async function installDependencies({
 	try {
 		s.start(`Running ${packageManager} install...`);
 
-		switch (packageManager) {
-			case "npm":
-				await $({
-					cwd: projectDir,
-					stderr: "inherit",
-				})`${packageManager} install`;
-				break;
-			case "pnpm":
-			case "bun":
-				await $({
-					cwd: projectDir,
-				})`${packageManager} install`;
-				break;
-		}
+		await $({
+			cwd: projectDir,
+			stderr: "inherit",
+		})`${packageManager} install`;
 
 		s.stop("Dependencies installed successfully");
 
@@ -48,14 +38,17 @@ export async function installDependencies({
 
 async function runBiomeCheck(
 	projectDir: string,
-	packageManager: PackageManager,
+	packageManager: ProjectPackageManager,
 ) {
 	const s = spinner();
 
 	try {
 		s.start("Running Biome format check...");
 
-		await $({ cwd: projectDir })`${packageManager} biome check --write .`;
+		await $({
+			cwd: projectDir,
+			stderr: "inherit",
+		})`${packageManager} biome check --write .`;
 
 		s.stop("Biome check completed successfully");
 	} catch (error) {

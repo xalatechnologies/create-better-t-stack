@@ -1,6 +1,6 @@
-import type { PackageManager } from "../types";
+import type { ProjectPackageManager } from "../types";
 
-export const getUserPkgManager: () => PackageManager = () => {
+export const getUserPkgManager: () => ProjectPackageManager = () => {
 	const userAgent = process.env.npm_config_user_agent;
 
 	if (userAgent?.startsWith("pnpm")) {

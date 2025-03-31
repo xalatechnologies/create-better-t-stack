@@ -1,14 +1,14 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { BackendFramework } from "../types";
+import type { ProjectBackend } from "../types";
 
 export async function getBackendFrameworkChoice(
-	backendFramework?: BackendFramework,
-): Promise<BackendFramework> {
+	backendFramework?: ProjectBackend,
+): Promise<ProjectBackend> {
 	if (backendFramework !== undefined) return backendFramework;
 
-	const response = await select<BackendFramework>({
+	const response = await select<ProjectBackend>({
 		message: "Which backend framework would you like to use?",
 		options: [
 			{
@@ -22,7 +22,7 @@ export async function getBackendFrameworkChoice(
 				hint: "TypeScript framework with end-to-end type safety)",
 			},
 		],
-		initialValue: DEFAULT_CONFIG.backendFramework,
+		initialValue: DEFAULT_CONFIG.backend,
 	});
 
 	if (isCancel(response)) {

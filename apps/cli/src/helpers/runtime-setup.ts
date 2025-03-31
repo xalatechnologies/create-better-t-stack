@@ -1,12 +1,12 @@
 import path from "node:path";
 import fs from "fs-extra";
-import type { BackendFramework, Runtime } from "../types";
+import type { ProjectBackend, ProjectRuntime } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupRuntime(
 	projectDir: string,
-	runtime: Runtime,
-	backendFramework: BackendFramework,
+	runtime: ProjectRuntime,
+	backendFramework: ProjectBackend,
 ): Promise<void> {
 	const serverDir = path.join(projectDir, "apps/server");
 	const serverIndexPath = path.join(serverDir, "src/index.ts");
@@ -34,7 +34,7 @@ async function setupBunRuntime(
 	serverDir: string,
 	serverIndexPath: string,
 	indexContent: string,
-	backendFramework: BackendFramework,
+	backendFramework: ProjectBackend,
 ): Promise<void> {
 	const packageJsonPath = path.join(serverDir, "package.json");
 	const packageJson = await fs.readJson(packageJsonPath);
@@ -62,7 +62,7 @@ async function setupNodeRuntime(
 	serverDir: string,
 	serverIndexPath: string,
 	indexContent: string,
-	backendFramework: BackendFramework,
+	backendFramework: ProjectBackend,
 ): Promise<void> {
 	const packageJsonPath = path.join(serverDir, "package.json");
 	const packageJson = await fs.readJson(packageJsonPath);

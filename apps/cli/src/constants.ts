@@ -19,7 +19,7 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 	packageManager: getUserPkgManager(),
 	noInstall: false,
 	turso: false,
-	backendFramework: "hono",
+	backend: "hono",
 	runtime: "bun",
 };
 
@@ -59,6 +59,9 @@ export const dependencyVersionMap = {
 
 	"@hono/trpc-server": "^0.3.4",
 	hono: "^4.7.5",
+
+	ai: "^4.2.8",
+	"@ai-sdk/google": "^1.2.3",
 } as const;
 
 export type AvailableDependencies = keyof typeof dependencyVersionMap;

@@ -1,22 +1,22 @@
 import { log } from "@clack/prompts";
 import pc from "picocolors";
 import type {
-	PackageManager,
 	ProjectAddons,
 	ProjectDatabase,
 	ProjectFrontend,
 	ProjectOrm,
-	Runtime,
+	ProjectPackageManager,
+	ProjectRuntime,
 } from "../types";
 
 export function displayPostInstallInstructions(
 	database: ProjectDatabase,
 	projectName: string,
-	packageManager: PackageManager,
+	packageManager: ProjectPackageManager,
 	depsInstalled: boolean,
 	orm: ProjectOrm,
 	addons: ProjectAddons[],
-	runtime: Runtime,
+	runtime: ProjectRuntime,
 	frontends: ProjectFrontend[],
 ) {
 	const runCmd = packageManager === "npm" ? "npm run" : packageManager;
@@ -67,7 +67,7 @@ function getDatabaseInstructions(
 	database: ProjectDatabase,
 	orm?: ProjectOrm,
 	runCmd?: string,
-	runtime?: Runtime,
+	runtime?: ProjectRuntime,
 ): string {
 	const instructions = [];
 

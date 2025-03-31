@@ -1,12 +1,14 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { Runtime } from "../types";
+import type { ProjectRuntime } from "../types";
 
-export async function getRuntimeChoice(runtime?: Runtime): Promise<Runtime> {
+export async function getRuntimeChoice(
+	runtime?: ProjectRuntime,
+): Promise<ProjectRuntime> {
 	if (runtime !== undefined) return runtime;
 
-	const response = await select<Runtime>({
+	const response = await select<ProjectRuntime>({
 		message: "Which runtime would you like to use?",
 		options: [
 			{

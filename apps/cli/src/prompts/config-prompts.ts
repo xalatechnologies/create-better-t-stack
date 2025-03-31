@@ -1,15 +1,15 @@
 import { cancel, group } from "@clack/prompts";
 import pc from "picocolors";
 import type {
-	BackendFramework,
-	PackageManager,
 	ProjectAddons,
+	ProjectBackend,
 	ProjectConfig,
 	ProjectDatabase,
 	ProjectExamples,
 	ProjectFrontend,
 	ProjectOrm,
-	Runtime,
+	ProjectPackageManager,
+	ProjectRuntime,
 } from "../types";
 import { getAddonsChoice } from "./addons";
 import { getAuthChoice } from "./auth";
@@ -33,11 +33,11 @@ type PromptGroupResults = {
 	addons: ProjectAddons[];
 	examples: ProjectExamples[];
 	git: boolean;
-	packageManager: PackageManager;
+	packageManager: ProjectPackageManager;
 	noInstall: boolean;
 	turso: boolean;
-	backendFramework: BackendFramework;
-	runtime: Runtime;
+	backend: ProjectBackend;
+	runtime: ProjectRuntime;
 	frontend: ProjectFrontend[];
 };
 
@@ -50,7 +50,7 @@ export async function gatherConfig(
 				return getProjectName(flags.projectName);
 			},
 			frontend: () => getFrontendChoice(flags.frontend),
-			backendFramework: () => getBackendFrameworkChoice(flags.backendFramework),
+			backend: () => getBackendFrameworkChoice(flags.backend),
 			runtime: () => getRuntimeChoice(flags.runtime),
 			database: () => getDatabaseChoice(flags.database),
 			orm: ({ results }) =>
@@ -67,7 +67,12 @@ export async function gatherConfig(
 					: Promise.resolve(false),
 			addons: ({ results }) => getAddonsChoice(flags.addons, results.frontend),
 			examples: ({ results }) =>
-				getExamplesChoice(flags.examples, results.database, results.frontend),
+				getExamplesChoice(
+					flags.examples,
+					results.database,
+					results.frontend,
+					results.backend,
+				),
 			git: () => getGitChoice(flags.git),
 			packageManager: () => getPackageManagerChoice(flags.packageManager),
 			noInstall: () => getNoInstallChoice(flags.noInstall),
@@ -92,7 +97,7 @@ export async function gatherConfig(
 		packageManager: result.packageManager,
 		noInstall: result.noInstall,
 		turso: result.turso,
-		backendFramework: result.backendFramework,
+		backend: result.backend,
 		runtime: result.runtime,
 	};
 }

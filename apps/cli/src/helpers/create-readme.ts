@@ -5,7 +5,7 @@ import type {
 	ProjectConfig,
 	ProjectDatabase,
 	ProjectOrm,
-	Runtime,
+	ProjectRuntime,
 } from "../types";
 
 export async function createReadme(projectDir: string, options: ProjectConfig) {
@@ -80,7 +80,7 @@ function generateFeaturesList(
 	auth: boolean,
 	addons: ProjectAddons[],
 	orm: ProjectOrm,
-	runtime: Runtime,
+	runtime: ProjectRuntime,
 ): string {
 	const addonsList = [
 		"- **TypeScript** - For type safety and improved developer experience",
