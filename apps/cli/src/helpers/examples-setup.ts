@@ -12,7 +12,6 @@ export async function setupExamples(
 	backend: ProjectBackend,
 	frontend: ProjectFrontend[] = ["web"],
 ): Promise<void> {
-	console.log("EXAMPLEs:", examples);
 	const hasWebFrontend = frontend.includes("web");
 	const webAppExists = await fs.pathExists(path.join(projectDir, "apps/web"));
 
