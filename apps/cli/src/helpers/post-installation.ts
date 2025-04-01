@@ -58,7 +58,7 @@ ${nativeInstructions ? `\n${nativeInstructions.trim()}` : ""}${databaseInstructi
 }
 
 function getNativeInstructions(): string {
-	return `${pc.yellow("NOTE:")} If the Expo app cannot connect to the server, update the EXPO_PUBLIC_SERVER_URL in apps/native/.env to use your local IP address instead of localhost:\n${"EXPO_PUBLIC_SERVER_URL=http://192.168.0.103:3000"}\n`;
+	return `${pc.yellow("NOTE:")} For Expo connectivity issues, update apps/native/.env \nwith your local IP:\n${"EXPO_PUBLIC_SERVER_URL=http://192.168.0.103:3000"}\n`;
 }
 
 function getLintingInstructions(runCmd?: string): string {
