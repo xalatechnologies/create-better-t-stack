@@ -57,10 +57,6 @@ bun dev:cli
 bun dev:web
 ```
 
-## Contributors
+## Want to contribute?
 
-<a href="https://github.com/better-t-stack/create-better-t-stack/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=better-t-stack/create-better-t-stack" />
-</a>
-
-Made with [contrib.rocks](https://contrib.rocks).
+Just fork the repository and submit a pull request!

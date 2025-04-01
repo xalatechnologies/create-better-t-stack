@@ -1,4 +1,4 @@
-import { log } from "@clack/prompts";
+import { note } from "@clack/prompts";
 import pc from "picocolors";
 import type {
 	ProjectAddons,
@@ -42,8 +42,8 @@ export function displayPostInstallInstructions(
 	const hasNativeFrontend = frontends?.includes("native");
 	const hasFrontend = hasWebFrontend || hasNativeFrontend;
 
-	log.info(`${pc.bold("Next steps:")}
-${pc.cyan("1.")} ${cdCmd}
+	note(
+		`${pc.cyan("1.")} ${cdCmd}
 ${!depsInstalled ? `${pc.cyan("2.")} ${packageManager} install\n` : ""}${pc.cyan(depsInstalled ? "2." : "3.")} ${runCmd} dev
 
 ${pc.bold("Your project will be available at:")}
@@ -52,15 +52,17 @@ ${
 		? `${hasWebFrontend ? `${pc.cyan("•")} Frontend: http://localhost:3001\n` : ""}`
 		: `${pc.yellow("NOTE:")} You are creating a backend-only app (no frontend selected)\n`
 }${pc.cyan("•")} API: http://localhost:3000
-${nativeInstructions ? `\n${nativeInstructions.trim()}` : ""}${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}`);
+${nativeInstructions ? `\n${nativeInstructions.trim()}` : ""}${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}`,
+		"Next steps",
+	);
 }
 
 function getNativeInstructions(): string {
-	return `${pc.yellow("NOTE:")} If the Expo app cannot connect to the server, update the EXPO_PUBLIC_SERVER_URL in apps/native/.env to use your local IP address instead of localhost:\n${pc.dim("EXPO_PUBLIC_SERVER_URL=http://192.168.0.103:3000")}\n`;
+	return `${pc.yellow("NOTE:")} If the Expo app cannot connect to the server, update the EXPO_PUBLIC_SERVER_URL in apps/native/.env to use your local IP address instead of localhost:\n${"EXPO_PUBLIC_SERVER_URL=http://192.168.0.103:3000"}\n`;
 }
 
 function getLintingInstructions(runCmd?: string): string {
-	return `${pc.bold("Linting and formatting:")}\n${pc.cyan("•")} Format and lint fix: ${pc.dim(`${runCmd} check`)}\n\n`;
+	return `${pc.bold("\nLinting and formatting:")}\n${pc.cyan("•")} Format and lint fix: ${`${runCmd} check`}\n\n`;
 }
 
 function getDatabaseInstructions(
@@ -75,7 +77,7 @@ function getDatabaseInstructions(
 		if (database === "sqlite") {
 			instructions.push(
 				`${pc.yellow("NOTE:")} Turso support with Prisma is in Early Access and requires additional setup.`,
-				`${pc.dim("Learn more at: https://www.prisma.io/docs/orm/overview/databases/turso")}`,
+				`${"Learn more at: https://www.prisma.io/docs/orm/overview/databases/turso"}`,
 			);
 		}
 
@@ -85,24 +87,16 @@ function getDatabaseInstructions(
 			);
 		}
 
-		instructions.push(
-			`${pc.cyan("•")} Apply schema: ${pc.dim(`${runCmd} db:push`)}`,
-		);
-		instructions.push(
-			`${pc.cyan("•")} Database UI: ${pc.dim(`${runCmd} db:studio`)}`,
-		);
+		instructions.push(`${pc.cyan("•")} Apply schema: ${`${runCmd} db:push`}`);
+		instructions.push(`${pc.cyan("•")} Database UI: ${`${runCmd} db:studio`}`);
 	} else if (orm === "drizzle") {
 		if (database === "sqlite") {
 			instructions.push(
-				`${pc.cyan("•")} Start local DB: ${pc.dim(`cd apps/server && ${runCmd} db:local`)}`,
+				`${pc.cyan("•")} Start local DB: ${`cd apps/server && ${runCmd} db:local`}`,
 			);
 		}
-		instructions.push(
-			`${pc.cyan("•")} Apply schema: ${pc.dim(`${runCmd} db:push`)}`,
-		);
-		instructions.push(
-			`${pc.cyan("•")} Database UI: ${pc.dim(`${runCmd} db:studio`)}`,
-		);
+		instructions.push(`${pc.cyan("•")} Apply schema: ${`${runCmd} db:push`}`);
+		instructions.push(`${pc.cyan("•")} Database UI: ${`${runCmd} db:studio`}`);
 	}
 
 	return instructions.length
@@ -111,5 +105,5 @@ function getDatabaseInstructions(
 }
 
 function getTauriInstructions(runCmd?: string): string {
-	return `${pc.bold("Desktop app with Tauri:")}\n${pc.cyan("•")} Start desktop app: ${pc.dim(`cd apps/web && ${runCmd} desktop:dev`)}\n${pc.cyan("•")} Build desktop app: ${pc.dim(`cd apps/web && ${runCmd} desktop:build`)}\n${pc.yellow("NOTE:")} Tauri requires Rust and platform-specific dependencies. See: ${pc.dim("https://v2.tauri.app/start/prerequisites/")}\n\n`;
+	return `${pc.bold("Desktop app with Tauri:")}\n${pc.cyan("•")} Start desktop app: ${`cd apps/web && ${runCmd} desktop:dev`}\n${pc.cyan("•")} Build desktop app: ${`cd apps/web && ${runCmd} desktop:build`}\n${pc.yellow("NOTE:")} Tauri requires Rust and platform-specific dependencies. See: ${"https://v2.tauri.app/start/prerequisites/"}\n\n`;
 }

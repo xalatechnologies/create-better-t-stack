@@ -34,7 +34,7 @@ Follow the prompts to configure your project or use the `-y` flag for defaults.
 - **Desktop Apps**: Build native desktop apps with Tauri integration
 - **Code Quality**: Biome for linting and formatting
 - **Git Hooks**: Husky with lint-staged for pre-commit checks
-- **Examples**: Todo app with full CRUD functionality
+- **Examples**: Todo app with full CRUD functionality, AI Chat using AI SDK
 - **Developer Experience**: Git initialization, various package manager support (npm, pnpm, bun)
 
 ## Usage
@@ -43,39 +43,27 @@ Follow the prompts to configure your project or use the `-y` flag for defaults.
 Usage: create-better-t-stack [project-directory] [options]
 
 Options:
-  -V, --version          Output the version number
-  -y, --yes              Use default configuration
-  --no-database          Skip database setup
-  --sqlite               Use SQLite database
-  --postgres             Use PostgreSQL database
-  --auth                 Include authentication
-  --no-auth              Exclude authentication
-  --pwa                  Include Progressive Web App support
-  --tauri                Include Tauri desktop app support
-  --biome                Include Biome for linting and formatting
-  --husky                Include Husky, lint-staged for Git hooks
-  --no-addons            Skip all additional addons
-  --examples <examples>  Include specified examples
-  --no-examples          Skip all examples
-  --git                  Include git setup (default)
-  --no-git               Skip git initialization
-  --npm                  Use npm as package manager
-  --pnpm                 Use pnpm as package manager
-  --bun                  Use bun as package manager
-  --drizzle              Use Drizzle ORM
-  --prisma               Use Prisma ORM
-  --install              Install dependencies (default)
-  --no-install           Skip installing dependencies
-  --turso                Set up Turso for SQLite database
-  --no-turso             Skip Turso setup for SQLite database
-  --hono                 Use Hono backend framework (default)
-  --elysia               Use Elysia backend framework
-  --runtime <runtime>    Specify runtime (bun or node)
-  --web                  Include web frontend (default)
-  --native               Include Expo frontend
-  --no-web               Exclude web frontend
-  --no-native            Exclude Expo frontend
-  -h, --help             Display help
+  -V, --version                   Output the version number
+  -y, --yes                       Use default configuration
+  --database <type>               Database type (none, sqlite, postgres)
+  --orm <type>                    ORM type (none, drizzle, prisma)
+  --auth                          Include authentication
+  --no-auth                       Exclude authentication
+  --frontend <types>              Frontend types (web,native or both)
+  --addons <types>                Additional addons (pwa,tauri,biome,husky)
+  --no-addons                     Skip all additional addons
+  --examples <types>              Examples to include (todo,ai)
+  --no-examples                   Skip all examples
+  --git                           Initialize git repository
+  --no-git                        Skip git initialization
+  --package-manager <pm>          Package manager (npm, pnpm, bun)
+  --install                       Install dependencies
+  --no-install                    Skip installing dependencies
+  --turso                         Set up Turso for SQLite database
+  --no-turso                      Skip Turso setup
+  --backend <framework>           Backend framework (hono, elysia)
+  --runtime <runtime>             Runtime (bun, node)
+  -h, --help                      Display help
 ```
 
 ## Examples
@@ -87,17 +75,20 @@ npx create-better-t-stack my-app -y
 
 Create a project with specific options:
 ```bash
-npx create-better-t-stack my-app --postgres --drizzle --auth --pwa --biome
+npx create-better-t-stack my-app --database postgres --orm drizzle --auth --addons pwa,biome
 ```
 
 Create a project with Elysia and Node.js runtime:
 ```bash
-npx create-better-t-stack my-app --elysia --runtime node
+npx create-better-t-stack my-app --backend elysia --runtime node
 ```
 
-Create a project using Hono with no addons:
+Create a project with specific frontend options:
 ```bash
-npx create-better-t-stack my-app --hono --no-addons
+npx create-better-t-stack my-app --frontend web,native
 ```
 
-Created by [Aman Varshney](https://github.com/AmanVarshney01) & [Nitish Singh](https://github.com/FgrReloaded)
+Create a project with examples:
+```bash
+npx create-better-t-stack my-app --examples todo,ai
+```
