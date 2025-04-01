@@ -81,7 +81,6 @@ app.post("/ai", async (c) => {
 		return stream(c, (stream) => stream.pipe(result.toDataStream()));
 });`;
 
-			// Add the import section
 			if (indexContent.includes("import {")) {
 				const lastImportIndex = indexContent.lastIndexOf("import");
 				const endOfLastImport = indexContent.indexOf("\n", lastImportIndex);
@@ -94,7 +93,6 @@ ${indexContent.substring(endOfLastImport + 1)}`;
 ${indexContent}`;
 			}
 
-			// Add the route handler
 			const trpcHandlerIndex =
 				indexContent.indexOf('app.use("/trpc"') ||
 				indexContent.indexOf("app.use(trpc(");
@@ -103,7 +101,6 @@ ${indexContent}`;
 
 ${indexContent.substring(trpcHandlerIndex)}`;
 			} else {
-				// Add it near the end before export
 				const exportIndex = indexContent.indexOf("export default");
 				if (exportIndex !== -1) {
 					indexContent = `${indexContent.substring(0, exportIndex)}${aiRouteHandler}

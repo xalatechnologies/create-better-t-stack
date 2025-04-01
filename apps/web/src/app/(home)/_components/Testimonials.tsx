@@ -42,7 +42,6 @@ export default function Testimonials() {
 		return () => window.removeEventListener("resize", handleResize);
 	}, []);
 
-	// Get visible tweets
 	const getVisibleTweets = () => {
 		const visible = [];
 		for (let i = 0; i < tweetsPerPage; i++) {

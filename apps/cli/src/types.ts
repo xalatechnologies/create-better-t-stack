@@ -22,3 +22,19 @@ export interface ProjectConfig {
 	turso?: boolean;
 	frontend: ProjectFrontend[];
 }
+
+export type CLIOptions = {
+	yes?: boolean;
+	database?: string;
+	orm?: string;
+	auth?: boolean;
+	frontend?: string[];
+	addons?: string[];
+	examples?: string[] | boolean;
+	git?: boolean;
+	packageManager?: string;
+	install?: boolean;
+	turso?: boolean;
+	backend?: string;
+	runtime?: string;
+};

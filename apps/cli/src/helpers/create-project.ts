@@ -10,6 +10,7 @@ import { createReadme } from "./create-readme";
 import { setupDatabase } from "./db-setup";
 import { setupEnvironmentVariables } from "./env-setup";
 import { setupExamples } from "./examples-setup";
+import { installDependencies } from "./install-dependencies";
 import { displayPostInstallInstructions } from "./post-installation";
 import { initializeGit, updatePackageConfigurations } from "./project-config";
 import { setupRuntime } from "./runtime-setup";
@@ -90,6 +91,14 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 
 		await updatePackageConfigurations(projectDir, options);
 		await createReadme(projectDir, options);
+
+		if (!options.noInstall) {
+			await installDependencies({
+				projectDir,
+				packageManager: options.packageManager,
+				addons: options.addons,
+			});
+		}
 
 		displayPostInstallInstructions(
 			options.database,

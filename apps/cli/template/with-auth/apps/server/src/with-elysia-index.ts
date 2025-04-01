@@ -19,9 +19,8 @@ const app = new Elysia()
     const { request } = context;
     if (["POST", "GET"].includes(request.method)) {
       return auth.handler(request);
-    } else {
-      context.error(405);
     }
+    context.error(405);
   })
   .all("/trpc/*", async (context) => {
     const res = await fetchRequestHandler({
@@ -34,5 +33,5 @@ const app = new Elysia()
   })
   .get("/", () => "OK")
   .listen(3000, () => {
-    console.log(`Server is running on http://localhost:3000`);
+    console.log("Server is running on http://localhost:3000");
   });

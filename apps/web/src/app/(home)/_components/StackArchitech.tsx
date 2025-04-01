@@ -393,72 +393,58 @@ const StackArchitect = () => {
 		}
 
 		const projectName = stackState.projectName || "my-better-t-app";
-		const flags: string[] = ["--yes"]; // Start with yes flag
+		const flags: string[] = ["--yes"];
 
-		// Only add flags that differ from defaults
-
-		// Frontend (default is web)
 		if (stackState.frontend.length === 1 && stackState.frontend[0] === "none") {
 			flags.push("--frontend none");
 		} else if (
 			!(stackState.frontend.length === 1 && stackState.frontend[0] === "web")
 		) {
-			flags.push(`--frontend ${stackState.frontend.join(",")}`);
+			flags.push(`--frontend ${stackState.frontend.join(" ")}`);
 		}
 
-		// Database (default is sqlite)
 		if (stackState.database !== "sqlite") {
 			flags.push(`--database ${stackState.database}`);
 		}
 
-		// ORM (default is drizzle)
 		if (stackState.database !== "none" && stackState.orm !== "drizzle") {
 			flags.push(`--orm ${stackState.orm}`);
 		}
 
-		// Auth (default is true)
 		if (stackState.auth === "false") {
 			flags.push("--no-auth");
 		}
 
-		// Turso (default is false)
 		if (stackState.turso === "true") {
 			flags.push("--turso");
 		}
 
-		// Backend (default is hono)
 		if (stackState.backendFramework !== "hono") {
 			flags.push(`--backend ${stackState.backendFramework}`);
 		}
 
-		// Runtime (default is bun)
 		if (stackState.runtime !== "bun") {
 			flags.push(`--runtime ${stackState.runtime}`);
 		}
 
-		// Package manager (default is bun)
 		if (stackState.packageManager !== "bun") {
 			flags.push(`--package-manager ${stackState.packageManager}`);
 		}
 
-		// Git (default is true)
 		if (stackState.git === "false") {
 			flags.push("--no-git");
 		}
 
-		// Install (default is true)
 		if (stackState.install === "false") {
 			flags.push("--no-install");
 		}
 
-		// Addons (default is none)
 		if (stackState.addons.length > 0) {
-			flags.push(`--addons ${stackState.addons.join(",")}`);
+			flags.push(`--addons ${stackState.addons.join(" ")}`);
 		}
 
-		// Examples (default is none)
 		if (stackState.examples.length > 0) {
-			flags.push(`--examples ${stackState.examples.join(",")}`);
+			flags.push(`--examples ${stackState.examples.join(" ")}`);
 		}
 
 		return `${base} ${projectName} ${flags.join(" ")}`;
@@ -486,7 +472,6 @@ const StackArchitect = () => {
 
 					if (currentSelection.includes(techId)) {
 						if (currentSelection.length === 1) {
-							// Don't remove the last frontend option
 							return prev;
 						}
 
@@ -512,9 +497,7 @@ const StackArchitect = () => {
 						};
 					}
 
-					// Adding a frontend option
 					if (currentSelection.includes("none")) {
-						// Replace "none" with the selected option
 						return {
 							...prev,
 							frontend: [techId],

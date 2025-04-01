@@ -32,17 +32,17 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 	}
 
 	if (config.frontend && config.frontend.length > 0) {
-		flags.push(`--frontend ${config.frontend.join(",")}`);
+		flags.push(`--frontend ${config.frontend.join(" ")}`);
 	}
 
 	if (config.addons && config.addons.length > 0) {
-		flags.push(`--addons ${config.addons.join(",")}`);
+		flags.push(`--addons ${config.addons.join(" ")}`);
 	} else {
 		flags.push("--no-addons");
 	}
 
 	if (config.examples && config.examples.length > 0) {
-		flags.push(`--examples ${config.examples.join(",")}`);
+		flags.push(`--examples ${config.examples.join(" ")}`);
 	} else {
 		flags.push("--no-examples");
 	}

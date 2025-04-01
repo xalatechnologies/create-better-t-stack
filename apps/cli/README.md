@@ -1,6 +1,6 @@
 # Create Better-T-Stack CLI
 
-A CLI tool for scaffolding type-safe full-stack apps with Hono/Elysia backends, React web frontends, and Expo native apps, all connected through tRPC.
+A modern CLI tool for scaffolding end-to-end type-safe TypeScript projects with best practices and customizable configurations
 
 ## Quick Start
 
@@ -49,10 +49,10 @@ Options:
   --orm <type>                    ORM type (none, drizzle, prisma)
   --auth                          Include authentication
   --no-auth                       Exclude authentication
-  --frontend <types>              Frontend types (web,native or both)
-  --addons <types>                Additional addons (pwa,tauri,biome,husky)
+  --frontend <types...>           Frontend types (web, native, none)
+  --addons <types...>             Additional addons (pwa, tauri, biome, husky)
   --no-addons                     Skip all additional addons
-  --examples <types>              Examples to include (todo,ai)
+  --examples <types...>           Examples to include (todo, ai)
   --no-examples                   Skip all examples
   --git                           Initialize git repository
   --no-git                        Skip git initialization
@@ -75,7 +75,7 @@ npx create-better-t-stack my-app -y
 
 Create a project with specific options:
 ```bash
-npx create-better-t-stack my-app --database postgres --orm drizzle --auth --addons pwa,biome
+npx create-better-t-stack my-app --database postgres --orm drizzle --auth --addons pwa biome
 ```
 
 Create a project with Elysia and Node.js runtime:
@@ -85,10 +85,10 @@ npx create-better-t-stack my-app --backend elysia --runtime node
 
 Create a project with specific frontend options:
 ```bash
-npx create-better-t-stack my-app --frontend web,native
+npx create-better-t-stack my-app --frontend web native
 ```
 
 Create a project with examples:
 ```bash
-npx create-better-t-stack my-app --examples todo,ai
+npx create-better-t-stack my-app --examples todo ai
 ```
