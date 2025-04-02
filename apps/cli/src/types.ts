@@ -5,7 +5,7 @@ export type ProjectAddons = "pwa" | "biome" | "tauri" | "husky";
 export type ProjectBackend = "hono" | "elysia";
 export type ProjectRuntime = "node" | "bun";
 export type ProjectExamples = "todo" | "ai";
-export type ProjectFrontend = "web" | "native";
+export type ProjectFrontend = "react-router" | "tanstack-router" | "native";
 
 export interface ProjectConfig {
 	projectName: string;

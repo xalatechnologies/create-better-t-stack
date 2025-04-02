@@ -37,8 +37,14 @@ export function displayPostInstallInstructions(
 	const nativeInstructions = frontends?.includes("native")
 		? getNativeInstructions()
 		: "";
+	const pwaInstructions =
+		addons?.includes("pwa") && frontends?.includes("react-router")
+			? getPwaInstructions()
+			: "";
 
-	const hasWebFrontend = frontends?.includes("web");
+	const hasTanstackRouter = frontends?.includes("tanstack-router");
+	const hasReactRouter = frontends?.includes("react-router");
+	const hasWebFrontend = hasTanstackRouter || hasReactRouter;
 	const hasNativeFrontend = frontends?.includes("native");
 	const hasFrontend = hasWebFrontend || hasNativeFrontend;
 
@@ -49,10 +55,10 @@ ${!depsInstalled ? `${pc.cyan("2.")} ${packageManager} install\n` : ""}${pc.cyan
 ${pc.bold("Your project will be available at:")}
 ${
 	hasFrontend
-		? `${hasWebFrontend ? `${pc.cyan("•")} Frontend: http://localhost:3001\n` : ""}`
+		? `${hasWebFrontend ? `${pc.cyan("•")} Frontend: http://localhost:${hasReactRouter ? "5173" : "3001"}\n` : ""}`
 		: `${pc.yellow("NOTE:")} You are creating a backend-only app (no frontend selected)\n`
 }${pc.cyan("•")} API: http://localhost:3000
-${nativeInstructions ? `\n${nativeInstructions.trim()}` : ""}${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}`,
+${nativeInstructions ? `\n${nativeInstructions.trim()}` : ""}${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}${pwaInstructions ? `\n${pwaInstructions.trim()}` : ""}`,
 		"Next steps",
 	);
 }
@@ -105,5 +111,9 @@ function getDatabaseInstructions(
 }
 
 function getTauriInstructions(runCmd?: string): string {
-	return `${pc.bold("Desktop app with Tauri:")}\n${pc.cyan("•")} Start desktop app: ${`cd apps/web && ${runCmd} desktop:dev`}\n${pc.cyan("•")} Build desktop app: ${`cd apps/web && ${runCmd} desktop:build`}\n${pc.yellow("NOTE:")} Tauri requires Rust and platform-specific dependencies. See: ${"https://v2.tauri.app/start/prerequisites/"}\n\n`;
+	return `\n${pc.bold("Desktop app with Tauri:")}\n${pc.cyan("•")} Start desktop app: ${`cd apps/web && ${runCmd} desktop:dev`}\n${pc.cyan("•")} Build desktop app: ${`cd apps/web && ${runCmd} desktop:build`}\n${pc.yellow("NOTE:")} Tauri requires Rust and platform-specific dependencies.\nSee: ${"https://v2.tauri.app/start/prerequisites/"}\n\n`;
+}
+
+function getPwaInstructions(): string {
+	return `${pc.bold("PWA with React Router v7:")}\n${pc.yellow("NOTE:")} There is a known compatibility issue between VitePWA and React Router v7.\nSee: https://github.com/vite-pwa/vite-plugin-pwa/issues/809\n`;
 }

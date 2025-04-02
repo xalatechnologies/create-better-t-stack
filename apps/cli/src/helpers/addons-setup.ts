@@ -15,16 +15,17 @@ export async function setupAddons(
 	packageManager: ProjectPackageManager,
 	frontends: ProjectFrontend[],
 ) {
-	const hasWebFrontend = frontends.includes("web");
+	const hasWebFrontend =
+		frontends.includes("react-router") || frontends.includes("tanstack-router");
 
 	// if (addons.includes("docker")) {
-	// 	await setupDocker(projectDir);
+	//  await setupDocker(projectDir);
 	// }
 	if (addons.includes("pwa") && hasWebFrontend) {
-		await setupPwa(projectDir);
+		await setupPwa(projectDir, frontends);
 	}
 	if (addons.includes("tauri") && hasWebFrontend) {
-		await setupTauri(projectDir, packageManager);
+		await setupTauri(projectDir, packageManager, frontends);
 	}
 	if (addons.includes("biome")) {
 		await setupBiome(projectDir);
@@ -32,6 +33,13 @@ export async function setupAddons(
 	if (addons.includes("husky")) {
 		await setupHusky(projectDir);
 	}
+}
+
+export function getWebAppDir(
+	projectDir: string,
+	frontends: ProjectFrontend[],
+): string {
+	return path.join(projectDir, "apps/web");
 }
 
 async function setupBiome(projectDir: string) {
@@ -88,13 +96,13 @@ async function setupHusky(projectDir: string) {
 	}
 }
 
-async function setupPwa(projectDir: string) {
+async function setupPwa(projectDir: string, frontends: ProjectFrontend[]) {
 	const pwaTemplateDir = path.join(PKG_ROOT, "template/with-pwa");
 	if (await fs.pathExists(pwaTemplateDir)) {
 		await fs.copy(pwaTemplateDir, projectDir, { overwrite: true });
 	}
 
-	const clientPackageDir = path.join(projectDir, "apps/web");
+	const clientPackageDir = getWebAppDir(projectDir, frontends);
 
 	if (!(await fs.pathExists(clientPackageDir))) {
 		return;
@@ -105,6 +113,64 @@ async function setupPwa(projectDir: string) {
 		devDependencies: ["@vite-pwa/assets-generator"],
 		projectDir: clientPackageDir,
 	});
+
+	const viteConfigPath = path.join(clientPackageDir, "vite.config.ts");
+	if (await fs.pathExists(viteConfigPath)) {
+		let viteConfig = await fs.readFile(viteConfigPath, "utf8");
+
+		if (!viteConfig.includes("vite-plugin-pwa")) {
+			const firstImportMatch = viteConfig.match(
+				/^import .* from ['"](.*)['"]/m,
+			);
+
+			if (firstImportMatch) {
+				viteConfig = viteConfig.replace(
+					firstImportMatch[0],
+					`import { VitePWA } from "vite-plugin-pwa";\n${firstImportMatch[0]}`,
+				);
+			} else {
+				viteConfig = `import { VitePWA } from "vite-plugin-pwa";\n${viteConfig}`;
+			}
+		}
+
+		const pwaPluginCode = `VitePWA({
+      registerType: "autoUpdate",
+      manifest: {
+        name: "My App",
+        short_name: "My App",
+        description: "My App",
+        theme_color: "#0c0c0c",
+      },
+      pwaAssets: {
+        disabled: false,
+        config: true,
+      },
+      devOptions: {
+        enabled: true,
+      },
+    })`;
+
+		if (!viteConfig.includes("VitePWA(")) {
+			if (frontends.includes("react-router")) {
+				viteConfig = viteConfig.replace(
+					/plugins: \[\s*tailwindcss\(\)/,
+					`plugins: [\n    tailwindcss(),\n    ${pwaPluginCode}`,
+				);
+			} else if (frontends.includes("tanstack-router")) {
+				viteConfig = viteConfig.replace(
+					/plugins: \[\s*tailwindcss\(\)/,
+					`plugins: [\n    tailwindcss(),\n    ${pwaPluginCode}`,
+				);
+			} else {
+				viteConfig = viteConfig.replace(
+					/plugins: \[/,
+					`plugins: [\n    ${pwaPluginCode},`,
+				);
+			}
+		}
+
+		await fs.writeFile(viteConfigPath, viteConfig);
+	}
 
 	const clientPackageJsonPath = path.join(clientPackageDir, "package.json");
 	if (await fs.pathExists(clientPackageJsonPath)) {

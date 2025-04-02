@@ -41,7 +41,10 @@ async function main() {
 		.option("--orm <type>", "ORM type (none, drizzle, prisma)")
 		.option("--auth", "Include authentication")
 		.option("--no-auth", "Exclude authentication")
-		.option("--frontend <types...>", "Frontend types (web, native, none)")
+		.option(
+			"--frontend <types...>",
+			"Frontend types (tanstack-router, react-router, native, none)",
+		)
 		.option(
 			"--addons <types...>",
 			"Additional addons (pwa, tauri, biome, husky, none)",
@@ -251,7 +254,9 @@ function validateOptions(options: CLIOptions): void {
 
 		if (
 			options.frontend &&
-			!options.frontend.includes("web") &&
+			!options.frontend.some((f) =>
+				["tanstack-router", "react-router"].includes(f),
+			) &&
 			!options.frontend.includes("none")
 		) {
 			cancel(
@@ -264,7 +269,12 @@ function validateOptions(options: CLIOptions): void {
 	}
 
 	if (options.frontend && options.frontend.length > 0) {
-		const validFrontends = ["web", "native", "none"];
+		const validFrontends = [
+			"tanstack-router",
+			"react-router",
+			"native",
+			"none",
+		];
 		const invalidFrontends = options.frontend.filter(
 			(frontend: string) => !validFrontends.includes(frontend),
 		);
@@ -273,6 +283,19 @@ function validateOptions(options: CLIOptions): void {
 			cancel(
 				pc.red(
 					`Invalid frontend(s): ${invalidFrontends.join(", ")}. Valid options are: ${validFrontends.join(", ")}.`,
+				),
+			);
+			process.exit(1);
+		}
+
+		const webFrontends = options.frontend.filter(
+			(f) => f === "tanstack-router" || f === "react-router",
+		);
+
+		if (webFrontends.length > 1) {
+			cancel(
+				pc.red(
+					"Cannot select multiple web frameworks. Choose only one of: tanstack-router, react-router",
 				),
 			);
 			process.exit(1);
@@ -316,7 +339,9 @@ function validateOptions(options: CLIOptions): void {
 		if (
 			hasWebSpecificAddons &&
 			options.frontend &&
-			!options.frontend.includes("web") &&
+			!options.frontend.some((f) =>
+				["tanstack-router", "react-router"].includes(f),
+			) &&
 			!options.frontend.includes("none")
 		) {
 			cancel(
@@ -336,13 +361,26 @@ function processFlags(
 	projectDirectory?: string,
 ): Partial<ProjectConfig> {
 	let frontend: ProjectFrontend[] | undefined = undefined;
+
 	if (options.frontend) {
 		if (options.frontend.includes("none")) {
 			frontend = [];
 		} else {
 			frontend = options.frontend.filter(
-				(f): f is ProjectFrontend => f === "web" || f === "native",
+				(f): f is ProjectFrontend =>
+					f === "tanstack-router" || f === "react-router" || f === "native",
 			);
+
+			const webFrontends = frontend.filter(
+				(f) => f === "tanstack-router" || f === "react-router",
+			);
+
+			if (webFrontends.length > 1) {
+				const firstWebFrontend = webFrontends[0];
+				frontend = frontend.filter(
+					(f) => f === "native" || f === firstWebFrontend,
+				);
+			}
 		}
 	}
 
@@ -371,7 +409,12 @@ function processFlags(
 				(ex): ex is ProjectExamples => ex === "todo" || ex === "ai",
 			);
 
-			if (frontend && frontend.length > 0 && !frontend.includes("web")) {
+			if (
+				frontend &&
+				frontend.length > 0 &&
+				!frontend.includes("tanstack-router") &&
+				!frontend.includes("react-router")
+			) {
 				examples = [];
 				log.warn(
 					pc.yellow("Examples require web frontend - ignoring examples flag"),
@@ -402,7 +445,12 @@ function processFlags(
 					addon === "husky",
 			);
 
-			if (frontend && frontend.length > 0 && !frontend.includes("web")) {
+			if (
+				frontend &&
+				frontend.length > 0 &&
+				!frontend.includes("tanstack-router") &&
+				!frontend.includes("react-router")
+			) {
 				addons = addons.filter((addon) => !["pwa", "tauri"].includes(addon));
 				if (addons.length !== options.addons.length) {
 					log.warn(

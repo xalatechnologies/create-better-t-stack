@@ -39,12 +39,20 @@ const validateProjectName = (name: string): string | undefined => {
 const TECH_OPTIONS = {
 	frontend: [
 		{
-			id: "web",
-			name: "React Web",
-			description: "React with TanStack Router",
+			id: "tanstack-router",
+			name: "TanStack Router",
+			description: "Modern type-safe router for React",
 			icon: "🌐",
 			color: "from-blue-400 to-blue-600",
 			default: true,
+		},
+		{
+			id: "react-router",
+			name: "React Router",
+			description: "Declarative routing for React",
+			icon: "🧭",
+			color: "from-cyan-400 to-cyan-600",
+			default: false,
 		},
 		{
 			id: "native",
@@ -303,7 +311,7 @@ interface StackState {
 
 const DEFAULT_STACK: StackState = {
 	projectName: "my-better-t-app",
-	frontend: ["web"],
+	frontend: ["tanstack-router"],
 	runtime: "bun",
 	backendFramework: "hono",
 	database: "sqlite",
@@ -330,7 +338,10 @@ const StackArchitect = () => {
 	);
 
 	useEffect(() => {
-		if (!stack.frontend.includes("web") && stack.auth === "true") {
+		const hasWebFrontend =
+			stack.frontend.includes("tanstack-router") ||
+			stack.frontend.includes("react-router");
+		if (!hasWebFrontend && stack.auth === "true") {
 			setStack((prev) => ({
 				...prev,
 				auth: "false",
@@ -343,16 +354,21 @@ const StackArchitect = () => {
 		setCommand(cmd);
 
 		const notes: Record<string, string[]> = {};
+		const hasWebFrontend =
+			stack.frontend.includes("tanstack-router") ||
+			stack.frontend.includes("react-router");
 
 		notes.frontend = [];
 
 		notes.auth = [];
-		if (!stack.frontend.includes("web") && stack.auth === "true") {
-			notes.auth.push("Authentication is only available with React Web.");
+		if (!hasWebFrontend && stack.auth === "true") {
+			notes.auth.push(
+				"Authentication is only available with React Web (TanStack Router or React Router).",
+			);
 		}
 
 		notes.addons = [];
-		if (!stack.frontend.includes("web")) {
+		if (!hasWebFrontend) {
 			notes.addons.push("PWA and Tauri are only available with React Web.");
 		}
 
@@ -373,7 +389,7 @@ const StackArchitect = () => {
 		}
 
 		notes.examples = [];
-		if (!stack.frontend.includes("web")) {
+		if (!hasWebFrontend) {
 			notes.examples.push(
 				"Todo and Ai example are only available with React Web.",
 			);
@@ -398,7 +414,10 @@ const StackArchitect = () => {
 		if (stackState.frontend.length === 1 && stackState.frontend[0] === "none") {
 			flags.push("--frontend none");
 		} else if (
-			!(stackState.frontend.length === 1 && stackState.frontend[0] === "web")
+			!(
+				stackState.frontend.length === 1 &&
+				stackState.frontend[0] === "tanstack-router"
+			)
 		) {
 			flags.push(`--frontend ${stackState.frontend.join(" ")}`);
 		}
@@ -455,6 +474,7 @@ const StackArchitect = () => {
 			setStack((prev) => {
 				if (category === "frontend") {
 					const currentSelection = [...prev.frontend];
+					const webTypes = ["tanstack-router", "react-router"];
 
 					if (techId === "none") {
 						return {
@@ -470,50 +490,81 @@ const StackArchitect = () => {
 						};
 					}
 
-					if (currentSelection.includes(techId)) {
-						if (currentSelection.length === 1) {
+					// Handle web router types (tanstack-router or react-router)
+					if (webTypes.includes(techId)) {
+						// If clicking on an already selected web router, do nothing
+						if (
+							currentSelection.includes(techId) &&
+							currentSelection.length === 1
+						) {
 							return prev;
 						}
 
-						const newFrontend = currentSelection.filter((id) => id !== techId);
-
-						if (techId === "web") {
+						// If selecting a web router while another one is active, replace it
+						if (currentSelection.some((id) => webTypes.includes(id))) {
+							const nonWebSelections = currentSelection.filter(
+								(id) => !webTypes.includes(id),
+							);
 							return {
 								...prev,
-								frontend: newFrontend,
-								auth: "false",
-								examples: prev.examples.filter(
-									(ex) => ex !== "todo" && ex !== "ai",
-								),
-								addons: prev.addons.filter(
-									(addon) => addon !== "pwa" && addon !== "tauri",
-								),
+								frontend: [...nonWebSelections, techId],
+								auth: prev.auth, // Keep existing auth setting
+							};
+						}
+
+						// If no web router was selected before
+						if (currentSelection.includes("none")) {
+							return {
+								...prev,
+								frontend: [techId],
+								auth: "true",
 							};
 						}
 
 						return {
 							...prev,
-							frontend: newFrontend,
+							frontend: [
+								...currentSelection.filter((id) => id !== "none"),
+								techId,
+							],
+							auth: "true",
 						};
 					}
 
-					if (currentSelection.includes("none")) {
+					// Handle native selection
+					if (techId === "native") {
+						if (currentSelection.includes(techId)) {
+							if (currentSelection.length === 1) {
+								return prev; // Don't allow removing the last frontend
+							}
+							return {
+								...prev,
+								frontend: currentSelection.filter((id) => id !== techId),
+							};
+						}
+
+						if (currentSelection.includes("none")) {
+							return {
+								...prev,
+								frontend: [techId],
+							};
+						}
+
 						return {
 							...prev,
-							frontend: [techId],
-							...(techId === "web" && { auth: "true" }),
+							frontend: [...currentSelection, techId],
 						};
 					}
-					return {
-						...prev,
-						frontend: [...currentSelection, techId],
-						...(techId === "web" && { auth: "true" }),
-					};
+
+					return prev;
 				}
 
 				if (category === "addons" || category === "examples") {
 					const currentArray = [...(prev[category] || [])];
 					const index = currentArray.indexOf(techId);
+					const hasWebFrontend =
+						prev.frontend.includes("tanstack-router") ||
+						prev.frontend.includes("react-router");
 
 					if (index >= 0) {
 						currentArray.splice(index, 1);
@@ -521,14 +572,14 @@ const StackArchitect = () => {
 						if (
 							category === "examples" &&
 							techId === "todo" &&
-							!prev.frontend.includes("web")
+							!hasWebFrontend
 						) {
 							return prev;
 						}
 						if (
 							category === "addons" &&
 							(techId === "pwa" || techId === "tauri") &&
-							!prev.frontend.includes("web")
+							!hasWebFrontend
 						) {
 							return prev;
 						}
@@ -691,31 +742,32 @@ const StackArchitect = () => {
 											stack[activeTab as keyof StackState] === tech.id;
 									}
 
+									const hasWebFrontend =
+										stack.frontend.includes("tanstack-router") ||
+										stack.frontend.includes("react-router");
 									const isDisabled =
 										(activeTab === "orm" && stack.database === "none") ||
 										(activeTab === "turso" && stack.database !== "sqlite") ||
-										(activeTab === "auth" && !stack.frontend.includes("web")) ||
+										(activeTab === "auth" && !hasWebFrontend) ||
 										(activeTab === "examples" &&
-											((tech.id === "todo" &&
-												!stack.frontend.includes("web")) ||
-												(tech.id === "ai" &&
-													!stack.frontend.includes("web")))) ||
+											((tech.id === "todo" && !hasWebFrontend) ||
+												(tech.id === "ai" && !hasWebFrontend))) ||
 										(activeTab === "addons" &&
 											(tech.id === "pwa" || tech.id === "tauri") &&
-											!stack.frontend.includes("web"));
+											!hasWebFrontend);
 
 									return (
 										<motion.div
 											key={tech.id}
 											className={`
-                      p-2 px-3 rounded
-                      ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-                      ${
-												isSelected
-													? "bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-500/50"
-													: "hover:bg-gray-200 dark:hover:bg-gray-800 border border-gray-300 dark:border-gray-700"
-											}
-                    `}
+																						p-2 px-3 rounded
+																						${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+																						${
+																							isSelected
+																								? "bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-500/50"
+																								: "hover:bg-gray-200 dark:hover:bg-gray-800 border border-gray-300 dark:border-gray-700"
+																						}
+																				`}
 											whileHover={!isDisabled ? { scale: 1.02 } : undefined}
 											whileTap={!isDisabled ? { scale: 0.98 } : undefined}
 											onClick={() =>
@@ -873,13 +925,13 @@ const StackArchitect = () => {
 							type="button"
 							key={category}
 							className={`
-              py-2 px-4 text-xs font-mono whitespace-nowrap transition-colors
-              ${
-								activeTab === category
-									? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-t-2 border-blue-500"
-									: "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-800"
-							}
-            `}
+														py-2 px-4 text-xs font-mono whitespace-nowrap transition-colors
+														${
+															activeTab === category
+																? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-t-2 border-blue-500"
+																: "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-800"
+														}
+												`}
 							onClick={() => setActiveTab(category)}
 						>
 							{category}

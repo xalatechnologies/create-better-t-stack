@@ -9,7 +9,9 @@ export async function getAddonsChoice(
 ): Promise<ProjectAddons[]> {
 	if (Addons !== undefined) return Addons;
 
-	const hasWeb = frontends?.includes("web");
+	const hasWeb =
+		frontends?.includes("react-router") ||
+		frontends?.includes("tanstack-router");
 
 	const addonOptions = [
 		{

@@ -18,7 +18,10 @@ export async function getExamplesChoice(
 
 	if (database === "none") return [];
 
-	const hasWebFrontend = frontends?.includes("web");
+	const hasWebFrontend =
+		frontends?.includes("react-router") ||
+		frontends?.includes("tanstack-router");
+
 	if (!hasWebFrontend) return [];
 
 	let response: ProjectExamples[] | symbol = [];

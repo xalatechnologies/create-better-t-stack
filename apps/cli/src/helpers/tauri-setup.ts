@@ -1,14 +1,15 @@
 import path from "node:path";
 import { log, spinner } from "@clack/prompts";
-import { $, execa } from "execa";
+import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type { ProjectPackageManager } from "../types";
+import type { ProjectFrontend, ProjectPackageManager } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupTauri(
 	projectDir: string,
 	packageManager: ProjectPackageManager,
+	frontends: ProjectFrontend[],
 ): Promise<void> {
 	const s = spinner();
 	const clientPackageDir = path.join(projectDir, "apps/web");
@@ -60,13 +61,18 @@ export async function setupTauri(
 				args = ["@tauri-apps/cli@latest"];
 		}
 
+		const hasReactRouter = frontends.includes("react-router");
+		const devUrl = hasReactRouter
+			? "http://localhost:5173"
+			: "http://localhost:3001";
+
 		args = [
 			...args,
 			"init",
 			`--app-name=${path.basename(projectDir)}`,
 			`--window-title=${path.basename(projectDir)}`,
 			"--frontend-dist=dist",
-			"--dev-url=http://localhost:3001",
+			`--dev-url=${devUrl}`,
 			`--before-dev-command=${packageManager} run dev`,
 			`--before-build-command=${packageManager} run build`,
 		];

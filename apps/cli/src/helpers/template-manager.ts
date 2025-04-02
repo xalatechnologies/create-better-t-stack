@@ -8,31 +8,86 @@ import type {
 	ProjectOrm,
 } from "../types";
 
+/**
+ * Copy base template structure but exclude app-specific folders that will be added based on options
+ */
 export async function copyBaseTemplate(projectDir: string): Promise<void> {
 	const templateDir = path.join(PKG_ROOT, "template/base");
+
 	if (!(await fs.pathExists(templateDir))) {
 		throw new Error(`Template directory not found: ${templateDir}`);
 	}
-	await fs.copy(templateDir, projectDir);
+
+	await fs.ensureDir(projectDir);
+
+	const rootFiles = await fs.readdir(templateDir);
+	for (const file of rootFiles) {
+		const srcPath = path.join(templateDir, file);
+		const destPath = path.join(projectDir, file);
+
+		if (file === "apps") continue;
+
+		if (await fs.stat(srcPath).then((stat) => stat.isDirectory())) {
+			await fs.copy(srcPath, destPath);
+		} else {
+			await fs.copy(srcPath, destPath);
+		}
+	}
+
+	await fs.ensureDir(path.join(projectDir, "apps"));
+
+	const serverSrcDir = path.join(templateDir, "apps/server");
+	const serverDestDir = path.join(projectDir, "apps/server");
+	if (await fs.pathExists(serverSrcDir)) {
+		await fs.copy(serverSrcDir, serverDestDir);
+	}
 }
 
 export async function setupFrontendTemplates(
 	projectDir: string,
 	frontends: ProjectFrontend[],
 ): Promise<void> {
-	if (!frontends.includes("web")) {
+	const hasTanstackWeb = frontends.includes("tanstack-router");
+	const hasReactRouterWeb = frontends.includes("react-router");
+	const hasNative = frontends.includes("native");
+
+	if (hasTanstackWeb || hasReactRouterWeb) {
 		const webDir = path.join(projectDir, "apps/web");
-		if (await fs.pathExists(webDir)) {
-			await fs.remove(webDir);
+		await fs.ensureDir(webDir);
+
+		const webBaseDir = path.join(PKG_ROOT, "template/base/apps/web-base");
+		if (await fs.pathExists(webBaseDir)) {
+			await fs.copy(webBaseDir, webDir);
+		}
+
+		const frameworkName = hasTanstackWeb
+			? "web-tanstack-router"
+			: "web-react-router";
+		const webFrameworkDir = path.join(
+			PKG_ROOT,
+			`template/base/apps/${frameworkName}`,
+		);
+
+		if (await fs.pathExists(webFrameworkDir)) {
+			await fs.copy(webFrameworkDir, webDir, { overwrite: true });
+		}
+
+		const packageJsonPath = path.join(webDir, "package.json");
+		if (await fs.pathExists(packageJsonPath)) {
+			const packageJson = await fs.readJson(packageJsonPath);
+			packageJson.name = "web";
+			await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
 		}
 	}
 
-	if (!frontends.includes("native")) {
-		const nativeDir = path.join(projectDir, "apps/native");
-		if (await fs.pathExists(nativeDir)) {
-			await fs.remove(nativeDir);
+	if (hasNative) {
+		const nativeSrcDir = path.join(PKG_ROOT, "template/base/apps/native");
+		const nativeDestDir = path.join(projectDir, "apps/native");
+
+		if (await fs.pathExists(nativeSrcDir)) {
+			await fs.copy(nativeSrcDir, nativeDestDir);
 		}
-	} else {
+
 		await fs.writeFile(
 			path.join(projectDir, ".npmrc"),
 			"node-linker=hoisted\n",
@@ -91,14 +146,43 @@ export async function setupAuthTemplate(
 	framework: ProjectBackend,
 	orm: ProjectOrm,
 	database: ProjectDatabase,
+	frontends: ProjectFrontend[],
 ): Promise<void> {
 	if (!auth) return;
 
 	const authTemplateDir = path.join(PKG_ROOT, "template/with-auth");
 	if (await fs.pathExists(authTemplateDir)) {
-		const clientAuthDir = path.join(authTemplateDir, "apps/web");
-		const projectClientDir = path.join(projectDir, "apps/web");
-		await fs.copy(clientAuthDir, projectClientDir, { overwrite: true });
+		const hasReactRouter = frontends.includes("react-router");
+		const hasTanStackRouter = frontends.includes("tanstack-router");
+
+		if (hasReactRouter || hasTanStackRouter) {
+			const webDir = path.join(projectDir, "apps/web");
+
+			const webBaseAuthDir = path.join(authTemplateDir, "apps/web-base");
+			if (await fs.pathExists(webBaseAuthDir)) {
+				await fs.copy(webBaseAuthDir, webDir, { overwrite: true });
+			}
+
+			if (hasReactRouter) {
+				const reactRouterAuthDir = path.join(
+					authTemplateDir,
+					"apps/web-react-router",
+				);
+				if (await fs.pathExists(reactRouterAuthDir)) {
+					await fs.copy(reactRouterAuthDir, webDir, { overwrite: true });
+				}
+			}
+
+			if (hasTanStackRouter) {
+				const tanstackAuthDir = path.join(
+					authTemplateDir,
+					"apps/web-tanstack-router",
+				);
+				if (await fs.pathExists(tanstackAuthDir)) {
+					await fs.copy(tanstackAuthDir, webDir, { overwrite: true });
+				}
+			}
+		}
 
 		const serverAuthDir = path.join(authTemplateDir, "apps/server/src");
 		const projectServerDir = path.join(projectDir, "apps/server/src");
@@ -141,23 +225,53 @@ export async function setupAuthTemplate(
 				);
 			}
 		}
+
+		if (frontends.includes("native")) {
+			const nativeAuthDir = path.join(authTemplateDir, "apps/native");
+			const projectNativeDir = path.join(projectDir, "apps/native");
+
+			if (await fs.pathExists(nativeAuthDir)) {
+				await fs.copy(nativeAuthDir, projectNativeDir, { overwrite: true });
+			}
+		}
 	}
 }
 
 export async function fixGitignoreFiles(projectDir: string): Promise<void> {
-	const gitignorePaths = [
-		path.join(projectDir, "_gitignore"),
-		path.join(projectDir, "apps/web/_gitignore"),
-		path.join(projectDir, "apps/native/_gitignore"),
-		path.join(projectDir, "apps/server/_gitignore"),
-	];
+	const gitignorePaths = await findGitignoreFiles(projectDir);
 
 	for (const gitignorePath of gitignorePaths) {
 		if (await fs.pathExists(gitignorePath)) {
 			const targetPath = path.join(path.dirname(gitignorePath), ".gitignore");
-			await fs.move(gitignorePath, targetPath);
+			await fs.move(gitignorePath, targetPath, { overwrite: true });
 		}
 	}
+}
+
+/**
+ * Find all _gitignore files in the project recursively
+ */
+async function findGitignoreFiles(dir: string): Promise<string[]> {
+	const gitignoreFiles: string[] = [];
+
+	const gitignorePath = path.join(dir, "_gitignore");
+	if (await fs.pathExists(gitignorePath)) {
+		gitignoreFiles.push(gitignorePath);
+	}
+
+	try {
+		const entries = await fs.readdir(dir, { withFileTypes: true });
+
+		for (const entry of entries) {
+			if (entry.isDirectory() && entry.name !== "node_modules") {
+				const subDirPath = path.join(dir, entry.name);
+				const subDirFiles = await findGitignoreFiles(subDirPath);
+				gitignoreFiles.push(...subDirFiles);
+			}
+		}
+	} catch (error) {}
+
+	return gitignoreFiles;
 }
 
 function getOrmTemplateDir(orm: ProjectOrm, database: ProjectDatabase): string {

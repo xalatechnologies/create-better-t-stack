@@ -1,4 +1,4 @@
-import { cancel, isCancel, multiselect } from "@clack/prompts";
+import { cancel, isCancel, multiselect, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
 import type { ProjectFrontend } from "../types";
@@ -8,28 +8,66 @@ export async function getFrontendChoice(
 ): Promise<ProjectFrontend[]> {
 	if (frontendOptions !== undefined) return frontendOptions;
 
-	const response = await multiselect<ProjectFrontend>({
-		message: "Choose frontends",
+	const frontendTypes = await multiselect({
+		message: "Select platforms to develop for",
 		options: [
 			{
 				value: "web",
-				label: "Web App",
-				hint: "React + TanStack Router web application",
+				label: "Web",
+				hint: "React Web Application",
 			},
 			{
 				value: "native",
-				label: "Native App",
-				hint: "React Native + Expo application",
+				label: "Native",
+				hint: "Create a React Native/Expo app",
 			},
 		],
-		initialValues: DEFAULT_CONFIG.frontend,
-		required: false,
+		initialValues: DEFAULT_CONFIG.frontend.some(
+			(f) => f === "tanstack-router" || f === "react-router",
+		)
+			? ["web"]
+			: [],
 	});
 
-	if (isCancel(response)) {
+	if (isCancel(frontendTypes)) {
 		cancel(pc.red("Operation cancelled"));
 		process.exit(0);
 	}
 
-	return response;
+	const result: ProjectFrontend[] = [];
+
+	if (frontendTypes.includes("web")) {
+		const webFramework = await select<ProjectFrontend>({
+			message: "Choose frontend framework",
+			options: [
+				{
+					value: "tanstack-router",
+					label: "TanStack Router",
+					hint: "Modern and scalable routing for React Applications",
+				},
+				{
+					value: "react-router",
+					label: "React Router",
+					hint: "A user‑obsessed, standards‑focused, multi‑strategy router you can deploy anywhere.",
+				},
+			],
+			initialValue:
+				DEFAULT_CONFIG.frontend.find(
+					(f) => f === "tanstack-router" || f === "react-router",
+				) || "tanstack-router",
+		});
+
+		if (isCancel(webFramework)) {
+			cancel(pc.red("Operation cancelled"));
+			process.exit(0);
+		}
+
+		result.push(webFramework);
+	}
+
+	if (frontendTypes.includes("native")) {
+		result.push("native");
+	}
+
+	return result;
 }

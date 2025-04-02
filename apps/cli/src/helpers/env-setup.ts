@@ -17,7 +17,18 @@ export async function setupEnvironmentVariables(
 	}
 
 	if (!envContent.includes("CORS_ORIGIN")) {
-		envContent += "\nCORS_ORIGIN=http://localhost:3001";
+		const hasReactRouter = options.frontend.includes("react-router");
+		const hasTanStackRouter = options.frontend.includes("tanstack-router");
+
+		let corsOrigin = "http://localhost:3000";
+
+		if (hasReactRouter) {
+			corsOrigin = "http://localhost:5173";
+		} else if (hasTanStackRouter) {
+			corsOrigin = "http://localhost:3001";
+		}
+
+		envContent += `\nCORS_ORIGIN=${corsOrigin}`;
 	}
 
 	if (options.auth) {
@@ -55,20 +66,13 @@ export async function setupEnvironmentVariables(
 
 	await fs.writeFile(envPath, envContent.trim());
 
-	if (options.frontend.includes("web")) {
+	const hasReactRouter = options.frontend.includes("react-router");
+	const hasTanStackRouter = options.frontend.includes("tanstack-router");
+
+	if (hasReactRouter || hasTanStackRouter) {
 		const clientDir = path.join(projectDir, "apps/web");
-		const clientEnvPath = path.join(clientDir, ".env");
-		let clientEnvContent = "";
 
-		if (await fs.pathExists(clientEnvPath)) {
-			clientEnvContent = await fs.readFile(clientEnvPath, "utf8");
-		}
-
-		if (!clientEnvContent.includes("VITE_SERVER_URL")) {
-			clientEnvContent += "VITE_SERVER_URL=http://localhost:3000\n";
-		}
-
-		await fs.writeFile(clientEnvPath, clientEnvContent.trim());
+		await setupClientEnvFile(clientDir);
 	}
 
 	if (options.frontend.includes("native")) {
@@ -86,4 +90,19 @@ export async function setupEnvironmentVariables(
 
 		await fs.writeFile(nativeEnvPath, nativeEnvContent.trim());
 	}
+}
+
+async function setupClientEnvFile(clientDir: string) {
+	const clientEnvPath = path.join(clientDir, ".env");
+	let clientEnvContent = "";
+
+	if (await fs.pathExists(clientEnvPath)) {
+		clientEnvContent = await fs.readFile(clientEnvPath, "utf8");
+	}
+
+	if (!clientEnvContent.includes("VITE_SERVER_URL")) {
+		clientEnvContent += "VITE_SERVER_URL=http://localhost:3000\n";
+	}
+
+	await fs.writeFile(clientEnvPath, clientEnvContent.trim());
 }

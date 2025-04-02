@@ -4,6 +4,7 @@ import type {
 	ProjectAddons,
 	ProjectConfig,
 	ProjectDatabase,
+	ProjectFrontend,
 	ProjectOrm,
 	ProjectRuntime,
 } from "../types";
@@ -28,18 +29,25 @@ function generateReadmeContent(options: ProjectConfig): string {
 		addons = [],
 		orm = "drizzle",
 		runtime = "bun",
+		frontend = ["tanstack-router"],
 	} = options;
+
+	const hasReactRouter = frontend.includes("react-router");
+	const hasTanstackRouter = frontend.includes("tanstack-router");
+	const hasNative = frontend.includes("native");
 
 	const packageManagerRunCmd =
 		packageManager === "npm" ? "npm run" : packageManager;
 
+	const port = hasReactRouter ? "5173" : "3001";
+
 	return `# ${projectName}
 
-This project was created with [Better-T-Stack](https://github.com/better-t-stack/Better-T-Stack), a modern TypeScript stack that combines React, TanStack Router, Hono, tRPC, and more.
+This project was created with [Better-T-Stack](https://github.com/better-t-stack/Better-T-Stack), a modern TypeScript stack that combines React, ${hasTanstackRouter ? "TanStack Router" : "React Router"}, Hono, tRPC, and more.
 
 ## Features
 
-${generateFeaturesList(database, auth, addons, orm, runtime)}
+${generateFeaturesList(database, auth, addons, orm, runtime, frontend)}
 
 ## Getting Started
 
@@ -57,21 +65,31 @@ Then, run the development server:
 ${packageManagerRunCmd} dev
 \`\`\`
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
+${
+	hasTanstackRouter || hasReactRouter
+		? `Open [http://localhost:${port}](http://localhost:${port}) in your browser to see the web application.`
+		: ""
+}
+${hasNative ? "Use the Expo Go app to run the mobile application.\n" : ""}
 The API is running at [http://localhost:3000](http://localhost:3000).
+
+${
+	addons.includes("pwa") && hasReactRouter
+		? "\n## PWA Support with React Router v7\n\nThere is a known compatibility issue between VitePWA and React Router v7.\nSee: https://github.com/vite-pwa/vite-plugin-pwa/issues/809\n\nIf you encounter problems with the PWA functionality, you may need to manually modify\nthe service worker registration or consider waiting for a fix from VitePWA.\n"
+		: ""
+}
 
 ## Project Structure
 
 \`\`\`
 ${projectName}/
 ├── apps/
-│   ├── web/         # Frontend application (React, TanStack Router)
-│   └── server/         # Backend API (Hono, tRPC)
+${hasTanstackRouter || hasReactRouter ? `│   ├── web/         # Frontend application (React, ${hasTanstackRouter ? "TanStack Router" : "React Router"})\n` : ""}${hasNative ? "│   ├── native/      # Mobile application (React Native, Expo)\n" : ""}│   └── server/      # Backend API (Hono, tRPC)
 \`\`\`
 
 ## Available Scripts
 
-${generateScriptsList(packageManagerRunCmd, database, orm, auth)}
+${generateScriptsList(packageManagerRunCmd, database, orm, auth, hasNative)}
 `;
 }
 
@@ -81,16 +99,36 @@ function generateFeaturesList(
 	addons: ProjectAddons[],
 	orm: ProjectOrm,
 	runtime: ProjectRuntime,
+	frontend: ProjectFrontend[],
 ): string {
+	const hasTanstackRouter = frontend.includes("tanstack-router");
+	const hasReactRouter = frontend.includes("react-router");
+	const hasNative = frontend.includes("native");
+
 	const addonsList = [
 		"- **TypeScript** - For type safety and improved developer experience",
-		"- **TanStack Router** - File-based routing with full type safety",
+	];
+
+	if (hasTanstackRouter) {
+		addonsList.push(
+			"- **TanStack Router** - File-based routing with full type safety",
+		);
+	} else if (hasReactRouter) {
+		addonsList.push("- **React Router** - Declarative routing for React");
+	}
+
+	if (hasNative) {
+		addonsList.push("- **React Native** - Build mobile apps using React");
+		addonsList.push("- **Expo** - Tools for React Native development");
+	}
+
+	addonsList.push(
 		"- **TailwindCSS** - Utility-first CSS for rapid UI development",
 		"- **shadcn/ui** - Reusable UI components",
 		"- **Hono** - Lightweight, performant server framework",
 		"- **tRPC** - End-to-end type-safe APIs",
 		`- **${runtime === "bun" ? "Bun" : "Node.js"}** - Runtime environment`,
-	];
+	);
 
 	if (database !== "none") {
 		addonsList.push(
@@ -172,12 +210,18 @@ function generateScriptsList(
 	database: ProjectDatabase,
 	orm: ProjectOrm,
 	auth: boolean,
+	hasNative: boolean,
 ): string {
 	let scripts = `- \`${packageManagerRunCmd} dev\`: Start both web and server in development mode
 - \`${packageManagerRunCmd} build\`: Build both web and server
 - \`${packageManagerRunCmd} dev:web\`: Start only the web application
 - \`${packageManagerRunCmd} dev:server\`: Start only the server
 - \`${packageManagerRunCmd} check-types\`: Check TypeScript types across all apps`;
+
+	if (hasNative) {
+		scripts += `
+- \`${packageManagerRunCmd} dev:native\`: Start the React Native/Expo development server`;
+	}
 
 	if (database !== "none") {
 		scripts += `

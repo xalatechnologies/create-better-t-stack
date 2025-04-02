@@ -7,10 +7,7 @@
 	"bin": {
 		"create-better-t-stack": "dist/index.js"
 	},
-	"files": [
-		"dist",
-		"template"
-	],
+	"files": ["dist", "template"],
 	"keywords": [
 		"typescript",
 		"scaffold",

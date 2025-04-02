@@ -9,7 +9,7 @@ export const PKG_ROOT = path.join(distPath, "../");
 
 export const DEFAULT_CONFIG: ProjectConfig = {
 	projectName: "my-better-t-app",
-	frontend: ["web"],
+	frontend: ["tanstack-router"],
 	database: "sqlite",
 	orm: "drizzle",
 	auth: true,

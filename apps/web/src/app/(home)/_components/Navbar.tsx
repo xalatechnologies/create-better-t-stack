@@ -66,7 +66,7 @@ const Navbar = () => {
 					</span>
 				</div>
 
-				<div className="hidden md:flex justify-center">
+				<div className="hidden md:block absolute left-1/2 transform -translate-x-1/2">
 					<div
 						className={`flex items-center backdrop-blur-sm bg-gray-100/90 dark:bg-gray-900/90 rounded-lg border border-gray-200 dark:border-gray-800 py-1 px-1.5 text-sm relative transition-all duration-500 ease-out ${
 							scrolled ? "w-[350px]" : "w-[240px]"

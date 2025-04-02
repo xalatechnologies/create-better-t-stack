@@ -10,13 +10,20 @@ export async function setupExamples(
 	orm: ProjectOrm,
 	auth: boolean,
 	backend: ProjectBackend,
-	frontend: ProjectFrontend[] = ["web"],
+	frontend: ProjectFrontend[] = ["tanstack-router"],
 ): Promise<void> {
-	const hasWebFrontend = frontend.includes("web");
+	const hasTanstackRouter = frontend.includes("tanstack-router");
+	const hasReactRouter = frontend.includes("react-router");
+	const hasWebFrontend = hasTanstackRouter || hasReactRouter;
+
+	const routerType = hasTanstackRouter
+		? "web-tanstack-router"
+		: "web-react-router";
+
 	const webAppExists = await fs.pathExists(path.join(projectDir, "apps/web"));
 
 	if (examples.includes("todo") && hasWebFrontend && webAppExists) {
-		await setupTodoExample(projectDir, orm, auth);
+		await setupTodoExample(projectDir, orm, auth, routerType);
 	} else {
 		await cleanupTodoFiles(projectDir, orm);
 	}
@@ -27,17 +34,31 @@ export async function setupExamples(
 		hasWebFrontend &&
 		webAppExists
 	) {
-		await setupAIExample(projectDir);
+		await setupAIExample(projectDir, routerType);
 	}
 }
 
-async function setupAIExample(projectDir: string): Promise<void> {
+async function setupAIExample(
+	projectDir: string,
+	routerType: string,
+): Promise<void> {
 	const aiExampleDir = path.join(PKG_ROOT, "template/examples/ai");
 
 	if (await fs.pathExists(aiExampleDir)) {
-		await fs.copy(aiExampleDir, projectDir);
+		const aiRouteSourcePath = path.join(
+			aiExampleDir,
+			`apps/${routerType}/src/routes/ai.tsx`,
+		);
+		const aiRouteTargetPath = path.join(
+			projectDir,
+			"apps/web/src/routes/ai.tsx",
+		);
 
-		await updateHeaderWithAILink(projectDir);
+		if (await fs.pathExists(aiRouteSourcePath)) {
+			await fs.copy(aiRouteSourcePath, aiRouteTargetPath, { overwrite: true });
+		}
+
+		await updateHeaderWithAILink(projectDir, routerType);
 
 		const clientDir = path.join(projectDir, "apps/web");
 		addPackageDependency({
@@ -66,27 +87,27 @@ async function updateServerIndexWithAIRoute(projectDir: string): Promise<void> {
 			const importSection = `import { streamText } from "ai";\nimport { google } from "@ai-sdk/google";\nimport { stream } from "hono/streaming";`;
 
 			const aiRouteHandler = `
-app.post("/ai", async (c) => {
-		const body = await c.req.json();
-		const messages = body.messages || [];
+      app.post("/ai", async (c) => {
+        const body = await c.req.json();
+        const messages = body.messages || [];
 
-		const result = streamText({
-				model: google("gemini-2.0-flash-exp"),
-				messages,
-		});
+        const result = streamText({
+          model: google("gemini-2.0-flash-exp"),
+          messages,
+        });
 
-		c.header("X-Vercel-AI-Data-Stream", "v1");
-		c.header("Content-Type", "text/plain; charset=utf-8");
+        c.header("X-Vercel-AI-Data-Stream", "v1");
+        c.header("Content-Type", "text/plain; charset=utf-8");
 
-		return stream(c, (stream) => stream.pipe(result.toDataStream()));
-});`;
+        return stream(c, (stream) => stream.pipe(result.toDataStream()));
+      });`;
 
 			if (indexContent.includes("import {")) {
 				const lastImportIndex = indexContent.lastIndexOf("import");
 				const endOfLastImport = indexContent.indexOf("\n", lastImportIndex);
 				indexContent = `${indexContent.substring(0, endOfLastImport + 1)}
-${importSection}
-${indexContent.substring(endOfLastImport + 1)}`;
+        ${importSection}
+        ${indexContent.substring(endOfLastImport + 1)}`;
 			} else {
 				indexContent = `${importSection}
 
@@ -118,7 +139,10 @@ ${aiRouteHandler}`;
 	}
 }
 
-async function updateHeaderWithAILink(projectDir: string): Promise<void> {
+async function updateHeaderWithAILink(
+	projectDir: string,
+	routerType: string,
+): Promise<void> {
 	const headerPath = path.join(
 		projectDir,
 		"apps/web/src/components/header.tsx",
@@ -127,24 +151,20 @@ async function updateHeaderWithAILink(projectDir: string): Promise<void> {
 	if (await fs.pathExists(headerPath)) {
 		let headerContent = await fs.readFile(headerPath, "utf8");
 
-		if (headerContent.includes('{ to: "/todos"')) {
-			headerContent = headerContent.replace(
-				/{ to: "\/todos", label: "Todos" },/,
-				`{ to: "/todos", label: "Todos" },\n    { to: "/ai", label: "AI Chat" },`,
-			);
-		} else if (headerContent.includes('{ to: "/dashboard"')) {
-			headerContent = headerContent.replace(
-				/{ to: "\/dashboard", label: "Dashboard" },/,
-				`{ to: "/dashboard", label: "Dashboard" },\n    { to: "/ai", label: "AI Chat" },`,
-			);
-		} else {
-			headerContent = headerContent.replace(
-				/const links = \[\s*{ to: "\/", label: "Home" },/,
-				`const links = [\n    { to: "/", label: "Home" },\n    { to: "/ai", label: "AI Chat" },`,
-			);
-		}
+		const linksPattern = /const links = \[\s*([^;]*?)\s*\];/s;
+		const linksMatch = headerContent.match(linksPattern);
 
-		await fs.writeFile(headerPath, headerContent);
+		if (linksMatch) {
+			const linksContent = linksMatch[1];
+			if (!linksContent.includes('"/ai"')) {
+				const updatedLinks = `const links = [\n    ${linksContent}${
+					linksContent.trim().endsWith(",") ? "" : ","
+				}\n    { to: "/ai", label: "AI Chat" },\n  ];`;
+
+				headerContent = headerContent.replace(linksPattern, updatedLinks);
+				await fs.writeFile(headerPath, headerContent);
+			}
+		}
 	}
 }
 
@@ -152,12 +172,25 @@ async function setupTodoExample(
 	projectDir: string,
 	orm: ProjectOrm,
 	auth: boolean,
+	routerType: string,
 ): Promise<void> {
 	const todoExampleDir = path.join(PKG_ROOT, "template/examples/todo");
+
 	if (await fs.pathExists(todoExampleDir)) {
-		const todoRouteDir = path.join(todoExampleDir, "apps/web/src/routes");
-		const targetRouteDir = path.join(projectDir, "apps/web/src/routes");
-		await fs.copy(todoRouteDir, targetRouteDir, { overwrite: true });
+		const todoRouteSourceDir = path.join(
+			todoExampleDir,
+			`apps/${routerType}/src/routes/todos.tsx`,
+		);
+		const todoRouteTargetPath = path.join(
+			projectDir,
+			"apps/web/src/routes/todos.tsx",
+		);
+
+		if (await fs.pathExists(todoRouteSourceDir)) {
+			await fs.copy(todoRouteSourceDir, todoRouteTargetPath, {
+				overwrite: true,
+			});
+		}
 
 		if (orm !== "none") {
 			const todoRouterSourceFile = path.join(
@@ -174,16 +207,51 @@ async function setupTodoExample(
 					overwrite: true,
 				});
 			}
+
+			await updateRouterIndexToIncludeTodo(projectDir);
 		}
 
-		await updateHeaderWithTodoLink(projectDir, auth);
-		await addTodoButtonToHomepage(projectDir);
+		await updateHeaderWithTodoLink(projectDir, routerType);
+	}
+}
+
+async function updateRouterIndexToIncludeTodo(
+	projectDir: string,
+): Promise<void> {
+	const routerFile = path.join(projectDir, "apps/server/src/routers/index.ts");
+
+	if (await fs.pathExists(routerFile)) {
+		let routerContent = await fs.readFile(routerFile, "utf8");
+
+		if (!routerContent.includes("import { todoRouter }")) {
+			const lastImportIndex = routerContent.lastIndexOf("import");
+			const endOfImports = routerContent.indexOf("\n\n", lastImportIndex);
+
+			if (endOfImports !== -1) {
+				routerContent = `${routerContent.slice(0, endOfImports)}
+import { todoRouter } from "./todo";${routerContent.slice(endOfImports)}`;
+			} else {
+				routerContent = `import { todoRouter } from "./todo";\n${routerContent}`;
+			}
+
+			const routerDefIndex = routerContent.indexOf(
+				"export const appRouter = router({",
+			);
+			if (routerDefIndex !== -1) {
+				const routerContentStart =
+					routerContent.indexOf("{", routerDefIndex) + 1;
+				routerContent = `${routerContent.slice(0, routerContentStart)}
+  todo: todoRouter,${routerContent.slice(routerContentStart)}`;
+			}
+
+			await fs.writeFile(routerFile, routerContent);
+		}
 	}
 }
 
 async function updateHeaderWithTodoLink(
 	projectDir: string,
-	auth: boolean,
+	routerType: string,
 ): Promise<void> {
 	const headerPath = path.join(
 		projectDir,
@@ -193,19 +261,20 @@ async function updateHeaderWithTodoLink(
 	if (await fs.pathExists(headerPath)) {
 		let headerContent = await fs.readFile(headerPath, "utf8");
 
-		if (auth) {
-			headerContent = headerContent.replace(
-				/const links = \[\s*{ to: "\/", label: "Home" },\s*{ to: "\/dashboard", label: "Dashboard" },/,
-				`const links = [\n    { to: "/", label: "Home" },\n    { to: "/dashboard", label: "Dashboard" },\n    { to: "/todos", label: "Todos" },`,
-			);
-		} else {
-			headerContent = headerContent.replace(
-				/const links = \[\s*{ to: "\/", label: "Home" },/,
-				`const links = [\n    { to: "/", label: "Home" },\n    { to: "/todos", label: "Todos" },`,
-			);
-		}
+		const linksPattern = /const links = \[\s*([^;]*?)\s*\];/s;
+		const linksMatch = headerContent.match(linksPattern);
 
-		await fs.writeFile(headerPath, headerContent);
+		if (linksMatch) {
+			const linksContent = linksMatch[1];
+			if (!linksContent.includes('"/todos"')) {
+				const updatedLinks = `const links = [\n    ${linksContent}${
+					linksContent.trim().endsWith(",") ? "" : ","
+				}\n    { to: "/todos", label: "Todos" },\n  ];`;
+
+				headerContent = headerContent.replace(linksPattern, updatedLinks);
+				await fs.writeFile(headerPath, headerContent);
+			}
+		}
 	}
 }
 
@@ -253,27 +322,5 @@ async function updateRouterIndex(projectDir: string): Promise<void> {
 		);
 		routerContent = routerContent.replace(/todo: todoRouter,/, "");
 		await fs.writeFile(routerFile, routerContent);
-	}
-}
-
-async function addTodoButtonToHomepage(projectDir: string): Promise<void> {
-	const indexPath = path.join(projectDir, "apps/web/src/routes/index.tsx");
-
-	if (await fs.pathExists(indexPath)) {
-		let indexContent = await fs.readFile(indexPath, "utf8");
-
-		indexContent = indexContent.replace(
-			/<div id="buttons"><\/div>/,
-			`<div id="buttons" className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
-        <Button asChild>
-          <Link to="/todos" className="flex items-center">
-            View Todo Demo
-            <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
-        </Button>
-      </div>`,
-		);
-
-		await fs.writeFile(indexPath, indexContent);
 	}
 }

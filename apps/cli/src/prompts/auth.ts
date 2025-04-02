@@ -11,7 +11,9 @@ export async function getAuthChoice(
 	if (!hasDatabase) return false;
 
 	const hasNative = frontends?.includes("native");
-	const hasWeb = frontends?.includes("web");
+	const hasWeb =
+		frontends?.includes("tanstack-router") ||
+		frontends?.includes("react-router");
 
 	if (hasNative) {
 		log.warn(
