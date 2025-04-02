@@ -441,8 +441,6 @@ const StackArchitect = () => {
 
 		if (stackState.addons.length > 0) {
 			flags.push(`--addons ${stackState.addons.join(" ")}`);
-		} else {
-			flags.push("--addons none");
 		}
 
 		if (stackState.examples.length > 0) {
