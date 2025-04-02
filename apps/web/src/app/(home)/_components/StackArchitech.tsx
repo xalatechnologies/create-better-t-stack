@@ -243,7 +243,7 @@ const TECH_OPTIONS = {
 		{
 			id: "ai",
 			name: "AI Example",
-			description: "AI integration example",
+			description: "AI integration example using AI SDK",
 			icon: "🤖",
 			color: "from-purple-500 to-purple-700",
 			default: false,
@@ -441,6 +441,8 @@ const StackArchitect = () => {
 
 		if (stackState.addons.length > 0) {
 			flags.push(`--addons ${stackState.addons.join(" ")}`);
+		} else {
+			flags.push("--addons none");
 		}
 
 		if (stackState.examples.length > 0) {

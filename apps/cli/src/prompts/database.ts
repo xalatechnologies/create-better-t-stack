@@ -9,7 +9,7 @@ export async function getDatabaseChoice(
 	if (database !== undefined) return database;
 
 	const response = await select<ProjectDatabase>({
-		message: "Which database would you like to use?",
+		message: "Select database",
 		options: [
 			{
 				value: "none",

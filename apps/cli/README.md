@@ -50,8 +50,7 @@ Options:
   --auth                          Include authentication
   --no-auth                       Exclude authentication
   --frontend <types...>           Frontend types (web, native, none)
-  --addons <types...>             Additional addons (pwa, tauri, biome, husky)
-  --no-addons                     Skip all additional addons
+  --addons <types...>             Additional addons (pwa, tauri, biome, husky, none)
   --examples <types...>           Examples to include (todo, ai)
   --no-examples                   Skip all examples
   --git                           Initialize git repository

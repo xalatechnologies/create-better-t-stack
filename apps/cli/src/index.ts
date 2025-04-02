@@ -44,9 +44,8 @@ async function main() {
 		.option("--frontend <types...>", "Frontend types (web, native, none)")
 		.option(
 			"--addons <types...>",
-			"Additional addons (pwa, tauri, biome, husky)",
+			"Additional addons (pwa, tauri, biome, husky, none)",
 		)
-		.option("--no-addons", "Skip all additional addons")
 		.option("--examples <types...>", "Examples to include (todo, ai)")
 		.option("--no-examples", "Skip all examples")
 		.option("--git", "Initialize git repository")
@@ -285,8 +284,12 @@ function validateOptions(options: CLIOptions): void {
 		}
 	}
 
-	if (options.addons && options.addons.length > 0) {
-		const validAddons = ["pwa", "tauri", "biome", "husky"];
+	if (
+		options.addons &&
+		Array.isArray(options.addons) &&
+		options.addons.length > 0
+	) {
+		const validAddons = ["pwa", "tauri", "biome", "husky", "none"];
 		const invalidAddons = options.addons.filter(
 			(addon: string) => !validAddons.includes(addon),
 		);
@@ -297,6 +300,11 @@ function validateOptions(options: CLIOptions): void {
 					`Invalid addon(s): ${invalidAddons.join(", ")}. Valid options are: ${validAddons.join(", ")}.`,
 				),
 			);
+			process.exit(1);
+		}
+
+		if (options.addons.includes("none") && options.addons.length > 1) {
+			cancel(pc.red(`Cannot combine 'none' with other addons.`));
 			process.exit(1);
 		}
 
@@ -382,10 +390,10 @@ function processFlags(
 	}
 
 	let addons: ProjectAddons[] | undefined;
-	if ("addons" in options) {
-		if (options.addons === undefined) {
+	if (options.addons && Array.isArray(options.addons)) {
+		if (options.addons.includes("none")) {
 			addons = [];
-		} else if (options.addons) {
+		} else {
 			addons = options.addons.filter(
 				(addon): addon is ProjectAddons =>
 					addon === "pwa" ||

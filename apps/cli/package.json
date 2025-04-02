@@ -7,11 +7,35 @@
 	"bin": {
 		"create-better-t-stack": "dist/index.js"
 	},
-	"files": [
-		"dist",
-		"template"
+	"files": ["dist", "template"],
+	"keywords": [
+		"typescript",
+		"scaffold",
+		"generator",
+		"boilerplate",
+		"starter",
+		"cli",
+		"create-app",
+		"t3-stack",
+		"turborepo",
+		"trpc",
+		"monorepo",
+		"fullstack",
+		"type-safety",
+		"react",
+		"react-native",
+		"expo",
+		"hono",
+		"elysia",
+		"drizzle",
+		"prisma",
+		"tanstack",
+		"tailwind",
+		"shadcn",
+		"pwa",
+		"tauri",
+		"biome"
 	],
-	"keywords": [],
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/better-t-stack/create-better-t-stack.git",

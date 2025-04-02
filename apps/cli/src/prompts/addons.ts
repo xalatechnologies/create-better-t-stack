@@ -44,7 +44,7 @@ export async function getAddonsChoice(
 	);
 
 	const response = await multiselect<ProjectAddons>({
-		message: "Which Addons would you like to add?",
+		message: "Select addons",
 		options,
 		initialValues,
 		required: false,

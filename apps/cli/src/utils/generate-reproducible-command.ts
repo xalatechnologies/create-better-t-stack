@@ -18,9 +18,7 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 	}
 
 	flags.push(config.auth ? "--auth" : "--no-auth");
-
 	flags.push(config.git ? "--git" : "--no-git");
-
 	flags.push(config.noInstall ? "--no-install" : "--install");
 
 	if (config.runtime) {
@@ -38,7 +36,7 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 	if (config.addons && config.addons.length > 0) {
 		flags.push(`--addons ${config.addons.join(" ")}`);
 	} else {
-		flags.push("--no-addons");
+		flags.push("--addons none");
 	}
 
 	if (config.examples && config.examples.length > 0) {
@@ -55,7 +53,7 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 	const pkgManager = config.packageManager;
 
 	if (pkgManager === "npm") {
-		baseCommand = "npm create better-t-stack@latest";
+		baseCommand = "npx create-better-t-stack@latest";
 	} else if (pkgManager === "pnpm") {
 		baseCommand = "pnpm create better-t-stack@latest";
 	} else if (pkgManager === "bun") {

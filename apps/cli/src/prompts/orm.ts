@@ -11,7 +11,7 @@ export async function getORMChoice(
 	if (orm !== undefined) return orm;
 
 	const response = await select<ProjectOrm>({
-		message: "Which ORM would you like to use?",
+		message: "Select ORM",
 		options: [
 			{
 				value: "drizzle",

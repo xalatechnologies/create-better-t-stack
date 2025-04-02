@@ -24,7 +24,7 @@ export async function getAuthChoice(
 	if (auth !== undefined) return auth;
 
 	const response = await confirm({
-		message: "Would you like to add authentication with Better-Auth?",
+		message: "Add authentication with Better-Auth?",
 		initialValue: DEFAULT_CONFIG.auth,
 	});
 

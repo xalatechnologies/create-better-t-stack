@@ -9,7 +9,7 @@ export async function getFrontendChoice(
 	if (frontendOptions !== undefined) return frontendOptions;
 
 	const response = await multiselect<ProjectFrontend>({
-		message: "Which frontend applications would you like to create?",
+		message: "Choose frontends",
 		options: [
 			{
 				value: "web",

@@ -9,7 +9,7 @@ export async function getBackendFrameworkChoice(
 	if (backendFramework !== undefined) return backendFramework;
 
 	const response = await select<ProjectBackend>({
-		message: "Which backend framework would you like to use?",
+		message: "Select backend framework",
 		options: [
 			{
 				value: "hono",
@@ -19,7 +19,7 @@ export async function getBackendFrameworkChoice(
 			{
 				value: "elysia",
 				label: "Elysia",
-				hint: "TypeScript framework with end-to-end type safety)",
+				hint: "Ergonomic web framework for building backend servers",
 			},
 		],
 		initialValue: DEFAULT_CONFIG.backend,

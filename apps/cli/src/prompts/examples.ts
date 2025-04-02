@@ -25,7 +25,7 @@ export async function getExamplesChoice(
 
 	if (backend === "elysia") {
 		response = await multiselect<ProjectExamples>({
-			message: "Which examples would you like to include?",
+			message: "Include examples",
 			options: [
 				{
 					value: "todo",
@@ -40,7 +40,7 @@ export async function getExamplesChoice(
 
 	if (backend === "hono") {
 		response = await multiselect<ProjectExamples>({
-			message: "Which examples would you like to include?",
+			message: "Include examples",
 			options: [
 				{
 					value: "todo",

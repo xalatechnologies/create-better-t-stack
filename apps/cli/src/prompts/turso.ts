@@ -6,7 +6,7 @@ export async function getTursoSetupChoice(turso?: boolean): Promise<boolean> {
 	if (turso !== undefined) return turso;
 
 	const response = await confirm({
-		message: "Set up a Turso database for this project?",
+		message: "Set up Turso database?",
 		initialValue: DEFAULT_CONFIG.turso,
 	});
 

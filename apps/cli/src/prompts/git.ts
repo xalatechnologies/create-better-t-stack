@@ -6,7 +6,7 @@ export async function getGitChoice(git?: boolean): Promise<boolean> {
 	if (git !== undefined) return git;
 
 	const response = await confirm({
-		message: "Initialize a new git repository?",
+		message: "Initialize git repository?",
 		initialValue: DEFAULT_CONFIG.git,
 	});
 

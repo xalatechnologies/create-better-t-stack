@@ -1,6 +1,8 @@
 import path from "node:path";
+import { log } from "@clack/prompts";
 import { $, execa } from "execa";
 import fs from "fs-extra";
+import pc from "picocolors";
 import { PKG_ROOT } from "../constants";
 import type { ProjectConfig } from "../types";
 
@@ -79,7 +81,26 @@ export async function initializeGit(
 	projectDir: string,
 	useGit: boolean,
 ): Promise<void> {
-	if (useGit) {
-		await $({ cwd: projectDir })`git init`;
+	if (!useGit) return;
+
+	const gitVersionResult = await $({
+		cwd: projectDir,
+		reject: false,
+		stderr: "pipe",
+	})`git --version`;
+
+	if (gitVersionResult.exitCode !== 0) {
+		log.warn(pc.yellow("Git is not installed"));
+		return;
+	}
+
+	const result = await $({
+		cwd: projectDir,
+		reject: false,
+		stderr: "pipe",
+	})`git init`;
+
+	if (result.exitCode !== 0) {
+		throw new Error(`Git initialization failed: ${result.stderr}`);
 	}
 }

@@ -9,7 +9,7 @@ export async function getRuntimeChoice(
 	if (runtime !== undefined) return runtime;
 
 	const response = await select<ProjectRuntime>({
-		message: "Which runtime would you like to use?",
+		message: "Select runtime",
 		options: [
 			{
 				value: "bun",

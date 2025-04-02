@@ -11,7 +11,7 @@ export async function getPackageManagerChoice(
 	const detectedPackageManager = getUserPkgManager();
 
 	const response = await select<ProjectPackageManager>({
-		message: "Which package manager do you want to use?",
+		message: "Choose package manager",
 		options: [
 			{ value: "npm", label: "npm", hint: "Node Package Manager" },
 			{
