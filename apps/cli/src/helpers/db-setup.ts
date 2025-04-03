@@ -2,14 +2,20 @@ import path from "node:path";
 import { log, spinner } from "@clack/prompts";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type { ProjectDatabase, ProjectOrm } from "../types";
+import type {
+	ProjectDatabase,
+	ProjectOrm,
+	ProjectPackageManager,
+} from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
+import { setupPrismaPostgres } from "./prisma-postgres-setup";
 import { setupTurso } from "./turso-setup";
 
 export async function setupDatabase(
 	projectDir: string,
 	databaseType: ProjectDatabase,
 	orm: ProjectOrm,
+	packageManager: ProjectPackageManager,
 	setupTursoDb = true,
 ): Promise<void> {
 	const s = spinner();
@@ -52,6 +58,10 @@ export async function setupDatabase(
 					devDependencies: ["prisma"],
 					projectDir: serverDir,
 				});
+
+				if (databaseType === "postgres" && orm === "prisma") {
+					await setupPrismaPostgres(projectDir, true, packageManager);
+				}
 			}
 		}
 	} catch (error) {

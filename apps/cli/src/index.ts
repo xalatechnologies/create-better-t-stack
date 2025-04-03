@@ -58,6 +58,8 @@ async function main() {
 		.option("--no-install", "Skip installing dependencies")
 		.option("--turso", "Set up Turso for SQLite database")
 		.option("--no-turso", "Skip Turso setup")
+		.option("--prisma-postgres", "Set up Prisma Postgres")
+		.option("--no-prisma-postgres", "Skip Prisma Postgres setup")
 		.option("--backend <framework>", "Backend framework (hono, elysia)")
 		.option("--runtime <runtime>", "Runtime (bun, node)")
 		.parse();
@@ -196,6 +198,20 @@ function validateOptions(options: CLIOptions): void {
 			),
 		);
 		process.exit(1);
+	}
+
+	if ("prismaPostgres" in options && options.prismaPostgres === true) {
+		if (
+			(options.database && options.database !== "postgres") ||
+			(options.orm && options.orm !== "prisma")
+		) {
+			cancel(
+				pc.red(
+					"Prisma PostgreSQL setup requires PostgreSQL database with Prisma ORM. Cannot use --prisma-postgres with incompatible database or ORM options.",
+				),
+			);
+			process.exit(1);
+		}
 	}
 
 	if (
@@ -384,15 +400,35 @@ function processFlags(
 		}
 	}
 
-	const database = options.database as ProjectDatabase | undefined;
+	let database = options.database as ProjectDatabase | undefined;
 	let orm: ProjectOrm | undefined;
 	if (options.orm) {
 		orm = options.orm as ProjectOrm;
 	}
 
+	if ("prismaPostgres" in options && options.prismaPostgres === true) {
+		if (!database) {
+			database = "postgres" as ProjectDatabase;
+		}
+		if (!orm) {
+			orm = "prisma" as ProjectOrm;
+		}
+	}
+
 	let auth: boolean | undefined = "auth" in options ? options.auth : undefined;
 	let tursoOption: boolean | undefined =
 		"turso" in options ? options.turso : undefined;
+
+	let prismaPostgresOption: boolean | undefined =
+		"prismaPostgres" in options ? options.prismaPostgres : undefined;
+
+	if (
+		database === "none" ||
+		(database === "sqlite" && database !== undefined) ||
+		(orm !== undefined && orm !== "prisma")
+	) {
+		prismaPostgresOption = false;
+	}
 
 	if (database === "none") {
 		orm = "none";
@@ -473,21 +509,25 @@ function processFlags(
 		| ProjectPackageManager
 		| undefined;
 
-	return {
-		...(projectDirectory && { projectName: projectDirectory }),
-		...(database !== undefined && { database }),
-		...(orm !== undefined && { orm }),
-		...(auth !== undefined && { auth }),
-		...(packageManager && { packageManager }),
-		...("git" in options && { git: options.git }),
-		...("install" in options && { noInstall: !options.install }),
-		...(tursoOption !== undefined && { turso: tursoOption }),
-		...(backend && { backend }),
-		...(runtime && { runtime }),
-		...(frontend !== undefined && { frontend }),
-		...(addons !== undefined && { addons }),
-		...(examples !== undefined && { examples }),
-	};
+	const config: Partial<ProjectConfig> = {};
+
+	if (projectDirectory) config.projectName = projectDirectory;
+	if (database !== undefined) config.database = database;
+	if (orm !== undefined) config.orm = orm;
+	if (auth !== undefined) config.auth = auth;
+	if (packageManager) config.packageManager = packageManager;
+	if ("git" in options) config.git = options.git;
+	if ("install" in options) config.noInstall = !options.install;
+	if (tursoOption !== undefined) config.turso = tursoOption;
+	if (prismaPostgresOption !== undefined)
+		config.prismaPostgres = prismaPostgresOption;
+	if (backend) config.backend = backend;
+	if (runtime) config.runtime = runtime;
+	if (frontend !== undefined) config.frontend = frontend;
+	if (addons !== undefined) config.addons = addons;
+	if (examples !== undefined) config.examples = examples;
+
+	return config;
 }
 
 main().catch((err) => {

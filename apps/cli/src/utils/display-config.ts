@@ -64,5 +64,11 @@ export function displayConfig(config: Partial<ProjectConfig>) {
 		configDisplay.push(`${pc.blue("Turso Setup:")} ${config.turso}`);
 	}
 
+	if (config.prismaPostgres !== undefined) {
+		configDisplay.push(
+			`${pc.blue("Prisma Postgres Setup:")} ${config.prismaPostgres ? "Yes" : "No"}`,
+		);
+	}
+
 	return configDisplay.join("\n");
 }

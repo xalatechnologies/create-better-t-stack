@@ -4,7 +4,7 @@ import StackArchitect from "./StackArchitech";
 
 export default function CustomizableSection() {
 	return (
-		<section className="w-full max-w-6xl mx-auto space-y-16 mt-20 relative z-10 px-4 sm:px-6">
+		<section className="w-full max-w-7xl mx-auto space-y-16 mt-20 relative z-10 px-4 sm:px-6">
 			<div className="text-center space-y-8 relative">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}

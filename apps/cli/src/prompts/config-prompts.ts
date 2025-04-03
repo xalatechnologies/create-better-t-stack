@@ -21,6 +21,7 @@ import { getGitChoice } from "./git";
 import { getNoInstallChoice } from "./install";
 import { getORMChoice } from "./orm";
 import { getPackageManagerChoice } from "./package-manager";
+import { getPrismaSetupChoice } from "./prisma-postgres";
 import { getProjectName } from "./project-name";
 import { getRuntimeChoice } from "./runtime";
 import { getTursoSetupChoice } from "./turso";
@@ -36,6 +37,7 @@ type PromptGroupResults = {
 	packageManager: ProjectPackageManager;
 	noInstall: boolean;
 	turso: boolean;
+	prismaPostgres: boolean;
 	backend: ProjectBackend;
 	runtime: ProjectRuntime;
 	frontend: ProjectFrontend[];
@@ -64,6 +66,10 @@ export async function gatherConfig(
 			turso: ({ results }) =>
 				results.database === "sqlite" && results.orm !== "prisma"
 					? getTursoSetupChoice(flags.turso)
+					: Promise.resolve(false),
+			prismaPostgres: ({ results }) =>
+				results.database === "postgres" && results.orm === "prisma"
+					? getPrismaSetupChoice(flags.prismaPostgres)
 					: Promise.resolve(false),
 			addons: ({ results }) => getAddonsChoice(flags.addons, results.frontend),
 			examples: ({ results }) =>
@@ -97,6 +103,7 @@ export async function gatherConfig(
 		packageManager: result.packageManager,
 		noInstall: result.noInstall,
 		turso: result.turso,
+		prismaPostgres: result.prismaPostgres,
 		backend: result.backend,
 		runtime: result.runtime,
 	};

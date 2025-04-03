@@ -75,7 +75,7 @@ The API is running at [http://localhost:3000](http://localhost:3000).
 
 ${
 	addons.includes("pwa") && hasReactRouter
-		? "\n## PWA Support with React Router v7\n\nThere is a known compatibility issue between VitePWA and React Router v7.\nSee: https://github.com/vite-pwa/vite-plugin-pwa/issues/809\n\nIf you encounter problems with the PWA functionality, you may need to manually modify\nthe service worker registration or consider waiting for a fix from VitePWA.\n"
+		? "\n## PWA Support with React Router v7\n\nThere is a known compatibility issue between VitePWA and React Router v7.\nSee: https://github.com/vite-pwa/vite-plugin-pwa/issues/809\n"
 		: ""
 }
 

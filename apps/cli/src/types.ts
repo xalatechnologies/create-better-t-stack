@@ -20,6 +20,7 @@ export interface ProjectConfig {
 	packageManager: ProjectPackageManager;
 	noInstall?: boolean;
 	turso?: boolean;
+	prismaPostgres: boolean;
 	frontend: ProjectFrontend[];
 }
 
@@ -35,6 +36,7 @@ export type CLIOptions = {
 	packageManager?: string;
 	install?: boolean;
 	turso?: boolean;
+	prismaPostgres?: boolean;
 	backend?: string;
 	runtime?: string;
 };

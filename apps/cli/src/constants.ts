@@ -19,6 +19,7 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 	packageManager: getUserPkgManager(),
 	noInstall: false,
 	turso: false,
+	prismaPostgres: false,
 	backend: "hono",
 	runtime: "bun",
 };
@@ -62,6 +63,8 @@ export const dependencyVersionMap = {
 
 	ai: "^4.2.8",
 	"@ai-sdk/google": "^1.2.3",
+
+	"@prisma/extension-accelerate": "^1.3.0",
 } as const;
 
 export type AvailableDependencies = keyof typeof dependencyVersionMap;

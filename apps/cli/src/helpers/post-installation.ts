@@ -89,7 +89,7 @@ function getDatabaseInstructions(
 
 		if (runtime === "bun") {
 			instructions.push(
-				`${pc.yellow("NOTE:")} Prisma with Bun may require additional configuration. If you encounter errors, follow the guidance provided in the error messages`,
+				`${pc.yellow("NOTE:")} Prisma with Bun may require additional configuration. If you encounter errors,\nfollow the guidance provided in the error messages`,
 			);
 		}
 
