@@ -16,7 +16,8 @@ export async function setupDatabase(
 	databaseType: ProjectDatabase,
 	orm: ProjectOrm,
 	packageManager: ProjectPackageManager,
-	setupTursoDb = true,
+	setupTursoDb: boolean,
+	setupPrismaPostgresDb: boolean,
 ): Promise<void> {
 	const s = spinner();
 	const serverDir = path.join(projectDir, "apps/server");
@@ -59,7 +60,11 @@ export async function setupDatabase(
 					projectDir: serverDir,
 				});
 
-				if (databaseType === "postgres" && orm === "prisma") {
+				if (
+					databaseType === "postgres" &&
+					orm === "prisma" &&
+					setupPrismaPostgresDb
+				) {
 					await setupPrismaPostgres(projectDir, true, packageManager);
 				}
 			}
