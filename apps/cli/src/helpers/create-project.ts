@@ -66,7 +66,7 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			options.database,
 			options.frontend,
 		);
-		await setupAuth(projectDir, options.auth);
+		await setupAuth(projectDir, options.auth, options.frontend);
 
 		await setupRuntime(projectDir, options.runtime, options.backend);
 

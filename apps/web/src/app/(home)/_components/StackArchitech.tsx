@@ -1,12 +1,22 @@
 "use client";
 
+import {
+	DEFAULT_STACK,
+	PRESET_TEMPLATES,
+	type StackState,
+	TECH_OPTIONS,
+} from "@/lib/constant";
 import { motion } from "framer-motion";
 import {
 	Check,
 	Circle,
 	CircleCheck,
 	ClipboardCopy,
+	HelpCircle,
 	InfoIcon,
+	RefreshCw,
+	Settings,
+	Star,
 	Terminal,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -36,315 +46,6 @@ const validateProjectName = (name: string): string | undefined => {
 	return undefined;
 };
 
-const TECH_OPTIONS = {
-	frontend: [
-		{
-			id: "tanstack-router",
-			name: "TanStack Router",
-			description: "Modern type-safe router for React",
-			icon: "🌐",
-			color: "from-blue-400 to-blue-600",
-			default: true,
-		},
-		{
-			id: "react-router",
-			name: "React Router",
-			description: "Declarative routing for React",
-			icon: "🧭",
-			color: "from-cyan-400 to-cyan-600",
-			default: false,
-		},
-		{
-			id: "native",
-			name: "React Native",
-			description: "Expo with NativeWind",
-			icon: "📱",
-			color: "from-purple-400 to-purple-600",
-			default: false,
-		},
-		{
-			id: "none",
-			name: "No Frontend",
-			description: "API-only backend",
-			icon: "⚙️",
-			color: "from-gray-400 to-gray-600",
-			default: false,
-		},
-	],
-	runtime: [
-		{
-			id: "bun",
-			name: "Bun",
-			description: "Fast JavaScript runtime & toolkit",
-			icon: "🥟",
-			color: "from-amber-400 to-amber-600",
-			default: true,
-		},
-		{
-			id: "node",
-			name: "Node.js",
-			description: "JavaScript runtime environment",
-			icon: "🟩",
-			color: "from-green-400 to-green-600",
-		},
-	],
-	backendFramework: [
-		{
-			id: "hono",
-			name: "Hono",
-			description: "Ultrafast web framework",
-			icon: "⚡",
-			color: "from-blue-500 to-blue-700",
-			default: true,
-		},
-		{
-			id: "elysia",
-			name: "Elysia",
-			description: "TypeScript web framework",
-			icon: "🦊",
-			color: "from-purple-500 to-purple-700",
-		},
-	],
-	database: [
-		{
-			id: "sqlite",
-			name: "SQLite",
-			description: "File-based SQL database",
-			icon: "🗃️",
-			color: "from-blue-400 to-cyan-500",
-			default: true,
-		},
-		{
-			id: "postgres",
-			name: "PostgreSQL",
-			description: "Advanced SQL database",
-			icon: "🐘",
-			color: "from-indigo-400 to-indigo-600",
-		},
-		{
-			id: "none",
-			name: "No Database",
-			description: "Skip database integration",
-			icon: "🚫",
-			color: "from-gray-400 to-gray-600",
-		},
-	],
-	orm: [
-		{
-			id: "drizzle",
-			name: "Drizzle",
-			description: "TypeScript ORM",
-			icon: "💧",
-			color: "from-cyan-400 to-cyan-600",
-			default: true,
-		},
-		{
-			id: "prisma",
-			name: "Prisma",
-			description: "Next-gen ORM",
-			icon: "◮",
-			color: "from-purple-400 to-purple-600",
-		},
-	],
-	auth: [
-		{
-			id: "true",
-			name: "Better Auth",
-			description: "Simple authentication",
-			icon: "🔐",
-			color: "from-green-400 to-green-600",
-			default: true,
-		},
-		{
-			id: "false",
-			name: "No Auth",
-			description: "Skip authentication",
-			icon: "🔓",
-			color: "from-red-400 to-red-600",
-		},
-	],
-	turso: [
-		{
-			id: "true",
-			name: "Turso",
-			description: "SQLite cloud database",
-			icon: "☁️",
-			color: "from-pink-400 to-pink-600",
-			default: false,
-		},
-		{
-			id: "false",
-			name: "No Turso",
-			description: "Skip Turso integration",
-			icon: "🚫",
-			color: "from-gray-400 to-gray-600",
-			default: true,
-		},
-	],
-	prismaPostgres: [
-		{
-			id: "true",
-			name: "Prisma PostgreSQL",
-			description: "Set up PostgreSQL with Prisma",
-			icon: "🐘",
-			color: "from-indigo-400 to-indigo-600",
-			default: false,
-		},
-		{
-			id: "false",
-			name: "Skip Prisma PostgreSQL",
-			description: "Basic Prisma setup",
-			icon: "🚫",
-			color: "from-gray-400 to-gray-600",
-			default: true,
-		},
-	],
-	packageManager: [
-		{
-			id: "npm",
-			name: "npm",
-			description: "Default package manager",
-			icon: "📦",
-			color: "from-red-500 to-red-700",
-		},
-		{
-			id: "pnpm",
-			name: "pnpm",
-			description: "Fast, disk space efficient",
-			icon: "🚀",
-			color: "from-orange-500 to-orange-700",
-		},
-		{
-			id: "bun",
-			name: "bun",
-			description: "All-in-one toolkit",
-			icon: "🥟",
-			color: "from-amber-500 to-amber-700",
-			default: true,
-		},
-	],
-	addons: [
-		{
-			id: "pwa",
-			name: "PWA",
-			description: "Progressive Web App",
-			icon: "📱",
-			color: "from-blue-500 to-blue-700",
-			default: false,
-		},
-		{
-			id: "tauri",
-			name: "Tauri",
-			description: "Desktop app support",
-			icon: "🖥️",
-			color: "from-amber-500 to-amber-700",
-			default: false,
-		},
-		{
-			id: "biome",
-			name: "Biome",
-			description: "Linting & formatting",
-			icon: "🌿",
-			color: "from-green-500 to-green-700",
-			default: false,
-		},
-		{
-			id: "husky",
-			name: "Husky",
-			description: "Git hooks & lint-staged",
-			icon: "🐶",
-			color: "from-purple-500 to-purple-700",
-			default: false,
-		},
-	],
-	examples: [
-		{
-			id: "todo",
-			name: "Todo Example",
-			description: "Simple todo application",
-			icon: "✅",
-			color: "from-indigo-500 to-indigo-700",
-			default: false,
-		},
-		{
-			id: "ai",
-			name: "AI Example",
-			description: "AI integration example using AI SDK",
-			icon: "🤖",
-			color: "from-purple-500 to-purple-700",
-			default: false,
-		},
-	],
-	git: [
-		{
-			id: "true",
-			name: "Git",
-			description: "Initialize Git repository",
-			icon: "📝",
-			color: "from-gray-500 to-gray-700",
-			default: true,
-		},
-		{
-			id: "false",
-			name: "No Git",
-			description: "Skip Git initialization",
-			icon: "🚫",
-			color: "from-red-400 to-red-600",
-		},
-	],
-	install: [
-		{
-			id: "true",
-			name: "Install Dependencies",
-			description: "Install packages automatically",
-			icon: "📥",
-			color: "from-green-400 to-green-600",
-			default: true,
-		},
-		{
-			id: "false",
-			name: "Skip Install",
-			description: "Skip dependency installation",
-			icon: "⏭️",
-			color: "from-yellow-400 to-yellow-600",
-		},
-	],
-};
-
-interface StackState {
-	projectName: string;
-	frontend: string[];
-	runtime: string;
-	backendFramework: string;
-	database: string;
-	orm: string | null;
-	auth: string;
-	turso: string;
-	prismaPostgres: string;
-	packageManager: string;
-	addons: string[];
-	examples: string[];
-	git: string;
-	install: string;
-}
-
-const DEFAULT_STACK: StackState = {
-	projectName: "my-better-t-app",
-	frontend: ["tanstack-router"],
-	runtime: "bun",
-	backendFramework: "hono",
-	database: "sqlite",
-	orm: "drizzle",
-	auth: "true",
-	turso: "false",
-	prismaPostgres: "false",
-	packageManager: "bun",
-	addons: [],
-	examples: [],
-	git: "true",
-	install: "true",
-};
-
 const StackArchitect = () => {
 	const [stack, setStack] = useState<StackState>(DEFAULT_STACK);
 	const [command, setCommand] = useState(
@@ -356,18 +57,21 @@ const StackArchitect = () => {
 	const [projectNameError, setProjectNameError] = useState<string | undefined>(
 		undefined,
 	);
+	const [showPresets, setShowPresets] = useState(false);
+	const [showHelp, setShowHelp] = useState(false);
+	const [lastSavedStack, setLastSavedStack] = useState<StackState | null>(null);
 
 	useEffect(() => {
-		const hasWebFrontend =
-			stack.frontend.includes("tanstack-router") ||
-			stack.frontend.includes("react-router");
-		if (!hasWebFrontend && stack.auth === "true") {
-			setStack((prev) => ({
-				...prev,
-				auth: "false",
-			}));
+		const savedStack = localStorage.getItem("betterTStackPreference");
+		if (savedStack) {
+			try {
+				const parsedStack = JSON.parse(savedStack);
+				setLastSavedStack(parsedStack);
+			} catch (e) {
+				console.error("Failed to parse saved stack", e);
+			}
 		}
-	}, [stack.frontend, stack.auth]);
+	}, []);
 
 	useEffect(() => {
 		if (stack.database === "none" && stack.orm !== "none") {
@@ -385,7 +89,17 @@ const StackArchitect = () => {
 				setStack((prev) => ({ ...prev, turso: "false" }));
 			}
 		}
-	}, [stack.database, stack.orm, stack.prismaPostgres, stack.turso]);
+
+		if (stack.database === "none" && stack.auth === "true") {
+			setStack((prev) => ({ ...prev, auth: "false" }));
+		}
+	}, [
+		stack.database,
+		stack.orm,
+		stack.prismaPostgres,
+		stack.turso,
+		stack.auth,
+	]);
 
 	useEffect(() => {
 		const cmd = generateCommand(stack);
@@ -397,13 +111,6 @@ const StackArchitect = () => {
 			stack.frontend.includes("react-router");
 
 		notes.frontend = [];
-
-		notes.auth = [];
-		if (!hasWebFrontend && stack.auth === "true") {
-			notes.auth.push(
-				"Authentication is only available with React Web (TanStack Router or React Router).",
-			);
-		}
 
 		notes.addons = [];
 		if (!hasWebFrontend) {
@@ -417,6 +124,11 @@ const StackArchitect = () => {
 			notes.orm.push(
 				"ORM options are only available when a database is selected.",
 			);
+		}
+
+		notes.auth = [];
+		if (stack.database === "none") {
+			notes.auth.push("Authentication requires a database.");
 		}
 
 		notes.turso = [];
@@ -535,7 +247,6 @@ const StackArchitect = () => {
 						return {
 							...prev,
 							frontend: ["none"],
-							auth: "false",
 							examples: [],
 							addons: prev.addons.filter(
 								(addon) => addon !== "pwa" && addon !== "tauri",
@@ -543,68 +254,33 @@ const StackArchitect = () => {
 						};
 					}
 
-					if (webTypes.includes(techId)) {
-						if (
-							currentSelection.includes(techId) &&
-							currentSelection.length === 1
-						) {
+					if (currentSelection.includes(techId)) {
+						if (currentSelection.length === 1) {
 							return prev;
 						}
 
-						if (currentSelection.some((id) => webTypes.includes(id))) {
-							const nonWebSelections = currentSelection.filter(
-								(id) => !webTypes.includes(id),
-							);
-							return {
-								...prev,
-								frontend: [...nonWebSelections, techId],
-								auth: prev.auth,
-							};
-						}
-
-						if (currentSelection.includes("none")) {
-							return {
-								...prev,
-								frontend: [techId],
-								auth: "true",
-							};
-						}
-
 						return {
 							...prev,
-							frontend: [
-								...currentSelection.filter((id) => id !== "none"),
-								techId,
-							],
-							auth: "true",
+							frontend: currentSelection.filter((id) => id !== techId),
 						};
 					}
 
-					if (techId === "native") {
-						if (currentSelection.includes(techId)) {
-							if (currentSelection.length === 1) {
-								return prev;
-							}
-							return {
-								...prev,
-								frontend: currentSelection.filter((id) => id !== techId),
-							};
-						}
+					let newSelection = [...currentSelection];
 
-						if (currentSelection.includes("none")) {
-							return {
-								...prev,
-								frontend: [techId],
-							};
-						}
-
-						return {
-							...prev,
-							frontend: [...currentSelection, techId],
-						};
+					if (newSelection.includes("none")) {
+						newSelection = [];
 					}
 
-					return prev;
+					if (webTypes.includes(techId)) {
+						newSelection = newSelection.filter((id) => !webTypes.includes(id));
+					}
+
+					newSelection.push(techId);
+
+					return {
+						...prev,
+						frontend: newSelection,
+					};
 				}
 
 				if (category === "addons" || category === "examples") {
@@ -666,7 +342,7 @@ const StackArchitect = () => {
 							orm: "none",
 							turso: "false",
 							prismaPostgres: "false",
-							auth: hasWebFrontend(prev.frontend) ? prev.auth : "false",
+							auth: "false",
 						};
 					}
 
@@ -679,6 +355,11 @@ const StackArchitect = () => {
 							prismaPostgres:
 								techId === "postgres" && prev.orm === "prisma"
 									? prev.prismaPostgres
+									: "false",
+							auth:
+								hasWebFrontend(prev.frontend) ||
+								prev.frontend.includes("native")
+									? "true"
 									: "false",
 						};
 					}
@@ -735,6 +416,14 @@ const StackArchitect = () => {
 					return prev;
 				}
 
+				if (
+					category === "auth" &&
+					prev.database === "none" &&
+					techId === "true"
+				) {
+					return prev;
+				}
+
 				return {
 					...prev,
 					[category]: techId,
@@ -747,7 +436,8 @@ const StackArchitect = () => {
 	const hasWebFrontend = useCallback((frontendOptions: string[]) => {
 		return (
 			frontendOptions.includes("tanstack-router") ||
-			frontendOptions.includes("react-router")
+			frontendOptions.includes("react-router") ||
+			frontendOptions.includes("native")
 		);
 	}, []);
 
@@ -756,6 +446,40 @@ const StackArchitect = () => {
 		setCopied(true);
 		setTimeout(() => setCopied(false), 2000);
 	}, [command]);
+
+	const resetStack = useCallback(() => {
+		setStack(DEFAULT_STACK);
+		setActiveTab("frontend");
+	}, []);
+
+	const saveCurrentStack = useCallback(() => {
+		localStorage.setItem("betterTStackPreference", JSON.stringify(stack));
+		setLastSavedStack(stack);
+		const saveMessage = document.createElement("div");
+		saveMessage.textContent = "Stack preferences saved!";
+		saveMessage.className =
+			"fixed bottom-4 right-4 bg-green-500 text-white py-2 px-4 rounded-md shadow-lg z-50";
+		document.body.appendChild(saveMessage);
+		setTimeout(() => {
+			document.body.removeChild(saveMessage);
+		}, 3000);
+	}, [stack]);
+
+	const loadSavedStack = useCallback(() => {
+		if (lastSavedStack) {
+			setStack(lastSavedStack);
+		}
+	}, [lastSavedStack]);
+
+	const applyPreset = useCallback((presetId: string) => {
+		const preset = PRESET_TEMPLATES.find(
+			(template) => template.id === presetId,
+		);
+		if (preset) {
+			setStack(preset.stack);
+			setShowPresets(false);
+		}
+	}, []);
 
 	return (
 		<div className="mx-auto w-full">
@@ -769,7 +493,23 @@ const StackArchitect = () => {
 					<div className="font-mono text-gray-600 text-xs dark:text-gray-400">
 						Stack Architect Terminal
 					</div>
-					<div>
+					<div className="flex space-x-2">
+						<button
+							type="button"
+							onClick={() => setShowHelp(!showHelp)}
+							className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+							title="Help"
+						>
+							<HelpCircle className="h-4 w-4" />
+						</button>
+						<button
+							type="button"
+							onClick={() => setShowPresets(!showPresets)}
+							className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+							title="Presets"
+						>
+							<Star className="h-4 w-4" />
+						</button>
 						<button
 							type="button"
 							onClick={copyToClipboard}
@@ -784,9 +524,59 @@ const StackArchitect = () => {
 						</button>
 					</div>
 				</div>
+
+				{showHelp && (
+					<div className="border-gray-300 border-b bg-blue-50 p-4 dark:border-gray-700 dark:bg-blue-900/20">
+						<h3 className="mb-2 font-medium text-blue-800 dark:text-blue-300">
+							How to Use Stack Architect
+						</h3>
+						<ul className="list-disc space-y-1 pl-5 text-blue-700 text-sm dark:text-blue-400">
+							<li>
+								Select your preferred technologies from each category using the
+								tabs below
+							</li>
+							<li>
+								The command will automatically update based on your selections
+							</li>
+							<li>
+								Click the copy button to copy the command to your clipboard
+							</li>
+							<li>
+								You can reset to defaults or choose from presets for quick setup
+							</li>
+							<li>Save your preferences to load them later when you return</li>
+						</ul>
+					</div>
+				)}
+
+				{showPresets && (
+					<div className="border-gray-300 border-b bg-amber-50 p-4 dark:border-gray-700 dark:bg-amber-900/20">
+						<h3 className="mb-2 font-medium text-amber-800 dark:text-amber-300">
+							Quick Start Presets
+						</h3>
+						<div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+							{PRESET_TEMPLATES.map((preset) => (
+								<button
+									type="button"
+									key={preset.id}
+									onClick={() => applyPreset(preset.id)}
+									className="rounded border border-amber-200 p-2 text-left transition-colors hover:bg-amber-100 dark:border-amber-700 dark:hover:bg-amber-800/30"
+								>
+									<div className="font-medium text-amber-700 dark:text-amber-300">
+										{preset.name}
+									</div>
+									<div className="text-amber-600 text-xs dark:text-amber-400">
+										{preset.description}
+									</div>
+								</button>
+							))}
+						</div>
+					</div>
+				)}
+
 				<div className="p-4 font-mono">
-					<div className="mb-4">
-						<label className="mb-2 flex flex-col">
+					<div className="mb-4 flex items-start justify-between">
+						<label className="flex flex-col">
 							<span className="mb-1 text-gray-600 text-xs dark:text-gray-400">
 								Project Name:
 							</span>
@@ -811,6 +601,40 @@ const StackArchitect = () => {
 								<p className="mt-1 text-red-500 text-xs">{projectNameError}</p>
 							)}
 						</label>
+
+						<div className="flex gap-2">
+							<button
+								type="button"
+								onClick={resetStack}
+								className="flex items-center gap-1 rounded border border-gray-300 bg-gray-200 px-2 py-1 text-gray-700 text-xs hover:bg-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+								title="Reset to defaults"
+							>
+								<RefreshCw className="h-3 w-3" />
+								Reset
+							</button>
+
+							{lastSavedStack && (
+								<button
+									type="button"
+									onClick={loadSavedStack}
+									className="flex items-center gap-1 rounded border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700 text-xs hover:bg-blue-200 dark:border-blue-700 dark:bg-blue-900/50 dark:text-blue-300 dark:hover:bg-blue-800/50"
+									title="Load saved preferences"
+								>
+									<Settings className="h-3 w-3" />
+									Load Saved
+								</button>
+							)}
+
+							<button
+								type="button"
+								onClick={saveCurrentStack}
+								className="flex items-center gap-1 rounded border border-green-300 bg-green-100 px-2 py-1 text-green-700 text-xs hover:bg-green-200 dark:border-green-700 dark:bg-green-900/50 dark:text-green-300 dark:hover:bg-green-800/50"
+								title="Save current preferences"
+							>
+								<Star className="h-3 w-3" />
+								Save
+							</button>
+						</div>
 					</div>
 					<div className="mb-4">
 						<div className="flex">
@@ -833,7 +657,7 @@ const StackArchitect = () => {
 							</ul>
 						</div>
 					)}
-					<div className="mt-4 border-gray-300 border-t pt-4 dark:border-gray-700">
+					<div className="border-gray-300 border-t pt-4 dark:border-gray-700">
 						<div className="mb-3 flex items-center text-gray-600 dark:text-gray-400">
 							<Terminal className="mr-2 h-4 w-4" />
 							<span>
@@ -867,7 +691,6 @@ const StackArchitect = () => {
 										(activeTab === "prismaPostgres" &&
 											(stack.database !== "postgres" ||
 												stack.orm !== "prisma")) ||
-										(activeTab === "auth" && !hasWebFrontendSelected) ||
 										(activeTab === "examples" &&
 											(((tech.id === "todo" || tech.id === "ai") &&
 												!hasWebFrontendSelected) ||
@@ -875,18 +698,37 @@ const StackArchitect = () => {
 													stack.backendFramework === "elysia"))) ||
 										(activeTab === "addons" &&
 											(tech.id === "pwa" || tech.id === "tauri") &&
-											!hasWebFrontendSelected);
+											!hasWebFrontendSelected) ||
+										(activeTab === "auth" &&
+											tech.id === "true" &&
+											stack.database === "none");
+
+									const compatNote = isDisabled
+										? compatNotes[activeTab]?.find((note) =>
+												note.toLowerCase().includes(tech.name.toLowerCase()),
+											)
+										: null;
 
 									return (
 										<motion.div
 											key={tech.id}
-											className={`p-2 px-3 rounded${isDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
-												${
+											className={`rounded p-2 px-3${
+												isDisabled
+													? " cursor-not-allowed opacity-50"
+													: " cursor-pointer"
+											}
+                        ${
 													isSelected
 														? "border border-blue-300 bg-blue-100 dark:border-blue-500/50 dark:bg-blue-900/40"
 														: "border border-gray-300 hover:bg-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
 												}
-											`}
+                      `}
+											title={
+												isDisabled
+													? compatNote ||
+														"Option not available with current selection"
+													: tech.description
+											}
 											whileHover={!isDisabled ? { scale: 1.02 } : undefined}
 											whileTap={!isDisabled ? { scale: 0.98 } : undefined}
 											onClick={() =>
@@ -935,8 +777,30 @@ const StackArchitect = () => {
 						</div>
 
 						<div className="mb-3 border-gray-300 border-t pt-3 dark:border-gray-700">
-							<div className="mb-2 text-gray-600 text-xs dark:text-gray-400">
-								Selected Stack
+							<div className="mb-2 flex items-center justify-between">
+								<div className="text-gray-600 text-xs dark:text-gray-400">
+									Selected Stack
+								</div>
+								<button
+									type="button"
+									onClick={() => {
+										alert(
+											// biome-ignore lint/style/useTemplate: <explanation>
+											"Stack Summary:\n\n" +
+												Object.entries(stack)
+													.map(([key, value]) => {
+														if (Array.isArray(value)) {
+															return `${key}: ${value.join(", ") || "none"}`;
+														}
+														return `${key}: ${value || "none"}`;
+													})
+													.join("\n"),
+										);
+									}}
+									className="text-blue-600 text-xs hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+								>
+									Full Summary
+								</button>
 							</div>
 							<div className="flex flex-wrap gap-1">
 								{stack.frontend.map((frontendId) => {
@@ -994,12 +858,14 @@ const StackArchitect = () => {
 									</span>
 								)}
 
-								{hasWebFrontend(stack.frontend) && (
-									<span className="inline-flex items-center rounded border border-green-300 bg-green-100 px-1.5 py-0.5 text-green-800 text-xs dark:border-green-700/30 dark:bg-green-900/30 dark:text-green-300">
-										{TECH_OPTIONS.auth.find((t) => t.id === stack.auth)?.icon}{" "}
-										{TECH_OPTIONS.auth.find((t) => t.id === stack.auth)?.name}
-									</span>
-								)}
+								{stack.frontend[0] !== "none" &&
+									stack.database !== "none" &&
+									stack.auth === "true" && (
+										<span className="inline-flex items-center rounded border border-green-300 bg-green-100 px-1.5 py-0.5 text-green-800 text-xs dark:border-green-700/30 dark:bg-green-900/30 dark:text-green-300">
+											{TECH_OPTIONS.auth.find((t) => t.id === "true")?.icon}{" "}
+											{TECH_OPTIONS.auth.find((t) => t.id === "true")?.name}
+										</span>
+									)}
 
 								{stack.turso === "true" &&
 									stack.database === "sqlite" &&
@@ -1072,10 +938,10 @@ const StackArchitect = () => {
 							key={category}
 							className={`whitespace-nowrap px-4 py-2 font-mono text-xs transition-colors${
 								activeTab === category
-									? "border-blue-500 border-t-2 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-									: "text-gray-600 hover:bg-gray-300 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+									? " border-blue-500 border-t-2 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+									: " text-gray-600 hover:bg-gray-300 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
 							}
-							`}
+              `}
 							onClick={() => setActiveTab(category)}
 						>
 							{category}

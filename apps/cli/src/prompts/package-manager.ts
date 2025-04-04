@@ -15,14 +15,14 @@ export async function getPackageManagerChoice(
 		options: [
 			{ value: "npm", label: "npm", hint: "Node Package Manager" },
 			{
-				value: "bun",
-				label: "bun",
-				hint: "All-in-one JavaScript runtime & toolkit",
-			},
-			{
 				value: "pnpm",
 				label: "pnpm",
 				hint: "Fast, disk space efficient package manager",
+			},
+			{
+				value: "bun",
+				label: "bun",
+				hint: "All-in-one JavaScript runtime & toolkit",
 			},
 		],
 		initialValue: detectedPackageManager,

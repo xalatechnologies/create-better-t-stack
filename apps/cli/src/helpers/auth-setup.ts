@@ -1,6 +1,7 @@
 import path from "node:path";
 import { log } from "@clack/prompts";
 import pc from "picocolors";
+import type { ProjectFrontend } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
 export function generateAuthSecret(length = 32): string {
@@ -17,6 +18,7 @@ export function generateAuthSecret(length = 32): string {
 export async function setupAuth(
 	projectDir: string,
 	enableAuth: boolean,
+	frontends: ProjectFrontend[] = [],
 ): Promise<void> {
 	if (!enableAuth) {
 		return;
@@ -24,16 +26,33 @@ export async function setupAuth(
 
 	const serverDir = path.join(projectDir, "apps/server");
 	const clientDir = path.join(projectDir, "apps/web");
+	const nativeDir = path.join(projectDir, "apps/native");
 
 	try {
-		addPackageDependency({
-			dependencies: ["better-auth"],
-			projectDir: serverDir,
-		});
-		addPackageDependency({
-			dependencies: ["better-auth"],
-			projectDir: clientDir,
-		});
+		if (
+			frontends.includes("react-router") ||
+			frontends.includes("tanstack-router")
+		) {
+			addPackageDependency({
+				dependencies: ["better-auth"],
+				projectDir: serverDir,
+			});
+			addPackageDependency({
+				dependencies: ["better-auth"],
+				projectDir: clientDir,
+			});
+		}
+
+		if (frontends.includes("native")) {
+			addPackageDependency({
+				dependencies: ["better-auth", "@better-auth/expo"],
+				projectDir: nativeDir,
+			});
+			addPackageDependency({
+				dependencies: ["better-auth", "@better-auth/expo"],
+				projectDir: serverDir,
+			});
+		}
 	} catch (error) {
 		log.error(pc.red("Failed to configure authentication"));
 		if (error instanceof Error) {

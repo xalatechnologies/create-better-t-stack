@@ -26,6 +26,7 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 
 export const dependencyVersionMap = {
 	"better-auth": "^1.2.4",
+	"@better-auth/expo": "^1.2.5",
 
 	"drizzle-orm": "^0.38.4",
 	"drizzle-kit": "^0.30.5",

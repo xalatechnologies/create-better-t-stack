@@ -10,19 +10,6 @@ export async function getAuthChoice(
 ): Promise<boolean> {
 	if (!hasDatabase) return false;
 
-	const hasNative = frontends?.includes("native");
-	const hasWeb =
-		frontends?.includes("tanstack-router") ||
-		frontends?.includes("react-router");
-
-	if (hasNative) {
-		log.warn(
-			pc.yellow("Note: Authentication is not yet available with native"),
-		);
-	}
-
-	if (!hasWeb) return false;
-
 	if (auth !== undefined) return auth;
 
 	const response = await confirm({

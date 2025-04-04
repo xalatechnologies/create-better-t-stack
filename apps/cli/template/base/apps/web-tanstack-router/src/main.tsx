@@ -3,13 +3,13 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
 import Loader from "./components/loader";
 import { routeTree } from "./routeTree.gen";
-import { queryClient, trpcClient } from "./utils/trpc";
+import { queryClient, trpc } from "./utils/trpc";
 
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   defaultPendingComponent: () => <Loader />,
-  context: { trpcClient },
+  context: { trpc, queryClient },
   Wrap: function WrapComponent({ children }) {
     return (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

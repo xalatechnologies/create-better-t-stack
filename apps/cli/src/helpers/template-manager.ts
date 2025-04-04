@@ -7,6 +7,7 @@ import type {
 	ProjectFrontend,
 	ProjectOrm,
 } from "../types";
+import { addPackageDependency } from "../utils/add-package-deps";
 
 /**
  * Copy base template structure but exclude app-specific folders that will be added based on options
@@ -233,7 +234,80 @@ export async function setupAuthTemplate(
 			if (await fs.pathExists(nativeAuthDir)) {
 				await fs.copy(nativeAuthDir, projectNativeDir, { overwrite: true });
 			}
+
+			addPackageDependency({
+				dependencies: ["@better-auth/expo"],
+				projectDir: path.join(projectDir, "apps/server"),
+			});
+
+			await updateAuthConfigWithExpoPlugin(projectDir, orm, database);
 		}
+	}
+}
+
+// Need to find a better way to handle this
+async function updateAuthConfigWithExpoPlugin(
+	projectDir: string,
+	orm: ProjectOrm,
+	database: ProjectDatabase,
+): Promise<void> {
+	const serverDir = path.join(projectDir, "apps/server");
+
+	let authFilePath: string | undefined;
+	if (orm === "drizzle") {
+		if (database === "sqlite") {
+			authFilePath = path.join(serverDir, "src/lib/auth.ts");
+		} else if (database === "postgres") {
+			authFilePath = path.join(serverDir, "src/lib/auth.ts");
+		}
+	} else if (orm === "prisma") {
+		if (database === "sqlite") {
+			authFilePath = path.join(serverDir, "src/lib/auth.ts");
+		} else if (database === "postgres") {
+			authFilePath = path.join(serverDir, "src/lib/auth.ts");
+		}
+	}
+
+	if (authFilePath && (await fs.pathExists(authFilePath))) {
+		let authFileContent = await fs.readFile(authFilePath, "utf8");
+
+		if (!authFileContent.includes("@better-auth/expo")) {
+			const importLine = 'import { expo } from "@better-auth/expo";\n';
+
+			const lastImportIndex = authFileContent.lastIndexOf("import");
+			const afterLastImport =
+				authFileContent.indexOf("\n", lastImportIndex) + 1;
+
+			authFileContent =
+				authFileContent.substring(0, afterLastImport) +
+				importLine +
+				authFileContent.substring(afterLastImport);
+		}
+
+		if (!authFileContent.includes("plugins:")) {
+			authFileContent = authFileContent.replace(
+				/}\);/,
+				"  plugins: [expo()],\n});",
+			);
+		} else if (!authFileContent.includes("expo()")) {
+			authFileContent = authFileContent.replace(
+				/plugins: \[(.*?)\]/s,
+				(match, plugins) => {
+					return `plugins: [${plugins}${plugins.trim() ? ", " : ""}expo()]`;
+				},
+			);
+		}
+
+		if (!authFileContent.includes("my-better-t-app://")) {
+			authFileContent = authFileContent.replace(
+				/trustedOrigins: \[(.*?)\]/s,
+				(match, origins) => {
+					return `trustedOrigins: [${origins}${origins.trim() ? ", " : ""}"my-better-t-app://"]`;
+				},
+			);
+		}
+
+		await fs.writeFile(authFilePath, authFileContent);
 	}
 }
 
