@@ -77,7 +77,7 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: { children: ReactNode }) {
 	return (
-		<main className="relative z-10 min-h-svh bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-black transition-color duration-300 overflow-hidden">
+		<main className="relative z-10 min-h-svh overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100 transition-color duration-300 dark:from-gray-950 dark:to-black">
 			<Navbar />
 			{children}
 			<Footer />

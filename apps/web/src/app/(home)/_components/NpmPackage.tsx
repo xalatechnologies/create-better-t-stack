@@ -20,9 +20,9 @@ const NpmPackage = () => {
 	}, []);
 
 	return (
-		<div className="flex items-center justify-center mt-2">
-			<span className="inline-block w-3 h-5 bg-blue-400 dark:bg-blue-500 animate-pulse mr-2" />
-			<span className="text-gray-700 dark:text-gray-300 text-xl font-mono">
+		<div className="mt-2 flex items-center justify-center">
+			<span className="mr-2 inline-block h-5 w-3 animate-pulse bg-blue-400 dark:bg-blue-500" />
+			<span className="font-mono text-gray-700 text-xl dark:text-gray-300">
 				{versionLoading ? "[v1.0.0]" : `[v${version}]`}
 			</span>
 		</div>

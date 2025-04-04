@@ -68,7 +68,7 @@ function getNativeInstructions(): string {
 }
 
 function getLintingInstructions(runCmd?: string): string {
-	return `${pc.bold("\nLinting and formatting:")}\n${pc.cyan("•")} Format and lint fix: ${`${runCmd} check`}\n\n`;
+	return `${pc.bold("Linting and formatting:")}\n${pc.cyan("•")} Format and lint fix: ${`${runCmd} check`}\n\n`;
 }
 
 function getDatabaseInstructions(

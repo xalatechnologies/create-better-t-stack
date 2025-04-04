@@ -65,7 +65,7 @@ export async function setupDatabase(
 					orm === "prisma" &&
 					setupPrismaPostgresDb
 				) {
-					await setupPrismaPostgres(projectDir, true, packageManager);
+					await setupPrismaPostgres(projectDir, packageManager);
 				}
 			}
 		}

@@ -17,17 +17,17 @@ export function CommandDisplay({ command }: CommandDisplayProps) {
 	};
 
 	return (
-		<div className="relative group">
-			<div className="dark:bg-gray-950/20 bg-gray-100/80 w-fit backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-lg p-4 font-mono text-sm text-gray-800 dark:text-gray-300 overflow-x-auto">
+		<div className="group relative">
+			<div className="w-fit overflow-x-auto rounded-lg border border-gray-200 bg-gray-100/80 p-4 font-mono text-gray-800 text-sm backdrop-blur-xl dark:border-gray-800 dark:bg-gray-950/20 dark:text-gray-300">
 				<button
 					type="button"
 					onClick={copyToClipboard}
-					className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+					className="-translate-y-1/2 absolute top-1/2 right-4 rounded-md p-2 transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
 				>
 					{copied ? (
-						<Check className="w-4 h-4 text-green-500" />
+						<Check className="h-4 w-4 text-green-500" />
 					) : (
-						<Copy className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+						<Copy className="h-4 w-4 text-gray-500 dark:text-gray-400" />
 					)}
 				</button>
 				<pre className="pr-12 max-sm:text-xs">{command}</pre>

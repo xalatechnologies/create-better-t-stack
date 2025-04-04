@@ -3,14 +3,14 @@ import Link from "next/link";
 
 const Footer = () => {
 	return (
-		<footer className="relative w-full font-mono border-t border-gray-200 dark:border-gray-800">
-			<div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-				<div className="grid md:grid-cols-3 gap-8 mb-12">
+		<footer className="relative w-full border-gray-200 border-t font-mono dark:border-gray-800">
+			<div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+				<div className="mb-12 grid gap-8 md:grid-cols-3">
 					<div>
-						<h3 className="text-gray-900 dark:text-white font-bold mb-4 text-lg flex items-center gap-2">
+						<h3 className="mb-4 flex items-center gap-2 font-bold text-gray-900 text-lg dark:text-white">
 							<span>Better-T Stack</span>
 						</h3>
-						<p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+						<p className="text-gray-600 leading-relaxed dark:text-gray-400">
 							Type-safe, modern TypeScript scaffolding for full-stack web
 							development
 						</p>
@@ -19,7 +19,7 @@ const Footer = () => {
 							<Link
 								href="https://github.com/better-t-stack/create-better-t-stack"
 								target="_blank"
-								className="text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+								className="text-gray-500 transition-colors hover:text-gray-900 dark:hover:text-white"
 								aria-label="GitHub"
 							>
 								<Github size={18} />
@@ -27,7 +27,7 @@ const Footer = () => {
 							<Link
 								href="https://www.npmjs.com/package/create-better-t-stack"
 								target="_blank"
-								className="text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+								className="text-gray-500 transition-colors hover:text-gray-900 dark:hover:text-white"
 								aria-label="NPM"
 							>
 								<svg
@@ -44,15 +44,15 @@ const Footer = () => {
 					</div>
 
 					<div>
-						<h3 className="text-gray-900 dark:text-white font-bold mb-4 text-lg">
+						<h3 className="mb-4 font-bold text-gray-900 text-lg dark:text-white">
 							Resources
 						</h3>
-						<ul className="text-gray-600 dark:text-gray-400 space-y-2.5">
+						<ul className="space-y-2.5 text-gray-600 dark:text-gray-400">
 							<li>
 								<Link
 									target="_blank"
 									href="https://github.com/better-t-stack/create-better-t-stack"
-									className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+									className="transition-colors hover:text-blue-600 dark:hover:text-blue-400"
 								>
 									GitHub Repository
 								</Link>
@@ -61,7 +61,7 @@ const Footer = () => {
 								<Link
 									target="_blank"
 									href="https://www.npmjs.com/package/create-better-t-stack"
-									className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+									className="transition-colors hover:text-blue-600 dark:hover:text-blue-400"
 								>
 									NPM Package
 								</Link>
@@ -70,7 +70,7 @@ const Footer = () => {
 								<Link
 									target="_blank"
 									href="https://my-better-t-app-client.pages.dev/"
-									className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+									className="transition-colors hover:text-blue-600 dark:hover:text-blue-400"
 								>
 									Demo Application
 								</Link>
@@ -88,12 +88,12 @@ const Footer = () => {
 					</div>
 
 					<div>
-						<h3 className="text-gray-900 dark:text-white font-bold mb-4 text-lg">
+						<h3 className="mb-4 font-bold text-gray-900 text-lg dark:text-white">
 							Contact
 						</h3>
-						<div className="text-gray-600 dark:text-gray-400 space-y-2.5">
+						<div className="space-y-2.5 text-gray-600 dark:text-gray-400">
 							<p className="flex items-center">
-								<span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm mr-2">
+								<span className="mr-2 rounded bg-gray-100 px-2 py-1 font-mono text-sm dark:bg-gray-800">
 									$
 								</span>
 								<span>amanvarshney.work@gmail.com</span>
@@ -106,13 +106,13 @@ const Footer = () => {
 					</div>
 				</div>
 
-				<div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+				<div className="mt-12 flex flex-col items-center justify-between gap-4 border-gray-200 border-t pt-6 sm:flex-row dark:border-gray-800">
 					<p className="text-gray-500 text-sm">
 						© {new Date().getFullYear()} Better-T Stack. All rights reserved.
 					</p>
-					<p className="text-gray-500 text-sm flex items-center gap-1.5">
+					<p className="flex items-center gap-1.5 text-gray-500 text-sm">
 						Built with
-						<span className="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent font-medium">
+						<span className="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text font-medium text-transparent">
 							TypeScript
 						</span>
 					</p>

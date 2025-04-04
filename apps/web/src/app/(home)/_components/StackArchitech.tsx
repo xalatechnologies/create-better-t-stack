@@ -758,22 +758,22 @@ const StackArchitect = () => {
 	}, [command]);
 
 	return (
-		<div className="w-full mx-auto">
-			<div className="rounded-xl overflow-hidden shadow-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white">
-				<div className="bg-gray-200 dark:bg-gray-800 px-4 py-2 flex items-center justify-between">
+		<div className="mx-auto w-full">
+			<div className="overflow-hidden rounded-xl border border-gray-300 bg-gray-100 text-gray-800 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+				<div className="flex items-center justify-between bg-gray-200 px-4 py-2 dark:bg-gray-800">
 					<div className="flex space-x-2">
-						<div className="w-3 h-3 rounded-full bg-red-500" />
-						<div className="w-3 h-3 rounded-full bg-yellow-500" />
-						<div className="w-3 h-3 rounded-full bg-green-500" />
+						<div className="h-3 w-3 rounded-full bg-red-500" />
+						<div className="h-3 w-3 rounded-full bg-yellow-500" />
+						<div className="h-3 w-3 rounded-full bg-green-500" />
 					</div>
-					<div className="font-mono text-xs text-gray-600 dark:text-gray-400">
+					<div className="font-mono text-gray-600 text-xs dark:text-gray-400">
 						Stack Architect Terminal
 					</div>
 					<div>
 						<button
 							type="button"
 							onClick={copyToClipboard}
-							className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors"
+							className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
 							title="Copy command"
 						>
 							{copied ? (
@@ -786,8 +786,8 @@ const StackArchitect = () => {
 				</div>
 				<div className="p-4 font-mono">
 					<div className="mb-4">
-						<label className="flex flex-col mb-2">
-							<span className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+						<label className="mb-2 flex flex-col">
+							<span className="mb-1 text-gray-600 text-xs dark:text-gray-400">
 								Project Name:
 							</span>
 							<div className="flex items-center">
@@ -799,50 +799,50 @@ const StackArchitect = () => {
 										setStack((prev) => ({ ...prev, projectName: newValue }));
 										setProjectNameError(validateProjectName(newValue));
 									}}
-									className={`bg-gray-200 dark:bg-gray-800 border ${
+									className={`border bg-gray-200 dark:bg-gray-800 ${
 										projectNameError
 											? "border-red-500 dark:border-red-500"
 											: "border-gray-300 dark:border-gray-700"
-									} rounded px-2 py-1 font-mono text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400`}
+									} rounded px-2 py-1 font-mono text-sm focus:border-blue-500 focus:outline-none dark:focus:border-blue-400`}
 									placeholder="my-better-t-app"
 								/>
 							</div>
 							{projectNameError && (
-								<p className="text-red-500 text-xs mt-1">{projectNameError}</p>
+								<p className="mt-1 text-red-500 text-xs">{projectNameError}</p>
 							)}
 						</label>
 					</div>
 					<div className="mb-4">
 						<div className="flex">
-							<span className="text-green-600 dark:text-green-400 mr-2">$</span>
+							<span className="mr-2 text-green-600 dark:text-green-400">$</span>
 							<code className="text-gray-700 dark:text-gray-300">
 								{command}
 							</code>
 						</div>
 					</div>
 					{compatNotes[activeTab] && compatNotes[activeTab].length > 0 && (
-						<div className="mb-4 p-3 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-							<div className="flex items-center gap-2 mb-2 text-sm font-medium text-blue-800 dark:text-blue-300">
+						<div className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
+							<div className="mb-2 flex items-center gap-2 font-medium text-blue-800 text-sm dark:text-blue-300">
 								<InfoIcon className="h-4 w-4" />
 								<span>Compatibility Notes</span>
 							</div>
-							<ul className="list-disc list-inside text-xs text-blue-700 dark:text-blue-400 space-y-1">
+							<ul className="list-inside list-disc space-y-1 text-blue-700 text-xs dark:text-blue-400">
 								{compatNotes[activeTab].map((note) => (
 									<li key={note}>{note}</li>
 								))}
 							</ul>
 						</div>
 					)}
-					<div className="border-t border-gray-300 dark:border-gray-700 pt-4 mt-4">
-						<div className="mb-3 text-gray-600 dark:text-gray-400 flex items-center">
-							<Terminal className="w-4 h-4 mr-2" />
+					<div className="mt-4 border-gray-300 border-t pt-4 dark:border-gray-700">
+						<div className="mb-3 flex items-center text-gray-600 dark:text-gray-400">
+							<Terminal className="mr-2 h-4 w-4" />
 							<span>
 								Configure{" "}
 								{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
 							</span>
 						</div>
 
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+						<div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
 							{TECH_OPTIONS[activeTab as keyof typeof TECH_OPTIONS].map(
 								(tech) => {
 									let isSelected = false;
@@ -880,13 +880,11 @@ const StackArchitect = () => {
 									return (
 										<motion.div
 											key={tech.id}
-											className={`
-												p-2 px-3 rounded
-												${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+											className={`p-2 px-3 rounded${isDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
 												${
 													isSelected
-														? "bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-500/50"
-														: "hover:bg-gray-200 dark:hover:bg-gray-800 border border-gray-300 dark:border-gray-700"
+														? "border border-blue-300 bg-blue-100 dark:border-blue-500/50 dark:bg-blue-900/40"
+														: "border border-gray-300 hover:bg-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
 												}
 											`}
 											whileHover={!isDisabled ? { scale: 1.02 } : undefined}
@@ -900,7 +898,7 @@ const StackArchitect = () => {
 											}
 										>
 											<div className="flex items-center">
-												<div className="flex-shrink-0 mr-2">
+												<div className="mr-2 flex-shrink-0">
 													{isSelected ? (
 														<CircleCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 													) : (
@@ -920,12 +918,12 @@ const StackArchitect = () => {
 															{tech.name}
 														</span>
 													</div>
-													<p className="text-xs text-gray-500">
+													<p className="text-gray-500 text-xs">
 														{tech.description}
 													</p>
 												</div>
 												{tech.default && !isSelected && (
-													<span className="text-xs text-gray-500 dark:text-gray-600 ml-2">
+													<span className="ml-2 text-gray-500 text-xs dark:text-gray-600">
 														Default
 													</span>
 												)}
@@ -936,8 +934,8 @@ const StackArchitect = () => {
 							)}
 						</div>
 
-						<div className="border-t border-gray-300 dark:border-gray-700 pt-3 mb-3">
-							<div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+						<div className="mb-3 border-gray-300 border-t pt-3 dark:border-gray-700">
+							<div className="mb-2 text-gray-600 text-xs dark:text-gray-400">
 								Selected Stack
 							</div>
 							<div className="flex flex-wrap gap-1">
@@ -948,13 +946,13 @@ const StackArchitect = () => {
 									return frontend ? (
 										<span
 											key={frontendId}
-											className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-700/30"
+											className="inline-flex items-center rounded border border-blue-300 bg-blue-100 px-1.5 py-0.5 text-blue-800 text-xs dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300"
 										>
 											{frontend.icon} {frontend.name}
 										</span>
 									) : null;
 								})}
-								<span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/30">
+								<span className="inline-flex items-center rounded border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-amber-800 text-xs dark:border-amber-700/30 dark:bg-amber-900/30 dark:text-amber-300">
 									{
 										TECH_OPTIONS.runtime.find((t) => t.id === stack.runtime)
 											?.icon
@@ -965,7 +963,7 @@ const StackArchitect = () => {
 									}
 								</span>
 
-								<span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-700/30">
+								<span className="inline-flex items-center rounded border border-blue-300 bg-blue-100 px-1.5 py-0.5 text-blue-800 text-xs dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300">
 									{
 										TECH_OPTIONS.backendFramework.find(
 											(t) => t.id === stack.backendFramework,
@@ -978,7 +976,7 @@ const StackArchitect = () => {
 									}
 								</span>
 
-								<span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700/30">
+								<span className="inline-flex items-center rounded border border-indigo-300 bg-indigo-100 px-1.5 py-0.5 text-indigo-800 text-xs dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300">
 									{
 										TECH_OPTIONS.database.find((t) => t.id === stack.database)
 											?.icon
@@ -990,14 +988,14 @@ const StackArchitect = () => {
 								</span>
 
 								{stack.orm && stack.database !== "none" && (
-									<span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-cyan-100 dark:bg-cyan-900/30 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-700/30">
+									<span className="inline-flex items-center rounded border border-cyan-300 bg-cyan-100 px-1.5 py-0.5 text-cyan-800 text-xs dark:border-cyan-700/30 dark:bg-cyan-900/30 dark:text-cyan-300">
 										{TECH_OPTIONS.orm.find((t) => t.id === stack.orm)?.icon}{" "}
 										{TECH_OPTIONS.orm.find((t) => t.id === stack.orm)?.name}
 									</span>
 								)}
 
 								{hasWebFrontend(stack.frontend) && (
-									<span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-300 dark:border-green-700/30">
+									<span className="inline-flex items-center rounded border border-green-300 bg-green-100 px-1.5 py-0.5 text-green-800 text-xs dark:border-green-700/30 dark:bg-green-900/30 dark:text-green-300">
 										{TECH_OPTIONS.auth.find((t) => t.id === stack.auth)?.icon}{" "}
 										{TECH_OPTIONS.auth.find((t) => t.id === stack.auth)?.name}
 									</span>
@@ -1006,7 +1004,7 @@ const StackArchitect = () => {
 								{stack.turso === "true" &&
 									stack.database === "sqlite" &&
 									stack.orm !== "prisma" && (
-										<span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-300 border border-pink-300 dark:border-pink-700/30">
+										<span className="inline-flex items-center rounded border border-pink-300 bg-pink-100 px-1.5 py-0.5 text-pink-800 text-xs dark:border-pink-700/30 dark:bg-pink-900/30 dark:text-pink-300">
 											{
 												TECH_OPTIONS.turso.find((t) => t.id === stack.turso)
 													?.icon
@@ -1021,7 +1019,7 @@ const StackArchitect = () => {
 								{stack.prismaPostgres === "true" &&
 									stack.database === "postgres" &&
 									stack.orm === "prisma" && (
-										<span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700/30">
+										<span className="inline-flex items-center rounded border border-indigo-300 bg-indigo-100 px-1.5 py-0.5 text-indigo-800 text-xs dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300">
 											{
 												TECH_OPTIONS.prismaPostgres.find(
 													(t) => t.id === stack.prismaPostgres,
@@ -1042,7 +1040,7 @@ const StackArchitect = () => {
 									return addon ? (
 										<span
 											key={addonId}
-											className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-violet-100 dark:bg-violet-900/30 text-violet-800 dark:text-violet-300 border border-violet-300 dark:border-violet-700/30"
+											className="inline-flex items-center rounded border border-violet-300 bg-violet-100 px-1.5 py-0.5 text-violet-800 text-xs dark:border-violet-700/30 dark:bg-violet-900/30 dark:text-violet-300"
 										>
 											{addon.icon} {addon.name}
 										</span>
@@ -1057,7 +1055,7 @@ const StackArchitect = () => {
 										return example ? (
 											<span
 												key={exampleId}
-												className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-300 border border-teal-300 dark:border-teal-700/30"
+												className="inline-flex items-center rounded border border-teal-300 bg-teal-100 px-1.5 py-0.5 text-teal-800 text-xs dark:border-teal-700/30 dark:bg-teal-900/30 dark:text-teal-300"
 											>
 												{example.icon} {example.name}
 											</span>
@@ -1067,18 +1065,16 @@ const StackArchitect = () => {
 						</div>
 					</div>
 				</div>
-				<div className="bg-gray-200 dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 flex overflow-x-auto">
+				<div className="flex overflow-x-auto border-gray-300 border-t bg-gray-200 dark:border-gray-700 dark:bg-gray-900">
 					{Object.keys(TECH_OPTIONS).map((category) => (
 						<button
 							type="button"
 							key={category}
-							className={`
-								py-2 px-4 text-xs font-mono whitespace-nowrap transition-colors
-								${
-									activeTab === category
-										? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-t-2 border-blue-500"
-										: "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-800"
-								}
+							className={`whitespace-nowrap px-4 py-2 font-mono text-xs transition-colors${
+								activeTab === category
+									? "border-blue-500 border-t-2 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+									: "text-gray-600 hover:bg-gray-300 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+							}
 							`}
 							onClick={() => setActiveTab(category)}
 						>

@@ -53,15 +53,15 @@ const CodeContainer = () => {
 	}, [typingComplete, currentStep]);
 
 	return (
-		<div className="w-full max-w-3xl mx-auto mt-4 sm:mt-8">
-			<div className="rounded-xl overflow-hidden shadow-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-black text-gray-800 dark:text-white">
-				<div className="bg-gray-200 dark:bg-gray-800 px-3 sm:px-4 py-2 flex items-center justify-between">
+		<div className="mx-auto mt-4 w-full max-w-3xl sm:mt-8">
+			<div className="overflow-hidden rounded-xl border border-gray-300 bg-gray-100 text-gray-800 shadow-xl dark:border-gray-700 dark:bg-black dark:text-white">
+				<div className="flex items-center justify-between bg-gray-200 px-3 py-2 sm:px-4 dark:bg-gray-800">
 					<div className="flex space-x-2">
-						<div className="w-3 h-3 rounded-full bg-red-500" />
-						<div className="w-3 h-3 rounded-full bg-yellow-500" />
-						<div className="w-3 h-3 rounded-full bg-green-500" />
+						<div className="h-3 w-3 rounded-full bg-red-500" />
+						<div className="h-3 w-3 rounded-full bg-yellow-500" />
+						<div className="h-3 w-3 rounded-full bg-green-500" />
 					</div>
-					<div className="font-mono text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 hidden xs:block">
+					<div className="xs:block hidden font-mono text-[10px] text-gray-600 sm:text-xs dark:text-gray-400">
 						Quick Install Terminal
 					</div>
 
@@ -69,16 +69,16 @@ const CodeContainer = () => {
 						<button
 							type="button"
 							onClick={() => setIsOpen(!isOpen)}
-							className="flex items-center px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs bg-gray-300/50 dark:bg-gray-800/50 rounded border border-gray-300 dark:border-gray-700 hover:bg-gray-300/80 dark:hover:bg-gray-700/50"
+							className="flex items-center rounded border border-gray-300 bg-gray-300/50 px-1.5 py-1 text-[10px] hover:bg-gray-300/80 sm:px-2 sm:text-xs dark:border-gray-700 dark:bg-gray-800/50 dark:hover:bg-gray-700/50"
 						>
-							<Terminal className="w-3 h-3 mr-1 text-gray-600 dark:text-gray-400">
+							<Terminal className="mr-1 h-3 w-3 text-gray-600 dark:text-gray-400">
 								<title>Package Manager</title>
 							</Terminal>
-							<span className="text-gray-700 dark:text-gray-300 mr-1">
+							<span className="mr-1 text-gray-700 dark:text-gray-300">
 								{selectedPM}
 							</span>
 							<svg
-								className="w-3 h-3 text-gray-700 dark:text-gray-400"
+								className="h-3 w-3 text-gray-700 dark:text-gray-400"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -97,7 +97,7 @@ const CodeContainer = () => {
 							<motion.div
 								initial={{ opacity: 0, y: -5 }}
 								animate={{ opacity: 1, y: 0 }}
-								className="absolute right-0 mt-1 w-32 sm:w-36 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-lg z-50"
+								className="absolute right-0 z-50 mt-1 w-32 rounded-md border border-gray-300 bg-white shadow-lg sm:w-36 dark:border-gray-700 dark:bg-gray-900"
 							>
 								<ul>
 									{(Object.keys(commands) as Array<"npm" | "pnpm" | "bun">).map(
@@ -105,10 +105,10 @@ const CodeContainer = () => {
 											<li key={pm}>
 												<button
 													type="button"
-													className={`block w-full text-left px-3 py-1.5 text-[10px] sm:text-xs ${
+													className={`block w-full px-3 py-1.5 text-left text-[10px] sm:text-xs ${
 														selectedPM === pm
-															? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-l-2 border-blue-500"
-															: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+															? "border-blue-500 border-l-2 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+															: "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
 													}`}
 													onClick={() => copyToClipboard(pm)}
 												>
@@ -129,10 +129,10 @@ const CodeContainer = () => {
 					</div>
 				</div>
 
-				<div className="p-3 sm:p-4 font-mono text-xs sm:text-sm bg-gray-50 dark:bg-gray-900 overflow-x-auto">
+				<div className="overflow-x-auto bg-gray-50 p-3 font-mono text-xs sm:p-4 sm:text-sm dark:bg-gray-900">
 					<div className="flex items-center">
 						<div className="flex-grow overflow-x-auto">
-							<span className="text-green-600 dark:text-green-400 mr-2">$</span>
+							<span className="mr-2 text-green-600 dark:text-green-400">$</span>
 							<span className="text-gray-700 dark:text-gray-300">
 								{commands[selectedPM]}
 							</span>
@@ -140,7 +140,7 @@ const CodeContainer = () => {
 								className={
 									typingComplete
 										? "hidden"
-										: "text-blue-600 dark:text-blue-500 animate-pulse ml-1"
+										: "ml-1 animate-pulse text-blue-600 dark:text-blue-500"
 								}
 							>
 								▌
@@ -151,15 +151,15 @@ const CodeContainer = () => {
 							whileTap={{ scale: 0.95 }}
 							type="button"
 							onClick={() => copyToClipboard(selectedPM)}
-							className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors flex-shrink-0 ml-2"
+							className="ml-2 flex-shrink-0 text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
 							title="Copy command"
 						>
 							{copied ? (
-								<Check className="w-4 h-4">
+								<Check className="h-4 w-4">
 									<title>Copied!</title>
 								</Check>
 							) : (
-								<ClipboardCopy className="w-4 h-4">
+								<ClipboardCopy className="h-4 w-4">
 									<title>Copy to clipboard</title>
 								</ClipboardCopy>
 							)}
@@ -172,7 +172,7 @@ const CodeContainer = () => {
 							animate={{ opacity: 1 }}
 							className="overflow-x-auto"
 						>
-							<div className="mt-3 pl-2 sm:pl-4 text-amber-600 dark:text-amber-400">
+							<div className="mt-3 pl-2 text-amber-600 sm:pl-4 dark:text-amber-400">
 								{currentStep >= 1 && (
 									<motion.p
 										initial={{ opacity: 0, y: -5 }}
@@ -234,9 +234,9 @@ const CodeContainer = () => {
 										initial={{ opacity: 0, x: -5 }}
 										animate={{ opacity: 1, x: 0 }}
 										transition={{ delay: 0.4 }}
-										className="text-blue-600 dark:text-blue-400 flex items-center"
+										className="flex items-center text-blue-600 dark:text-blue-400"
 									>
-										<CircleCheck className="w-4 h-4 mr-1 flex-shrink-0">
+										<CircleCheck className="mr-1 h-4 w-4 flex-shrink-0">
 											<title>Completed</title>
 										</CircleCheck>
 										<span>Creating project structure</span>
@@ -247,9 +247,9 @@ const CodeContainer = () => {
 										initial={{ opacity: 0, x: -5 }}
 										animate={{ opacity: 1, x: 0 }}
 										transition={{ delay: 0.5 }}
-										className="text-blue-600 dark:text-blue-400 flex items-center"
+										className="flex items-center text-blue-600 dark:text-blue-400"
 									>
-										<CircleCheck className="w-4 h-4 mr-1 flex-shrink-0">
+										<CircleCheck className="mr-1 h-4 w-4 flex-shrink-0">
 											<title>Completed</title>
 										</CircleCheck>
 										<span>Installing dependencies</span>
@@ -265,9 +265,9 @@ const CodeContainer = () => {
 											initial={{ opacity: 0, x: -5 }}
 											animate={{ opacity: 1, x: 0 }}
 											transition={{ delay: 0.7 }}
-											className="text-blue-600 dark:text-blue-400 flex items-center"
+											className="flex items-center text-blue-600 dark:text-blue-400"
 										>
-											<CircleCheck className="w-4 h-4 mr-1 flex-shrink-0">
+											<CircleCheck className="mr-1 h-4 w-4 flex-shrink-0">
 												<title>Completed</title>
 											</CircleCheck>
 											<span>Setting up database schema</span>
@@ -276,9 +276,9 @@ const CodeContainer = () => {
 											initial={{ opacity: 0, x: -5 }}
 											animate={{ opacity: 1, x: 0 }}
 											transition={{ delay: 0.8 }}
-											className="text-blue-600 dark:text-blue-400 flex items-center"
+											className="flex items-center text-blue-600 dark:text-blue-400"
 										>
-											<CircleCheck className="w-4 h-4 mr-1 flex-shrink-0">
+											<CircleCheck className="mr-1 h-4 w-4 flex-shrink-0">
 												<title>Completed</title>
 											</CircleCheck>
 											<span>Configuring authentication</span>
@@ -287,10 +287,10 @@ const CodeContainer = () => {
 											initial={{ opacity: 0 }}
 											animate={{ opacity: 1 }}
 											transition={{ delay: 0.9 }}
-											className="mt-4 flex flex-col xs:flex-row xs:items-center px-2 py-2 rounded bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800/30 text-[10px] sm:text-xs"
+											className="mt-4 flex xs:flex-row flex-col xs:items-center rounded border border-blue-300 bg-blue-100 px-2 py-2 text-[10px] text-blue-800 sm:text-xs dark:border-blue-800/30 dark:bg-blue-900/20 dark:text-blue-300"
 										>
 											<svg
-												className="w-4 h-4 mb-1 xs:mb-0 xs:mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0"
+												className="xs:mr-2 mb-1 xs:mb-0 h-4 w-4 flex-shrink-0 text-blue-600 dark:text-blue-400"
 												viewBox="0 0 24 24"
 												fill="none"
 												stroke="currentColor"
@@ -304,11 +304,11 @@ const CodeContainer = () => {
 											</svg>
 											<div className="flex flex-wrap">
 												<span className="mr-1">Project ready! Run</span>
-												<code className="px-1 py-0.5 bg-blue-200 dark:bg-blue-800/50 rounded mb-1 xs:mb-0 mr-1">
+												<code className="mr-1 mb-1 xs:mb-0 rounded bg-blue-200 px-1 py-0.5 dark:bg-blue-800/50">
 													cd my-better-t-app
 												</code>
 												<span className="mr-1">and</span>
-												<code className="px-1 py-0.5 bg-blue-200 dark:bg-blue-800/50 rounded">
+												<code className="rounded bg-blue-200 px-1 py-0.5 dark:bg-blue-800/50">
 													{selectedPM === "npm" && "npm run dev"}
 													{selectedPM === "pnpm" && "pnpm dev"}
 													{selectedPM === "bun" && "bun dev"}
@@ -322,22 +322,22 @@ const CodeContainer = () => {
 					)}
 
 					<div
-						className={`flex mt-4 ${
+						className={`mt-4 flex ${
 							currentStep >= 5 && typingComplete ? "" : "hidden"
 						}`}
 					>
-						<span className="text-green-600 dark:text-green-400 mr-2">$</span>
-						<span className="text-blue-600 dark:text-blue-500 animate-pulse">
+						<span className="mr-2 text-green-600 dark:text-green-400">$</span>
+						<span className="animate-pulse text-blue-600 dark:text-blue-500">
 							▌
 						</span>
 					</div>
 				</div>
 
-				<div className="bg-gray-200 dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 px-2 sm:px-4 py-2">
-					<div className="flex items-center justify-center text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 text-center">
+				<div className="border-gray-300 border-t bg-gray-200 px-2 py-2 sm:px-4 dark:border-gray-700 dark:bg-gray-900">
+					<div className="flex items-center justify-center text-center text-[10px] text-gray-600 sm:text-xs dark:text-gray-400">
 						<span className="inline-flex flex-wrap items-center justify-center gap-1">
 							<span>For custom options, use</span>
-							<code className="px-1 py-0.5 bg-gray-300 dark:bg-gray-700 rounded whitespace-nowrap">
+							<code className="whitespace-nowrap rounded bg-gray-300 px-1 py-0.5 dark:bg-gray-700">
 								{selectedPM === "npm" && "npx"}
 								{selectedPM === "pnpm" && "pnpm dlx"}
 								{selectedPM === "bun" && "bunx"} create-better-t-stack

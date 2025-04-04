@@ -101,20 +101,9 @@ DATABASE_URL="your_database_url"`);
 
 export async function setupPrismaPostgres(
 	projectDir: string,
-	shouldSetupPrisma: boolean,
 	packageManager: ProjectPackageManager = "npm",
 ) {
 	const serverDir = path.join(projectDir, "apps/server");
-
-	if (!shouldSetupPrisma) {
-		await writeEnvFile(projectDir);
-		log.info(
-			pc.blue(
-				"Using default Postgres configuration. You'll need to provide your own database.",
-			),
-		);
-		return;
-	}
 
 	try {
 		const config = await initPrismaDatabase(serverDir, packageManager);

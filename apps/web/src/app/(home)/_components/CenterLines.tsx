@@ -3,18 +3,8 @@ import React from "react";
 const CenterLines = () => {
 	return (
 		<>
-			<div
-				className="absolute top-3/4 -translate-y-1/2 left-0 w-80 h-14
-						rounded-bl-3xl transform rotate-180
-						border-b-2 border-l-2 border-slate-700 dark:border-slate-300
-						shadow-lg backdrop-blur-sm"
-			/>
-			<div
-				className="absolute top-3/4 -translate-y-1/2 right-0 w-80 h-14
-						rounded-br-3xl transform rotate-180
-						border-b-2 border-r-2 border-slate-700 dark:border-slate-300
-						shadow-lg backdrop-blur-sm"
-			/>
+			<div className="-translate-y-1/2 absolute top-3/4 left-0 h-14 w-80 rotate-180 transform rounded-bl-3xl border-slate-700 border-b-2 border-l-2 shadow-lg backdrop-blur-sm dark:border-slate-300" />
+			<div className="-translate-y-1/2 absolute top-3/4 right-0 h-14 w-80 rotate-180 transform rounded-br-3xl border-slate-700 border-r-2 border-b-2 shadow-lg backdrop-blur-sm dark:border-slate-300" />
 		</>
 	);
 };
