@@ -8,10 +8,11 @@
 		"cli": "cd apps/cli && node dist/index.js",
 		"dev:web": "turbo run dev --filter=web",
 		"build:web": "turbo run build --filter=web",
-		"build:web:cloudflare": "bun install && bun run build:web",
 		"build:cli": "turbo run build --filter=create-better-t-stack",
 		"check": "turbo check",
-		"publish-packages": "turbo run build --filter=create-better-t-stack && changeset publish"
+		"publish-packages": "turbo run build --filter=create-better-t-stack && changeset publish",
+		"build:web:cloudflare": "bun install && bun run build:web",
+		"deploy:web": "bun run build:web:cloudflare && bunx wrangler pages deploy ./apps/web/out"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
