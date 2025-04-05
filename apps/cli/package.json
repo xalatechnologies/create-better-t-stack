@@ -12,16 +12,14 @@
 		"dist"
 	],
 	"keywords": [
+		"better-t-stack",
 		"typescript",
-		"scaffold",
-		"generator",
 		"boilerplate",
 		"starter",
 		"cli",
-		"create-app",
-		"t3-stack",
 		"turborepo",
 		"trpc",
+		"better-auth",
 		"monorepo",
 		"fullstack",
 		"type-safety",

@@ -17,7 +17,7 @@ bun create better-t-stack@latest
 pnpm create better-t-stack@latest
 ```
 
-Follow the prompts to configure your project or use the `-y` flag for defaults.
+Follow the prompts to configure your project or use the `--yes` flag for defaults.
 
 ## Features
 
@@ -69,7 +69,7 @@ Options:
 
 Create a project with default configuration:
 ```bash
-npx create-better-t-stack my-app -y
+npx create-better-t-stack my-app --yes
 ```
 
 Create a project with specific options:
@@ -84,7 +84,7 @@ npx create-better-t-stack my-app --backend elysia --runtime node
 
 Create a project with specific frontend options:
 ```bash
-npx create-better-t-stack my-app --frontend web native
+npx create-better-t-stack my-app --frontend tanstack-router native
 ```
 
 Create a project with examples:
