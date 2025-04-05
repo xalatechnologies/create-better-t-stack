@@ -9,13 +9,13 @@ import Testimonials from "./_components/Testimonials";
 
 export default function HomePage() {
 	return (
-		<main className="flex flex-col items-center justify-start px-2 pt-24 pb-10 sm:px-4 sm:pb-16 md:px-8 md:pt-28">
+		<main className="flex flex-col items-center justify-start px-2 pt-24 pb-10 sm:px-4 sm:pb-16 md:px-8 md:pt-28 lg:pt-36">
 			<BackgroundGradients />
 			<div className="relative z-10 mx-auto mb-10 max-w-5xl text-center sm:mb-16">
 				<div className="px-1 sm:px-6 lg:px-8">
 					<div className="flex flex-col items-center justify-center space-y-3 text-center sm:space-y-4">
-						<h1 className="font-bold text-4xl text-gray-900 xs:text-5xl tracking-tight sm:text-6xl md:text-7xl dark:text-white">
-							<span className="block bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text pb-1 text-transparent">
+						<h1 className="font-bold font-mono text-4xl xs:text-5xl tracking-tight sm:text-6xl md:text-7xl">
+							<span className="border-blue-500 border-b-2 pb-1 text-gray-900 dark:text-blue-100">
 								Better-T Stack
 							</span>
 						</h1>
@@ -24,7 +24,7 @@ export default function HomePage() {
 							<NpmPackage />
 						</div>
 
-						<p className="max-w-2xl px-1 font-medium text-gray-600 text-lg sm:text-xl dark:text-gray-300">
+						<p className="max-w-2xl px-1 font-mono text-gray-600 text-lg sm:text-xl dark:text-gray-300">
 							A modern CLI tool for scaffolding end-to-end type-safe TypeScript
 							projects with best practices and customizable configurations
 						</p>
@@ -36,13 +36,9 @@ export default function HomePage() {
 						<ShinyText
 							text="Type-safe. Modern. Minimal. Fast."
 							speed={3}
-							className="text-gray-600 text-xs xs:text-sm sm:text-base dark:text-gray-400"
+							className="font-mono text-gray-600 text-xs xs:text-sm sm:text-base dark:text-gray-400"
 						/>
 					</div>
-				</div>
-
-				<div className="-z-10 absolute inset-0">
-					<div className="-skew-y-12 absolute inset-0 transform bg-gradient-to-r from-blue-300/20 to-indigo-300/20 blur-2xl dark:from-purple-500/20 dark:to-indigo-500/20 dark:blur-3xl" />
 				</div>
 			</div>
 
@@ -57,10 +53,10 @@ export default function HomePage() {
 						</div>
 
 						<div className="px-4 sm:px-6">
-							<div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md sm:h-8 sm:w-8">
+							<div className="flex h-7 w-7 items-center justify-center rounded-full border border-blue-500 bg-white sm:h-8 sm:w-8 dark:bg-gray-900">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
-									className="h-3.5 w-3.5 text-white sm:h-4 sm:w-4"
+									className="h-3.5 w-3.5 text-blue-500 sm:h-4 sm:w-4"
 									viewBox="0 0 20 20"
 									fill="currentColor"
 								>
@@ -75,12 +71,12 @@ export default function HomePage() {
 						</div>
 
 						<div className="hidden w-1/3 items-center sm:flex">
-							<div className="h-2 w-2 rounded-full bg-indigo-500/50" />
-							<div className="h-px flex-grow bg-gradient-to-l from-transparent to-indigo-500/40" />
+							<div className="h-2 w-2 rounded-full bg-blue-500/50" />
+							<div className="h-px flex-grow bg-gradient-to-l from-transparent to-blue-500/40" />
 						</div>
 					</div>
 
-					<div className="mt-6 h-px w-full bg-gradient-to-r from-blue-500/20 via-indigo-500/40 to-blue-500/20 sm:hidden" />
+					<div className="mt-6 h-px w-full bg-blue-500/20 sm:hidden" />
 				</div>
 			</div>
 

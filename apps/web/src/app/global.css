@@ -72,7 +72,7 @@
 }
 
 /* custom scrollbar */
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
 	width: 8px;
 }
 
@@ -90,4 +90,4 @@
 
 ::-webkit-scrollbar-thumb:hover {
 	background: linear-gradient(45deg, #888, #aaa);
-}
+} */

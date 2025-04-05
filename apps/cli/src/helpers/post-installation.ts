@@ -60,7 +60,7 @@ ${
 }${pc.cyan("•")} API: http://localhost:3000
 ${nativeInstructions ? `\n${nativeInstructions.trim()}` : ""}${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}${pwaInstructions ? `\n${pwaInstructions.trim()}` : ""}
 \n${pc.bold("Like Better-T Stack?")} Please consider giving us a star on GitHub:
-${pc.cyan("https://github.com/better-t-stack/create-better-t-stack")}`,
+${pc.cyan("https://github.com/AmanVarshney01/create-better-t-stack")}`,
 		"Next steps",
 	);
 }

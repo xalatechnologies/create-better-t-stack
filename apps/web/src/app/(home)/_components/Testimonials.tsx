@@ -19,7 +19,9 @@ const TWEET_IDS = [
 	"1904301540422070671",
 	"1904338606409531710",
 	"1904318186750652606",
+	"1908568583799484519",
 	"1904179661086556412",
+	"1908558365128876311",
 	"1907772878139072851",
 	"1906149740095705265",
 	"1906001923456790710",
@@ -82,11 +84,8 @@ export default function Testimonials() {
 					transition={{ duration: 0.5 }}
 					className="relative"
 				>
-					<h2 className="font-bold text-3xl sm:text-4xl">
-						<span className="mr-1 font-mono text-blue-500 dark:text-blue-400">
-							{">"}
-						</span>
-						<span className="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-500">
+					<h2 className="font-bold font-mono text-2xl tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
+						<span className="border-blue-500 border-b-2 pb-1 text-gray-900 dark:text-blue-100">
 							Developer Feedback
 						</span>
 					</h2>

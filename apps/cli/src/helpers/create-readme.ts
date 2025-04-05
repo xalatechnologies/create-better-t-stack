@@ -43,7 +43,7 @@ function generateReadmeContent(options: ProjectConfig): string {
 
 	return `# ${projectName}
 
-This project was created with [Better-T-Stack](https://github.com/better-t-stack/Better-T-Stack), a modern TypeScript stack that combines React, ${hasTanstackRouter ? "TanStack Router" : "React Router"}, Hono, tRPC, and more.
+This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, ${hasTanstackRouter ? "TanStack Router" : "React Router"}, Hono, tRPC, and more.
 
 ## Features
 
