@@ -38,9 +38,9 @@ export const metadata: Metadata = {
 		canonical: "/",
 	},
 	openGraph: {
-		title: "Better-T-Stack | Type-Safe TypeScript Project Scaffolding",
+		title: "Better T Stack",
 		description:
-			"Create modern full-stack TypeScript applications with complete type safety from database to frontend",
+			"A modern CLI tool for scaffolding end-to-end type-safe TypeScript projects with best practices and customizable configurations",
 		url: "https://better-t-stack.pages.dev",
 		siteName: "Better-T-Stack",
 		images: [
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 				url: "/image.png",
 				width: 1200,
 				height: 630,
-				alt: "Better-T-Stack Logo and Tagline",
+				alt: "Better-T-Stack",
 			},
 		],
 		locale: "en_US",
@@ -56,9 +56,9 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Better-T-Stack | Type-Safe TypeScript Project Scaffolding",
+		title: "Better T Stack",
 		description:
-			"Create modern TypeScript applications with complete type safety from frontend to backend",
+			"A modern CLI tool for scaffolding end-to-end type-safe TypeScript projects with best practices and customizable configurations",
 		images: ["/image.png"],
 	},
 	robots: {
