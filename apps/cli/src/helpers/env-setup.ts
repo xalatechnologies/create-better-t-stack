@@ -19,12 +19,13 @@ export async function setupEnvironmentVariables(
 	if (!envContent.includes("CORS_ORIGIN")) {
 		const hasReactRouter = options.frontend.includes("react-router");
 		const hasTanStackRouter = options.frontend.includes("tanstack-router");
+		const hasTanStackStart = options.frontend.includes("tanstack-start");
 
 		let corsOrigin = "http://localhost:3000";
 
 		if (hasReactRouter) {
 			corsOrigin = "http://localhost:5173";
-		} else if (hasTanStackRouter) {
+		} else if (hasTanStackRouter || hasTanStackStart) {
 			corsOrigin = "http://localhost:3001";
 		}
 
@@ -68,10 +69,12 @@ export async function setupEnvironmentVariables(
 
 	const hasReactRouter = options.frontend.includes("react-router");
 	const hasTanStackRouter = options.frontend.includes("tanstack-router");
+	const hasTanStackStart = options.frontend.includes("tanstack-start");
+	const hasWebFrontend =
+		hasReactRouter || hasTanStackRouter || hasTanStackStart;
 
-	if (hasReactRouter || hasTanStackRouter) {
+	if (hasWebFrontend) {
 		const clientDir = path.join(projectDir, "apps/web");
-
 		await setupClientEnvFile(clientDir);
 	}
 

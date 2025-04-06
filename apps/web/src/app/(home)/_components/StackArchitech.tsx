@@ -108,7 +108,8 @@ const StackArchitect = () => {
 		const notes: Record<string, string[]> = {};
 		const hasWebFrontend =
 			stack.frontend.includes("tanstack-router") ||
-			stack.frontend.includes("react-router");
+			stack.frontend.includes("react-router") ||
+			stack.frontend.includes("tanstack-start");
 
 		notes.frontend = [];
 
@@ -241,7 +242,11 @@ const StackArchitect = () => {
 			setStack((prev) => {
 				if (category === "frontend") {
 					const currentSelection = [...prev.frontend];
-					const webTypes = ["tanstack-router", "react-router"];
+					const webTypes = [
+						"tanstack-router",
+						"react-router",
+						"tanstack-start",
+					];
 
 					if (techId === "none") {
 						return {
@@ -288,7 +293,8 @@ const StackArchitect = () => {
 					const index = currentArray.indexOf(techId);
 					const hasWebFrontend =
 						prev.frontend.includes("tanstack-router") ||
-						prev.frontend.includes("react-router");
+						prev.frontend.includes("react-router") ||
+						prev.frontend.includes("tanstack-start");
 
 					if (index >= 0) {
 						currentArray.splice(index, 1);
@@ -312,7 +318,8 @@ const StackArchitect = () => {
 						if (
 							category === "addons" &&
 							(techId === "pwa" || techId === "tauri") &&
-							!hasWebFrontend
+							!prev.frontend.includes("tanstack-router") &&
+							!prev.frontend.includes("react-router")
 						) {
 							return prev;
 						}
@@ -437,6 +444,7 @@ const StackArchitect = () => {
 		return (
 			frontendOptions.includes("tanstack-router") ||
 			frontendOptions.includes("react-router") ||
+			frontendOptions.includes("tanstack-start") ||
 			frontendOptions.includes("native")
 		);
 	}, []);
@@ -681,6 +689,11 @@ const StackArchitect = () => {
 
 									const hasWebFrontendSelected =
 										stack.frontend.includes("tanstack-router") ||
+										stack.frontend.includes("react-router") ||
+										stack.frontend.includes("tanstack-start");
+
+									const hasPWACompatibleFrontend =
+										stack.frontend.includes("tanstack-router") ||
 										stack.frontend.includes("react-router");
 
 									const isDisabled =
@@ -698,7 +711,7 @@ const StackArchitect = () => {
 													stack.backendFramework === "elysia"))) ||
 										(activeTab === "addons" &&
 											(tech.id === "pwa" || tech.id === "tauri") &&
-											!hasWebFrontendSelected) ||
+											!hasPWACompatibleFrontend) ||
 										(activeTab === "auth" &&
 											tech.id === "true" &&
 											stack.database === "none");

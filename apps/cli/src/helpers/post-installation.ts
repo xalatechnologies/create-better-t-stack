@@ -43,10 +43,14 @@ export function displayPostInstallInstructions(
 			: "";
 
 	const hasTanstackRouter = frontends?.includes("tanstack-router");
+	const hasTanstackStart = frontends?.includes("tanstack-start");
 	const hasReactRouter = frontends?.includes("react-router");
-	const hasWebFrontend = hasTanstackRouter || hasReactRouter;
+	const hasWebFrontend =
+		hasTanstackRouter || hasReactRouter || hasTanstackStart;
 	const hasNativeFrontend = frontends?.includes("native");
 	const hasFrontend = hasWebFrontend || hasNativeFrontend;
+
+	const webPort = hasReactRouter ? "5173" : "3001";
 
 	note(
 		`${pc.cyan("1.")} ${cdCmd}
@@ -55,7 +59,7 @@ ${!depsInstalled ? `${pc.cyan("2.")} ${packageManager} install\n` : ""}${pc.cyan
 ${pc.bold("Your project will be available at:")}
 ${
 	hasFrontend
-		? `${hasWebFrontend ? `${pc.cyan("•")} Frontend: http://localhost:${hasReactRouter ? "5173" : "3001"}\n` : ""}`
+		? `${hasWebFrontend ? `${pc.cyan("•")} Frontend: http://localhost:${webPort}\n` : ""}`
 		: `${pc.yellow("NOTE:")} You are creating a backend-only app (no frontend selected)\n`
 }${pc.cyan("•")} API: http://localhost:3000
 ${nativeInstructions ? `\n${nativeInstructions.trim()}` : ""}${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}${pwaInstructions ? `\n${pwaInstructions.trim()}` : ""}

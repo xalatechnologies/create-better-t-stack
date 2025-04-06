@@ -23,7 +23,10 @@ export async function getFrontendChoice(
 			},
 		],
 		initialValues: DEFAULT_CONFIG.frontend.some(
-			(f) => f === "tanstack-router" || f === "react-router",
+			(f) =>
+				f === "tanstack-router" ||
+				f === "react-router" ||
+				f === "tanstack-start",
 		)
 			? ["web"]
 			: [],
@@ -50,10 +53,18 @@ export async function getFrontendChoice(
 					label: "React Router",
 					hint: "A user‑obsessed, standards‑focused, multi‑strategy router you can deploy anywhere.",
 				},
+				{
+					value: "tanstack-start",
+					label: "TanStack Start (beta)",
+					hint: "SSR, Streaming, Server Functions, API Routes, bundling and more powered by TanStack Router and Vite.",
+				},
 			],
 			initialValue:
 				DEFAULT_CONFIG.frontend.find(
-					(f) => f === "tanstack-router" || f === "react-router",
+					(f) =>
+						f === "tanstack-router" ||
+						f === "react-router" ||
+						f === "tanstack-start",
 				) || "tanstack-router",
 		});
 

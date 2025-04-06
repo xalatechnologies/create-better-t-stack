@@ -20,7 +20,8 @@ export async function getExamplesChoice(
 
 	const hasWebFrontend =
 		frontends?.includes("react-router") ||
-		frontends?.includes("tanstack-router");
+		frontends?.includes("tanstack-router") ||
+		frontends?.includes("tanstack-start");
 
 	if (!hasWebFrontend) return [];
 

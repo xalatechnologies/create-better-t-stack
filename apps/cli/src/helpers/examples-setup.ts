@@ -13,12 +13,19 @@ export async function setupExamples(
 	frontend: ProjectFrontend[] = ["tanstack-router"],
 ): Promise<void> {
 	const hasTanstackRouter = frontend.includes("tanstack-router");
+	const hasTanstackStart = frontend.includes("tanstack-start");
 	const hasReactRouter = frontend.includes("react-router");
-	const hasWebFrontend = hasTanstackRouter || hasReactRouter;
+	const hasWebFrontend =
+		hasTanstackRouter || hasReactRouter || hasTanstackStart;
 
-	const routerType = hasTanstackRouter
-		? "web-tanstack-router"
-		: "web-react-router";
+	let routerType: string;
+	if (hasTanstackRouter) {
+		routerType = "web-tanstack-router";
+	} else if (hasTanstackStart) {
+		routerType = "web-tanstack-start";
+	} else {
+		routerType = "web-react-router";
+	}
 
 	const webAppExists = await fs.pathExists(path.join(projectDir, "apps/web"));
 
@@ -87,27 +94,28 @@ async function updateServerIndexWithAIRoute(projectDir: string): Promise<void> {
 			const importSection = `import { streamText } from "ai";\nimport { google } from "@ai-sdk/google";\nimport { stream } from "hono/streaming";`;
 
 			const aiRouteHandler = `
-      app.post("/ai", async (c) => {
-        const body = await c.req.json();
-        const messages = body.messages || [];
+// AI chat endpoint
+app.post("/ai", async (c) => {
+  const body = await c.req.json();
+  const messages = body.messages || [];
 
-        const result = streamText({
-          model: google("gemini-2.0-flash-exp"),
-          messages,
-        });
+  const result = streamText({
+    model: google("gemini-1.5-flash"),
+    messages,
+  });
 
-        c.header("X-Vercel-AI-Data-Stream", "v1");
-        c.header("Content-Type", "text/plain; charset=utf-8");
+  c.header("X-Vercel-AI-Data-Stream", "v1");
+  c.header("Content-Type", "text/plain; charset=utf-8");
 
-        return stream(c, (stream) => stream.pipe(result.toDataStream()));
-      });`;
+  return stream(c, (stream) => stream.pipe(result.toDataStream()));
+});`;
 
 			if (indexContent.includes("import {")) {
 				const lastImportIndex = indexContent.lastIndexOf("import");
 				const endOfLastImport = indexContent.indexOf("\n", lastImportIndex);
 				indexContent = `${indexContent.substring(0, endOfLastImport + 1)}
-        ${importSection}
-        ${indexContent.substring(endOfLastImport + 1)}`;
+${importSection}
+${indexContent.substring(endOfLastImport + 1)}`;
 			} else {
 				indexContent = `${importSection}
 
@@ -177,7 +185,7 @@ async function setupTodoExample(
 	const todoExampleDir = path.join(PKG_ROOT, "template/examples/todo");
 
 	if (await fs.pathExists(todoExampleDir)) {
-		const todoRouteSourceDir = path.join(
+		const todoRouteSourcePath = path.join(
 			todoExampleDir,
 			`apps/${routerType}/src/routes/todos.tsx`,
 		);
@@ -186,8 +194,8 @@ async function setupTodoExample(
 			"apps/web/src/routes/todos.tsx",
 		);
 
-		if (await fs.pathExists(todoRouteSourceDir)) {
-			await fs.copy(todoRouteSourceDir, todoRouteTargetPath, {
+		if (await fs.pathExists(todoRouteSourcePath)) {
+			await fs.copy(todoRouteSourcePath, todoRouteTargetPath, {
 				overwrite: true,
 			});
 		}

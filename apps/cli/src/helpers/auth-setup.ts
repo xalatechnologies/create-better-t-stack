@@ -31,7 +31,8 @@ export async function setupAuth(
 	try {
 		if (
 			frontends.includes("react-router") ||
-			frontends.includes("tanstack-router")
+			frontends.includes("tanstack-router") ||
+			frontends.includes("tanstack-start")
 		) {
 			addPackageDependency({
 				dependencies: ["better-auth"],

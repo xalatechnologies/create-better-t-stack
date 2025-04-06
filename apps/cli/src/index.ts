@@ -43,7 +43,7 @@ async function main() {
 		.option("--no-auth", "Exclude authentication")
 		.option(
 			"--frontend <types...>",
-			"Frontend types (tanstack-router, react-router, native, none)",
+			"Frontend types (tanstack-router, react-router, tanstack-start, native, none)",
 		)
 		.option(
 			"--addons <types...>",
@@ -271,7 +271,7 @@ function validateOptions(options: CLIOptions): void {
 		if (
 			options.frontend &&
 			!options.frontend.some((f) =>
-				["tanstack-router", "react-router"].includes(f),
+				["tanstack-router", "react-router", "tanstack-start"].includes(f),
 			) &&
 			!options.frontend.includes("none")
 		) {
@@ -288,6 +288,7 @@ function validateOptions(options: CLIOptions): void {
 		const validFrontends = [
 			"tanstack-router",
 			"react-router",
+			"tanstack-start",
 			"native",
 			"none",
 		];
@@ -305,13 +306,16 @@ function validateOptions(options: CLIOptions): void {
 		}
 
 		const webFrontends = options.frontend.filter(
-			(f) => f === "tanstack-router" || f === "react-router",
+			(f) =>
+				f === "tanstack-router" ||
+				f === "react-router" ||
+				f === "tanstack-start",
 		);
 
 		if (webFrontends.length > 1) {
 			cancel(
 				pc.red(
-					"Cannot select multiple web frameworks. Choose only one of: tanstack-router, react-router",
+					"Cannot select multiple web frameworks. Choose only one of: tanstack-router, tanstack-start, react-router",
 				),
 			);
 			process.exit(1);
@@ -357,14 +361,13 @@ function validateOptions(options: CLIOptions): void {
 			options.frontend &&
 			!options.frontend.some((f) =>
 				["tanstack-router", "react-router"].includes(f),
-			) &&
-			!options.frontend.includes("none")
+			)
 		) {
 			cancel(
 				pc.red(
-					`PWA and Tauri addons require a web frontend. Cannot use --addons ${options.addons
+					`PWA and Tauri addons require tanstack-router or react-router. Cannot use --addons ${options.addons
 						.filter((a) => webSpecificAddons.includes(a))
-						.join(", ")} with --frontend native only`,
+						.join(", ")} with incompatible frontend options.`,
 				),
 			);
 			process.exit(1);
@@ -384,11 +387,17 @@ function processFlags(
 		} else {
 			frontend = options.frontend.filter(
 				(f): f is ProjectFrontend =>
-					f === "tanstack-router" || f === "react-router" || f === "native",
+					f === "tanstack-router" ||
+					f === "react-router" ||
+					f === "tanstack-start" ||
+					f === "native",
 			);
 
 			const webFrontends = frontend.filter(
-				(f) => f === "tanstack-router" || f === "react-router",
+				(f) =>
+					f === "tanstack-router" ||
+					f === "react-router" ||
+					f === "tanstack-start",
 			);
 
 			if (webFrontends.length > 1) {
@@ -448,8 +457,9 @@ function processFlags(
 			if (
 				frontend &&
 				frontend.length > 0 &&
-				!frontend.includes("tanstack-router") &&
-				!frontend.includes("react-router")
+				!frontend.some((f) =>
+					["tanstack-router", "react-router", "tanstack-start"].includes(f),
+				)
 			) {
 				examples = [];
 				log.warn(
@@ -481,19 +491,23 @@ function processFlags(
 					addon === "husky",
 			);
 
-			if (
-				frontend &&
-				frontend.length > 0 &&
-				!frontend.includes("tanstack-router") &&
-				!frontend.includes("react-router")
-			) {
-				addons = addons.filter((addon) => !["pwa", "tauri"].includes(addon));
-				if (addons.length !== options.addons.length) {
+			const hasCompatibleWebFrontend = frontend?.some(
+				(f) => f === "tanstack-router" || f === "react-router",
+			);
+
+			if (!hasCompatibleWebFrontend) {
+				const webSpecificAddons = ["pwa", "tauri"];
+				const filteredAddons = addons.filter(
+					(addon) => !webSpecificAddons.includes(addon),
+				);
+
+				if (filteredAddons.length !== addons.length) {
 					log.warn(
 						pc.yellow(
-							"PWA and Tauri addons require web frontend - removing these addons",
+							"PWA and Tauri addons require tanstack-router or react-router - removing these addons",
 						),
 					);
+					addons = filteredAddons;
 				}
 			}
 

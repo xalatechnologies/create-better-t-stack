@@ -18,9 +18,6 @@ export async function setupAddons(
 	const hasWebFrontend =
 		frontends.includes("react-router") || frontends.includes("tanstack-router");
 
-	// if (addons.includes("docker")) {
-	//  await setupDocker(projectDir);
-	// }
 	if (addons.includes("pwa") && hasWebFrontend) {
 		await setupPwa(projectDir, frontends);
 	}

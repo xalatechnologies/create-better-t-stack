@@ -17,6 +17,14 @@ export const TECH_OPTIONS = {
 			default: false,
 		},
 		{
+			id: "tanstack-start",
+			name: "TanStack Start",
+			description: "Quick starter template from TanStack",
+			icon: "🚀",
+			color: "from-purple-400 to-purple-600",
+			default: false,
+		},
+		{
 			id: "native",
 			name: "React Native",
 			description: "Expo with NativeWind",

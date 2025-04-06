@@ -49,10 +49,11 @@ export async function setupFrontendTemplates(
 	frontends: ProjectFrontend[],
 ): Promise<void> {
 	const hasTanstackWeb = frontends.includes("tanstack-router");
+	const hasTanstackStart = frontends.includes("tanstack-start");
 	const hasReactRouterWeb = frontends.includes("react-router");
 	const hasNative = frontends.includes("native");
 
-	if (hasTanstackWeb || hasReactRouterWeb) {
+	if (hasTanstackWeb || hasReactRouterWeb || hasTanstackStart) {
 		const webDir = path.join(projectDir, "apps/web");
 		await fs.ensureDir(webDir);
 
@@ -61,9 +62,13 @@ export async function setupFrontendTemplates(
 			await fs.copy(webBaseDir, webDir);
 		}
 
-		const frameworkName = hasTanstackWeb
-			? "web-tanstack-router"
-			: "web-react-router";
+		let frameworkName = "web-react-router";
+		if (hasTanstackWeb) {
+			frameworkName = "web-tanstack-router";
+		} else if (hasTanstackStart) {
+			frameworkName = "web-tanstack-start";
+		}
+
 		const webFrameworkDir = path.join(
 			PKG_ROOT,
 			`template/base/apps/${frameworkName}`,
@@ -155,8 +160,9 @@ export async function setupAuthTemplate(
 	if (await fs.pathExists(authTemplateDir)) {
 		const hasReactRouter = frontends.includes("react-router");
 		const hasTanStackRouter = frontends.includes("tanstack-router");
+		const hasTanStackStart = frontends.includes("tanstack-start");
 
-		if (hasReactRouter || hasTanStackRouter) {
+		if (hasReactRouter || hasTanStackRouter || hasTanStackStart) {
 			const webDir = path.join(projectDir, "apps/web");
 
 			const webBaseAuthDir = path.join(authTemplateDir, "apps/web-base");
@@ -181,6 +187,16 @@ export async function setupAuthTemplate(
 				);
 				if (await fs.pathExists(tanstackAuthDir)) {
 					await fs.copy(tanstackAuthDir, webDir, { overwrite: true });
+				}
+			}
+
+			if (hasTanStackStart) {
+				const tanstackStartAuthDir = path.join(
+					authTemplateDir,
+					"apps/web-tanstack-start",
+				);
+				if (await fs.pathExists(tanstackStartAuthDir)) {
+					await fs.copy(tanstackStartAuthDir, webDir, { overwrite: true });
 				}
 			}
 		}

@@ -49,7 +49,7 @@ Options:
   --orm <type>                    ORM type (none, drizzle, prisma)
   --auth                          Include authentication
   --no-auth                       Exclude authentication
-  --frontend <types...>           Frontend types (web, native, none)
+  --frontend <types...>           Frontend types (tanstack-router, react-router, tanstack-start, native, none)
   --addons <types...>             Additional addons (pwa, tauri, biome, husky, none)
   --examples <types...>           Examples to include (todo, ai)
   --no-examples                   Skip all examples
@@ -60,6 +60,8 @@ Options:
   --no-install                    Skip installing dependencies
   --turso                         Set up Turso for SQLite database
   --no-turso                      Skip Turso setup
+  --prisma-postgres               Set up Prisma Postgres
+  --no-prisma-postgres            Skip Prisma Postgres setup
   --backend <framework>           Backend framework (hono, elysia)
   --runtime <runtime>             Runtime (bun, node)
   -h, --help                      Display help

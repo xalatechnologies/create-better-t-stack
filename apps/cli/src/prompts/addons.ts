@@ -9,7 +9,7 @@ export async function getAddonsChoice(
 ): Promise<ProjectAddons[]> {
 	if (Addons !== undefined) return Addons;
 
-	const hasWeb =
+	const hasCompatibleWebFrontend =
 		frontends?.includes("react-router") ||
 		frontends?.includes("tanstack-router");
 
@@ -39,10 +39,13 @@ export async function getAddonsChoice(
 		},
 	];
 
-	const options = hasWeb ? [...webAddonOptions, ...addonOptions] : addonOptions;
+	const options = hasCompatibleWebFrontend
+		? [...webAddonOptions, ...addonOptions]
+		: addonOptions;
 
 	const initialValues = DEFAULT_CONFIG.addons.filter(
-		(addon) => hasWeb || (addon !== "pwa" && addon !== "tauri"),
+		(addon) =>
+			hasCompatibleWebFrontend || (addon !== "pwa" && addon !== "tauri"),
 	);
 
 	const response = await multiselect<ProjectAddons>({
