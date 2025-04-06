@@ -484,13 +484,13 @@ const StackArchitect = () => {
 	return (
 		<div className="mx-auto w-full">
 			<div className="overflow-hidden rounded-xl border border-gray-300 bg-gray-100 text-gray-800 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-				<div className="flex items-center justify-between bg-gray-200 px-4 py-2 dark:bg-gray-800">
+				<div className="flex items-center justify-between bg-gray-200 px-2 py-2 sm:px-4 dark:bg-gray-800">
 					<div className="flex space-x-2">
 						<div className="h-3 w-3 rounded-full bg-red-500" />
 						<div className="h-3 w-3 rounded-full bg-yellow-500" />
 						<div className="h-3 w-3 rounded-full bg-green-500" />
 					</div>
-					<div className="font-mono text-gray-600 text-xs dark:text-gray-400">
+					<div className="hidden font-mono text-gray-600 text-xs sm:block dark:text-gray-400">
 						Stack Architect Terminal
 					</div>
 					<div className="flex space-x-2">
@@ -526,11 +526,11 @@ const StackArchitect = () => {
 				</div>
 
 				{showHelp && (
-					<div className="border-gray-300 border-b bg-blue-50 p-4 dark:border-gray-700 dark:bg-blue-900/20">
-						<h3 className="mb-2 font-medium text-blue-800 dark:text-blue-300">
+					<div className="border-gray-300 border-b bg-blue-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-blue-900/20">
+						<h3 className="mb-2 font-medium text-blue-800 text-sm dark:text-blue-300">
 							How to Use Stack Architect
 						</h3>
-						<ul className="list-disc space-y-1 pl-5 text-blue-700 text-sm dark:text-blue-400">
+						<ul className="list-disc space-y-1 pl-5 text-blue-700 text-xs dark:text-blue-400">
 							<li>
 								Select your preferred technologies from each category using the
 								tabs below
@@ -550,8 +550,8 @@ const StackArchitect = () => {
 				)}
 
 				{showPresets && (
-					<div className="border-gray-300 border-b bg-amber-50 p-4 dark:border-gray-700 dark:bg-amber-900/20">
-						<h3 className="mb-2 font-medium text-amber-800 dark:text-amber-300">
+					<div className="border-gray-300 border-b bg-amber-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-amber-900/20">
+						<h3 className="mb-2 font-medium text-amber-800 text-sm dark:text-amber-300">
 							Quick Start Presets
 						</h3>
 						<div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -562,7 +562,7 @@ const StackArchitect = () => {
 									onClick={() => applyPreset(preset.id)}
 									className="rounded border border-amber-200 p-2 text-left transition-colors hover:bg-amber-100 dark:border-amber-700 dark:hover:bg-amber-800/30"
 								>
-									<div className="font-medium text-amber-700 dark:text-amber-300">
+									<div className="font-medium text-amber-700 text-sm dark:text-amber-300">
 										{preset.name}
 									</div>
 									<div className="text-amber-600 text-xs dark:text-amber-400">
@@ -574,9 +574,9 @@ const StackArchitect = () => {
 					</div>
 				)}
 
-				<div className="p-4 font-mono">
-					<div className="mb-4 flex items-start justify-between">
-						<label className="flex flex-col">
+				<div className="p-3 font-mono sm:p-4">
+					<div className="mb-4 flex flex-col justify-between sm:flex-row sm:items-start">
+						<label className="mb-2 flex flex-col sm:mb-0">
 							<span className="mb-1 text-gray-600 text-xs dark:text-gray-400">
 								Project Name:
 							</span>
@@ -589,7 +589,7 @@ const StackArchitect = () => {
 										setStack((prev) => ({ ...prev, projectName: newValue }));
 										setProjectNameError(validateProjectName(newValue));
 									}}
-									className={`border bg-gray-200 dark:bg-gray-800 ${
+									className={`w-full border bg-gray-200 sm:w-auto dark:bg-gray-800 ${
 										projectNameError
 											? "border-red-500 dark:border-red-500"
 											: "border-gray-300 dark:border-gray-700"
@@ -602,7 +602,7 @@ const StackArchitect = () => {
 							)}
 						</label>
 
-						<div className="flex gap-2">
+						<div className="flex flex-wrap gap-2">
 							<button
 								type="button"
 								onClick={resetStack}
@@ -636,17 +636,17 @@ const StackArchitect = () => {
 							</button>
 						</div>
 					</div>
-					<div className="mb-4">
+					<div className="mb-4 overflow-x-auto">
 						<div className="flex">
 							<span className="mr-2 text-green-600 dark:text-green-400">$</span>
-							<code className="text-gray-700 dark:text-gray-300">
+							<code className="whitespace-pre-wrap break-all text-gray-700 text-xs sm:text-sm dark:text-gray-300">
 								{command}
 							</code>
 						</div>
 					</div>
 					{compatNotes[activeTab] && compatNotes[activeTab].length > 0 && (
 						<div className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
-							<div className="mb-2 flex items-center gap-2 font-medium text-blue-800 text-sm dark:text-blue-300">
+							<div className="mb-2 flex items-center gap-2 font-medium text-blue-800 text-xs sm:text-sm dark:text-blue-300">
 								<InfoIcon className="h-4 w-4" />
 								<span>Compatibility Notes</span>
 							</div>
@@ -658,7 +658,7 @@ const StackArchitect = () => {
 						</div>
 					)}
 					<div className="border-gray-300 border-t pt-4 dark:border-gray-700">
-						<div className="mb-3 flex items-center text-gray-600 dark:text-gray-400">
+						<div className="mb-3 flex items-center text-gray-600 text-sm dark:text-gray-400">
 							<Terminal className="mr-2 h-4 w-4" />
 							<span>
 								Configure{" "}
@@ -749,23 +749,25 @@ const StackArchitect = () => {
 												</div>
 												<div className="flex-grow">
 													<div className="flex items-center">
-														<span className="mr-2">{tech.icon}</span>
+														<span className="mr-2 text-base sm:text-lg">
+															{tech.icon}
+														</span>
 														<span
-															className={
+															className={`${
 																isSelected
 																	? "text-blue-700 dark:text-blue-300"
 																	: "text-gray-700 dark:text-gray-300"
-															}
+															} text-xs sm:text-sm`}
 														>
 															{tech.name}
 														</span>
 													</div>
-													<p className="text-gray-500 text-xs">
+													<p className="hidden text-gray-500 text-xs sm:block">
 														{tech.description}
 													</p>
 												</div>
 												{tech.default && !isSelected && (
-													<span className="ml-2 text-gray-500 text-xs dark:text-gray-600">
+													<span className="ml-2 hidden text-gray-500 text-xs sm:block dark:text-gray-600">
 														Default
 													</span>
 												)}
@@ -936,7 +938,7 @@ const StackArchitect = () => {
 						<button
 							type="button"
 							key={category}
-							className={`whitespace-nowrap px-4 py-2 font-mono text-xs transition-colors${
+							className={`whitespace-nowrap px-2 py-2 font-mono text-[10px] sm:px-4 sm:text-xs transition-colors${
 								activeTab === category
 									? " border-blue-500 border-t-2 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
 									: " text-gray-600 hover:bg-gray-300 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"

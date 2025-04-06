@@ -30,7 +30,7 @@ const TWEET_IDS = [
 
 export default function Testimonials() {
 	const [startIndex, setStartIndex] = useState(0);
-	const [tweetsPerPage, setTweetsPerPage] = useState(3);
+	const [tweetsPerPage, setTweetsPerPage] = useState(1);
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -75,8 +75,8 @@ export default function Testimonials() {
 	const currentPage = Math.floor(startIndex / tweetsPerPage) + 1;
 
 	return (
-		<section className="relative z-10 mx-auto mt-20 w-full max-w-7xl space-y-16 px-4 sm:px-6">
-			<div className="relative space-y-8 text-center">
+		<section className="relative z-10 mx-auto mt-12 w-full max-w-7xl space-y-8 px-4 sm:mt-20 sm:space-y-16 sm:px-6">
+			<div className="relative space-y-4 text-center sm:space-y-8">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					whileInView={{ opacity: 1, y: 0 }}
@@ -84,7 +84,7 @@ export default function Testimonials() {
 					transition={{ duration: 0.5 }}
 					className="relative"
 				>
-					<h2 className="font-bold font-mono text-2xl tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
+					<h2 className="font-bold font-mono text-xl tracking-tight sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl">
 						<span className="border-blue-500 border-b-2 pb-1 text-gray-900 dark:text-blue-100">
 							Developer Feedback
 						</span>
@@ -97,7 +97,7 @@ export default function Testimonials() {
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-100px" }}
 					transition={{ duration: 0.5, delay: 0.2 }}
-					className="mx-auto max-w-3xl font-mono text-gray-700 text-lg leading-relaxed sm:text-xl dark:text-gray-300"
+					className="mx-auto max-w-3xl font-mono text-base text-gray-700 leading-relaxed sm:text-lg md:text-xl dark:text-gray-300"
 				>
 					what devs are saying about Better-T-Stack
 				</motion.p>
@@ -108,25 +108,26 @@ export default function Testimonials() {
 				whileInView={{ opacity: 1, y: 0 }}
 				viewport={{ once: true, margin: "-100px" }}
 				transition={{ duration: 0.5, delay: 0.3 }}
-				className="relative mt-8"
+				className="relative mt-4 sm:mt-8"
 			>
 				<div className="overflow-hidden rounded-xl border border-gray-300 bg-gray-100 shadow-xl dark:border-gray-700 dark:bg-gray-900">
-					<div className="flex items-center justify-between bg-gray-200 px-4 py-2 dark:bg-gray-800">
-						<div className="flex space-x-2">
-							<div className="h-3 w-3 rounded-full bg-red-500" />
-							<div className="h-3 w-3 rounded-full bg-yellow-500" />
-							<div className="h-3 w-3 rounded-full bg-green-500" />
+					<div className="flex items-center justify-between bg-gray-200 px-2 py-2 sm:px-4 dark:bg-gray-800">
+						<div className="flex space-x-1 sm:space-x-2">
+							<div className="h-2 w-2 rounded-full bg-red-500 sm:h-3 sm:w-3" />
+							<div className="h-2 w-2 rounded-full bg-yellow-500 sm:h-3 sm:w-3" />
+							<div className="h-2 w-2 rounded-full bg-green-500 sm:h-3 sm:w-3" />
 						</div>
-						<div className="font-mono text-gray-600 text-xs dark:text-gray-400">
-							Developer Feedback Terminal
+						<div className="font-mono text-[10px] text-gray-600 sm:text-xs dark:text-gray-400">
+							Developer Feedback
 						</div>
-						<div className="flex items-center gap-2">
+						<div className="flex items-center gap-1 sm:gap-2">
 							<motion.button
 								whileHover={{ scale: 1.05 }}
 								whileTap={{ scale: 0.95 }}
 								onClick={handlePrev}
-								className="flex h-6 w-6 items-center justify-center rounded bg-gray-300 text-gray-700 transition-colors hover:bg-gray-400 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+								className="flex h-5 w-5 items-center justify-center rounded bg-gray-300 text-gray-700 transition-colors hover:bg-gray-400 sm:h-6 sm:w-6 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
 								title="Previous testimonials"
+								aria-label="Previous testimonials"
 							>
 								<ChevronLeft className="h-3 w-3" />
 							</motion.button>
@@ -135,8 +136,9 @@ export default function Testimonials() {
 								whileHover={{ scale: 1.05 }}
 								whileTap={{ scale: 0.95 }}
 								onClick={handleNext}
-								className="flex h-6 w-6 items-center justify-center rounded bg-gray-300 text-gray-700 transition-colors hover:bg-gray-400 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+								className="flex h-5 w-5 items-center justify-center rounded bg-gray-300 text-gray-700 transition-colors hover:bg-gray-400 sm:h-6 sm:w-6 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
 								title="Next testimonials"
+								aria-label="Next testimonials"
 							>
 								<ChevronRight className="h-3 w-3" />
 							</motion.button>
@@ -151,24 +153,24 @@ export default function Testimonials() {
 						</div>
 					</div>
 
-					<div className="flex items-center justify-between border-gray-300 border-t bg-gray-200 p-3 dark:border-gray-700 dark:bg-gray-800">
-						<div className="flex items-center gap-2">
-							<span className="text-gray-700 text-xs dark:text-gray-300">
-								Page {currentPage} of {totalPages}
+					<div className="flex items-center justify-between border-gray-300 border-t bg-gray-200 px-2 py-2 sm:p-3 dark:border-gray-700 dark:bg-gray-800">
+						<div className="flex items-center">
+							<span className="text-[10px] text-gray-700 sm:text-xs dark:text-gray-300">
+								{currentPage}/{totalPages}
 							</span>
 						</div>
 
-						<div className="flex items-center gap-3">
-							<div className="hidden items-center gap-1 sm:flex">
-								{Array.from({ length: totalPages }).map((_, i) => {
-									const isActive = i === currentPage - 1;
+						<div className="flex items-center gap-2 sm:gap-3">
+							<div className="flex items-center gap-1">
+								{Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
+									const isActive = i === Math.min(currentPage - 1, 4);
 									return (
 										<button
 											type="button"
-											// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+											// biome-ignore lint/suspicious/noArrayIndexKey: pagination indicator
 											key={i}
 											onClick={() => setStartIndex(i * tweetsPerPage)}
-											className={`h-1.5 w-1.5 rounded-full transition-colors ${
+											className={`h-1 w-1 rounded-full transition-colors sm:h-1.5 sm:w-1.5 ${
 												isActive
 													? "bg-blue-500"
 													: "bg-gray-400 hover:bg-gray-500 dark:bg-gray-600"
@@ -177,6 +179,11 @@ export default function Testimonials() {
 										/>
 									);
 								})}
+								{totalPages > 5 && (
+									<span className="text-[8px] text-gray-500 sm:text-[10px] dark:text-gray-400">
+										...
+									</span>
+								)}
 							</div>
 						</div>
 					</div>
