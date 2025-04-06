@@ -2,7 +2,7 @@
 
 A modern CLI tool for scaffolding end-to-end type-safe TypeScript projects with best practices and customizable configurations
 
-<img src="https://github.com/user-attachments/assets/3282cd7a-f627-4ca0-b6d1-38f174a6d34e" width="700">
+![demo](https://github.com/user-attachments/assets/87f6fffd-750d-43c5-9d00-cefbb644ed92)
 
 ## Quick Start
 
