@@ -42,7 +42,7 @@ export async function getExamplesChoice(
 		});
 	}
 
-	if (backend === "hono") {
+	if (backend === "hono" || backend === "express") {
 		response = await multiselect<ProjectExamples>({
 			message: "Include examples",
 			options: [

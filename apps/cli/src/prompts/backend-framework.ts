@@ -17,6 +17,11 @@ export async function getBackendFrameworkChoice(
 				hint: "Lightweight, ultrafast web framework",
 			},
 			{
+				value: "express",
+				label: "Express",
+				hint: "Fast, unopinionated, minimalist web framework for Node.js",
+			},
+			{
 				value: "elysia",
 				label: "Elysia",
 				hint: "Ergonomic web framework for building backend servers",

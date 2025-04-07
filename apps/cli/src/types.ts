@@ -1,8 +1,8 @@
-export type ProjectDatabase = "sqlite" | "postgres" | "none";
-export type ProjectOrm = "drizzle" | "prisma" | "none";
+export type ProjectDatabase = "sqlite" | "postgres" | "mongodb" | "none";
+export type ProjectOrm = "drizzle" | "prisma";
 export type ProjectPackageManager = "npm" | "pnpm" | "bun";
 export type ProjectAddons = "pwa" | "biome" | "tauri" | "husky";
-export type ProjectBackend = "hono" | "elysia";
+export type ProjectBackend = "hono" | "elysia" | "express";
 export type ProjectRuntime = "node" | "bun";
 export type ProjectExamples = "todo" | "ai";
 export type ProjectFrontend =
@@ -10,6 +10,11 @@ export type ProjectFrontend =
 	| "tanstack-router"
 	| "tanstack-start"
 	| "native";
+export type ProjectDBSetup =
+	| "turso"
+	| "prisma-postgres"
+	| "mongodb-atlas"
+	| "none";
 
 export interface ProjectConfig {
 	projectName: string;
@@ -22,9 +27,8 @@ export interface ProjectConfig {
 	examples: ProjectExamples[];
 	git: boolean;
 	packageManager: ProjectPackageManager;
-	noInstall?: boolean;
-	turso?: boolean;
-	prismaPostgres: boolean;
+	noInstall: boolean;
+	dbSetup: ProjectDBSetup;
 	frontend: ProjectFrontend[];
 }
 
@@ -39,8 +43,7 @@ export type CLIOptions = {
 	git?: boolean;
 	packageManager?: string;
 	install?: boolean;
-	turso?: boolean;
-	prismaPostgres?: boolean;
+	dbSetup?: string;
 	backend?: string;
 	runtime?: string;
 };

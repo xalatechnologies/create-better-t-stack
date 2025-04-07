@@ -27,6 +27,13 @@ export async function setupBackendDependencies(
 			dependencies.push("@elysiajs/node");
 			devDependencies.push("tsx", "@types/node");
 		}
+	} else if (framework === "express") {
+		dependencies.push("express", "cors");
+		devDependencies.push("@types/express", "@types/cors");
+
+		if (runtime === "node") {
+			devDependencies.push("tsx", "@types/node");
+		}
 	}
 
 	if (runtime === "bun") {

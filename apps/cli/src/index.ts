@@ -9,6 +9,7 @@ import type {
 	ProjectAddons,
 	ProjectBackend,
 	ProjectConfig,
+	ProjectDBSetup,
 	ProjectDatabase,
 	ProjectExamples,
 	ProjectFrontend,
@@ -37,8 +38,11 @@ async function main() {
 		.version(getLatestCLIVersion())
 		.argument("[project-directory]", "Project name/directory")
 		.option("-y, --yes", "Use default configuration")
-		.option("--database <type>", "Database type (none, sqlite, postgres)")
-		.option("--orm <type>", "ORM type (none, drizzle, prisma)")
+		.option(
+			"--database <type>",
+			"Database type (none, sqlite, postgres, mongodb)",
+		)
+		.option("--orm <type>", "ORM type (drizzle, prisma)")
 		.option("--auth", "Include authentication")
 		.option("--no-auth", "Exclude authentication")
 		.option(
@@ -56,11 +60,14 @@ async function main() {
 		.option("--package-manager <pm>", "Package manager (npm, pnpm, bun)")
 		.option("--install", "Install dependencies")
 		.option("--no-install", "Skip installing dependencies")
-		.option("--turso", "Set up Turso for SQLite database")
-		.option("--no-turso", "Skip Turso setup")
-		.option("--prisma-postgres", "Set up Prisma Postgres")
-		.option("--no-prisma-postgres", "Skip Prisma Postgres setup")
-		.option("--backend <framework>", "Backend framework (hono, elysia)")
+		.option(
+			"--db-setup <setup>",
+			"Database setup (turso, prisma-postgres, mongodb-atlas, none)",
+		)
+		.option(
+			"--backend <framework>",
+			"Backend framework (hono, express, elysia)",
+		)
 		.option("--runtime <runtime>", "Runtime (bun, node)")
 		.parse();
 
@@ -125,20 +132,41 @@ async function main() {
 function validateOptions(options: CLIOptions): void {
 	if (
 		options.database &&
-		!["none", "sqlite", "postgres"].includes(options.database)
+		!["none", "sqlite", "postgres", "mongodb"].includes(options.database)
 	) {
 		cancel(
 			pc.red(
-				`Invalid database type: ${options.database}. Must be none, sqlite, or postgres.`,
+				`Invalid database type: ${options.database}. Must be none, sqlite, postgres, or mongodb.`,
 			),
 		);
 		process.exit(1);
 	}
 
-	if (options.orm && !["none", "drizzle", "prisma"].includes(options.orm)) {
+	if (options.orm && !["drizzle", "prisma"].includes(options.orm)) {
+		cancel(
+			pc.red(`Invalid ORM type: ${options.orm}. Must be drizzle or prisma.`),
+		);
+		process.exit(1);
+	}
+
+	if (
+		options.dbSetup &&
+		!["turso", "prisma-postgres", "mongodb-atlas", "none"].includes(
+			options.dbSetup,
+		)
+	) {
 		cancel(
 			pc.red(
-				`Invalid ORM type: ${options.orm}. Must be none, drizzle, or prisma.`,
+				`Invalid database setup: ${options.dbSetup}. Must be turso, prisma-postgres, mongodb-atlas, or none.`,
+			),
+		);
+		process.exit(1);
+	}
+
+	if (options.database === "mongodb" && options.orm === "drizzle") {
+		cancel(
+			pc.red(
+				"MongoDB is only available with Prisma. Cannot use --database mongodb with --orm drizzle",
 			),
 		);
 		process.exit(1);
@@ -163,51 +191,62 @@ function validateOptions(options: CLIOptions): void {
 			process.exit(1);
 		}
 
-		if ("turso" in options && options.turso === true) {
+		if (options.dbSetup && options.dbSetup !== "none") {
 			cancel(
 				pc.red(
-					"Turso setup requires a SQLite database. Cannot use --turso with --database none.",
+					`Database setup requires a database. Cannot use --db-setup ${options.dbSetup} with --database none.`,
 				),
 			);
 			process.exit(1);
 		}
 	}
 
-	if (
-		"turso" in options &&
-		options.turso === true &&
-		options.database &&
-		options.database !== "sqlite"
-	) {
-		cancel(
-			pc.red(
-				`Turso setup requires a SQLite database. Cannot use --turso with --database ${options.database}`,
-			),
-		);
-		process.exit(1);
-	}
-
-	if (
-		"turso" in options &&
-		options.turso === true &&
-		options.orm === "prisma"
-	) {
-		cancel(
-			pc.red(
-				"Turso setup is not compatible with Prisma. Cannot use --turso with --orm prisma",
-			),
-		);
-		process.exit(1);
-	}
-
-	if ("prismaPostgres" in options && options.prismaPostgres === true) {
-		if (
-			(options.database && options.database !== "postgres") ||
-			(options.orm && options.orm !== "prisma")
-		) {
+	// Check for database setup compatibility
+	if (options.dbSetup === "turso") {
+		if (options.database && options.database !== "sqlite") {
 			cancel(
 				pc.red(
-					"Prisma PostgreSQL setup requires PostgreSQL database with Prisma ORM. Cannot use --prisma-postgres with incompatible database or ORM options.",
+					`Turso setup requires a SQLite database. Cannot use --db-setup turso with --database ${options.database}`,
+				),
+			);
+			process.exit(1);
+		}
+
+		if (options.orm === "prisma") {
+			cancel(
+				pc.red(
+					"Turso setup is not compatible with Prisma. Cannot use --db-setup turso with --orm prisma",
+				),
+			);
+			process.exit(1);
+		}
+	}
+
+	if (options.dbSetup === "prisma-postgres") {
+		if (options.database && options.database !== "postgres") {
+			cancel(
+				pc.red(
+					"Prisma PostgreSQL setup requires PostgreSQL database. Cannot use --db-setup prisma-postgres with a different database type.",
+				),
+			);
+			process.exit(1);
+		}
+
+		if (options.orm && options.orm !== "prisma") {
+			cancel(
+				pc.red(
+					"Prisma PostgreSQL setup requires Prisma ORM. Cannot use --db-setup prisma-postgres with a different ORM.",
+				),
+			);
+			process.exit(1);
+		}
+	}
+
+	if (options.dbSetup === "mongodb-atlas") {
+		if (options.database && options.database !== "mongodb") {
+			cancel(
+				pc.red(
+					"MongoDB Atlas setup requires MongoDB database. Cannot use --db-setup mongodb-atlas with a different database type.",
 				),
 			);
 			process.exit(1);
@@ -226,10 +265,13 @@ function validateOptions(options: CLIOptions): void {
 		process.exit(1);
 	}
 
-	if (options.backend && !["hono", "elysia"].includes(options.backend)) {
+	if (
+		options.backend &&
+		!["hono", "elysia", "express"].includes(options.backend)
+	) {
 		cancel(
 			pc.red(
-				`Invalid backend framework: ${options.backend}. Must be hono or elysia.`,
+				`Invalid backend framework: ${options.backend}. Must be hono, elysia, or express.`,
 			),
 		);
 		process.exit(1);
@@ -409,42 +451,6 @@ function processFlags(
 		}
 	}
 
-	let database = options.database as ProjectDatabase | undefined;
-	let orm: ProjectOrm | undefined;
-	if (options.orm) {
-		orm = options.orm as ProjectOrm;
-	}
-
-	if ("prismaPostgres" in options && options.prismaPostgres === true) {
-		if (!database) {
-			database = "postgres" as ProjectDatabase;
-		}
-		if (!orm) {
-			orm = "prisma" as ProjectOrm;
-		}
-	}
-
-	let auth: boolean | undefined = "auth" in options ? options.auth : undefined;
-	let tursoOption: boolean | undefined =
-		"turso" in options ? options.turso : undefined;
-
-	let prismaPostgresOption: boolean | undefined =
-		"prismaPostgres" in options ? options.prismaPostgres : undefined;
-
-	if (
-		database === "none" ||
-		(database === "sqlite" && database !== undefined) ||
-		(orm !== undefined && orm !== "prisma")
-	) {
-		prismaPostgresOption = false;
-	}
-
-	if (database === "none") {
-		orm = "none";
-		auth = false;
-		tursoOption = false;
-	}
-
 	let examples: ProjectExamples[] | undefined;
 	if ("examples" in options) {
 		if (options.examples === false) {
@@ -517,11 +523,43 @@ function processFlags(
 		}
 	}
 
+	let database = options.database as ProjectDatabase | undefined;
+	let orm = options.orm as ProjectOrm | undefined;
+	const auth = "auth" in options ? options.auth : undefined;
+
 	const backend = options.backend as ProjectBackend | undefined;
 	const runtime = options.runtime as ProjectRuntime | undefined;
 	const packageManager = options.packageManager as
 		| ProjectPackageManager
 		| undefined;
+
+	let dbSetup: ProjectDBSetup | undefined = undefined;
+	if (options.dbSetup) {
+		if (options.dbSetup === "none") {
+			dbSetup = "none";
+		} else {
+			dbSetup = options.dbSetup as ProjectDBSetup;
+
+			if (dbSetup === "turso") {
+				database = "sqlite";
+
+				if (orm === "prisma") {
+					log.warn(
+						pc.yellow(
+							"Turso is not compatible with Prisma - switching to Drizzle",
+						),
+					);
+					orm = "drizzle";
+				}
+			} else if (dbSetup === "prisma-postgres") {
+				database = "postgres";
+				orm = "prisma";
+			} else if (dbSetup === "mongodb-atlas") {
+				database = "mongodb";
+				orm = "prisma";
+			}
+		}
+	}
 
 	const config: Partial<ProjectConfig> = {};
 
@@ -532,9 +570,7 @@ function processFlags(
 	if (packageManager) config.packageManager = packageManager;
 	if ("git" in options) config.git = options.git;
 	if ("install" in options) config.noInstall = !options.install;
-	if (tursoOption !== undefined) config.turso = tursoOption;
-	if (prismaPostgresOption !== undefined)
-		config.prismaPostgres = prismaPostgresOption;
+	if (dbSetup !== undefined) config.dbSetup = dbSetup;
 	if (backend) config.backend = backend;
 	if (runtime) config.runtime = runtime;
 	if (frontend !== undefined) config.frontend = frontend;

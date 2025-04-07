@@ -26,6 +26,11 @@ export async function getDatabaseChoice(
 				label: "PostgreSQL",
 				hint: "Traditional relational database",
 			},
+			{
+				value: "mongodb",
+				label: "MongoDB",
+				hint: "NoSQL document-oriented database",
+			},
 		],
 		initialValue: DEFAULT_CONFIG.database,
 	});

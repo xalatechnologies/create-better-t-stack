@@ -8,6 +8,7 @@ import type {
 	ProjectPackageManager,
 } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
+import { setupMongoDBAtlas } from "./mongodb-atlas-setup";
 import { setupPrismaPostgres } from "./prisma-postgres-setup";
 import { setupTurso } from "./turso-setup";
 
@@ -18,6 +19,7 @@ export async function setupDatabase(
 	packageManager: ProjectPackageManager,
 	setupTursoDb: boolean,
 	setupPrismaPostgresDb: boolean,
+	setupMongoDBAtlasDb: boolean,
 ): Promise<void> {
 	const s = spinner();
 	const serverDir = path.join(projectDir, "apps/server");
@@ -67,6 +69,18 @@ export async function setupDatabase(
 				) {
 					await setupPrismaPostgres(projectDir, packageManager);
 				}
+			}
+		} else if (databaseType === "mongodb") {
+			if (orm === "prisma") {
+				addPackageDependency({
+					dependencies: ["@prisma/client"],
+					devDependencies: ["prisma"],
+					projectDir: serverDir,
+				});
+			}
+
+			if (setupMongoDBAtlasDb) {
+				await setupMongoDBAtlas(projectDir);
 			}
 		}
 	} catch (error) {

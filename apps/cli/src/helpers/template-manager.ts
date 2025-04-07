@@ -372,9 +372,9 @@ function getOrmTemplateDir(orm: ProjectOrm, database: ProjectDatabase): string {
 	}
 
 	if (orm === "prisma") {
-		return database === "sqlite"
-			? "template/with-prisma-sqlite"
-			: "template/with-prisma-postgres";
+		if (database === "sqlite") return "template/with-prisma-sqlite";
+		if (database === "postgres") return "template/with-prisma-postgres";
+		if (database === "mongodb") return "template/with-prisma-mongodb";
 	}
 
 	return "template/base";
@@ -388,9 +388,9 @@ function getAuthLibDir(orm: ProjectOrm, database: ProjectDatabase): string {
 	}
 
 	if (orm === "prisma") {
-		return database === "sqlite"
-			? "with-prisma-sqlite-lib"
-			: "with-prisma-postgres-lib";
+		if (database === "sqlite") return "with-prisma-sqlite-lib";
+		if (database === "postgres") return "with-prisma-postgres-lib";
+		if (database === "mongodb") return "with-prisma-mongodb-lib";
 	}
 
 	throw new Error("Invalid ORM or database configuration for auth setup");

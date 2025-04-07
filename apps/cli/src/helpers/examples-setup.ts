@@ -37,7 +37,7 @@ export async function setupExamples(
 
 	if (
 		examples.includes("ai") &&
-		backend === "hono" &&
+		(backend === "hono" || backend === "express") &&
 		hasWebFrontend &&
 		webAppExists
 	) {
@@ -89,6 +89,7 @@ async function updateServerIndexWithAIRoute(projectDir: string): Promise<void> {
 	if (await fs.pathExists(serverIndexPath)) {
 		let indexContent = await fs.readFile(serverIndexPath, "utf8");
 		const isHono = indexContent.includes("hono");
+		const isExpress = indexContent.includes("express");
 
 		if (isHono) {
 			const importSection = `import { streamText } from "ai";\nimport { google } from "@ai-sdk/google";\nimport { stream } from "hono/streaming";`;
@@ -110,6 +111,7 @@ app.post("/ai", async (c) => {
   return stream(c, (stream) => stream.pipe(result.toDataStream()));
 });`;
 
+			// Add imports and route handler for Hono
 			if (indexContent.includes("import {")) {
 				const lastImportIndex = indexContent.lastIndexOf("import");
 				const endOfLastImport = indexContent.indexOf("\n", lastImportIndex);
@@ -141,9 +143,66 @@ ${indexContent.substring(exportIndex)}`;
 ${aiRouteHandler}`;
 				}
 			}
+		} else if (isExpress) {
+			// Express implementation
+			const importSection = `import { streamText } from "ai";\nimport { google } from "@ai-sdk/google";`;
 
-			await fs.writeFile(serverIndexPath, indexContent);
+			const aiRouteHandler = `
+// AI chat endpoint
+app.post("/ai", async (req, res) => {
+  const { messages = [] } = req.body;
+
+  const result = streamText({
+    model: google("gemini-1.5-flash"),
+    messages,
+  });
+
+  result.pipeDataStreamToResponse(res);
+});`;
+
+			// Add imports for Express
+			if (
+				indexContent.includes("import {") ||
+				indexContent.includes("import ")
+			) {
+				const lastImportIndex = indexContent.lastIndexOf("import");
+				const endOfLastImport = indexContent.indexOf("\n", lastImportIndex);
+				indexContent = `${indexContent.substring(0, endOfLastImport + 1)}
+${importSection}
+${indexContent.substring(endOfLastImport + 1)}`;
+			} else {
+				indexContent = `${importSection}
+
+${indexContent}`;
+			}
+
+			// Add route handler for Express
+			const trpcHandlerIndex = indexContent.indexOf('app.use("/trpc"');
+			if (trpcHandlerIndex !== -1) {
+				indexContent = `${indexContent.substring(0, trpcHandlerIndex)}${aiRouteHandler}
+
+${indexContent.substring(trpcHandlerIndex)}`;
+			} else {
+				const appListenIndex = indexContent.indexOf("app.listen(");
+				if (appListenIndex !== -1) {
+					// Find the line before app.listen
+					const prevNewlineIndex = indexContent.lastIndexOf(
+						"\n",
+						appListenIndex,
+					);
+					indexContent = `${indexContent.substring(0, prevNewlineIndex)}${aiRouteHandler}
+
+${indexContent.substring(prevNewlineIndex)}`;
+				} else {
+					// Fallback: append to the end
+					indexContent = `${indexContent}
+
+${aiRouteHandler}`;
+				}
+			}
 		}
+
+		await fs.writeFile(serverIndexPath, indexContent);
 	}
 }
 

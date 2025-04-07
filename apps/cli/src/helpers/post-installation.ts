@@ -2,6 +2,7 @@ import { note } from "@clack/prompts";
 import pc from "picocolors";
 import type {
 	ProjectAddons,
+	ProjectDBSetup,
 	ProjectDatabase,
 	ProjectFrontend,
 	ProjectOrm,
@@ -18,6 +19,7 @@ export function displayPostInstallInstructions(
 	addons: ProjectAddons[],
 	runtime: ProjectRuntime,
 	frontends: ProjectFrontend[],
+	dbSetup?: ProjectDBSetup,
 ) {
 	const runCmd = packageManager === "npm" ? "npm run" : packageManager;
 	const cdCmd = `cd ${projectName}`;

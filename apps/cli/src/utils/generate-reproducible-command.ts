@@ -12,8 +12,8 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 			flags.push(`--orm ${config.orm}`);
 		}
 
-		if (config.database === "sqlite") {
-			flags.push(config.turso ? "--turso" : "--no-turso");
+		if (config.dbSetup && config.dbSetup !== "none") {
+			flags.push(`--db-setup ${config.dbSetup}`);
 		}
 	}
 

@@ -74,6 +74,13 @@ export const TECH_OPTIONS = {
 			icon: "🦊",
 			color: "from-purple-500 to-purple-700",
 		},
+		{
+			id: "express",
+			name: "Express",
+			description: "Popular Node.js framework",
+			icon: "🚂",
+			color: "from-gray-500 to-gray-700",
+		},
 	],
 	database: [
 		{
@@ -90,6 +97,13 @@ export const TECH_OPTIONS = {
 			description: "Advanced SQL database",
 			icon: "🐘",
 			color: "from-indigo-400 to-indigo-600",
+		},
+		{
+			id: "mongodb",
+			name: "MongoDB",
+			description: "NoSQL document database",
+			icon: "🍃",
+			color: "from-green-400 to-green-600",
 		},
 		{
 			id: "none",
@@ -115,6 +129,44 @@ export const TECH_OPTIONS = {
 			icon: "◮",
 			color: "from-purple-400 to-purple-600",
 		},
+		{
+			id: "none",
+			name: "No ORM",
+			description: "Skip ORM integration",
+			icon: "🚫",
+			color: "from-gray-400 to-gray-600",
+		},
+	],
+	dbSetup: [
+		{
+			id: "turso",
+			name: "Turso",
+			description: "SQLite cloud database powered by libSQL",
+			icon: "☁️",
+			color: "from-pink-400 to-pink-600",
+		},
+		{
+			id: "prisma-postgres",
+			name: "Prisma PostgreSQL",
+			description: "Set up PostgreSQL with Prisma",
+			icon: "🐘",
+			color: "from-indigo-400 to-indigo-600",
+		},
+		{
+			id: "mongodb-atlas",
+			name: "MongoDB Atlas",
+			description: "Cloud MongoDB setup with Atlas",
+			icon: "🌩️",
+			color: "from-green-400 to-green-600",
+		},
+		{
+			id: "none",
+			name: "Basic Setup",
+			description: "No cloud DB integration",
+			icon: "💻",
+			color: "from-gray-400 to-gray-600",
+			default: true,
+		},
 	],
 	auth: [
 		{
@@ -131,42 +183,6 @@ export const TECH_OPTIONS = {
 			description: "Skip authentication",
 			icon: "🔓",
 			color: "from-red-400 to-red-600",
-		},
-	],
-	turso: [
-		{
-			id: "true",
-			name: "Turso",
-			description: "SQLite cloud database",
-			icon: "☁️",
-			color: "from-pink-400 to-pink-600",
-			default: false,
-		},
-		{
-			id: "false",
-			name: "No Turso",
-			description: "Skip Turso integration",
-			icon: "🚫",
-			color: "from-gray-400 to-gray-600",
-			default: true,
-		},
-	],
-	prismaPostgres: [
-		{
-			id: "true",
-			name: "Prisma PostgreSQL",
-			description: "Set up PostgreSQL with Prisma",
-			icon: "🐘",
-			color: "from-indigo-400 to-indigo-600",
-			default: false,
-		},
-		{
-			id: "false",
-			name: "Skip Prisma PostgreSQL",
-			description: "Basic Prisma setup",
-			icon: "🚫",
-			color: "from-gray-400 to-gray-600",
-			default: true,
 		},
 	],
 	packageManager: [
@@ -293,9 +309,8 @@ export const PRESET_TEMPLATES = [
 			backendFramework: "hono",
 			database: "sqlite",
 			orm: "drizzle",
+			dbSetup: "none",
 			auth: "true",
-			turso: "false",
-			prismaPostgres: "false",
 			packageManager: "bun",
 			addons: [],
 			examples: [],
@@ -314,9 +329,8 @@ export const PRESET_TEMPLATES = [
 			backendFramework: "hono",
 			database: "sqlite",
 			orm: "drizzle",
+			dbSetup: "none",
 			auth: "true",
-			turso: "false",
-			prismaPostgres: "false",
 			packageManager: "bun",
 			addons: [],
 			examples: [],
@@ -335,9 +349,8 @@ export const PRESET_TEMPLATES = [
 			backendFramework: "hono",
 			database: "postgres",
 			orm: "drizzle",
+			dbSetup: "none",
 			auth: "false",
-			turso: "false",
-			prismaPostgres: "false",
 			packageManager: "bun",
 			addons: [],
 			examples: [],
@@ -356,9 +369,8 @@ export const PRESET_TEMPLATES = [
 			backendFramework: "hono",
 			database: "sqlite",
 			orm: "drizzle",
+			dbSetup: "turso",
 			auth: "true",
-			turso: "true",
-			prismaPostgres: "false",
 			packageManager: "bun",
 			addons: ["pwa", "biome", "husky", "tauri"],
 			examples: ["todo", "ai"],
@@ -374,10 +386,9 @@ export type StackState = {
 	runtime: string;
 	backendFramework: string;
 	database: string;
-	orm: string | null;
+	orm: string;
+	dbSetup: string;
 	auth: string;
-	turso: string;
-	prismaPostgres: string;
 	packageManager: string;
 	addons: string[];
 	examples: string[];
@@ -392,9 +403,8 @@ export const DEFAULT_STACK: StackState = {
 	backendFramework: "hono",
 	database: "sqlite",
 	orm: "drizzle",
+	dbSetup: "none",
 	auth: "true",
-	turso: "false",
-	prismaPostgres: "false",
 	packageManager: "bun",
 	addons: [],
 	examples: [],

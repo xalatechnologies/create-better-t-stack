@@ -44,14 +44,18 @@ export async function setupEnvironmentVariables(
 
 	if (options.database !== "none") {
 		if (options.orm === "prisma" && !envContent.includes("DATABASE_URL")) {
-			const databaseUrlLine =
-				options.database === "sqlite"
-					? ""
-					: `\nDATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"`;
+			let databaseUrlLine = "";
+			if (options.database === "sqlite") {
+				databaseUrlLine = "";
+			} else if (options.database === "postgres") {
+				databaseUrlLine = `\nDATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"`;
+			} else if (options.database === "mongodb") {
+				databaseUrlLine = `\nDATABASE_URL="mongodb://localhost:27017/mydatabase"`;
+			}
 			envContent += databaseUrlLine;
 		}
 
-		if (options.database === "sqlite" && !options.turso) {
+		if (options.database === "sqlite" && options.dbSetup !== "turso") {
 			if (!envContent.includes("TURSO_CONNECTION_URL")) {
 				envContent += "\nTURSO_CONNECTION_URL=http://127.0.0.1:8080";
 			}

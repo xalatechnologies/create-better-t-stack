@@ -18,8 +18,7 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 	git: true,
 	packageManager: getUserPkgManager(),
 	noInstall: false,
-	turso: false,
-	prismaPostgres: false,
+	dbSetup: "none",
 	backend: "hono",
 	runtime: "bun",
 };
@@ -61,6 +60,11 @@ export const dependencyVersionMap = {
 
 	"@hono/trpc-server": "^0.3.4",
 	hono: "^4.7.5",
+
+	cors: "^2.8.5",
+	express: "^5.1.0",
+	"@types/express": "^5.0.1",
+	"@types/cors": "^2.8.17",
 
 	ai: "^4.2.8",
 	"@ai-sdk/google": "^1.2.3",

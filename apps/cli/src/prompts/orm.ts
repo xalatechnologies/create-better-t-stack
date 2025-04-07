@@ -1,14 +1,20 @@
-import { cancel, isCancel, select } from "@clack/prompts";
+import { cancel, isCancel, log, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { ProjectOrm } from "../types";
+import type { ProjectDatabase, ProjectOrm } from "../types";
 
 export async function getORMChoice(
 	orm: ProjectOrm | undefined,
 	hasDatabase: boolean,
+	database?: ProjectDatabase,
 ): Promise<ProjectOrm> {
 	if (!hasDatabase) return "none";
 	if (orm !== undefined) return orm;
+
+	if (database === "mongodb") {
+		log.info("Only Prisma is supported with MongoDB.");
+		return "prisma";
+	}
 
 	const response = await select<ProjectOrm>({
 		message: "Select ORM",

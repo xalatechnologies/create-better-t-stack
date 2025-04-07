@@ -54,8 +54,9 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			options.database,
 			options.orm,
 			options.packageManager,
-			options.turso ?? options.database === "sqlite",
-			options.prismaPostgres,
+			options.dbSetup === "turso",
+			options.dbSetup === "prisma-postgres",
+			options.dbSetup === "mongodb-atlas",
 		);
 
 		await setupAuthTemplate(

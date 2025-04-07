@@ -12,6 +12,7 @@ import {
 import { $ } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
+import { commandExists } from "../utils/command-exists";
 
 type TursoConfig = {
 	dbUrl: string;
@@ -26,12 +27,7 @@ type TursoGroup = {
 };
 
 async function isTursoInstalled() {
-	try {
-		const result = await $`turso --version`;
-		return result.exitCode === 0;
-	} catch (error) {
-		return false;
-	}
+	return commandExists("turso");
 }
 
 async function isTursoLoggedIn() {

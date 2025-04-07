@@ -24,10 +24,10 @@ Follow the prompts to configure your project or use the `--yes` flag for default
 - **Monorepo**: Turborepo for optimized build system and workspace management
 - **Frontend**: React, TanStack Router, TanStack Query, Tailwind CSS with shadcn/ui components
 - **Native Apps**: Create React Native apps with Expo for iOS and Android
-- **Backend Frameworks**: Choose between Hono or Elysia
+- **Backend Frameworks**: Choose between Hono, Express, or Elysia
 - **API Layer**: End-to-end type safety with tRPC
 - **Runtime Options**: Choose between Bun or Node.js for your server
-- **Database Options**: SQLite (via Turso), PostgreSQL, or no database
+- **Database Options**: SQLite (via Turso), PostgreSQL, MongoDB, or no database
 - **ORM Selection**: Choose between Drizzle ORM or Prisma
 - **Authentication**: Optional auth setup with Better-Auth
 - **Progressive Web App**: Add PWA support with service workers and installable apps
@@ -45,7 +45,7 @@ Usage: create-better-t-stack [project-directory] [options]
 Options:
   -V, --version                   Output the version number
   -y, --yes                       Use default configuration
-  --database <type>               Database type (none, sqlite, postgres)
+  --database <type>               Database type (none, sqlite, postgres, mongodb)
   --orm <type>                    ORM type (none, drizzle, prisma)
   --auth                          Include authentication
   --no-auth                       Exclude authentication
@@ -58,11 +58,8 @@ Options:
   --package-manager <pm>          Package manager (npm, pnpm, bun)
   --install                       Install dependencies
   --no-install                    Skip installing dependencies
-  --turso                         Set up Turso for SQLite database
-  --no-turso                      Skip Turso setup
-  --prisma-postgres               Set up Prisma Postgres
-  --no-prisma-postgres            Skip Prisma Postgres setup
-  --backend <framework>           Backend framework (hono, elysia)
+  --db-setup <setup>              Database setup (turso, prisma-postgres, mongodb-atlas, none)
+  --backend <framework>           Backend framework (hono, express, elysia)
   --runtime <runtime>             Runtime (bun, node)
   -h, --help                      Display help
 ```
@@ -92,4 +89,9 @@ npx create-better-t-stack my-app --frontend tanstack-router native
 Create a project with examples:
 ```bash
 npx create-better-t-stack my-app --examples todo ai
+```
+
+Create a project with Turso database setup:
+```bash
+npx create-better-t-stack my-app --db-setup turso
 ```

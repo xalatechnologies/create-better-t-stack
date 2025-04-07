@@ -60,14 +60,8 @@ export function displayConfig(config: Partial<ProjectConfig>) {
 		configDisplay.push(`${pc.blue("Skip Install:")} ${config.noInstall}`);
 	}
 
-	if (config.turso !== undefined) {
-		configDisplay.push(`${pc.blue("Turso Setup:")} ${config.turso}`);
-	}
-
-	if (config.prismaPostgres !== undefined) {
-		configDisplay.push(
-			`${pc.blue("Prisma Postgres Setup:")} ${config.prismaPostgres ? "Yes" : "No"}`,
-		);
+	if (config.dbSetup !== undefined) {
+		configDisplay.push(`${pc.blue("Database Setup:")} ${config.dbSetup}`);
 	}
 
 	return configDisplay.join("\n");

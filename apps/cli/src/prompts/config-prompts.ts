@@ -1,9 +1,10 @@
-import { cancel, group } from "@clack/prompts";
+import { cancel, group, log } from "@clack/prompts";
 import pc from "picocolors";
 import type {
 	ProjectAddons,
 	ProjectBackend,
 	ProjectConfig,
+	ProjectDBSetup,
 	ProjectDatabase,
 	ProjectExamples,
 	ProjectFrontend,
@@ -15,16 +16,15 @@ import { getAddonsChoice } from "./addons";
 import { getAuthChoice } from "./auth";
 import { getBackendFrameworkChoice } from "./backend-framework";
 import { getDatabaseChoice } from "./database";
+import { getDBSetupChoice } from "./db-setup";
 import { getExamplesChoice } from "./examples";
 import { getFrontendChoice } from "./frontend-option";
 import { getGitChoice } from "./git";
 import { getNoInstallChoice } from "./install";
 import { getORMChoice } from "./orm";
 import { getPackageManagerChoice } from "./package-manager";
-import { getPrismaSetupChoice } from "./prisma-postgres";
 import { getProjectName } from "./project-name";
 import { getRuntimeChoice } from "./runtime";
-import { getTursoSetupChoice } from "./turso";
 
 type PromptGroupResults = {
 	projectName: string;
@@ -36,8 +36,7 @@ type PromptGroupResults = {
 	git: boolean;
 	packageManager: ProjectPackageManager;
 	noInstall: boolean;
-	turso: boolean;
-	prismaPostgres: boolean;
+	dbSetup: ProjectDBSetup;
 	backend: ProjectBackend;
 	runtime: ProjectRuntime;
 	frontend: ProjectFrontend[];
@@ -46,6 +45,32 @@ type PromptGroupResults = {
 export async function gatherConfig(
 	flags: Partial<ProjectConfig>,
 ): Promise<ProjectConfig> {
+	// Handle specific dbSetup scenarios to adjust database and ORM before prompts
+	if (flags.dbSetup) {
+		if (flags.dbSetup === "turso") {
+			// Force database to be sqlite when turso is selected
+			flags.database = "sqlite";
+
+			// If orm is explicitly set to prisma, warn and switch to drizzle
+			if (flags.orm === "prisma") {
+				log.warn(
+					pc.yellow(
+						"Turso is not compatible with Prisma - switching to Drizzle",
+					),
+				);
+				flags.orm = "drizzle";
+			}
+		} else if (flags.dbSetup === "prisma-postgres") {
+			// Force database and orm for prisma-postgres
+			flags.database = "postgres";
+			flags.orm = "prisma";
+		} else if (flags.dbSetup === "mongodb-atlas") {
+			// Force database for mongodb-atlas
+			flags.database = "mongodb";
+			flags.orm = "prisma"; // MongoDB only works with Prisma
+		}
+	}
+
 	const result = await group<PromptGroupResults>(
 		{
 			projectName: async () => {
@@ -56,21 +81,15 @@ export async function gatherConfig(
 			runtime: () => getRuntimeChoice(flags.runtime),
 			database: () => getDatabaseChoice(flags.database),
 			orm: ({ results }) =>
-				getORMChoice(flags.orm, results.database !== "none"),
+				getORMChoice(flags.orm, results.database !== "none", results.database),
 			auth: ({ results }) =>
 				getAuthChoice(
 					flags.auth,
 					results.database !== "none",
 					results.frontend,
 				),
-			turso: ({ results }) =>
-				results.database === "sqlite" && results.orm !== "prisma"
-					? getTursoSetupChoice(flags.turso)
-					: Promise.resolve(false),
-			prismaPostgres: ({ results }) =>
-				results.database === "postgres" && results.orm === "prisma"
-					? getPrismaSetupChoice(flags.prismaPostgres)
-					: Promise.resolve(false),
+			dbSetup: ({ results }) =>
+				getDBSetupChoice(results.database ?? "none", flags.dbSetup),
 			addons: ({ results }) => getAddonsChoice(flags.addons, results.frontend),
 			examples: ({ results }) =>
 				getExamplesChoice(
@@ -102,8 +121,7 @@ export async function gatherConfig(
 		git: result.git,
 		packageManager: result.packageManager,
 		noInstall: result.noInstall,
-		turso: result.turso,
-		prismaPostgres: result.prismaPostgres,
+		dbSetup: result.dbSetup,
 		backend: result.backend,
 		runtime: result.runtime,
 	};

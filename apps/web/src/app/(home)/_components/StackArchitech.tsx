@@ -74,32 +74,45 @@ const StackArchitect = () => {
 	}, []);
 
 	useEffect(() => {
-		if (stack.database === "none" && stack.orm !== "none") {
-			setStack((prev) => ({ ...prev, orm: "none" }));
-		}
-
-		if (stack.database !== "postgres" || stack.orm !== "prisma") {
-			if (stack.prismaPostgres === "true") {
-				setStack((prev) => ({ ...prev, prismaPostgres: "false" }));
+		if (stack.database === "none") {
+			if (stack.orm !== "none") {
+				setStack((prev) => ({ ...prev, orm: "none" }));
+			}
+			if (stack.auth === "true") {
+				setStack((prev) => ({ ...prev, auth: "false" }));
+			}
+			if (stack.dbSetup !== "none") {
+				setStack((prev) => ({ ...prev, dbSetup: "none" }));
 			}
 		}
 
-		if (stack.database !== "sqlite" || stack.orm === "prisma") {
-			if (stack.turso === "true") {
-				setStack((prev) => ({ ...prev, turso: "false" }));
-			}
+		if (stack.database === "mongodb" && stack.orm === "drizzle") {
+			setStack((prev) => ({ ...prev, orm: "prisma" }));
 		}
 
-		if (stack.database === "none" && stack.auth === "true") {
-			setStack((prev) => ({ ...prev, auth: "false" }));
+		if (stack.dbSetup === "turso") {
+			if (stack.database !== "sqlite") {
+				setStack((prev) => ({ ...prev, database: "sqlite" }));
+			}
+			if (stack.orm === "prisma") {
+				setStack((prev) => ({ ...prev, orm: "drizzle" }));
+			}
+		} else if (stack.dbSetup === "prisma-postgres") {
+			if (stack.database !== "postgres") {
+				setStack((prev) => ({ ...prev, database: "postgres" }));
+			}
+			if (stack.orm !== "prisma") {
+				setStack((prev) => ({ ...prev, orm: "prisma" }));
+			}
+		} else if (stack.dbSetup === "mongodb-atlas") {
+			if (stack.database !== "mongodb") {
+				setStack((prev) => ({ ...prev, database: "mongodb" }));
+			}
+			if (stack.orm !== "prisma") {
+				setStack((prev) => ({ ...prev, orm: "prisma" }));
+			}
 		}
-	}, [
-		stack.database,
-		stack.orm,
-		stack.prismaPostgres,
-		stack.turso,
-		stack.auth,
-	]);
+	}, [stack.database, stack.orm, stack.dbSetup, stack.auth]);
 
 	useEffect(() => {
 		const cmd = generateCommand(stack);
@@ -113,6 +126,33 @@ const StackArchitect = () => {
 
 		notes.frontend = [];
 
+		notes.dbSetup = [];
+		if (stack.database === "none") {
+			notes.dbSetup.push("Database setup requires a database.");
+		} else {
+			if (stack.dbSetup === "turso") {
+				if (stack.database !== "sqlite") {
+					notes.dbSetup.push("Turso setup requires SQLite database.");
+				}
+				if (stack.orm === "prisma") {
+					notes.dbSetup.push("Turso is not compatible with Prisma ORM.");
+				}
+			} else if (stack.dbSetup === "prisma-postgres") {
+				if (stack.database !== "postgres") {
+					notes.dbSetup.push(
+						"Prisma PostgreSQL setup requires PostgreSQL database.",
+					);
+				}
+				if (stack.orm !== "prisma") {
+					notes.dbSetup.push("Prisma PostgreSQL setup requires Prisma ORM.");
+				}
+			} else if (stack.dbSetup === "mongodb-atlas") {
+				if (stack.database !== "mongodb") {
+					notes.dbSetup.push("MongoDB Atlas setup requires MongoDB database.");
+				}
+			}
+		}
+
 		notes.addons = [];
 		if (!hasWebFrontend) {
 			notes.addons.push("PWA and Tauri are only available with React Web.");
@@ -125,28 +165,13 @@ const StackArchitect = () => {
 			notes.orm.push(
 				"ORM options are only available when a database is selected.",
 			);
+		} else if (stack.database === "mongodb" && stack.orm === "drizzle") {
+			notes.orm.push("MongoDB is only available with Prisma ORM.");
 		}
 
 		notes.auth = [];
 		if (stack.database === "none") {
 			notes.auth.push("Authentication requires a database.");
-		}
-
-		notes.turso = [];
-		if (stack.database !== "sqlite") {
-			notes.turso.push(
-				"Turso integration is only available with SQLite database.",
-			);
-		}
-		if (stack.orm === "prisma") {
-			notes.turso.push("Turso is not compatible with Prisma ORM.");
-		}
-
-		notes.prismaPostgres = [];
-		if (stack.database !== "postgres" || stack.orm !== "prisma") {
-			notes.prismaPostgres.push(
-				"Prisma PostgreSQL setup requires PostgreSQL database with Prisma ORM.",
-			);
 		}
 
 		notes.examples = [];
@@ -198,12 +223,8 @@ const StackArchitect = () => {
 			flags.push("--no-auth");
 		}
 
-		if (stackState.turso === "true") {
-			flags.push("--turso");
-		}
-
-		if (stackState.prismaPostgres === "true") {
-			flags.push("--prisma-postgres");
+		if (stackState.dbSetup !== "none") {
+			flags.push(`--db-setup ${stackState.dbSetup}`);
 		}
 
 		if (stackState.backendFramework !== "hono") {
@@ -263,7 +284,6 @@ const StackArchitect = () => {
 						if (currentSelection.length === 1) {
 							return prev;
 						}
-
 						return {
 							...prev,
 							frontend: currentSelection.filter((id) => id !== techId),
@@ -296,6 +316,10 @@ const StackArchitect = () => {
 						prev.frontend.includes("react-router") ||
 						prev.frontend.includes("tanstack-start");
 
+					const hasPWACompatibleFrontend =
+						prev.frontend.includes("tanstack-router") ||
+						prev.frontend.includes("react-router");
+
 					if (index >= 0) {
 						currentArray.splice(index, 1);
 					} else {
@@ -318,8 +342,7 @@ const StackArchitect = () => {
 						if (
 							category === "addons" &&
 							(techId === "pwa" || techId === "tauri") &&
-							!prev.frontend.includes("tanstack-router") &&
-							!prev.frontend.includes("react-router")
+							!hasPWACompatibleFrontend
 						) {
 							return prev;
 						}
@@ -342,45 +365,40 @@ const StackArchitect = () => {
 				}
 
 				if (category === "database") {
+					let updatedState = { ...prev, database: techId };
+
 					if (techId === "none") {
-						return {
-							...prev,
-							database: techId,
+						updatedState = {
+							...updatedState,
 							orm: "none",
-							turso: "false",
-							prismaPostgres: "false",
+							dbSetup: "none",
 							auth: "false",
 						};
-					}
+					} else if (prev.database === "none") {
+						updatedState.orm = techId === "mongodb" ? "prisma" : "drizzle";
+						updatedState.dbSetup = "none";
 
-					if (prev.database === "none") {
-						return {
-							...prev,
-							database: techId,
-							orm: "drizzle",
-							turso: techId === "sqlite" ? prev.turso : "false",
-							prismaPostgres:
-								techId === "postgres" && prev.orm === "prisma"
-									? prev.prismaPostgres
-									: "false",
-							auth:
-								hasWebFrontend(prev.frontend) ||
-								prev.frontend.includes("native")
-									? "true"
-									: "false",
-						};
-					}
-
-					const updatedState = {
-						...prev,
-						database: techId,
-					};
-
-					if (techId === "sqlite") {
-						updatedState.prismaPostgres = "false";
-					} else if (techId === "postgres" && prev.orm === "prisma") {
+						const hasCompatibleFrontend =
+							prev.frontend.length > 0 && !prev.frontend.includes("none");
+						if (hasCompatibleFrontend) {
+							updatedState.auth = "true";
+						}
 					} else {
-						updatedState.turso = "false";
+						if (techId === "mongodb" && updatedState.orm === "drizzle") {
+							updatedState.orm = "prisma";
+						}
+
+						if (updatedState.dbSetup !== "none") {
+							if (
+								(updatedState.dbSetup === "turso" && techId !== "sqlite") ||
+								(updatedState.dbSetup === "prisma-postgres" &&
+									techId !== "postgres") ||
+								(updatedState.dbSetup === "mongodb-atlas" &&
+									techId !== "mongodb")
+							) {
+								updatedState.dbSetup = "none";
+							}
+						}
 					}
 
 					return updatedState;
@@ -396,31 +414,41 @@ const StackArchitect = () => {
 						orm: techId,
 					};
 
-					if (techId === "prisma") {
-						updatedState.turso = "false";
-						if (prev.database === "postgres") {
-						} else {
-							updatedState.prismaPostgres = "false";
+					if (updatedState.dbSetup !== "none") {
+						if (
+							(updatedState.dbSetup === "turso" && techId === "prisma") ||
+							(updatedState.dbSetup === "prisma-postgres" &&
+								techId !== "prisma")
+						) {
+							updatedState.dbSetup = "none";
 						}
-					} else if (techId === "drizzle" || techId === "none") {
-						updatedState.prismaPostgres = "false";
 					}
 
 					return updatedState;
 				}
 
-				if (
-					category === "turso" &&
-					(prev.database !== "sqlite" || prev.orm === "prisma")
-				) {
-					return prev;
-				}
+				if (category === "dbSetup") {
+					if (prev.database === "none" && techId !== "none") {
+						return prev;
+					}
 
-				if (
-					category === "prismaPostgres" &&
-					(prev.database !== "postgres" || prev.orm !== "prisma")
-				) {
-					return prev;
+					const updatedState = {
+						...prev,
+						dbSetup: techId,
+					};
+
+					if (techId === "turso") {
+						updatedState.database = "sqlite";
+						updatedState.orm = "drizzle";
+					} else if (techId === "prisma-postgres") {
+						updatedState.database = "postgres";
+						updatedState.orm = "prisma";
+					} else if (techId === "mongodb-atlas") {
+						updatedState.database = "mongodb";
+						updatedState.orm = "prisma";
+					}
+
+					return updatedState;
 				}
 
 				if (
@@ -439,15 +467,6 @@ const StackArchitect = () => {
 		},
 		[],
 	);
-
-	const hasWebFrontend = useCallback((frontendOptions: string[]) => {
-		return (
-			frontendOptions.includes("tanstack-router") ||
-			frontendOptions.includes("react-router") ||
-			frontendOptions.includes("tanstack-start") ||
-			frontendOptions.includes("native")
-		);
-	}, []);
 
 	const copyToClipboard = useCallback(() => {
 		navigator.clipboard.writeText(command);
@@ -698,12 +717,16 @@ const StackArchitect = () => {
 
 									const isDisabled =
 										(activeTab === "orm" && stack.database === "none") ||
-										(activeTab === "turso" &&
-											(stack.database !== "sqlite" ||
-												stack.orm === "prisma")) ||
-										(activeTab === "prismaPostgres" &&
-											(stack.database !== "postgres" ||
-												stack.orm !== "prisma")) ||
+										(activeTab === "dbSetup" &&
+											((tech.id !== "none" && stack.database === "none") ||
+												(tech.id === "turso" &&
+													(stack.database !== "sqlite" ||
+														stack.orm === "prisma")) ||
+												(tech.id === "prisma-postgres" &&
+													(stack.database !== "postgres" ||
+														stack.orm !== "prisma")) ||
+												(tech.id === "mongodb-atlas" &&
+													stack.database !== "mongodb"))) ||
 										(activeTab === "examples" &&
 											(((tech.id === "todo" || tech.id === "ai") &&
 												!hasWebFrontendSelected) ||
@@ -866,7 +889,7 @@ const StackArchitect = () => {
 									}
 								</span>
 
-								{stack.orm && stack.database !== "none" && (
+								{stack.orm !== "none" && stack.database !== "none" && (
 									<span className="inline-flex items-center rounded border border-cyan-300 bg-cyan-100 px-1.5 py-0.5 text-cyan-800 text-xs dark:border-cyan-700/30 dark:bg-cyan-900/30 dark:text-cyan-300">
 										{TECH_OPTIONS.orm.find((t) => t.id === stack.orm)?.icon}{" "}
 										{TECH_OPTIONS.orm.find((t) => t.id === stack.orm)?.name}
@@ -882,37 +905,18 @@ const StackArchitect = () => {
 										</span>
 									)}
 
-								{stack.turso === "true" &&
-									stack.database === "sqlite" &&
-									stack.orm !== "prisma" && (
-										<span className="inline-flex items-center rounded border border-pink-300 bg-pink-100 px-1.5 py-0.5 text-pink-800 text-xs dark:border-pink-700/30 dark:bg-pink-900/30 dark:text-pink-300">
-											{
-												TECH_OPTIONS.turso.find((t) => t.id === stack.turso)
-													?.icon
-											}{" "}
-											{
-												TECH_OPTIONS.turso.find((t) => t.id === stack.turso)
-													?.name
-											}
-										</span>
-									)}
-
-								{stack.prismaPostgres === "true" &&
-									stack.database === "postgres" &&
-									stack.orm === "prisma" && (
-										<span className="inline-flex items-center rounded border border-indigo-300 bg-indigo-100 px-1.5 py-0.5 text-indigo-800 text-xs dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300">
-											{
-												TECH_OPTIONS.prismaPostgres.find(
-													(t) => t.id === stack.prismaPostgres,
-												)?.icon
-											}{" "}
-											{
-												TECH_OPTIONS.prismaPostgres.find(
-													(t) => t.id === stack.prismaPostgres,
-												)?.name
-											}
-										</span>
-									)}
+								{stack.dbSetup !== "none" && (
+									<span className="inline-flex items-center rounded border border-pink-300 bg-pink-100 px-1.5 py-0.5 text-pink-800 text-xs dark:border-pink-700/30 dark:bg-pink-900/30 dark:text-pink-300">
+										{
+											TECH_OPTIONS.dbSetup.find((t) => t.id === stack.dbSetup)
+												?.icon
+										}{" "}
+										{
+											TECH_OPTIONS.dbSetup.find((t) => t.id === stack.dbSetup)
+												?.name
+										}
+									</span>
+								)}
 
 								{stack.addons.map((addonId) => {
 									const addon = TECH_OPTIONS.addons.find(
