@@ -22,6 +22,7 @@ export async function getFrontendChoice(
 				hint: "Create a React Native/Expo app",
 			},
 		],
+		required: false,
 		initialValues: DEFAULT_CONFIG.frontend.some(
 			(f) =>
 				f === "tanstack-router" ||

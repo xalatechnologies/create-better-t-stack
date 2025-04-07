@@ -29,6 +29,10 @@ export async function setupAuth(
 	const nativeDir = path.join(projectDir, "apps/native");
 
 	try {
+		addPackageDependency({
+			dependencies: ["better-auth"],
+			projectDir: serverDir,
+		});
 		if (
 			frontends.includes("react-router") ||
 			frontends.includes("tanstack-router") ||
@@ -36,21 +40,16 @@ export async function setupAuth(
 		) {
 			addPackageDependency({
 				dependencies: ["better-auth"],
-				projectDir: serverDir,
-			});
-			addPackageDependency({
-				dependencies: ["better-auth"],
 				projectDir: clientDir,
 			});
 		}
-
 		if (frontends.includes("native")) {
 			addPackageDependency({
 				dependencies: ["better-auth", "@better-auth/expo"],
 				projectDir: nativeDir,
 			});
 			addPackageDependency({
-				dependencies: ["better-auth", "@better-auth/expo"],
+				dependencies: ["@better-auth/expo"],
 				projectDir: serverDir,
 			});
 		}
