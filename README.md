@@ -60,3 +60,13 @@ bun dev:web
 ## Want to contribute?
 
 Just fork the repository and submit a pull request!
+
+## Star History
+
+<a href="https://www.star-history.com/#AmanVarshney01/create-better-t-stack&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=AmanVarshney01/create-better-t-stack&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=AmanVarshney01/create-better-t-stack&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=AmanVarshney01/create-better-t-stack&type=Date" />
+ </picture>
+</a>
