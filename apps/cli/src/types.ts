@@ -1,5 +1,5 @@
 export type ProjectDatabase = "sqlite" | "postgres" | "mongodb" | "none";
-export type ProjectOrm = "drizzle" | "prisma";
+export type ProjectOrm = "drizzle" | "prisma" | "none";
 export type ProjectPackageManager = "npm" | "pnpm" | "bun";
 export type ProjectAddons = "pwa" | "biome" | "tauri" | "husky";
 export type ProjectBackend = "hono" | "elysia" | "express";
