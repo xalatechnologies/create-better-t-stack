@@ -7,7 +7,15 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": [".next", "dist", ".source", "out", "template", ".turbo"]
+		"ignore": [
+			".next",
+			"dist",
+			".source",
+			"out",
+			"template",
+			".turbo",
+			"package.json"
+		]
 	},
 	"formatter": {
 		"enabled": true,
