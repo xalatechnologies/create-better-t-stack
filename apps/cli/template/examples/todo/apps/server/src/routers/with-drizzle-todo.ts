@@ -12,12 +12,9 @@ export const todoRouter = router({
   create: publicProcedure
     .input(z.object({ text: z.string().min(1) }))
     .mutation(async ({ input }) => {
-      return await db
-        .insert(todo)
-        .values({
-          text: input.text,
-        })
-        .returning();
+      return await db.insert(todo).values({
+        text: input.text,
+      });
     }),
 
   toggle: publicProcedure
@@ -26,16 +23,12 @@ export const todoRouter = router({
       return await db
         .update(todo)
         .set({ completed: input.completed })
-        .where(eq(todo.id, input.id))
-        .returning();
+        .where(eq(todo.id, input.id));
     }),
 
   delete: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
-      return await db
-        .delete(todo)
-        .where(eq(todo.id, input.id))
-        .returning();
+      return await db.delete(todo).where(eq(todo.id, input.id));
     }),
 });

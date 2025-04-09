@@ -1,12 +1,17 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
-import type { ProjectDBSetup } from "../types";
+import type { ProjectDBSetup, ProjectOrm } from "../types";
 
 export async function getDBSetupChoice(
 	databaseType: string,
 	dbSetup: ProjectDBSetup | undefined,
+	orm?: ProjectOrm,
 ): Promise<ProjectDBSetup> {
 	if (dbSetup !== undefined) return dbSetup as ProjectDBSetup;
+
+	if (databaseType === "sqlite" && orm === "prisma") {
+		return "none";
+	}
 
 	let options: Array<{ value: ProjectDBSetup; label: string; hint: string }> =
 		[];
@@ -16,7 +21,7 @@ export async function getDBSetupChoice(
 			{
 				value: "turso" as const,
 				label: "Turso",
-				hint: "SQLite for Production. Powered by libSQL.",
+				hint: "SQLite for Production. Powered by libSQL",
 			},
 			{ value: "none" as const, label: "None", hint: "Manual setup" },
 		];

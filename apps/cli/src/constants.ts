@@ -33,6 +33,8 @@ export const dependencyVersionMap = {
 	"@libsql/client": "^0.14.0",
 	postgres: "^3.4.5",
 
+	mysql2: "^3.14.0",
+
 	"@prisma/client": "^6.5.0",
 	prisma: "^6.5.0",
 

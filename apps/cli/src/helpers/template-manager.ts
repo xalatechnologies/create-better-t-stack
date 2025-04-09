@@ -366,14 +366,15 @@ async function findGitignoreFiles(dir: string): Promise<string[]> {
 
 function getOrmTemplateDir(orm: ProjectOrm, database: ProjectDatabase): string {
 	if (orm === "drizzle") {
-		return database === "sqlite"
-			? "template/with-drizzle-sqlite"
-			: "template/with-drizzle-postgres";
+		if (database === "sqlite") return "template/with-drizzle-sqlite";
+		if (database === "postgres") return "template/with-drizzle-postgres";
+		if (database === "mysql") return "template/with-drizzle-mysql";
 	}
 
 	if (orm === "prisma") {
 		if (database === "sqlite") return "template/with-prisma-sqlite";
 		if (database === "postgres") return "template/with-prisma-postgres";
+		if (database === "mysql") return "template/with-prisma-mysql";
 		if (database === "mongodb") return "template/with-prisma-mongodb";
 	}
 
@@ -382,14 +383,15 @@ function getOrmTemplateDir(orm: ProjectOrm, database: ProjectDatabase): string {
 
 function getAuthLibDir(orm: ProjectOrm, database: ProjectDatabase): string {
 	if (orm === "drizzle") {
-		return database === "sqlite"
-			? "with-drizzle-sqlite-lib"
-			: "with-drizzle-postgres-lib";
+		if (database === "sqlite") return "with-drizzle-sqlite-lib";
+		if (database === "postgres") return "with-drizzle-postgres-lib";
+		if (database === "mysql") return "with-drizzle-mysql-lib";
 	}
 
 	if (orm === "prisma") {
 		if (database === "sqlite") return "with-prisma-sqlite-lib";
 		if (database === "postgres") return "with-prisma-postgres-lib";
+		if (database === "mysql") return "with-prisma-mysql-lib";
 		if (database === "mongodb") return "with-prisma-mongodb-lib";
 	}
 

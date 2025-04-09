@@ -45,27 +45,6 @@ type PromptGroupResults = {
 export async function gatherConfig(
 	flags: Partial<ProjectConfig>,
 ): Promise<ProjectConfig> {
-	if (flags.dbSetup) {
-		if (flags.dbSetup === "turso") {
-			flags.database = "sqlite";
-
-			if (flags.orm === "prisma") {
-				log.warn(
-					pc.yellow(
-						"Turso is not compatible with Prisma - switching to Drizzle",
-					),
-				);
-				flags.orm = "drizzle";
-			}
-		} else if (flags.dbSetup === "prisma-postgres") {
-			flags.database = "postgres";
-			flags.orm = "prisma";
-		} else if (flags.dbSetup === "mongodb-atlas") {
-			flags.database = "mongodb";
-			flags.orm = "prisma";
-		}
-	}
-
 	const result = await group<PromptGroupResults>(
 		{
 			projectName: async () => {
@@ -84,7 +63,11 @@ export async function gatherConfig(
 					results.frontend,
 				),
 			dbSetup: ({ results }) =>
-				getDBSetupChoice(results.database ?? "none", flags.dbSetup),
+				getDBSetupChoice(
+					results.database ?? "none",
+					flags.dbSetup,
+					results.orm,
+				),
 			addons: ({ results }) => getAddonsChoice(flags.addons, results.frontend),
 			examples: ({ results }) =>
 				getExamplesChoice(

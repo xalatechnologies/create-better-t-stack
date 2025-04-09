@@ -40,7 +40,7 @@ async function main() {
 		.option("-y, --yes", "Use default configuration")
 		.option(
 			"--database <type>",
-			"Database type (none, sqlite, postgres, mongodb)",
+			"Database type (none, sqlite, postgres, mysql, mongodb)",
 		)
 		.option("--orm <type>", "ORM type (drizzle, prisma)")
 		.option("--auth", "Include authentication")
@@ -80,9 +80,7 @@ async function main() {
 		const options = program.opts() as CLIOptions;
 		const projectDirectory = program.args[0];
 
-		validateOptions(options);
-
-		const flagConfig = processFlags(options, projectDirectory);
+		const flagConfig = processAndValidateFlags(options, projectDirectory);
 
 		if (!options.yes && Object.keys(flagConfig).length > 0) {
 			log.info(pc.yellow("Using these pre-selected options:"));
@@ -129,41 +127,39 @@ async function main() {
 	}
 }
 
-function validateOptions(options: CLIOptions): void {
-	if (
-		options.database &&
-		!["none", "sqlite", "postgres", "mongodb"].includes(options.database)
-	) {
-		cancel(
-			pc.red(
-				`Invalid database type: ${options.database}. Must be none, sqlite, postgres, or mongodb.`,
-			),
-		);
-		process.exit(1);
+function processAndValidateFlags(
+	options: CLIOptions,
+	projectDirectory?: string,
+): Partial<ProjectConfig> {
+	const config: Partial<ProjectConfig> = {};
+
+	if (options.database) {
+		if (
+			!["none", "sqlite", "postgres", "mysql", "mongodb"].includes(
+				options.database,
+			)
+		) {
+			cancel(
+				pc.red(
+					`Invalid database type: ${options.database}. Must be none, sqlite, postgres, mysql, or mongodb.`,
+				),
+			);
+			process.exit(1);
+		}
+		config.database = options.database as ProjectDatabase;
 	}
 
-	if (options.orm && !["drizzle", "prisma"].includes(options.orm)) {
-		cancel(
-			pc.red(`Invalid ORM type: ${options.orm}. Must be drizzle or prisma.`),
-		);
-		process.exit(1);
+	if (options.orm) {
+		if (!["drizzle", "prisma"].includes(options.orm)) {
+			cancel(
+				pc.red(`Invalid ORM type: ${options.orm}. Must be drizzle or prisma.`),
+			);
+			process.exit(1);
+		}
+		config.orm = options.orm as ProjectOrm;
 	}
 
-	if (
-		options.dbSetup &&
-		!["turso", "prisma-postgres", "mongodb-atlas", "none"].includes(
-			options.dbSetup,
-		)
-	) {
-		cancel(
-			pc.red(
-				`Invalid database setup: ${options.dbSetup}. Must be turso, prisma-postgres, mongodb-atlas, or none.`,
-			),
-		);
-		process.exit(1);
-	}
-
-	if (options.database === "mongodb" && options.orm === "drizzle") {
+	if (config.database === "mongodb" && config.orm === "drizzle") {
 		cancel(
 			pc.red(
 				"MongoDB is only available with Prisma. Cannot use --database mongodb with --orm drizzle",
@@ -172,7 +168,81 @@ function validateOptions(options: CLIOptions): void {
 		process.exit(1);
 	}
 
-	if (options.database === "none") {
+	if (options.dbSetup) {
+		if (
+			!["turso", "prisma-postgres", "mongodb-atlas", "none"].includes(
+				options.dbSetup,
+			)
+		) {
+			cancel(
+				pc.red(
+					`Invalid database setup: ${options.dbSetup}. Must be turso, prisma-postgres, mongodb-atlas, or none.`,
+				),
+			);
+			process.exit(1);
+		}
+
+		if (options.dbSetup !== "none") {
+			config.dbSetup = options.dbSetup as ProjectDBSetup;
+
+			if (options.dbSetup === "turso") {
+				if (options.database && options.database !== "sqlite") {
+					cancel(
+						pc.red(
+							`Turso setup requires a SQLite database. Cannot use --db-setup turso with --database ${options.database}`,
+						),
+					);
+					process.exit(1);
+				}
+				config.database = "sqlite";
+
+				if (options.orm === "prisma") {
+					cancel(
+						pc.red(
+							"Turso setup is not compatible with Prisma. Cannot use --db-setup turso with --orm prisma",
+						),
+					);
+					process.exit(1);
+				}
+				config.orm = "drizzle";
+			} else if (options.dbSetup === "prisma-postgres") {
+				if (options.database && options.database !== "postgres") {
+					cancel(
+						pc.red(
+							"Prisma PostgreSQL setup requires PostgreSQL database. Cannot use --db-setup prisma-postgres with a different database type.",
+						),
+					);
+					process.exit(1);
+				}
+				config.database = "postgres";
+
+				if (options.orm && options.orm !== "prisma") {
+					cancel(
+						pc.red(
+							"Prisma PostgreSQL setup requires Prisma ORM. Cannot use --db-setup prisma-postgres with a different ORM.",
+						),
+					);
+					process.exit(1);
+				}
+				config.orm = "prisma";
+			} else if (options.dbSetup === "mongodb-atlas") {
+				if (options.database && options.database !== "mongodb") {
+					cancel(
+						pc.red(
+							"MongoDB Atlas setup requires MongoDB database. Cannot use --db-setup mongodb-atlas with a different database type.",
+						),
+					);
+					process.exit(1);
+				}
+				config.database = "mongodb";
+				config.orm = "prisma";
+			}
+		} else {
+			config.dbSetup = "none";
+		}
+	}
+
+	if (config.database === "none") {
 		if (options.auth === true) {
 			cancel(
 				pc.red(
@@ -201,128 +271,30 @@ function validateOptions(options: CLIOptions): void {
 		}
 	}
 
-	if (options.dbSetup === "turso") {
-		if (options.database && options.database !== "sqlite") {
-			cancel(
-				pc.red(
-					`Turso setup requires a SQLite database. Cannot use --db-setup turso with --database ${options.database}`,
-				),
-			);
-			process.exit(1);
-		}
-
-		if (options.orm === "prisma") {
-			cancel(
-				pc.red(
-					"Turso setup is not compatible with Prisma. Cannot use --db-setup turso with --orm prisma",
-				),
-			);
-			process.exit(1);
-		}
+	if ("auth" in options) {
+		config.auth = options.auth;
 	}
 
-	if (options.dbSetup === "prisma-postgres") {
-		if (options.database && options.database !== "postgres") {
+	if (options.backend) {
+		if (!["hono", "elysia", "express"].includes(options.backend)) {
 			cancel(
 				pc.red(
-					"Prisma PostgreSQL setup requires PostgreSQL database. Cannot use --db-setup prisma-postgres with a different database type.",
+					`Invalid backend framework: ${options.backend}. Must be hono, elysia, or express.`,
 				),
 			);
 			process.exit(1);
 		}
-
-		if (options.orm && options.orm !== "prisma") {
-			cancel(
-				pc.red(
-					"Prisma PostgreSQL setup requires Prisma ORM. Cannot use --db-setup prisma-postgres with a different ORM.",
-				),
-			);
-			process.exit(1);
-		}
+		config.backend = options.backend as ProjectBackend;
 	}
 
-	if (options.dbSetup === "mongodb-atlas") {
-		if (options.database && options.database !== "mongodb") {
+	if (options.runtime) {
+		if (!["bun", "node"].includes(options.runtime)) {
 			cancel(
-				pc.red(
-					"MongoDB Atlas setup requires MongoDB database. Cannot use --db-setup mongodb-atlas with a different database type.",
-				),
+				pc.red(`Invalid runtime: ${options.runtime}. Must be bun or node.`),
 			);
 			process.exit(1);
 		}
-	}
-
-	if (
-		options.packageManager &&
-		!["npm", "pnpm", "bun"].includes(options.packageManager)
-	) {
-		cancel(
-			pc.red(
-				`Invalid package manager: ${options.packageManager}. Must be npm, pnpm, or bun.`,
-			),
-		);
-		process.exit(1);
-	}
-
-	if (
-		options.backend &&
-		!["hono", "elysia", "express"].includes(options.backend)
-	) {
-		cancel(
-			pc.red(
-				`Invalid backend framework: ${options.backend}. Must be hono, elysia, or express.`,
-			),
-		);
-		process.exit(1);
-	}
-
-	if (options.runtime && !["bun", "node"].includes(options.runtime)) {
-		cancel(pc.red(`Invalid runtime: ${options.runtime}. Must be bun or node.`));
-		process.exit(1);
-	}
-
-	if (
-		options.examples &&
-		Array.isArray(options.examples) &&
-		options.examples.length > 0
-	) {
-		const validExamples = ["todo", "ai"];
-		const invalidExamples = options.examples.filter(
-			(example: string) => !validExamples.includes(example),
-		);
-
-		if (invalidExamples.length > 0) {
-			cancel(
-				pc.red(
-					`Invalid example(s): ${invalidExamples.join(", ")}. Valid options are: ${validExamples.join(", ")}.`,
-				),
-			);
-			process.exit(1);
-		}
-
-		if (options.examples.includes("ai") && options.backend === "elysia") {
-			cancel(
-				pc.red(
-					"AI example is only compatible with Hono backend. Cannot use --examples ai with --backend elysia",
-				),
-			);
-			process.exit(1);
-		}
-
-		if (
-			options.frontend &&
-			!options.frontend.some((f) =>
-				["tanstack-router", "react-router", "tanstack-start"].includes(f),
-			) &&
-			!options.frontend.includes("none")
-		) {
-			cancel(
-				pc.red(
-					"Examples require a web frontend. Cannot use --examples with --frontend native only",
-				),
-			);
-			process.exit(1);
-		}
+		config.runtime = options.runtime as ProjectRuntime;
 	}
 
 	if (options.frontend && options.frontend.length > 0) {
@@ -346,33 +318,42 @@ function validateOptions(options: CLIOptions): void {
 			process.exit(1);
 		}
 
-		const webFrontends = options.frontend.filter(
-			(f) =>
-				f === "tanstack-router" ||
-				f === "react-router" ||
-				f === "tanstack-start",
-		);
-
-		if (webFrontends.length > 1) {
-			cancel(
-				pc.red(
-					"Cannot select multiple web frameworks. Choose only one of: tanstack-router, tanstack-start, react-router",
-				),
+		if (options.frontend.includes("none")) {
+			if (options.frontend.length > 1) {
+				cancel(pc.red(`Cannot combine 'none' with other frontend options.`));
+				process.exit(1);
+			}
+			config.frontend = [];
+		} else {
+			const validOptions = options.frontend.filter(
+				(f): f is ProjectFrontend =>
+					f === "tanstack-router" ||
+					f === "react-router" ||
+					f === "tanstack-start" ||
+					f === "native",
 			);
-			process.exit(1);
-		}
 
-		if (options.frontend.includes("none") && options.frontend.length > 1) {
-			cancel(pc.red(`Cannot combine 'none' with other frontend options.`));
-			process.exit(1);
+			const webFrontends = validOptions.filter(
+				(f) =>
+					f === "tanstack-router" ||
+					f === "react-router" ||
+					f === "tanstack-start",
+			);
+
+			if (webFrontends.length > 1) {
+				cancel(
+					pc.red(
+						"Cannot select multiple web frameworks. Choose only one of: tanstack-router, tanstack-start, react-router",
+					),
+				);
+				process.exit(1);
+			}
+
+			config.frontend = validOptions;
 		}
 	}
 
-	if (
-		options.addons &&
-		Array.isArray(options.addons) &&
-		options.addons.length > 0
-	) {
+	if (options.addons && options.addons.length > 0) {
 		const validAddons = ["pwa", "tauri", "biome", "husky", "none"];
 		const invalidAddons = options.addons.filter(
 			(addon: string) => !validAddons.includes(addon),
@@ -387,108 +368,14 @@ function validateOptions(options: CLIOptions): void {
 			process.exit(1);
 		}
 
-		if (options.addons.includes("none") && options.addons.length > 1) {
-			cancel(pc.red(`Cannot combine 'none' with other addons.`));
-			process.exit(1);
-		}
-
-		const webSpecificAddons = ["pwa", "tauri"];
-		const hasWebSpecificAddons = options.addons.some((addon) =>
-			webSpecificAddons.includes(addon),
-		);
-
-		if (
-			hasWebSpecificAddons &&
-			options.frontend &&
-			!options.frontend.some((f) =>
-				["tanstack-router", "react-router"].includes(f),
-			)
-		) {
-			cancel(
-				pc.red(
-					`PWA and Tauri addons require tanstack-router or react-router. Cannot use --addons ${options.addons
-						.filter((a) => webSpecificAddons.includes(a))
-						.join(", ")} with incompatible frontend options.`,
-				),
-			);
-			process.exit(1);
-		}
-	}
-}
-
-function processFlags(
-	options: CLIOptions,
-	projectDirectory?: string,
-): Partial<ProjectConfig> {
-	let frontend: ProjectFrontend[] | undefined = undefined;
-
-	if (options.frontend) {
-		if (options.frontend.includes("none")) {
-			frontend = [];
-		} else {
-			frontend = options.frontend.filter(
-				(f): f is ProjectFrontend =>
-					f === "tanstack-router" ||
-					f === "react-router" ||
-					f === "tanstack-start" ||
-					f === "native",
-			);
-
-			const webFrontends = frontend.filter(
-				(f) =>
-					f === "tanstack-router" ||
-					f === "react-router" ||
-					f === "tanstack-start",
-			);
-
-			if (webFrontends.length > 1) {
-				const firstWebFrontend = webFrontends[0];
-				frontend = frontend.filter(
-					(f) => f === "native" || f === firstWebFrontend,
-				);
-			}
-		}
-	}
-
-	let examples: ProjectExamples[] | undefined;
-	if ("examples" in options) {
-		if (options.examples === false) {
-			examples = [];
-		} else if (Array.isArray(options.examples)) {
-			examples = options.examples.filter(
-				(ex): ex is ProjectExamples => ex === "todo" || ex === "ai",
-			);
-
-			if (
-				frontend &&
-				frontend.length > 0 &&
-				!frontend.some((f) =>
-					["tanstack-router", "react-router", "tanstack-start"].includes(f),
-				)
-			) {
-				examples = [];
-				log.warn(
-					pc.yellow("Examples require web frontend - ignoring examples flag"),
-				);
-			}
-
-			if (examples.includes("ai") && options.backend === "elysia") {
-				examples = examples.filter((ex) => ex !== "ai");
-				log.warn(
-					pc.yellow(
-						"AI example is not compatible with Elysia - removing AI example",
-					),
-				);
-			}
-		}
-	}
-
-	let addons: ProjectAddons[] | undefined;
-	if (options.addons && Array.isArray(options.addons)) {
 		if (options.addons.includes("none")) {
-			addons = [];
+			if (options.addons.length > 1) {
+				cancel(pc.red(`Cannot combine 'none' with other addons.`));
+				process.exit(1);
+			}
+			config.addons = [];
 		} else {
-			addons = options.addons.filter(
+			const validOptions = options.addons.filter(
 				(addon): addon is ProjectAddons =>
 					addon === "pwa" ||
 					addon === "tauri" ||
@@ -496,85 +383,111 @@ function processFlags(
 					addon === "husky",
 			);
 
-			const hasCompatibleWebFrontend = frontend?.some(
+			const webSpecificAddons = ["pwa", "tauri"];
+			const hasWebSpecificAddons = validOptions.some((addon) =>
+				webSpecificAddons.includes(addon),
+			);
+
+			const hasCompatibleWebFrontend = config.frontend?.some(
 				(f) => f === "tanstack-router" || f === "react-router",
 			);
 
-			if (!hasCompatibleWebFrontend) {
-				const webSpecificAddons = ["pwa", "tauri"];
-				const filteredAddons = addons.filter(
-					(addon) => !webSpecificAddons.includes(addon),
+			if (hasWebSpecificAddons && !hasCompatibleWebFrontend) {
+				cancel(
+					pc.red(
+						"PWA and Tauri addons require tanstack-router or react-router. Cannot use these addons with your frontend selection.",
+					),
 				);
-
-				if (filteredAddons.length !== addons.length) {
-					log.warn(
-						pc.yellow(
-							"PWA and Tauri addons require tanstack-router or react-router - removing these addons",
-						),
-					);
-					addons = filteredAddons;
-				}
+				process.exit(1);
 			}
 
-			if (addons.includes("husky") && !addons.includes("biome")) {
-				addons.push("biome");
+			if (validOptions.includes("husky") && !validOptions.includes("biome")) {
+				validOptions.push("biome");
 			}
+
+			config.addons = validOptions;
 		}
 	}
 
-	let database = options.database as ProjectDatabase | undefined;
-	let orm = options.orm as ProjectOrm | undefined;
-	const auth = "auth" in options ? options.auth : undefined;
+	if ("examples" in options) {
+		if (options.examples === false) {
+			config.examples = [];
+		} else if (Array.isArray(options.examples)) {
+			const validExamples = ["todo", "ai"];
+			const invalidExamples = options.examples.filter(
+				(example: string) => !validExamples.includes(example),
+			);
 
-	const backend = options.backend as ProjectBackend | undefined;
-	const runtime = options.runtime as ProjectRuntime | undefined;
-	const packageManager = options.packageManager as
-		| ProjectPackageManager
-		| undefined;
-
-	let dbSetup: ProjectDBSetup | undefined = undefined;
-	if (options.dbSetup) {
-		if (options.dbSetup === "none") {
-			dbSetup = "none";
-		} else {
-			dbSetup = options.dbSetup as ProjectDBSetup;
-
-			if (dbSetup === "turso") {
-				database = "sqlite";
-
-				if (orm === "prisma") {
-					log.warn(
-						pc.yellow(
-							"Turso is not compatible with Prisma - switching to Drizzle",
-						),
-					);
-					orm = "drizzle";
-				}
-			} else if (dbSetup === "prisma-postgres") {
-				database = "postgres";
-				orm = "prisma";
-			} else if (dbSetup === "mongodb-atlas") {
-				database = "mongodb";
-				orm = "prisma";
+			if (invalidExamples.length > 0) {
+				cancel(
+					pc.red(
+						`Invalid example(s): ${invalidExamples.join(", ")}. Valid options are: ${validExamples.join(", ")}.`,
+					),
+				);
+				process.exit(1);
 			}
+
+			if (
+				options.examples.includes("ai") &&
+				(options.backend === "elysia" || config.backend === "elysia")
+			) {
+				cancel(
+					pc.red(
+						"AI example is only compatible with Hono backend. Cannot use --examples ai with --backend elysia",
+					),
+				);
+				process.exit(1);
+			}
+
+			const hasWebFrontend = config.frontend?.some((f) =>
+				["tanstack-router", "react-router", "tanstack-start"].includes(f),
+			);
+
+			if (
+				options.examples.length > 0 &&
+				!hasWebFrontend &&
+				(!options.frontend ||
+					!options.frontend.some((f) =>
+						["tanstack-router", "react-router", "tanstack-start"].includes(f),
+					))
+			) {
+				cancel(
+					pc.red(
+						"Examples require a web frontend (tanstack-router, react-router, or tanstack-start). Cannot use --examples without a compatible frontend.",
+					),
+				);
+				process.exit(1);
+			}
+
+			config.examples = options.examples.filter(
+				(ex): ex is ProjectExamples => ex === "todo" || ex === "ai",
+			);
 		}
 	}
 
-	const config: Partial<ProjectConfig> = {};
+	if (options.packageManager) {
+		if (!["npm", "pnpm", "bun"].includes(options.packageManager)) {
+			cancel(
+				pc.red(
+					`Invalid package manager: ${options.packageManager}. Must be npm, pnpm, or bun.`,
+				),
+			);
+			process.exit(1);
+		}
+		config.packageManager = options.packageManager as ProjectPackageManager;
+	}
 
-	if (projectDirectory) config.projectName = projectDirectory;
-	if (database !== undefined) config.database = database;
-	if (orm !== undefined) config.orm = orm;
-	if (auth !== undefined) config.auth = auth;
-	if (packageManager) config.packageManager = packageManager;
-	if ("git" in options) config.git = options.git;
-	if ("install" in options) config.noInstall = !options.install;
-	if (dbSetup !== undefined) config.dbSetup = dbSetup;
-	if (backend) config.backend = backend;
-	if (runtime) config.runtime = runtime;
-	if (frontend !== undefined) config.frontend = frontend;
-	if (addons !== undefined) config.addons = addons;
-	if (examples !== undefined) config.examples = examples;
+	if ("git" in options) {
+		config.git = options.git;
+	}
+
+	if ("install" in options) {
+		config.noInstall = !options.install;
+	}
+
+	if (projectDirectory) {
+		config.projectName = projectDirectory;
+	}
 
 	return config;
 }

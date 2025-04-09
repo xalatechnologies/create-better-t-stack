@@ -18,10 +18,12 @@
 			"persistent": true
 		},
 		"db:push": {
-			"cache": false
+			"cache": false,
+			"persistent": true
 		},
 		"db:studio": {
-			"cache": false
+			"cache": false,
+			"persistent": true
 		}
 	}
 }

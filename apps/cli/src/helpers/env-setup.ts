@@ -3,73 +3,50 @@ import fs from "fs-extra";
 import type { ProjectConfig } from "../types";
 import { generateAuthSecret } from "./auth-setup";
 
+interface EnvVariable {
+	key: string;
+	value: string;
+	condition: boolean;
+}
+
+async function addEnvVariablesToFile(
+	filePath: string,
+	variables: EnvVariable[],
+): Promise<void> {
+	await fs.ensureDir(path.dirname(filePath));
+
+	let envContent = "";
+	if (await fs.pathExists(filePath)) {
+		envContent = await fs.readFile(filePath, "utf8");
+	}
+
+	let modified = false;
+	for (const { key, value, condition } of variables) {
+		if (condition) {
+			const regex = new RegExp(`^${key}=.*$`, "m");
+			if (regex.test(envContent)) {
+				if (value) {
+					envContent = envContent.replace(regex, `${key}=${value}`);
+					modified = true;
+				}
+			} else {
+				envContent += `\n${key}=${value}`;
+				modified = true;
+			}
+		}
+	}
+
+	if (modified) {
+		await fs.writeFile(filePath, envContent.trim());
+	}
+}
+
 export async function setupEnvironmentVariables(
 	projectDir: string,
 	options: ProjectConfig,
 ): Promise<void> {
 	const serverDir = path.join(projectDir, "apps/server");
-
 	const envPath = path.join(serverDir, ".env");
-	let envContent = "";
-
-	if (await fs.pathExists(envPath)) {
-		envContent = await fs.readFile(envPath, "utf8");
-	}
-
-	if (!envContent.includes("CORS_ORIGIN")) {
-		const hasReactRouter = options.frontend.includes("react-router");
-		const hasTanStackRouter = options.frontend.includes("tanstack-router");
-		const hasTanStackStart = options.frontend.includes("tanstack-start");
-
-		let corsOrigin = "http://localhost:3000";
-
-		if (hasReactRouter) {
-			corsOrigin = "http://localhost:5173";
-		} else if (hasTanStackRouter || hasTanStackStart) {
-			corsOrigin = "http://localhost:3001";
-		}
-
-		envContent += `\nCORS_ORIGIN=${corsOrigin}`;
-	}
-
-	if (options.auth) {
-		if (!envContent.includes("BETTER_AUTH_SECRET")) {
-			envContent += `\nBETTER_AUTH_SECRET=${generateAuthSecret()}`;
-		}
-
-		if (!envContent.includes("BETTER_AUTH_URL")) {
-			envContent += "\nBETTER_AUTH_URL=http://localhost:3000";
-		}
-	}
-
-	if (options.database !== "none") {
-		if (options.orm === "prisma" && !envContent.includes("DATABASE_URL")) {
-			let databaseUrlLine = "";
-			if (options.database === "sqlite") {
-				databaseUrlLine = "";
-			} else if (options.database === "postgres") {
-				databaseUrlLine = `\nDATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"`;
-			} else if (options.database === "mongodb") {
-				databaseUrlLine = `\nDATABASE_URL="mongodb://localhost:27017/mydatabase"`;
-			}
-			envContent += databaseUrlLine;
-		}
-
-		if (options.database === "sqlite" && options.dbSetup !== "turso") {
-			if (!envContent.includes("DATABASE_URL")) {
-				envContent += "\nDATABASE_URL=file:./local.db";
-			}
-		}
-	}
-
-	if (
-		options.examples?.includes("ai") &&
-		!envContent.includes("GOOGLE_GENERATIVE_AI_API_KEY")
-	) {
-		envContent += "\nGOOGLE_GENERATIVE_AI_API_KEY=";
-	}
-
-	await fs.writeFile(envPath, envContent.trim());
 
 	const hasReactRouter = options.frontend.includes("react-router");
 	const hasTanStackRouter = options.frontend.includes("tanstack-router");
@@ -77,39 +54,84 @@ export async function setupEnvironmentVariables(
 	const hasWebFrontend =
 		hasReactRouter || hasTanStackRouter || hasTanStackStart;
 
+	let corsOrigin = "http://localhost:3000";
+	if (hasReactRouter) {
+		corsOrigin = "http://localhost:5173";
+	} else if (hasTanStackRouter || hasTanStackStart) {
+		corsOrigin = "http://localhost:3001";
+	}
+
+	let databaseUrl = "";
+	const specializedSetup =
+		options.dbSetup === "turso" ||
+		options.dbSetup === "prisma-postgres" ||
+		options.dbSetup === "mongodb-atlas";
+
+	if (!specializedSetup) {
+		if (options.database === "postgres") {
+			databaseUrl =
+				"postgresql://postgres:postgres@localhost:5432/mydb?schema=public";
+		} else if (options.database === "mysql") {
+			databaseUrl = "mysql://root:password@localhost:3306/mydb";
+		} else if (options.database === "mongodb") {
+			databaseUrl = "mongodb://localhost:27017/mydatabase";
+		} else if (options.database === "sqlite") {
+			databaseUrl = "file:./local.db";
+		}
+	}
+
+	const serverVars: EnvVariable[] = [
+		{
+			key: "CORS_ORIGIN",
+			value: corsOrigin,
+			condition: true,
+		},
+		{
+			key: "BETTER_AUTH_SECRET",
+			value: generateAuthSecret(),
+			condition: !!options.auth,
+		},
+		{
+			key: "BETTER_AUTH_URL",
+			value: "http://localhost:3000",
+			condition: !!options.auth,
+		},
+		{
+			key: "DATABASE_URL",
+			value: databaseUrl,
+			condition:
+				options.database !== "none" && databaseUrl !== "" && !specializedSetup,
+		},
+		{
+			key: "GOOGLE_GENERATIVE_AI_API_KEY",
+			value: "",
+			condition: options.examples?.includes("ai") || false,
+		},
+	];
+
+	await addEnvVariablesToFile(envPath, serverVars);
+
 	if (hasWebFrontend) {
 		const clientDir = path.join(projectDir, "apps/web");
-		await setupClientEnvFile(clientDir);
+		const clientVars: EnvVariable[] = [
+			{
+				key: "VITE_SERVER_URL",
+				value: "http://localhost:3000",
+				condition: true,
+			},
+		];
+		await addEnvVariablesToFile(path.join(clientDir, ".env"), clientVars);
 	}
 
 	if (options.frontend.includes("native")) {
 		const nativeDir = path.join(projectDir, "apps/native");
-		const nativeEnvPath = path.join(nativeDir, ".env");
-		let nativeEnvContent = "";
-
-		if (await fs.pathExists(nativeEnvPath)) {
-			nativeEnvContent = await fs.readFile(nativeEnvPath, "utf8");
-		}
-
-		if (!nativeEnvContent.includes("EXPO_PUBLIC_SERVER_URL")) {
-			nativeEnvContent += "EXPO_PUBLIC_SERVER_URL=http://localhost:3000\n";
-		}
-
-		await fs.writeFile(nativeEnvPath, nativeEnvContent.trim());
+		const nativeVars: EnvVariable[] = [
+			{
+				key: "EXPO_PUBLIC_SERVER_URL",
+				value: "http://localhost:3000",
+				condition: true,
+			},
+		];
+		await addEnvVariablesToFile(path.join(nativeDir, ".env"), nativeVars);
 	}
-}
-
-async function setupClientEnvFile(clientDir: string) {
-	const clientEnvPath = path.join(clientDir, ".env");
-	let clientEnvContent = "";
-
-	if (await fs.pathExists(clientEnvPath)) {
-		clientEnvContent = await fs.readFile(clientEnvPath, "utf8");
-	}
-
-	if (!clientEnvContent.includes("VITE_SERVER_URL")) {
-		clientEnvContent += "VITE_SERVER_URL=http://localhost:3000\n";
-	}
-
-	await fs.writeFile(clientEnvPath, clientEnvContent.trim());
 }

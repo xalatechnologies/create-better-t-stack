@@ -27,6 +27,11 @@ export async function getDatabaseChoice(
 				hint: "powerful, open source object-relational database system",
 			},
 			{
+				value: "mysql",
+				label: "MySQL",
+				hint: "popular open-source relational database system",
+			},
+			{
 				value: "mongodb",
 				label: "MongoDB",
 				hint: "open-source NoSQL database that stores data in JSON-like documents called BSON",
