@@ -99,6 +99,13 @@ export const TECH_OPTIONS = {
 			color: "from-indigo-400 to-indigo-600",
 		},
 		{
+			id: "mysql",
+			name: "MySQL",
+			description: "Popular relational database",
+			icon: "🐬",
+			color: "from-blue-500 to-blue-700",
+		},
+		{
 			id: "mongodb",
 			name: "MongoDB",
 			description: "NoSQL document database",
