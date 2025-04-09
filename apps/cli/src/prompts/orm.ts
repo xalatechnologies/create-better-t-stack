@@ -22,7 +22,7 @@ export async function getORMChoice(
 			{
 				value: "drizzle",
 				label: "Drizzle",
-				hint: "Type-safe, lightweight ORM",
+				hint: "lightweight and performant TypeScript ORM",
 			},
 			{
 				value: "prisma",

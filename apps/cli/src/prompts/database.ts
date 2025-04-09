@@ -19,17 +19,17 @@ export async function getDatabaseChoice(
 			{
 				value: "sqlite",
 				label: "SQLite",
-				hint: "by Turso",
+				hint: "lightweight, server-less, embedded relational database management system",
 			},
 			{
 				value: "postgres",
 				label: "PostgreSQL",
-				hint: "Traditional relational database",
+				hint: "powerful, open source object-relational database system",
 			},
 			{
 				value: "mongodb",
 				label: "MongoDB",
-				hint: "NoSQL document-oriented database",
+				hint: "open-source NoSQL database that stores data in JSON-like documents called BSON",
 			},
 		],
 		initialValue: DEFAULT_CONFIG.database,

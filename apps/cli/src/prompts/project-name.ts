@@ -21,10 +21,7 @@ function validateDirectoryName(name: string): string | undefined {
 	if (name.startsWith(".") || name.startsWith("-")) {
 		return "Project name cannot start with a dot or dash";
 	}
-	if (
-		name.toLowerCase() === "node_modules" ||
-		name.toLowerCase() === "favicon.ico"
-	) {
+	if (name.toLowerCase() === "node_modules") {
 		return "Project name is reserved";
 	}
 	return undefined;

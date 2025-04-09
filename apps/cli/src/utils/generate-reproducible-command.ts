@@ -12,7 +12,7 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 			flags.push(`--orm ${config.orm}`);
 		}
 
-		if (config.dbSetup && config.dbSetup !== "none") {
+		if (config.dbSetup) {
 			flags.push(`--db-setup ${config.dbSetup}`);
 		}
 	}

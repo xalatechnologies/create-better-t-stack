@@ -157,10 +157,10 @@ async function createTursoDatabase(
 async function writeEnvFile(projectDir: string, config?: TursoConfig) {
 	const envPath = path.join(projectDir, "apps/server", ".env");
 	const envContent = config
-		? `TURSO_CONNECTION_URL="${config.dbUrl}"
-TURSO_AUTH_TOKEN="${config.authToken}"`
-		: `TURSO_CONNECTION_URL=
-TURSO_AUTH_TOKEN=`;
+		? `DATABASE_URL="${config.dbUrl}"
+DATABASE_AUTH_TOKEN="${config.authToken}"`
+		: `DATABASE_URL=
+DATABASE_AUTH_TOKEN=`;
 
 	await fs.writeFile(envPath, envContent);
 }
@@ -173,8 +173,8 @@ function displayManualSetupInstructions() {
 3. Get your database URL and authentication token
 4. Add these credentials to the .env file in apps/server/.env
 
-TURSO_CONNECTION_URL=your_database_url
-TURSO_AUTH_TOKEN=your_auth_token`);
+DATABASE_URL=your_database_url
+DATABASE_AUTH_TOKEN=your_auth_token`);
 }
 
 export async function setupTurso(

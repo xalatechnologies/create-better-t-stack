@@ -104,11 +104,6 @@ function getDatabaseInstructions(
 		instructions.push(`${pc.cyan("•")} Apply schema: ${`${runCmd} db:push`}`);
 		instructions.push(`${pc.cyan("•")} Database UI: ${`${runCmd} db:studio`}`);
 	} else if (orm === "drizzle") {
-		if (database === "sqlite") {
-			instructions.push(
-				`${pc.cyan("•")} Start local DB: ${`cd apps/server && ${runCmd} db:local`}`,
-			);
-		}
 		instructions.push(`${pc.cyan("•")} Apply schema: ${`${runCmd} db:push`}`);
 		instructions.push(`${pc.cyan("•")} Database UI: ${`${runCmd} db:studio`}`);
 	}
