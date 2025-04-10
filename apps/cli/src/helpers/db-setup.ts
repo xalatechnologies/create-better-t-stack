@@ -45,8 +45,8 @@ export async function setupDatabase(
 				});
 			} else if (databaseType === "postgres") {
 				addPackageDependency({
-					dependencies: ["drizzle-orm", "postgres"],
-					devDependencies: ["drizzle-kit"],
+					dependencies: ["drizzle-orm", "pg"],
+					devDependencies: ["drizzle-kit", "@types/pg"],
 					projectDir: serverDir,
 				});
 			} else if (databaseType === "mysql") {

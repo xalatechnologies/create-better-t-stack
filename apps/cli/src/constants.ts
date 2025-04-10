@@ -31,7 +31,8 @@ export const dependencyVersionMap = {
 	"drizzle-kit": "^0.30.5",
 
 	"@libsql/client": "^0.14.0",
-	postgres: "^3.4.5",
+	pg: "^8.14.1",
+	"@types/pg": "^8.11.11",
 
 	mysql2: "^3.14.0",
 
