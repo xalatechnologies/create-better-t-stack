@@ -25,7 +25,7 @@ export async function getDBSetupChoice(
 			},
 			{ value: "none" as const, label: "None", hint: "Manual setup" },
 		];
-	} else if (databaseType === "postgres") {
+	} else if (databaseType === "postgres" && orm === "prisma") {
 		options = [
 			{
 				value: "prisma-postgres" as const,
