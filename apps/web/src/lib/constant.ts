@@ -234,6 +234,14 @@ export const TECH_OPTIONS = {
 			default: false,
 		},
 		{
+			id: "starlight",
+			name: "Starlight",
+			description: "Documentation site with Astro",
+			icon: "📚",
+			color: "from-teal-500 to-teal-700",
+			default: false,
+		},
+		{
 			id: "biome",
 			name: "Biome",
 			description: "Linting & formatting",
@@ -379,7 +387,7 @@ export const PRESET_TEMPLATES = [
 			dbSetup: "turso",
 			auth: "true",
 			packageManager: "bun",
-			addons: ["pwa", "biome", "husky", "tauri"],
+			addons: ["pwa", "biome", "husky", "tauri", "starlight"],
 			examples: ["todo", "ai"],
 			git: "true",
 			install: "true",

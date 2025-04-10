@@ -7,6 +7,7 @@ import type {
 	ProjectPackageManager,
 } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
+import { setupStarlight } from "./starlight-setup";
 import { setupTauri } from "./tauri-setup";
 
 export async function setupAddons(
@@ -29,6 +30,9 @@ export async function setupAddons(
 	}
 	if (addons.includes("husky")) {
 		await setupHusky(projectDir);
+	}
+	if (addons.includes("starlight")) {
+		await setupStarlight(projectDir, packageManager);
 	}
 }
 

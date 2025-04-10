@@ -6,7 +6,7 @@ export type ProjectDatabase =
 	| "none";
 export type ProjectOrm = "drizzle" | "prisma" | "none";
 export type ProjectPackageManager = "npm" | "pnpm" | "bun";
-export type ProjectAddons = "pwa" | "biome" | "tauri" | "husky";
+export type ProjectAddons = "pwa" | "biome" | "tauri" | "husky" | "starlight";
 export type ProjectBackend = "hono" | "elysia" | "express";
 export type ProjectRuntime = "node" | "bun";
 export type ProjectExamples = "todo" | "ai";

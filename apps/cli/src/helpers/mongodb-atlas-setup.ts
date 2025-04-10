@@ -36,10 +36,9 @@ async function initMongoDBAtlas(
 			stdio: "inherit",
 		});
 
-		log.info(pc.yellow("Please enter your connection string"));
-
 		const connectionString = await text({
 			message: "Paste your complete MongoDB connection string:",
+			placeholder: "mongodb://USERNAME:PASSWORD@HOST/DATABASE",
 			validate(value) {
 				if (!value) return "Please enter a connection string";
 				if (!value.startsWith("mongodb")) {

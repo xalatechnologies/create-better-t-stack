@@ -62,12 +62,6 @@ export async function gatherConfig(
 					results.database !== "none",
 					results.frontend,
 				),
-			dbSetup: ({ results }) =>
-				getDBSetupChoice(
-					results.database ?? "none",
-					flags.dbSetup,
-					results.orm,
-				),
 			addons: ({ results }) => getAddonsChoice(flags.addons, results.frontend),
 			examples: ({ results }) =>
 				getExamplesChoice(
@@ -75,6 +69,12 @@ export async function gatherConfig(
 					results.database,
 					results.frontend,
 					results.backend,
+				),
+			dbSetup: ({ results }) =>
+				getDBSetupChoice(
+					results.database ?? "none",
+					flags.dbSetup,
+					results.orm,
 				),
 			git: () => getGitChoice(flags.git),
 			packageManager: () => getPackageManagerChoice(flags.packageManager),

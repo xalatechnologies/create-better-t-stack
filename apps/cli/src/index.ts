@@ -22,10 +22,9 @@ import { generateReproducibleCommand } from "./utils/generate-reproducible-comma
 import { getLatestCLIVersion } from "./utils/get-latest-cli-version";
 import { renderTitle } from "./utils/render-title";
 
-process.on("SIGINT", () => {
-	log.error(pc.red("Operation cancelled"));
-	process.exit(0);
-});
+const exit = () => process.exit(0);
+process.on("SIGINT", exit);
+process.on("SIGTERM", exit);
 
 const program = new Command();
 
@@ -51,7 +50,7 @@ async function main() {
 		)
 		.option(
 			"--addons <types...>",
-			"Additional addons (pwa, tauri, biome, husky, none)",
+			"Additional addons (pwa, tauri, starlight, biome, husky, none)",
 		)
 		.option("--examples <types...>", "Examples to include (todo, ai)")
 		.option("--no-examples", "Skip all examples")
@@ -354,7 +353,7 @@ function processAndValidateFlags(
 	}
 
 	if (options.addons && options.addons.length > 0) {
-		const validAddons = ["pwa", "tauri", "biome", "husky", "none"];
+		const validAddons = ["pwa", "tauri", "biome", "husky", "starlight", "none"];
 		const invalidAddons = options.addons.filter(
 			(addon: string) => !validAddons.includes(addon),
 		);
@@ -380,7 +379,8 @@ function processAndValidateFlags(
 					addon === "pwa" ||
 					addon === "tauri" ||
 					addon === "biome" ||
-					addon === "husky",
+					addon === "husky" ||
+					addon === "starlight",
 			);
 
 			const webSpecificAddons = ["pwa", "tauri"];

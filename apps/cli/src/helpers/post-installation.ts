@@ -43,6 +43,9 @@ export function displayPostInstallInstructions(
 		addons?.includes("pwa") && frontends?.includes("react-router")
 			? getPwaInstructions()
 			: "";
+	const starlightInstructions = addons?.includes("starlight")
+		? getStarlightInstructions(runCmd)
+		: "";
 
 	const hasTanstackRouter = frontends?.includes("tanstack-router");
 	const hasTanstackStart = frontends?.includes("tanstack-start");
@@ -64,7 +67,7 @@ ${
 		? `${hasWebFrontend ? `${pc.cyan("•")} Frontend: http://localhost:${webPort}\n` : ""}`
 		: `${pc.yellow("NOTE:")} You are creating a backend-only app (no frontend selected)\n`
 }${pc.cyan("•")} API: http://localhost:3000
-${nativeInstructions ? `\n${nativeInstructions.trim()}` : ""}${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}${pwaInstructions ? `\n${pwaInstructions.trim()}` : ""}
+${addons?.includes("starlight") ? `${pc.cyan("•")} Docs: http://localhost:4321\n` : ""}${nativeInstructions ? `\n${nativeInstructions.trim()}` : ""}${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}${pwaInstructions ? `\n${pwaInstructions.trim()}` : ""}${starlightInstructions ? `\n${starlightInstructions.trim()}` : ""}
 \n${pc.bold("Like Better-T Stack?")} Please consider giving us a star on GitHub:
 ${pc.cyan("https://github.com/AmanVarshney01/create-better-t-stack")}`,
 		"Next steps",
@@ -119,4 +122,8 @@ function getTauriInstructions(runCmd?: string): string {
 
 function getPwaInstructions(): string {
 	return `${pc.bold("PWA with React Router v7:")}\n${pc.yellow("NOTE:")} There is a known compatibility issue between VitePWA and React Router v7.\nSee: https://github.com/vite-pwa/vite-plugin-pwa/issues/809\n`;
+}
+
+function getStarlightInstructions(runCmd?: string): string {
+	return `${pc.bold("Documentation with Starlight:")}\n${pc.cyan("•")} Start docs site: ${`cd apps/docs && ${runCmd} dev`}\n${pc.cyan("•")} Build docs site: ${`cd apps/docs && ${runCmd} build`}\n`;
 }

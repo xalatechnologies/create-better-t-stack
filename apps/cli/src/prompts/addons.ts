@@ -15,6 +15,11 @@ export async function getAddonsChoice(
 
 	const addonOptions = [
 		{
+			value: "starlight" as const,
+			label: "Starlight",
+			hint: "Add Astro Starlight documentation site",
+		},
+		{
 			value: "biome" as const,
 			label: "Biome",
 			hint: "Add Biome for linting and formatting",

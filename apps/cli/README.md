@@ -32,6 +32,7 @@ Follow the prompts to configure your project or use the `--yes` flag for default
 - **Authentication**: Optional auth setup with Better-Auth
 - **Progressive Web App**: Add PWA support with service workers and installable apps
 - **Desktop Apps**: Build native desktop apps with Tauri integration
+- **Documentation**: Add an Astro Starlight documentation site to your project
 - **Code Quality**: Biome for linting and formatting
 - **Git Hooks**: Husky with lint-staged for pre-commit checks
 - **Examples**: Todo app with full CRUD functionality, AI Chat using AI SDK
@@ -45,12 +46,12 @@ Usage: create-better-t-stack [project-directory] [options]
 Options:
   -V, --version                   Output the version number
   -y, --yes                       Use default configuration
-  --database <type>               Database type (none, sqlite, postgres, mongodb)
+  --database <type>               Database type (none, sqlite, postgres, mysql, mongodb)
   --orm <type>                    ORM type (none, drizzle, prisma)
   --auth                          Include authentication
   --no-auth                       Exclude authentication
   --frontend <types...>           Frontend types (tanstack-router, react-router, tanstack-start, native, none)
-  --addons <types...>             Additional addons (pwa, tauri, biome, husky, none)
+  --addons <types...>             Additional addons (pwa, tauri, starlight, biome, husky, none)
   --examples <types...>           Examples to include (todo, ai)
   --no-examples                   Skip all examples
   --git                           Initialize git repository
@@ -94,4 +95,9 @@ npx create-better-t-stack my-app --examples todo ai
 Create a project with Turso database setup:
 ```bash
 npx create-better-t-stack my-app --db-setup turso
+```
+
+Create a project with documentation site:
+```bash
+npx create-better-t-stack my-app --addons starlight
 ```
