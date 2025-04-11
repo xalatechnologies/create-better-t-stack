@@ -69,7 +69,7 @@ const Navbar = () => {
 				<div className="-translate-x-1/2 absolute left-1/2 hidden transform md:block">
 					<div
 						className={`relative flex items-center rounded-lg border border-gray-200 bg-gray-100/90 px-1.5 py-1 text-sm backdrop-blur-sm transition-all duration-500 ease-out dark:border-gray-800 dark:bg-gray-900/90 ${
-							scrolled ? "w-[350px]" : "w-[240px]"
+							scrolled ? "w-[352px]" : "w-[245px]"
 						}`}
 					>
 						<div
@@ -129,7 +129,7 @@ const Navbar = () => {
 									: "pointer-events-none opacity-0"
 							}`}
 						>
-							<Github className="mr-1 size-4">
+							<Github className="size-4">
 								<title>GitHub</title>
 							</Github>
 							Github
@@ -146,7 +146,7 @@ const Navbar = () => {
 						href="/new"
 						className="inline-flex items-center rounded-lg border border-blue-300 bg-blue-100/90 px-4 py-1 font-mono text-blue-700 text-sm backdrop-blur-sm transition-colors hover:bg-blue-200 dark:border-blue-800 dark:bg-blue-900/90 dark:text-blue-300 dark:hover:bg-blue-800/50"
 					>
-						<Maximize2 className="mr-2 size-4" />
+						<Maximize2 className="mr-1 size-4" />
 						Stack Builder
 					</Link>
 					<Link
@@ -154,7 +154,7 @@ const Navbar = () => {
 						target="_blank"
 						className="inline-flex items-center rounded-lg border border-gray-200 bg-gray-100/90 px-4 py-1 font-mono text-gray-700 text-sm backdrop-blur-sm transition-colors hover:text-blue-600 dark:border-gray-800 dark:bg-gray-900/90 dark:text-gray-300 dark:hover:text-blue-300"
 					>
-						<Github className="mr-2 size-4">
+						<Github className="mr-1 size-4">
 							<title>GitHub</title>
 						</Github>
 						Star on GitHub
@@ -225,7 +225,7 @@ const Navbar = () => {
 							</Link>
 
 							<div className="flex items-center">
-								<PackageIcon pm="npm" className="mr-2 h-4 w-4" />
+								<PackageIcon pm="npm" className="mr-1 h-4 w-4" />
 								<Link
 									href="https://www.npmjs.com/package/create-better-t-stack"
 									target="_blank"
@@ -237,7 +237,7 @@ const Navbar = () => {
 							</div>
 
 							<div className="flex items-center">
-								<Github className="mr-2 size-4 text-gray-700 dark:text-gray-300" />
+								<Github className="mr-1 size-4 text-gray-700 dark:text-gray-300" />
 								<Link
 									href="https://www.github.com/better-t-stack/create-better-t-stack"
 									target="_blank"
@@ -266,7 +266,7 @@ const Navbar = () => {
 								className="inline-flex items-center rounded-md bg-gray-200 px-4 py-2 text-gray-800 transition-colors hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
 								onClick={() => setMobileMenuOpen(false)}
 							>
-								<Github className="mr-2 size-5" />
+								<Github className="mr-1 size-5" />
 								Star on GitHub
 							</Link>
 						</div>
