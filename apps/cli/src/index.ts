@@ -402,7 +402,16 @@ function processAndValidateFlags(
 				(f) => f === "tanstack-router" || f === "react-router",
 			);
 
-			if (hasWebSpecificAddons && !hasCompatibleWebFrontend) {
+			if (
+				hasWebSpecificAddons &&
+				!hasCompatibleWebFrontend &&
+				!(
+					options.yes &&
+					DEFAULT_CONFIG.frontend.some(
+						(f) => f === "tanstack-router" || f === "react-router",
+					)
+				)
+			) {
 				cancel(
 					pc.red(
 						"PWA and Tauri addons require tanstack-router or react-router. Cannot use these addons with your frontend selection.",
@@ -439,7 +448,8 @@ function processAndValidateFlags(
 
 			if (
 				options.examples.includes("ai") &&
-				(options.backend === "elysia" || config.backend === "elysia")
+				(options.backend === "elysia" || config.backend === "elysia") &&
+				!(options.yes && DEFAULT_CONFIG.backend !== "elysia")
 			) {
 				cancel(
 					pc.red(
@@ -459,7 +469,13 @@ function processAndValidateFlags(
 				(!options.frontend ||
 					!options.frontend.some((f) =>
 						["tanstack-router", "react-router", "tanstack-start"].includes(f),
-					))
+					)) &&
+				!(
+					options.yes &&
+					DEFAULT_CONFIG.frontend.some((f) =>
+						["tanstack-router", "react-router", "tanstack-start"].includes(f),
+					)
+				)
 			) {
 				cancel(
 					pc.red(
@@ -468,7 +484,6 @@ function processAndValidateFlags(
 				);
 				process.exit(1);
 			}
-
 			config.examples = options.examples.filter(
 				(ex): ex is ProjectExamples => ex === "todo" || ex === "ai",
 			);
