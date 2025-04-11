@@ -14,11 +14,13 @@ import {
 	ClipboardCopy,
 	HelpCircle,
 	InfoIcon,
+	Maximize2,
 	RefreshCw,
 	Settings,
 	Star,
 	Terminal,
 } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 const validateProjectName = (name: string): string | undefined => {
@@ -46,7 +48,11 @@ const validateProjectName = (name: string): string | undefined => {
 	return undefined;
 };
 
-const StackArchitect = () => {
+const StackArchitect = ({
+	fullscreen = false,
+}: {
+	fullscreen?: boolean;
+}) => {
 	const [stack, setStack] = useState<StackState>(DEFAULT_STACK);
 	const [command, setCommand] = useState(
 		"npx create-better-t-stack@latest my-better-t-app --yes",
@@ -520,7 +526,7 @@ const StackArchitect = () => {
 	}, []);
 
 	return (
-		<div className="mx-auto w-full">
+		<div className={`mx-auto w-full ${fullscreen ? "max-w-none" : ""}`}>
 			<div className="overflow-hidden rounded-xl border border-gray-300 bg-gray-100 text-gray-800 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-white">
 				<div className="flex items-center justify-between bg-gray-200 px-2 py-2 sm:px-4 dark:bg-gray-800">
 					<div className="flex space-x-2">
@@ -548,6 +554,13 @@ const StackArchitect = () => {
 						>
 							<Star className="h-4 w-4" />
 						</button>
+						<Link
+							href={fullscreen ? "/" : "/new"}
+							className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+							title={fullscreen ? "Exit Fullscreen" : "Open Fullscreen"}
+						>
+							<Maximize2 className="h-4 w-4" />
+						</Link>
 						<button
 							type="button"
 							onClick={copyToClipboard}
@@ -704,7 +717,7 @@ const StackArchitect = () => {
 							</span>
 						</div>
 
-						<div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+						<div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
 							{TECH_OPTIONS[activeTab as keyof typeof TECH_OPTIONS].map(
 								(tech) => {
 									let isSelected = false;

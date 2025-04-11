@@ -1,5 +1,5 @@
 "use client";
-import { Github, Menu, X } from "lucide-react";
+import { Github, Maximize2, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import PackageIcon from "./Icons";
@@ -47,10 +47,10 @@ const Navbar = () => {
 	return (
 		<>
 			<nav
-				className={`z-[100] flex w-screen items-center justify-between px-4 py-4 transition-all duration-300 sm:px-8 ${
+				className={`fixed top-0 z-[100] flex w-full items-center justify-between px-4 py-4 transition-all duration-300 sm:px-8 ${
 					scrolled
-						? "border-transparent bg-transparent"
-						: "border-gray-200 border-b bg-gray-50/80 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-950/80"
+						? "bg-transparent"
+						: "bg-gray-50/80 backdrop-blur-xl dark:bg-gray-950/80"
 				}`}
 			>
 				<div
@@ -138,10 +138,17 @@ const Navbar = () => {
 				</div>
 
 				<div
-					className={`hidden justify-end transition-opacity duration-300 md:flex ${
+					className={`hidden justify-end gap-2 transition-opacity duration-300 md:flex ${
 						scrolled ? "pointer-events-none opacity-0" : "opacity-100"
 					}`}
 				>
+					<Link
+						href="/new"
+						className="inline-flex items-center rounded-lg border border-blue-300 bg-blue-100/90 px-4 py-1 font-mono text-blue-700 text-sm backdrop-blur-sm transition-colors hover:bg-blue-200 dark:border-blue-800 dark:bg-blue-900/90 dark:text-blue-300 dark:hover:bg-blue-800/50"
+					>
+						<Maximize2 className="mr-2 size-4" />
+						Stack Builder
+					</Link>
 					<Link
 						href="https://www.github.com/better-t-stack/create-better-t-stack"
 						target="_blank"
@@ -169,7 +176,6 @@ const Navbar = () => {
 				</button>
 			</nav>
 
-			{/* Mobile Menu - Terminal Style */}
 			<div
 				className={`fixed inset-0 z-[99] pt-16 backdrop-blur-md transition-all duration-300 ease-in-out md:hidden ${
 					mobileMenuOpen
@@ -178,7 +184,6 @@ const Navbar = () => {
 				}`}
 			>
 				<div className="mx-4 mt-4 overflow-hidden rounded-lg border border-gray-300 bg-gray-100/95 shadow-lg dark:border-gray-700 dark:bg-gray-900/95">
-					{/* Terminal Header */}
 					<div className="flex items-center bg-gray-200 px-4 py-2 dark:bg-gray-800">
 						<div className="mr-4 flex space-x-2">
 							<div className="h-3 w-3 rounded-full bg-red-500" />
@@ -190,7 +195,6 @@ const Navbar = () => {
 						</div>
 					</div>
 
-					{/* Terminal Body */}
 					<div className="p-4 font-mono text-sm">
 						<div className="pb-3">
 							<span className="text-green-600 dark:text-green-500">
