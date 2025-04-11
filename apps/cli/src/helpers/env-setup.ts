@@ -65,7 +65,8 @@ export async function setupEnvironmentVariables(
 	const specializedSetup =
 		options.dbSetup === "turso" ||
 		options.dbSetup === "prisma-postgres" ||
-		options.dbSetup === "mongodb-atlas";
+		options.dbSetup === "mongodb-atlas" ||
+		options.dbSetup === "neon";
 
 	if (!specializedSetup) {
 		if (options.database === "postgres") {

@@ -25,13 +25,22 @@ export async function getDBSetupChoice(
 			},
 			{ value: "none" as const, label: "None", hint: "Manual setup" },
 		];
-	} else if (databaseType === "postgres" && orm === "prisma") {
+	} else if (databaseType === "postgres") {
 		options = [
 			{
-				value: "prisma-postgres" as const,
-				label: "Prisma Postgres",
-				hint: "Instant Postgres for Global Applications",
+				value: "neon" as const,
+				label: "Neon Postgres",
+				hint: "Serverless Postgres with branching capability",
 			},
+			...(orm === "prisma"
+				? [
+						{
+							value: "prisma-postgres" as const,
+							label: "Prisma Postgres",
+							hint: "Instant Postgres for Global Applications",
+						},
+					]
+				: []),
 			{ value: "none" as const, label: "None", hint: "Manual setup" },
 		];
 	} else if (databaseType === "mongodb") {

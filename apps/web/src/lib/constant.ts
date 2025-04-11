@@ -153,6 +153,13 @@ export const TECH_OPTIONS = {
 			color: "from-pink-400 to-pink-600",
 		},
 		{
+			id: "neon",
+			name: "Neon Postgres",
+			description: "Serverless PostgreSQL with Neon",
+			icon: "⚡",
+			color: "from-blue-400 to-blue-600",
+		},
+		{
 			id: "prisma-postgres",
 			name: "Prisma PostgreSQL",
 			description: "Set up PostgreSQL with Prisma",

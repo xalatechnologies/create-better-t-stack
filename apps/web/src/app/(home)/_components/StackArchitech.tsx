@@ -111,6 +111,10 @@ const StackArchitect = () => {
 			if (stack.orm !== "prisma") {
 				setStack((prev) => ({ ...prev, orm: "prisma" }));
 			}
+		} else if (stack.dbSetup === "neon") {
+			if (stack.database !== "postgres") {
+				setStack((prev) => ({ ...prev, database: "postgres" }));
+			}
 		}
 	}, [stack.database, stack.orm, stack.dbSetup, stack.auth]);
 
@@ -149,6 +153,10 @@ const StackArchitect = () => {
 			} else if (stack.dbSetup === "mongodb-atlas") {
 				if (stack.database !== "mongodb") {
 					notes.dbSetup.push("MongoDB Atlas setup requires MongoDB database.");
+				}
+			} else if (stack.dbSetup === "neon") {
+				if (stack.database !== "postgres") {
+					notes.dbSetup.push("Neon setup requires PostgreSQL database.");
 				}
 			}
 		}
@@ -394,7 +402,8 @@ const StackArchitect = () => {
 								(updatedState.dbSetup === "prisma-postgres" &&
 									techId !== "postgres") ||
 								(updatedState.dbSetup === "mongodb-atlas" &&
-									techId !== "mongodb")
+									techId !== "mongodb") ||
+								(updatedState.dbSetup === "neon" && techId !== "postgres")
 							) {
 								updatedState.dbSetup = "none";
 							}
@@ -446,6 +455,8 @@ const StackArchitect = () => {
 					} else if (techId === "mongodb-atlas") {
 						updatedState.database = "mongodb";
 						updatedState.orm = "prisma";
+					} else if (techId === "neon") {
+						updatedState.database = "postgres";
 					}
 
 					return updatedState;
@@ -726,7 +737,9 @@ const StackArchitect = () => {
 													(stack.database !== "postgres" ||
 														stack.orm !== "prisma")) ||
 												(tech.id === "mongodb-atlas" &&
-													stack.database !== "mongodb"))) ||
+													stack.database !== "mongodb") ||
+												(tech.id === "neon" &&
+													stack.database !== "postgres"))) ||
 										(activeTab === "examples" &&
 											(((tech.id === "todo" || tech.id === "ai") &&
 												!hasWebFrontendSelected) ||

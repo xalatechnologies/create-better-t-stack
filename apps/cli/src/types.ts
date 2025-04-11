@@ -19,6 +19,7 @@ export type ProjectDBSetup =
 	| "turso"
 	| "prisma-postgres"
 	| "mongodb-atlas"
+	| "neon"
 	| "none";
 
 export interface ProjectConfig {

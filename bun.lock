@@ -14,7 +14,7 @@
     },
     "apps/cli": {
       "name": "create-better-t-stack",
-      "version": "1.10.0",
+      "version": "1.11.0",
       "bin": {
         "create-better-t-stack": "dist/index.js",
       },

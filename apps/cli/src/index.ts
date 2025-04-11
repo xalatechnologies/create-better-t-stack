@@ -61,7 +61,7 @@ async function main() {
 		.option("--no-install", "Skip installing dependencies")
 		.option(
 			"--db-setup <setup>",
-			"Database setup (turso, prisma-postgres, mongodb-atlas, none)",
+			"Database setup (turso, neon, prisma-postgres, mongodb-atlas, none)",
 		)
 		.option(
 			"--backend <framework>",
@@ -169,13 +169,13 @@ function processAndValidateFlags(
 
 	if (options.dbSetup) {
 		if (
-			!["turso", "prisma-postgres", "mongodb-atlas", "none"].includes(
+			!["turso", "prisma-postgres", "mongodb-atlas", "neon", "none"].includes(
 				options.dbSetup,
 			)
 		) {
 			cancel(
 				pc.red(
-					`Invalid database setup: ${options.dbSetup}. Must be turso, prisma-postgres, mongodb-atlas, or none.`,
+					`Invalid database setup: ${options.dbSetup}. Must be turso, prisma-postgres, mongodb-atlas, neon, or none.`,
 				),
 			);
 			process.exit(1);
@@ -235,6 +235,16 @@ function processAndValidateFlags(
 				}
 				config.database = "mongodb";
 				config.orm = "prisma";
+			} else if (options.dbSetup === "neon") {
+				if (options.database && options.database !== "postgres") {
+					cancel(
+						pc.red(
+							"Neon PostgreSQL setup requires PostgreSQL database. Cannot use --db-setup neon with a different database type.",
+						),
+					);
+					process.exit(1);
+				}
+				config.database = "postgres";
 			}
 		} else {
 			config.dbSetup = "none";

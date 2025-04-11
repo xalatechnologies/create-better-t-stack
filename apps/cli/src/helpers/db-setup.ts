@@ -9,6 +9,7 @@ import type {
 } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 import { setupMongoDBAtlas } from "./mongodb-atlas-setup";
+import { setupNeonPostgres } from "./neon-setup";
 import { setupPrismaPostgres } from "./prisma-postgres-setup";
 import { setupTurso } from "./turso-setup";
 
@@ -20,6 +21,7 @@ export async function setupDatabase(
 	setupTursoDb: boolean,
 	setupPrismaPostgresDb: boolean,
 	setupMongoDBAtlasDb: boolean,
+	setupNeonPostgresDb: boolean,
 ): Promise<void> {
 	const s = spinner();
 	const serverDir = path.join(projectDir, "apps/server");
@@ -60,12 +62,12 @@ export async function setupDatabase(
 
 		if (databaseType === "sqlite" && setupTursoDb) {
 			await setupTurso(projectDir, orm === "drizzle");
-		} else if (
-			databaseType === "postgres" &&
-			orm === "prisma" &&
-			setupPrismaPostgresDb
-		) {
-			await setupPrismaPostgres(projectDir, packageManager);
+		} else if (databaseType === "postgres") {
+			if (orm === "prisma" && setupPrismaPostgresDb) {
+				await setupPrismaPostgres(projectDir, packageManager);
+			} else if (setupNeonPostgresDb) {
+				await setupNeonPostgres(projectDir, packageManager);
+			}
 		} else if (databaseType === "mongodb" && setupMongoDBAtlasDb) {
 			await setupMongoDBAtlas(projectDir);
 		}
