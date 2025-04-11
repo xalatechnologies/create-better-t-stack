@@ -52,12 +52,12 @@ export async function getFrontendChoice(
 				{
 					value: "react-router",
 					label: "React Router",
-					hint: "A user‑obsessed, standards‑focused, multi‑strategy router you can deploy anywhere.",
+					hint: "A user‑obsessed, standards‑focused, multi‑strategy router",
 				},
 				{
 					value: "tanstack-start",
 					label: "TanStack Start (beta)",
-					hint: "SSR, Streaming, Server Functions, API Routes, bundling and more powered by TanStack Router and Vite.",
+					hint: "SSR, Server Functions, API Routes and more with TanStack Router",
 				},
 			],
 			initialValue:

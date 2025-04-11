@@ -1,5 +1,5 @@
 import path from "node:path";
-import { cancel, isCancel, log, password } from "@clack/prompts";
+import { cancel, isCancel, log, password, spinner } from "@clack/prompts";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
@@ -14,8 +14,9 @@ async function initPrismaDatabase(
 	serverDir: string,
 	packageManager: ProjectPackageManager,
 ): Promise<PrismaConfig | null> {
+	const s = spinner();
 	try {
-		log.info(pc.blue("Initializing Prisma PostgreSQL"));
+		s.start("Initializing Prisma PostgreSQL");
 
 		const prismaDir = path.join(serverDir, "prisma");
 		await fs.ensureDir(prismaDir);
@@ -26,6 +27,8 @@ async function initPrismaDatabase(
 				: packageManager === "pnpm"
 					? "pnpm dlx"
 					: "bunx";
+
+		s.stop("Initializing Prisma. Follow the prompts below:");
 
 		await execa(initCmd, ["prisma", "init", "--db"], {
 			cwd: serverDir,
@@ -57,35 +60,42 @@ async function initPrismaDatabase(
 			databaseUrl: databaseUrl as string,
 		};
 	} catch (error) {
+		s.stop(pc.red("Failed to initialize Prisma PostgreSQL"));
 		if (error instanceof Error) {
-			log.error(pc.red(error.message));
+			log.error(error.message);
 		}
 		return null;
 	}
 }
 
 async function writeEnvFile(projectDir: string, config?: PrismaConfig) {
-	const envPath = path.join(projectDir, "apps/server", ".env");
-	let envContent = "";
+	try {
+		const envPath = path.join(projectDir, "apps/server", ".env");
+		await fs.ensureDir(path.dirname(envPath));
 
-	if (await fs.pathExists(envPath)) {
-		envContent = await fs.readFile(envPath, "utf8");
+		let envContent = "";
+		if (await fs.pathExists(envPath)) {
+			envContent = await fs.readFile(envPath, "utf8");
+		}
+
+		const databaseUrlLine = config
+			? `DATABASE_URL="${config.databaseUrl}"`
+			: `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"`;
+
+		if (!envContent.includes("DATABASE_URL=")) {
+			envContent += `\n${databaseUrlLine}`;
+		} else {
+			envContent = envContent.replace(
+				/DATABASE_URL=.*(\r?\n|$)/,
+				`${databaseUrlLine}$1`,
+			);
+		}
+
+		await fs.writeFile(envPath, envContent.trim());
+	} catch (error) {
+		log.error("Failed to update environment configuration");
+		throw error;
 	}
-
-	const databaseUrlLine = config
-		? `DATABASE_URL="${config.databaseUrl}"`
-		: `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"`;
-
-	if (!envContent.includes("DATABASE_URL=")) {
-		envContent += `\n${databaseUrlLine}`;
-	} else {
-		envContent = envContent.replace(
-			/DATABASE_URL=.*(\r?\n|$)/,
-			`${databaseUrlLine}$1`,
-		);
-	}
-
-	await fs.writeFile(envPath, envContent.trim());
 }
 
 function displayManualSetupInstructions() {
@@ -97,33 +107,6 @@ function displayManualSetupInstructions() {
 4. Add the database URL to the .env file in apps/server/.env
 
 DATABASE_URL="your_database_url"`);
-}
-
-export async function setupPrismaPostgres(
-	projectDir: string,
-	packageManager: ProjectPackageManager = "npm",
-) {
-	const serverDir = path.join(projectDir, "apps/server");
-
-	try {
-		const config = await initPrismaDatabase(serverDir, packageManager);
-
-		if (config) {
-			await writeEnvFile(projectDir, config);
-			await addPrismaAccelerateExtension(serverDir);
-			log.success(
-				pc.green("Prisma PostgreSQL database configured successfully!"),
-			);
-		} else {
-			await writeEnvFile(projectDir);
-			displayManualSetupInstructions();
-		}
-	} catch (error) {
-		log.error(pc.red(`Error during Prisma PostgreSQL setup: ${error}`));
-		await writeEnvFile(projectDir);
-		displayManualSetupInstructions();
-		log.info("Setup completed with manual configuration required.");
-	}
 }
 
 async function addPrismaAccelerateExtension(serverDir: string) {
@@ -159,9 +142,56 @@ export default prisma;
 				await fs.writeFile(dbFilePath, dbFileContent);
 			}
 		}
+		return true;
 	} catch (error) {
 		log.warn(
 			pc.yellow("Could not add Prisma Accelerate extension automatically"),
 		);
+		return false;
+	}
+}
+
+export async function setupPrismaPostgres(
+	projectDir: string,
+	packageManager: ProjectPackageManager = "npm",
+) {
+	const serverDir = path.join(projectDir, "apps/server");
+	const s = spinner();
+	s.start("Setting up Prisma PostgreSQL");
+
+	try {
+		await fs.ensureDir(serverDir);
+
+		s.stop("Starting Prisma setup");
+
+		const config = await initPrismaDatabase(serverDir, packageManager);
+
+		if (config) {
+			await writeEnvFile(projectDir, config);
+			await addPrismaAccelerateExtension(serverDir);
+			log.success(
+				pc.green("Prisma PostgreSQL database configured successfully!"),
+			);
+		} else {
+			const fallbackSpinner = spinner();
+			fallbackSpinner.start("Setting up fallback configuration");
+			await writeEnvFile(projectDir);
+			fallbackSpinner.stop("Manual setup required");
+			displayManualSetupInstructions();
+		}
+	} catch (error) {
+		s.stop(pc.red("Prisma PostgreSQL setup failed"));
+		log.error(
+			pc.red(
+				`Error during Prisma PostgreSQL setup: ${error instanceof Error ? error.message : String(error)}`,
+			),
+		);
+
+		try {
+			await writeEnvFile(projectDir);
+			displayManualSetupInstructions();
+		} catch {}
+
+		log.info("Setup completed with manual configuration required.");
 	}
 }

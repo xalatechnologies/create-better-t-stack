@@ -47,7 +47,7 @@ async function executeNeonCommand(
 
 		if (s) s.start(spinnerText);
 		const result = await execa(cmd, cmdArgs);
-		if (s) s.stop();
+		if (s) s.stop(spinnerText);
 
 		return result;
 	} catch (error) {
@@ -58,11 +58,15 @@ async function executeNeonCommand(
 
 async function isNeonAuthenticated(packageManager: string) {
 	try {
-		const { stdout } = await executeNeonCommand(packageManager, [
+		const { cmd, cmdArgs } = buildNeonCommand(packageManager, [
 			"projects",
 			"list",
 		]);
-		return !stdout.includes("not authenticated") && !stdout.includes("error");
+		const result = await execa(cmd, cmdArgs);
+		return (
+			!result.stdout.includes("not authenticated") &&
+			!result.stdout.includes("error")
+		);
 	} catch {
 		return false;
 	}
@@ -147,10 +151,13 @@ export async function setupNeonPostgres(
 	projectDir: string,
 	packageManager: ProjectPackageManager,
 ) {
-	const s = spinner();
+	const setupSpinner = spinner();
+	setupSpinner.start("Setting up Neon PostgreSQL");
 
 	try {
 		const isAuthenticated = await isNeonAuthenticated(packageManager);
+
+		setupSpinner.stop("Setting up Neon PostgreSQL");
 
 		if (!isAuthenticated) {
 			log.info("Please authenticate with Neon to continue:");
@@ -180,14 +187,20 @@ export async function setupNeonPostgres(
 			);
 		}
 
+		const finalSpinner = spinner();
+		finalSpinner.start("Configuring database connection");
+
 		await fs.ensureDir(path.join(projectDir, "apps/server"));
 		await writeEnvFile(projectDir, config);
-		log.success("Neon database configured successfully!");
+
+		finalSpinner.stop("Neon database configured successfully!");
 	} catch (error) {
-		s.stop(pc.red("Neon PostgreSQL setup failed"));
+		setupSpinner.stop(pc.red("Neon PostgreSQL setup failed"));
+
 		if (error instanceof Error) {
 			log.error(pc.red(error.message));
 		}
+
 		await writeEnvFile(projectDir);
 		displayManualSetupInstructions();
 	}
