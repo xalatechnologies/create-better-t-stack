@@ -24,7 +24,7 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 };
 
 export const dependencyVersionMap = {
-	"better-auth": "^1.2.4",
+	"better-auth": "^1.2.5",
 	"@better-auth/expo": "^1.2.5",
 
 	"drizzle-orm": "^0.38.4",
@@ -36,8 +36,8 @@ export const dependencyVersionMap = {
 
 	mysql2: "^3.14.0",
 
-	"@prisma/client": "^6.5.0",
-	prisma: "^6.5.0",
+	"@prisma/client": "^6.6.0",
+	prisma: "^6.6.0",
 
 	"vite-plugin-pwa": "^0.21.2",
 	"@vite-pwa/assets-generator": "^0.2.6",
@@ -62,7 +62,7 @@ export const dependencyVersionMap = {
 	elysia: "^1.2.25",
 
 	"@hono/trpc-server": "^0.3.4",
-	hono: "^4.7.5",
+	hono: "^4.7.6",
 
 	cors: "^2.8.5",
 	express: "^5.1.0",
