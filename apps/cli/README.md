@@ -52,8 +52,7 @@ Options:
   --no-auth                       Exclude authentication
   --frontend <types...>           Frontend types (tanstack-router, react-router, tanstack-start, native, none)
   --addons <types...>             Additional addons (pwa, tauri, starlight, biome, husky, none)
-  --examples <types...>           Examples to include (todo, ai)
-  --no-examples                   Skip all examples
+  --examples <types...>           Examples to include (todo, ai, none)
   --git                           Initialize git repository
   --no-git                        Skip git initialization
   --package-manager <pm>          Package manager (npm, pnpm, bun)
