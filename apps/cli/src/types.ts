@@ -6,15 +6,22 @@ export type ProjectDatabase =
 	| "none";
 export type ProjectOrm = "drizzle" | "prisma" | "none";
 export type ProjectPackageManager = "npm" | "pnpm" | "bun";
-export type ProjectAddons = "pwa" | "biome" | "tauri" | "husky" | "starlight";
+export type ProjectAddons =
+	| "pwa"
+	| "biome"
+	| "tauri"
+	| "husky"
+	| "starlight"
+	| "none";
 export type ProjectBackend = "hono" | "elysia" | "express";
 export type ProjectRuntime = "node" | "bun";
-export type ProjectExamples = "todo" | "ai";
+export type ProjectExamples = "todo" | "ai" | "none";
 export type ProjectFrontend =
 	| "react-router"
 	| "tanstack-router"
 	| "tanstack-start"
-	| "native";
+	| "native"
+	| "none";
 export type ProjectDBSetup =
 	| "turso"
 	| "prisma-postgres"

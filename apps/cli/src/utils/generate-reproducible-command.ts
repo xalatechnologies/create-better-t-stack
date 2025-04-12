@@ -42,7 +42,7 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 	if (config.examples && config.examples.length > 0) {
 		flags.push(`--examples ${config.examples.join(" ")}`);
 	} else {
-		flags.push("--no-examples");
+		flags.push("--examples none");
 	}
 
 	if (config.packageManager) {
