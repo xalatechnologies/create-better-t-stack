@@ -25,6 +25,14 @@ export const TECH_OPTIONS = {
 			default: false,
 		},
 		{
+			id: "next",
+			name: "Next.js",
+			description: "React framework with hybrid rendering",
+			icon: "▲",
+			color: "from-gray-700 to-black",
+			default: false,
+		},
+		{
 			id: "native",
 			name: "React Native",
 			description: "Expo with NativeWind",
@@ -66,6 +74,13 @@ export const TECH_OPTIONS = {
 			icon: "⚡",
 			color: "from-blue-500 to-blue-700",
 			default: true,
+		},
+		{
+			id: "next",
+			name: "Next.js",
+			description: "App Router and API Routes",
+			icon: "▲",
+			color: "from-gray-700 to-black",
 		},
 		{
 			id: "elysia",

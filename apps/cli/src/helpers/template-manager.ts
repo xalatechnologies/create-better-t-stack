@@ -51,9 +51,10 @@ export async function setupFrontendTemplates(
 	const hasTanstackWeb = frontends.includes("tanstack-router");
 	const hasTanstackStart = frontends.includes("tanstack-start");
 	const hasReactRouterWeb = frontends.includes("react-router");
+	const hasNextWeb = frontends.includes("next");
 	const hasNative = frontends.includes("native");
 
-	if (hasTanstackWeb || hasReactRouterWeb || hasTanstackStart) {
+	if (hasTanstackWeb || hasReactRouterWeb || hasTanstackStart || hasNextWeb) {
 		const webDir = path.join(projectDir, "apps/web");
 		await fs.ensureDir(webDir);
 
@@ -62,20 +63,35 @@ export async function setupFrontendTemplates(
 			await fs.copy(webBaseDir, webDir);
 		}
 
-		let frameworkName = "web-react-router";
 		if (hasTanstackWeb) {
-			frameworkName = "web-tanstack-router";
+			const frameworkDir = path.join(
+				PKG_ROOT,
+				"template/base/apps/web-tanstack-router",
+			);
+			if (await fs.pathExists(frameworkDir)) {
+				await fs.copy(frameworkDir, webDir, { overwrite: true });
+			}
 		} else if (hasTanstackStart) {
-			frameworkName = "web-tanstack-start";
-		}
-
-		const webFrameworkDir = path.join(
-			PKG_ROOT,
-			`template/base/apps/${frameworkName}`,
-		);
-
-		if (await fs.pathExists(webFrameworkDir)) {
-			await fs.copy(webFrameworkDir, webDir, { overwrite: true });
+			const frameworkDir = path.join(
+				PKG_ROOT,
+				"template/base/apps/web-tanstack-start",
+			);
+			if (await fs.pathExists(frameworkDir)) {
+				await fs.copy(frameworkDir, webDir, { overwrite: true });
+			}
+		} else if (hasReactRouterWeb) {
+			const frameworkDir = path.join(
+				PKG_ROOT,
+				"template/base/apps/web-react-router",
+			);
+			if (await fs.pathExists(frameworkDir)) {
+				await fs.copy(frameworkDir, webDir, { overwrite: true });
+			}
+		} else if (hasNextWeb) {
+			const frameworkDir = path.join(PKG_ROOT, "template/base/apps/web-next");
+			if (await fs.pathExists(frameworkDir)) {
+				await fs.copy(frameworkDir, webDir, { overwrite: true });
+			}
 		}
 
 		const packageJsonPath = path.join(webDir, "package.json");
@@ -105,6 +121,28 @@ export async function setupBackendFramework(
 	projectDir: string,
 	framework: ProjectBackend,
 ): Promise<void> {
+	if (framework === "next") {
+		const serverDir = path.join(projectDir, "apps/server");
+		const nextTemplateDir = path.join(
+			PKG_ROOT,
+			"template/with-next/apps/server",
+		);
+
+		await fs.ensureDir(serverDir);
+
+		if (await fs.pathExists(nextTemplateDir)) {
+			await fs.copy(nextTemplateDir, serverDir, { overwrite: true });
+
+			const packageJsonPath = path.join(serverDir, "package.json");
+			if (await fs.pathExists(packageJsonPath)) {
+				const packageJson = await fs.readJson(packageJsonPath);
+				packageJson.name = "server";
+				await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
+			}
+		}
+		return;
+	}
+
 	const frameworkDir = path.join(PKG_ROOT, `template/with-${framework}`);
 	if (await fs.pathExists(frameworkDir)) {
 		await fs.copy(frameworkDir, projectDir, { overwrite: true });
@@ -161,8 +199,14 @@ export async function setupAuthTemplate(
 		const hasReactRouter = frontends.includes("react-router");
 		const hasTanStackRouter = frontends.includes("tanstack-router");
 		const hasTanStackStart = frontends.includes("tanstack-start");
+		const hasNextRouter = frontends.includes("next");
 
-		if (hasReactRouter || hasTanStackRouter || hasTanStackStart) {
+		if (
+			hasReactRouter ||
+			hasTanStackRouter ||
+			hasTanStackStart ||
+			hasNextRouter
+		) {
 			const webDir = path.join(projectDir, "apps/web");
 
 			const webBaseAuthDir = path.join(authTemplateDir, "apps/web-base");
@@ -199,6 +243,13 @@ export async function setupAuthTemplate(
 					await fs.copy(tanstackStartAuthDir, webDir, { overwrite: true });
 				}
 			}
+
+			if (hasNextRouter) {
+				const nextAuthDir = path.join(authTemplateDir, "apps/web-next");
+				if (await fs.pathExists(nextAuthDir)) {
+					await fs.copy(nextAuthDir, webDir, { overwrite: true });
+				}
+			}
 		}
 
 		const serverAuthDir = path.join(authTemplateDir, "apps/server/src");
@@ -216,30 +267,73 @@ export async function setupAuthTemplate(
 			{ overwrite: true },
 		);
 
-		const contextFileName = `with-${framework}-context.ts`;
-		await fs.copy(
-			path.join(serverAuthDir, "lib", contextFileName),
-			path.join(projectServerDir, "lib/context.ts"),
-			{ overwrite: true },
-		);
-
-		const indexFileName = `with-${framework}-index.ts`;
-		await fs.copy(
-			path.join(serverAuthDir, indexFileName),
-			path.join(projectServerDir, "index.ts"),
-			{ overwrite: true },
-		);
-
-		const authLibFileName = getAuthLibDir(orm, database);
-		const authLibSourceDir = path.join(serverAuthDir, authLibFileName);
-		if (await fs.pathExists(authLibSourceDir)) {
-			const files = await fs.readdir(authLibSourceDir);
-			for (const file of files) {
-				await fs.copy(
-					path.join(authLibSourceDir, file),
-					path.join(projectServerDir, "lib", file),
-					{ overwrite: true },
+		if (framework === "next") {
+			if (
+				await fs.pathExists(
+					path.join(authTemplateDir, "apps/server/src/with-next-app"),
+				)
+			) {
+				const nextAppAuthDir = path.join(
+					authTemplateDir,
+					"apps/server/src/with-next-app",
 				);
+				const nextAppDestDir = path.join(projectDir, "apps/server/src/app");
+
+				await fs.ensureDir(nextAppDestDir);
+
+				const files = await fs.readdir(nextAppAuthDir);
+				for (const file of files) {
+					const srcPath = path.join(nextAppAuthDir, file);
+					const destPath = path.join(nextAppDestDir, file);
+					await fs.copy(srcPath, destPath, { overwrite: true });
+				}
+			}
+
+			const contextFileName = "with-next-context.ts";
+			await fs.copy(
+				path.join(serverAuthDir, "lib", contextFileName),
+				path.join(projectServerDir, "lib/context.ts"),
+				{ overwrite: true },
+			);
+
+			const authLibFileName = getAuthLibDir(orm, database);
+			const authLibSourceDir = path.join(serverAuthDir, authLibFileName);
+			if (await fs.pathExists(authLibSourceDir)) {
+				const files = await fs.readdir(authLibSourceDir);
+				for (const file of files) {
+					await fs.copy(
+						path.join(authLibSourceDir, file),
+						path.join(projectServerDir, "lib", file),
+						{ overwrite: true },
+					);
+				}
+			}
+		} else {
+			const contextFileName = `with-${framework}-context.ts`;
+			await fs.copy(
+				path.join(serverAuthDir, "lib", contextFileName),
+				path.join(projectServerDir, "lib/context.ts"),
+				{ overwrite: true },
+			);
+
+			const indexFileName = `with-${framework}-index.ts`;
+			await fs.copy(
+				path.join(serverAuthDir, indexFileName),
+				path.join(projectServerDir, "index.ts"),
+				{ overwrite: true },
+			);
+
+			const authLibFileName = getAuthLibDir(orm, database);
+			const authLibSourceDir = path.join(serverAuthDir, authLibFileName);
+			if (await fs.pathExists(authLibSourceDir)) {
+				const files = await fs.readdir(authLibSourceDir);
+				for (const file of files) {
+					await fs.copy(
+						path.join(authLibSourceDir, file),
+						path.join(projectServerDir, "lib", file),
+						{ overwrite: true },
+					);
+				}
 			}
 		}
 

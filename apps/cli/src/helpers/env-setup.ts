@@ -51,13 +51,14 @@ export async function setupEnvironmentVariables(
 	const hasReactRouter = options.frontend.includes("react-router");
 	const hasTanStackRouter = options.frontend.includes("tanstack-router");
 	const hasTanStackStart = options.frontend.includes("tanstack-start");
+	const hasNextJs = options.frontend.includes("next");
 	const hasWebFrontend =
-		hasReactRouter || hasTanStackRouter || hasTanStackStart;
+		hasReactRouter || hasTanStackRouter || hasTanStackStart || hasNextJs;
 
 	let corsOrigin = "http://localhost:3000";
 	if (hasReactRouter) {
 		corsOrigin = "http://localhost:5173";
-	} else if (hasTanStackRouter || hasTanStackStart) {
+	} else if (hasTanStackRouter || hasTanStackStart || hasNextJs) {
 		corsOrigin = "http://localhost:3001";
 	}
 
@@ -114,9 +115,15 @@ export async function setupEnvironmentVariables(
 
 	if (hasWebFrontend) {
 		const clientDir = path.join(projectDir, "apps/web");
+		let envVarName = "VITE_SERVER_URL";
+
+		if (hasNextJs) {
+			envVarName = "NEXT_PUBLIC_SERVER_URL";
+		}
+
 		const clientVars: EnvVariable[] = [
 			{
-				key: "VITE_SERVER_URL",
+				key: envVarName,
 				value: "http://localhost:3000",
 				condition: true,
 			},

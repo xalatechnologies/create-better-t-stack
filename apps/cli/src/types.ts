@@ -13,13 +13,14 @@ export type ProjectAddons =
 	| "husky"
 	| "starlight"
 	| "none";
-export type ProjectBackend = "hono" | "elysia" | "express";
+export type ProjectBackend = "hono" | "elysia" | "express" | "next";
 export type ProjectRuntime = "node" | "bun";
 export type ProjectExamples = "todo" | "ai" | "none";
 export type ProjectFrontend =
 	| "react-router"
 	| "tanstack-router"
 	| "tanstack-start"
+	| "next"
 	| "native"
 	| "none";
 export type ProjectDBSetup =

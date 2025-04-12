@@ -90,6 +90,7 @@ async function main() {
 					"tanstack-router",
 					"react-router",
 					"tanstack-start",
+					"next",
 					"native",
 					"none",
 				],
@@ -128,7 +129,7 @@ async function main() {
 			.option("backend", {
 				type: "string",
 				describe: "Backend framework",
-				choices: ["hono", "express", "elysia"],
+				choices: ["hono", "express", "next", "elysia"],
 			})
 			.option("runtime", {
 				type: "string",

@@ -1,12 +1,17 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { ProjectRuntime } from "../types";
+import type { ProjectBackend, ProjectRuntime } from "../types";
 
 export async function getRuntimeChoice(
 	runtime?: ProjectRuntime,
+	backend?: ProjectBackend,
 ): Promise<ProjectRuntime> {
 	if (runtime !== undefined) return runtime;
+
+	if (backend === "next") {
+		return "node";
+	}
 
 	const response = await select<ProjectRuntime>({
 		message: "Select runtime",

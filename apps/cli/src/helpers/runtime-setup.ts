@@ -8,6 +8,10 @@ export async function setupRuntime(
 	runtime: ProjectRuntime,
 	backendFramework: ProjectBackend,
 ): Promise<void> {
+	if (backendFramework === "next") {
+		return;
+	}
+
 	const serverDir = path.join(projectDir, "apps/server");
 	const serverIndexPath = path.join(serverDir, "src/index.ts");
 

@@ -1,26 +1,52 @@
-# Local
-.DS_Store
-*.local
-*.log*
+# Dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Dist
-node_modules
-dist/
+# Testing
+/coverage
+
+# Build outputs
+/.next/
+/out/
+/build/
+/dist/
 .vinxi
 .output
+.react-router/
+
+# Deployment
 .vercel
 .netlify
 .wrangler
+
+# Environment & local files
+.env*
+!.env.example
+.DS_Store
+*.pem
+*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log*
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
 
 # IDE
 .vscode/*
 !.vscode/extensions.json
 .idea
 
-*.env*
-!.env.example
-
+# Other
 dev-dist
-
-/.react-router/
-/build/

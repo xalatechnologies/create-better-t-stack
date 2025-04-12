@@ -27,7 +27,8 @@ export async function getFrontendChoice(
 			(f) =>
 				f === "tanstack-router" ||
 				f === "react-router" ||
-				f === "tanstack-start",
+				f === "tanstack-start" ||
+				f === "next",
 		)
 			? ["web"]
 			: [],
@@ -55,6 +56,11 @@ export async function getFrontendChoice(
 					hint: "A user‑obsessed, standards‑focused, multi‑strategy router",
 				},
 				{
+					value: "next",
+					label: "Next.js",
+					hint: "The React Framework for the Web",
+				},
+				{
 					value: "tanstack-start",
 					label: "TanStack Start (beta)",
 					hint: "SSR, Server Functions, API Routes and more with TanStack Router",
@@ -65,7 +71,8 @@ export async function getFrontendChoice(
 					(f) =>
 						f === "tanstack-router" ||
 						f === "react-router" ||
-						f === "tanstack-start",
+						f === "tanstack-start" ||
+						f === "next",
 				) || "tanstack-router",
 		});
 

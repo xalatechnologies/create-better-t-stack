@@ -52,7 +52,8 @@ export async function gatherConfig(
 			},
 			frontend: () => getFrontendChoice(flags.frontend),
 			backend: () => getBackendFrameworkChoice(flags.backend),
-			runtime: () => getRuntimeChoice(flags.runtime),
+			runtime: ({ results }) =>
+				getRuntimeChoice(flags.runtime, results.backend),
 			database: () => getDatabaseChoice(flags.database),
 			orm: ({ results }) =>
 				getORMChoice(flags.orm, results.database !== "none", results.database),

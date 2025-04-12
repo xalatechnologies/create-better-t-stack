@@ -132,7 +132,8 @@ const StackArchitect = ({
 		const hasWebFrontend =
 			stack.frontend.includes("tanstack-router") ||
 			stack.frontend.includes("react-router") ||
-			stack.frontend.includes("tanstack-start");
+			stack.frontend.includes("tanstack-start") ||
+			stack.frontend.includes("next");
 
 		notes.frontend = [];
 
@@ -281,6 +282,7 @@ const StackArchitect = ({
 						"tanstack-router",
 						"react-router",
 						"tanstack-start",
+						"next",
 					];
 
 					if (techId === "none") {

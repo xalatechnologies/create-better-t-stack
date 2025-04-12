@@ -1,22 +1,32 @@
 # prod
 dist/
+/build
+/out/
 
 # dev
 .yarn/
+!.yarn/patches
+!.yarn/plugins
 !.yarn/releases
+!.yarn/versions
 .vscode/*
 !.vscode/launch.json
 !.vscode/*.code-snippets
 .idea/workspace.xml
 .idea/usage.statistics.xml
 .idea/shelf
+.wrangler
+/.next/
+.vercel
 
 # deps
 node_modules/
-.wrangler
+/node_modules
+/.pnp
+.pnp.*
 
 # env
-.env
+.env*
 .env.production
 .dev.vars
 
@@ -31,6 +41,11 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+*.pem
 
 # local db
 *.db*
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

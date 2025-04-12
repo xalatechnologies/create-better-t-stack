@@ -17,6 +17,11 @@ export async function getBackendFrameworkChoice(
 				hint: "Lightweight, ultrafast web framework",
 			},
 			{
+				value: "next",
+				label: "Next.js",
+				hint: "Full-stack framework with API routes",
+			},
+			{
 				value: "express",
 				label: "Express",
 				hint: "Fast, unopinionated, minimalist web framework for Node.js",
