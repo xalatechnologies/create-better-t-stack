@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server';
 
 function handler(req: NextRequest) {
   return fetchRequestHandler({
-    endpoint: '/api/trpc',
+    endpoint: '/trpc',
     req,
     router: appRouter,
     createContext: () => createContext(req)
