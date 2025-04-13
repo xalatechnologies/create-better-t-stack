@@ -4,6 +4,7 @@
 	"description": "A modern CLI tool for scaffolding end-to-end type-safe TypeScript projects with best practices and customizable configurations",
 	"type": "module",
 	"license": "MIT",
+	"author": "Aman Varshney",
 	"bin": {
 		"create-better-t-stack": "dist/index.js"
 	},
@@ -53,6 +54,7 @@
 	},
 	"dependencies": {
 		"@clack/prompts": "^0.10.1",
+		"consola": "^3.4.2",
 		"execa": "^8.0.1",
 		"fs-extra": "^11.3.0",
 		"gradient-string": "^3.0.0",

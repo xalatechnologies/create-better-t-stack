@@ -1,5 +1,5 @@
 import path from "node:path";
-import { log } from "@clack/prompts";
+import consola from "consola";
 import pc from "picocolors";
 import type { ProjectFrontend } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
@@ -54,9 +54,9 @@ export async function setupAuth(
 			});
 		}
 	} catch (error) {
-		log.error(pc.red("Failed to configure authentication"));
+		consola.error(pc.red("Failed to configure authentication"));
 		if (error instanceof Error) {
-			log.error(pc.red(error.message));
+			consola.error(pc.red(error.message));
 		}
 		throw error;
 	}

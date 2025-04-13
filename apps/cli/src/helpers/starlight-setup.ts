@@ -1,5 +1,6 @@
 import path from "node:path";
 import { log, spinner } from "@clack/prompts";
+import consola from "consola";
 import { execa } from "execa";
 import pc from "picocolors";
 import type { ProjectPackageManager } from "../types";
@@ -57,7 +58,7 @@ export async function setupStarlight(
 	} catch (error) {
 		s.stop(pc.red("Failed to set up Starlight documentation site"));
 		if (error instanceof Error) {
-			log.error(pc.red(error.message));
+			consola.error(pc.red(error.message));
 		}
 		throw error;
 	}

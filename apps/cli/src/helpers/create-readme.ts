@@ -1,4 +1,5 @@
 import path from "node:path";
+import consola from "consola";
 import fs from "fs-extra";
 import type {
 	ProjectAddons,
@@ -16,7 +17,7 @@ export async function createReadme(projectDir: string, options: ProjectConfig) {
 	try {
 		await fs.writeFile(readmePath, content);
 	} catch (error) {
-		console.error("Failed to create README.md file:", error);
+		consola.error("Failed to create README.md file:", error);
 	}
 }
 
@@ -30,24 +31,33 @@ function generateReadmeContent(options: ProjectConfig): string {
 		orm = "drizzle",
 		runtime = "bun",
 		frontend = ["tanstack-router"],
+		backend = "hono",
 	} = options;
 
 	const hasReactRouter = frontend.includes("react-router");
 	const hasTanstackRouter = frontend.includes("tanstack-router");
 	const hasNative = frontend.includes("native");
+	const hasNext = frontend.includes("next");
+	const hasTanstackStart = frontend.includes("tanstack-start");
 
 	const packageManagerRunCmd =
 		packageManager === "npm" ? "npm run" : packageManager;
 
-	const port = hasReactRouter ? "5173" : "3001";
+	// Determine the web port based on the frontend framework
+	let webPort = "3001"; // Default for TanStack Router and TanStack Start
+	if (hasReactRouter) {
+		webPort = "5173";
+	} else if (hasNext) {
+		webPort = "3000";
+	}
 
 	return `# ${projectName}
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, ${hasTanstackRouter ? "TanStack Router" : "React Router"}, Hono, tRPC, and more.
+This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, ${hasTanstackRouter ? "TanStack Router" : hasReactRouter ? "React Router" : hasNext ? "Next.js" : hasTanstackStart ? "TanStack Start" : ""}, ${backend[0].toUpperCase() + backend.slice(1)}, tRPC, and more.
 
 ## Features
 
-${generateFeaturesList(database, auth, addons, orm, runtime, frontend)}
+${generateFeaturesList(database, auth, addons, orm, runtime, frontend, backend)}
 
 ## Getting Started
 
@@ -66,8 +76,8 @@ ${packageManagerRunCmd} dev
 \`\`\`
 
 ${
-	hasTanstackRouter || hasReactRouter
-		? `Open [http://localhost:${port}](http://localhost:${port}) in your browser to see the web application.`
+	hasTanstackRouter || hasReactRouter || hasNext || hasTanstackStart
+		? `Open [http://localhost:${webPort}](http://localhost:${webPort}) in your browser to see the web application.`
 		: ""
 }
 ${hasNative ? "Use the Expo Go app to run the mobile application.\n" : ""}
@@ -84,12 +94,12 @@ ${
 \`\`\`
 ${projectName}/
 ├── apps/
-${hasTanstackRouter || hasReactRouter ? `│   ├── web/         # Frontend application (React, ${hasTanstackRouter ? "TanStack Router" : "React Router"})\n` : ""}${hasNative ? "│   ├── native/      # Mobile application (React Native, Expo)\n" : ""}│   └── server/      # Backend API (Hono, tRPC)
+${hasTanstackRouter || hasReactRouter || hasNext || hasTanstackStart ? `│   ├── web/         # Frontend application (${hasTanstackRouter ? "React + TanStack Router" : hasReactRouter ? "React + React Router" : hasNext ? "Next.js" : "React + TanStack Start"})\n` : ""}${hasNative ? "│   ├── native/      # Mobile application (React Native, Expo)\n" : ""}${addons.includes("starlight") ? "│   ├── docs/        # Documentation site (Astro Starlight)\n" : ""}│   └── server/      # Backend API (${backend[0].toUpperCase() + backend.slice(1)}, tRPC)
 \`\`\`
 
 ## Available Scripts
 
-${generateScriptsList(packageManagerRunCmd, database, orm, auth, hasNative)}
+${generateScriptsList(packageManagerRunCmd, database, orm, auth, hasNative, addons, backend)}
 `;
 }
 
@@ -100,10 +110,13 @@ function generateFeaturesList(
 	orm: ProjectOrm,
 	runtime: ProjectRuntime,
 	frontend: ProjectFrontend[],
+	backend: string,
 ): string {
 	const hasTanstackRouter = frontend.includes("tanstack-router");
 	const hasReactRouter = frontend.includes("react-router");
 	const hasNative = frontend.includes("native");
+	const hasNext = frontend.includes("next");
+	const hasTanstackStart = frontend.includes("tanstack-start");
 
 	const addonsList = [
 		"- **TypeScript** - For type safety and improved developer experience",
@@ -115,6 +128,12 @@ function generateFeaturesList(
 		);
 	} else if (hasReactRouter) {
 		addonsList.push("- **React Router** - Declarative routing for React");
+	} else if (hasNext) {
+		addonsList.push("- **Next.js** - Full-stack React framework");
+	} else if (hasTanstackStart) {
+		addonsList.push(
+			"- **TanStack Start** - SSR framework with TanStack Router",
+		);
 	}
 
 	if (hasNative) {
@@ -125,7 +144,19 @@ function generateFeaturesList(
 	addonsList.push(
 		"- **TailwindCSS** - Utility-first CSS for rapid UI development",
 		"- **shadcn/ui** - Reusable UI components",
-		"- **Hono** - Lightweight, performant server framework",
+	);
+
+	if (backend === "hono") {
+		addonsList.push("- **Hono** - Lightweight, performant server framework");
+	} else if (backend === "express") {
+		addonsList.push("- **Express** - Fast, unopinionated web framework");
+	} else if (backend === "elysia") {
+		addonsList.push("- **Elysia** - Type-safe, high-performance framework");
+	} else if (backend === "next") {
+		addonsList.push("- **Next.js** - Full-stack React framework");
+	}
+
+	addonsList.push(
 		"- **tRPC** - End-to-end type-safe APIs",
 		`- **${runtime === "bun" ? "Bun" : "Node.js"}** - Runtime environment`,
 	);
@@ -133,7 +164,7 @@ function generateFeaturesList(
 	if (database !== "none") {
 		addonsList.push(
 			`- **${orm === "drizzle" ? "Drizzle" : "Prisma"}** - TypeScript-first ORM`,
-			`- **${database === "sqlite" ? "SQLite/Turso" : "PostgreSQL"}** - Database engine`,
+			`- **${database === "sqlite" ? "SQLite/Turso" : database === "postgres" ? "PostgreSQL" : database === "mysql" ? "MySQL" : "MongoDB"}** - Database engine`,
 		);
 	}
 
@@ -152,6 +183,8 @@ function generateFeaturesList(
 			addonsList.push("- **Biome** - Linting and formatting");
 		} else if (addon === "husky") {
 			addonsList.push("- **Husky** - Git hooks for code quality");
+		} else if (addon === "starlight") {
+			addonsList.push("- **Starlight** - Documentation site with Astro");
 		}
 	}
 
@@ -186,10 +219,22 @@ cd apps/server && ${packageManagerRunCmd} db:local
 1. Make sure you have a PostgreSQL database set up.
 2. Update your \`apps/server/.env\` file with your PostgreSQL connection details.
 `;
+	} else if (database === "mysql") {
+		setup += `This project uses MySQL${orm === "drizzle" ? " with Drizzle ORM" : " with Prisma"}.
+
+1. Make sure you have a MySQL database set up.
+2. Update your \`apps/server/.env\` file with your MySQL connection details.
+`;
+	} else if (database === "mongodb") {
+		setup += `This project uses MongoDB with Prisma ORM.
+
+1. Make sure you have MongoDB set up.
+2. Update your \`apps/server/.env\` file with your MongoDB connection URI.
+`;
 	}
 
 	setup += `
-${auth ? "4" : "3"}. ${
+${auth ? "3" : "3"}. ${
 		orm === "prisma"
 			? `Generate the Prisma client and push the schema:
 \`\`\`bash
@@ -211,9 +256,11 @@ function generateScriptsList(
 	orm: ProjectOrm,
 	auth: boolean,
 	hasNative: boolean,
+	addons: ProjectAddons[],
+	backend: string,
 ): string {
-	let scripts = `- \`${packageManagerRunCmd} dev\`: Start both web and server in development mode
-- \`${packageManagerRunCmd} build\`: Build both web and server
+	let scripts = `- \`${packageManagerRunCmd} dev\`: Start all applications in development mode
+- \`${packageManagerRunCmd} build\`: Build all applications
 - \`${packageManagerRunCmd} dev:web\`: Start only the web application
 - \`${packageManagerRunCmd} dev:server\`: Start only the server
 - \`${packageManagerRunCmd} check-types\`: Check TypeScript types across all apps`;
@@ -229,8 +276,31 @@ function generateScriptsList(
 - \`${packageManagerRunCmd} db:studio\`: Open database studio UI`;
 
 		if (database === "sqlite" && orm === "drizzle") {
-			scripts += `\n- \`cd apps/server && ${packageManagerRunCmd} db:local\`: Start the local SQLite database`;
+			scripts += `
+- \`cd apps/server && ${packageManagerRunCmd} db:local\`: Start the local SQLite database`;
 		}
+	}
+
+	if (addons.includes("biome")) {
+		scripts += `
+- \`${packageManagerRunCmd} check\`: Run Biome formatting and linting`;
+	}
+
+	if (addons.includes("pwa")) {
+		scripts += `
+- \`cd apps/web && ${packageManagerRunCmd} generate-pwa-assets\`: Generate PWA assets`;
+	}
+
+	if (addons.includes("tauri")) {
+		scripts += `
+- \`cd apps/web && ${packageManagerRunCmd} desktop:dev\`: Start Tauri desktop app in development
+- \`cd apps/web && ${packageManagerRunCmd} desktop:build\`: Build Tauri desktop app`;
+	}
+
+	if (addons.includes("starlight")) {
+		scripts += `
+- \`cd apps/docs && ${packageManagerRunCmd} dev\`: Start documentation site
+- \`cd apps/docs && ${packageManagerRunCmd} build\`: Build documentation site`;
 	}
 
 	return scripts;

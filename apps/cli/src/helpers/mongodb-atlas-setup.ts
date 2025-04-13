@@ -1,5 +1,6 @@
 import path from "node:path";
 import { cancel, isCancel, log, spinner, text } from "@clack/prompts";
+import consola from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
@@ -34,7 +35,7 @@ async function initMongoDBAtlas(
 		const hasAtlas = await checkAtlasCLI();
 
 		if (!hasAtlas) {
-			log.error(pc.red("MongoDB Atlas CLI not found."));
+			consola.error(pc.red("MongoDB Atlas CLI not found."));
 			log.info(
 				pc.yellow(
 					"Please install it from: https://www.mongodb.com/docs/atlas/cli/current/install-atlas-cli/",
@@ -74,7 +75,7 @@ async function initMongoDBAtlas(
 		};
 	} catch (error) {
 		if (error instanceof Error) {
-			log.error(pc.red(error.message));
+			consola.error(pc.red(error.message));
 		}
 		return null;
 	}
@@ -105,7 +106,7 @@ async function writeEnvFile(projectDir: string, config?: MongoDBConfig) {
 
 		await fs.writeFile(envPath, envContent.trim());
 	} catch (error) {
-		log.error("Failed to update environment configuration");
+		consola.error("Failed to update environment configuration");
 		throw error;
 	}
 }
@@ -154,7 +155,7 @@ export async function setupMongoDBAtlas(projectDir: string) {
 		}
 	} catch (error) {
 		mainSpinner.stop(pc.red("MongoDB Atlas setup failed"));
-		log.error(
+		consola.error(
 			pc.red(
 				`Error during MongoDB Atlas setup: ${error instanceof Error ? error.message : String(error)}`,
 			),

@@ -1,4 +1,4 @@
-import { note } from "@clack/prompts";
+import { consola } from "consola";
 import pc from "picocolors";
 import type {
 	ProjectAddons,
@@ -57,8 +57,8 @@ export function displayPostInstallInstructions(
 
 	const webPort = hasReactRouter ? "5173" : "3001";
 
-	note(
-		`${pc.cyan("1.")} ${cdCmd}
+	consola.box(
+		`${pc.bold("Next steps")}\n${pc.cyan("1.")} ${cdCmd}
 ${!depsInstalled ? `${pc.cyan("2.")} ${packageManager} install\n` : ""}${pc.cyan(depsInstalled ? "2." : "3.")} ${runCmd} dev
 
 ${pc.bold("Your project will be available at:")}
@@ -68,9 +68,9 @@ ${
 		: `${pc.yellow("NOTE:")} You are creating a backend-only app (no frontend selected)\n`
 }${pc.cyan("•")} API: http://localhost:3000
 ${addons?.includes("starlight") ? `${pc.cyan("•")} Docs: http://localhost:4321\n` : ""}${nativeInstructions ? `\n${nativeInstructions.trim()}` : ""}${databaseInstructions ? `\n${databaseInstructions.trim()}` : ""}${tauriInstructions ? `\n${tauriInstructions.trim()}` : ""}${lintingInstructions ? `\n${lintingInstructions.trim()}` : ""}${pwaInstructions ? `\n${pwaInstructions.trim()}` : ""}${starlightInstructions ? `\n${starlightInstructions.trim()}` : ""}
-\n${pc.bold("Like Better-T Stack?")} Please consider giving us a star on GitHub:
+
+${pc.bold("Like Better-T Stack?")} Please consider giving us a star on GitHub:
 ${pc.cyan("https://github.com/AmanVarshney01/create-better-t-stack")}`,
-		"Next steps",
 	);
 }
 

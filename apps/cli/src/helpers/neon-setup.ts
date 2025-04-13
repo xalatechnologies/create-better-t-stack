@@ -1,5 +1,6 @@
 import path from "node:path";
 import { cancel, isCancel, log, spinner, text } from "@clack/prompts";
+import { consola } from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
@@ -82,7 +83,7 @@ async function authenticateWithNeon(packageManager: string) {
 		log.success("Authenticated with Neon successfully!");
 		return true;
 	} catch (error) {
-		log.error(pc.red("Failed to authenticate with Neon"));
+		consola.error(pc.red("Failed to authenticate with Neon"));
 		throw error;
 	}
 }
@@ -116,10 +117,12 @@ async function createNeonProject(
 				roleName: params.role,
 			};
 		}
-		log.error(pc.red("Failed to extract connection information from response"));
+		consola.error(
+			pc.red("Failed to extract connection information from response"),
+		);
 		return null;
 	} catch (error) {
-		log.error(pc.red("Failed to create Neon project"));
+		consola.error(pc.red("Failed to create Neon project"));
 		throw error;
 	}
 }
@@ -198,7 +201,7 @@ export async function setupNeonPostgres(
 		setupSpinner.stop(pc.red("Neon PostgreSQL setup failed"));
 
 		if (error instanceof Error) {
-			log.error(pc.red(error.message));
+			consola.error(pc.red(error.message));
 		}
 
 		await writeEnvFile(projectDir);

@@ -1,4 +1,5 @@
 import { log, spinner } from "@clack/prompts";
+import consola from "consola";
 import { $ } from "execa";
 import pc from "picocolors";
 import type { ProjectAddons, ProjectPackageManager } from "../types";
@@ -30,7 +31,7 @@ export async function installDependencies({
 	} catch (error) {
 		s.stop(pc.red("Failed to install dependencies"));
 		if (error instanceof Error) {
-			log.error(pc.red(`Installation error: ${error.message}`));
+			consola.error(pc.red(`Installation error: ${error.message}`));
 		}
 		throw error;
 	}

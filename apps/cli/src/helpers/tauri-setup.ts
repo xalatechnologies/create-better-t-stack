@@ -1,5 +1,6 @@
 import path from "node:path";
 import { log, spinner } from "@clack/prompts";
+import { consola } from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
@@ -88,7 +89,7 @@ export async function setupTauri(
 	} catch (error) {
 		s.stop(pc.red("Failed to set up Tauri"));
 		if (error instanceof Error) {
-			log.error(pc.red(error.message));
+			consola.error(pc.red(error.message));
 		}
 		throw error;
 	}

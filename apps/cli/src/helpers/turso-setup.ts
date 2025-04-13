@@ -9,6 +9,7 @@ import {
 	spinner,
 	text,
 } from "@clack/prompts";
+import consola from "consola";
 import { $ } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
@@ -301,7 +302,7 @@ export async function setupTurso(
 		}
 	} catch (error) {
 		setupSpinner.stop(pc.red("Failed to set up Turso database"));
-		log.error(
+		consola.error(
 			pc.red(
 				`Error during Turso setup: ${error instanceof Error ? error.message : String(error)}`,
 			),

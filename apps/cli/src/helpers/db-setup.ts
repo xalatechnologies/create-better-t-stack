@@ -1,5 +1,6 @@
 import path from "node:path";
 import { log, spinner } from "@clack/prompts";
+import consola from "consola";
 import fs from "fs-extra";
 import pc from "picocolors";
 import type {
@@ -74,7 +75,7 @@ export async function setupDatabase(
 	} catch (error) {
 		s.stop(pc.red("Failed to set up database"));
 		if (error instanceof Error) {
-			log.error(pc.red(error.message));
+			consola.error(pc.red(error.message));
 		}
 		throw error;
 	}

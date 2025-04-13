@@ -1,4 +1,5 @@
-import { cancel, intro, log, outro, spinner } from "@clack/prompts";
+import { cancel, intro, log, outro } from "@clack/prompts";
+import { consola } from "consola";
 import pc from "picocolors";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
@@ -49,7 +50,6 @@ process.on("SIGTERM", exit);
 
 async function main() {
 	const startTime = Date.now();
-	const s = spinner();
 
 	try {
 		const argv = await yargs(hideBin(process.argv))
@@ -146,13 +146,14 @@ async function main() {
 			.wrap(null)
 			.parse();
 
-		renderTitle();
-		intro(pc.magenta("Creating a new Better-T-Stack project"));
-
 		const options = argv as YargsArgv;
 		const projectDirectory = options.projectDirectory;
 
+		renderTitle();
+
 		const flagConfig = processAndValidateFlags(options, projectDirectory);
+
+		intro(pc.magenta("Creating a new Better-T-Stack project"));
 
 		if (!options.yes && Object.keys(flagConfig).length > 0) {
 			log.info(pc.yellow("Using these pre-selected options:"));
@@ -177,9 +178,11 @@ async function main() {
 		await createProject(config);
 
 		log.success(
-			`You can reproduce this setup with the following command:\n${pc.white(
-				generateReproducibleCommand(config),
-			)}`,
+			pc.blue(
+				`You can reproduce this setup with the following command:\n${generateReproducibleCommand(
+					config,
+				)}`,
+			),
 		);
 
 		const elapsedTimeInSeconds = ((Date.now() - startTime) / 1000).toFixed(2);
@@ -189,16 +192,16 @@ async function main() {
 			),
 		);
 	} catch (error) {
-		s.stop(pc.red("Failed"));
 		if (error instanceof Error) {
 			if (error.name === "YError") {
 				cancel(pc.red(`Invalid arguments: ${error.message}`));
 			} else {
-				cancel(pc.red(`An unexpected error occurred: ${error.message}`));
+				consola.error(`An unexpected error occurred: ${error.message}`);
+				consola.error(error.stack);
 			}
 			process.exit(1);
 		} else {
-			cancel(pc.red("An unexpected error occurred."));
+			consola.error("An unexpected error occurred.");
 			console.error(error);
 			process.exit(1);
 		}
@@ -227,10 +230,8 @@ function processAndValidateFlags(
 		(config.database ?? options.database) === "mongodb" &&
 		(config.orm ?? options.orm) === "drizzle"
 	) {
-		cancel(
-			pc.red(
-				"MongoDB is only available with Prisma. Cannot use --database mongodb with --orm drizzle",
-			),
+		consola.fatal(
+			"MongoDB is only available with Prisma. Cannot use --database mongodb with --orm drizzle",
 		);
 		process.exit(1);
 	}
@@ -243,50 +244,40 @@ function processAndValidateFlags(
 
 			if (dbSetup === "turso") {
 				if (options.database && options.database !== "sqlite") {
-					cancel(
-						pc.red(
-							`Turso setup requires a SQLite database. Cannot use --db-setup turso with --database ${options.database}`,
-						),
+					consola.fatal(
+						`Turso setup requires a SQLite database. Cannot use --db-setup turso with --database ${options.database}`,
 					);
 					process.exit(1);
 				}
 				config.database = "sqlite";
 
 				if (options.orm === "prisma") {
-					cancel(
-						pc.red(
-							"Turso setup is not compatible with Prisma. Cannot use --db-setup turso with --orm prisma",
-						),
+					consola.fatal(
+						"Turso setup is not compatible with Prisma. Cannot use --db-setup turso with --orm prisma",
 					);
 					process.exit(1);
 				}
 				config.orm = "drizzle";
 			} else if (dbSetup === "prisma-postgres") {
 				if (options.database && options.database !== "postgres") {
-					cancel(
-						pc.red(
-							"Prisma PostgreSQL setup requires PostgreSQL database. Cannot use --db-setup prisma-postgres with a different database type.",
-						),
+					consola.fatal(
+						"Prisma PostgreSQL setup requires PostgreSQL database. Cannot use --db-setup prisma-postgres with a different database type.",
 					);
 					process.exit(1);
 				}
 				config.database = "postgres";
 
 				if (options.orm && options.orm !== "prisma" && options.orm !== "none") {
-					cancel(
-						pc.red(
-							"Prisma PostgreSQL setup requires Prisma ORM. Cannot use --db-setup prisma-postgres with a different ORM.",
-						),
+					consola.fatal(
+						"Prisma PostgreSQL setup requires Prisma ORM. Cannot use --db-setup prisma-postgres with a different ORM.",
 					);
 					process.exit(1);
 				}
 				config.orm = "prisma";
 			} else if (dbSetup === "mongodb-atlas") {
 				if (options.database && options.database !== "mongodb") {
-					cancel(
-						pc.red(
-							"MongoDB Atlas setup requires MongoDB database. Cannot use --db-setup mongodb-atlas with a different database type.",
-						),
+					consola.fatal(
+						"MongoDB Atlas setup requires MongoDB database. Cannot use --db-setup mongodb-atlas with a different database type.",
 					);
 					process.exit(1);
 				}
@@ -294,10 +285,8 @@ function processAndValidateFlags(
 				config.orm = "prisma";
 			} else if (dbSetup === "neon") {
 				if (options.database && options.database !== "postgres") {
-					cancel(
-						pc.red(
-							"Neon PostgreSQL setup requires PostgreSQL database. Cannot use --db-setup neon with a different database type.",
-						),
+					consola.fatal(
+						"Neon PostgreSQL setup requires PostgreSQL database. Cannot use --db-setup neon with a different database type.",
 					);
 					process.exit(1);
 				}
@@ -311,20 +300,16 @@ function processAndValidateFlags(
 	const effectiveDatabase = config.database ?? options.database;
 	if (effectiveDatabase === "none") {
 		if (options.auth === true) {
-			cancel(
-				pc.red(
-					"Authentication requires a database. Cannot use --auth with --database none.",
-				),
+			consola.fatal(
+				"Authentication requires a database. Cannot use --auth with --database none.",
 			);
 			process.exit(1);
 		}
 
 		const effectiveOrm = config.orm ?? options.orm;
 		if (effectiveOrm && effectiveOrm !== "none") {
-			cancel(
-				pc.red(
-					`Cannot use ORM with no database. Cannot use --orm ${effectiveOrm} with --database none.`,
-				),
+			consola.fatal(
+				`Cannot use ORM with no database. Cannot use --orm ${effectiveOrm} with --database none.`,
 			);
 			process.exit(1);
 		}
@@ -332,10 +317,8 @@ function processAndValidateFlags(
 
 		const effectiveDbSetup = config.dbSetup ?? options.dbSetup;
 		if (effectiveDbSetup && effectiveDbSetup !== "none") {
-			cancel(
-				pc.red(
-					`Database setup requires a database. Cannot use --db-setup ${effectiveDbSetup} with --database none.`,
-				),
+			consola.fatal(
+				`Database setup requires a database. Cannot use --db-setup ${effectiveDbSetup} with --database none.`,
 			);
 			process.exit(1);
 		}
@@ -357,7 +340,7 @@ function processAndValidateFlags(
 	if (options.frontend && options.frontend.length > 0) {
 		if (options.frontend.includes("none")) {
 			if (options.frontend.length > 1) {
-				cancel(pc.red(`Cannot combine 'none' with other frontend options.`));
+				consola.fatal(`Cannot combine 'none' with other frontend options.`);
 				process.exit(1);
 			}
 			config.frontend = [];
@@ -374,10 +357,8 @@ function processAndValidateFlags(
 			);
 
 			if (webFrontends.length > 1) {
-				cancel(
-					pc.red(
-						"Cannot select multiple web frameworks. Choose only one of: tanstack-router, tanstack-start, react-router",
-					),
+				consola.fatal(
+					"Cannot select multiple web frameworks. Choose only one of: tanstack-router, tanstack-start, react-router",
 				);
 				process.exit(1);
 			}
@@ -388,7 +369,7 @@ function processAndValidateFlags(
 	if (options.addons && options.addons.length > 0) {
 		if (options.addons.includes("none")) {
 			if (options.addons.length > 1) {
-				cancel(pc.red(`Cannot combine 'none' with other addons.`));
+				consola.fatal(`Cannot combine 'none' with other addons.`);
 				process.exit(1);
 			}
 			config.addons = [];
@@ -411,18 +392,14 @@ function processAndValidateFlags(
 
 			if (hasWebSpecificAddons && !hasCompatibleWebFrontend) {
 				if (options.frontend) {
-					cancel(
-						pc.red(
-							"PWA and Tauri addons require tanstack-router or react-router. Cannot use these addons with your frontend selection.",
-						),
+					consola.fatal(
+						"PWA and Tauri addons require tanstack-router or react-router. Cannot use these addons with your frontend selection.",
 					);
 					process.exit(1);
 				} else if (!options.yes) {
 				} else {
-					cancel(
-						pc.red(
-							"PWA and Tauri addons require tanstack-router or react-router (default frontend incompatible).",
-						),
+					consola.fatal(
+						"PWA and Tauri addons require tanstack-router or react-router (default frontend incompatible).",
 					);
 					process.exit(1);
 				}
@@ -439,7 +416,7 @@ function processAndValidateFlags(
 	if (options.examples && options.examples.length > 0) {
 		if (options.examples.includes("none")) {
 			if (options.examples.length > 1) {
-				cancel(pc.red("Cannot combine 'none' with other examples."));
+				consola.fatal("Cannot combine 'none' with other examples.");
 				process.exit(1);
 			}
 			config.examples = [];
@@ -454,10 +431,8 @@ function processAndValidateFlags(
 				effectiveBackend === "elysia" &&
 				!(options.yes && DEFAULT_CONFIG.backend !== "elysia")
 			) {
-				cancel(
-					pc.red(
-						"AI example is only compatible with Hono backend. Cannot use --examples ai with --backend elysia",
-					),
+				consola.fatal(
+					"AI example is only compatible with Hono backend. Cannot use --examples ai with --backend elysia",
 				);
 				process.exit(1);
 			}
@@ -473,18 +448,14 @@ function processAndValidateFlags(
 
 			if (!hasWebFrontend) {
 				if (options.frontend) {
-					cancel(
-						pc.red(
-							"Examples require a web frontend (tanstack-router, react-router, or tanstack-start). Cannot use --examples with your frontend selection.",
-						),
+					consola.fatal(
+						"Examples require a web frontend (tanstack-router, react-router, or tanstack-start). Cannot use --examples with your frontend selection.",
 					);
 					process.exit(1);
 				} else if (!options.yes) {
 				} else {
-					cancel(
-						pc.red(
-							"Examples require a web frontend (tanstack-router, react-router, or tanstack-start) (default frontend incompatible).",
-						),
+					consola.fatal(
+						"Examples require a web frontend (tanstack-router, react-router, or tanstack-start) (default frontend incompatible).",
 					);
 					process.exit(1);
 				}
@@ -514,12 +485,12 @@ function processAndValidateFlags(
 }
 
 main().catch((err) => {
-	log.error("Aborting installation due to unexpected error...");
+	consola.error("Aborting installation due to unexpected error...");
 	if (err instanceof Error) {
-		log.error(err.message);
+		consola.error(err.message);
 		console.error(err.stack);
 	} else {
-		log.error(
+		consola.error(
 			"An unknown error has occurred. Please open an issue on GitHub with the below:",
 		);
 		console.error(err);

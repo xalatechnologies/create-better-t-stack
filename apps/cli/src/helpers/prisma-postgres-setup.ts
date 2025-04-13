@@ -1,5 +1,6 @@
 import path from "node:path";
 import { cancel, isCancel, log, password, spinner } from "@clack/prompts";
+import { consola } from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
@@ -62,7 +63,7 @@ async function initPrismaDatabase(
 	} catch (error) {
 		s.stop(pc.red("Failed to initialize Prisma PostgreSQL"));
 		if (error instanceof Error) {
-			log.error(error.message);
+			consola.error(error.message);
 		}
 		return null;
 	}
@@ -93,7 +94,7 @@ async function writeEnvFile(projectDir: string, config?: PrismaConfig) {
 
 		await fs.writeFile(envPath, envContent.trim());
 	} catch (error) {
-		log.error("Failed to update environment configuration");
+		consola.error("Failed to update environment configuration");
 		throw error;
 	}
 }
@@ -181,7 +182,7 @@ export async function setupPrismaPostgres(
 		}
 	} catch (error) {
 		s.stop(pc.red("Prisma PostgreSQL setup failed"));
-		log.error(
+		consola.error(
 			pc.red(
 				`Error during Prisma PostgreSQL setup: ${error instanceof Error ? error.message : String(error)}`,
 			),
