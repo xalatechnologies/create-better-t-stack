@@ -8,6 +8,7 @@ import { createProject } from "./helpers/create-project";
 import { gatherConfig } from "./prompts/config-prompts";
 import type {
 	ProjectAddons,
+	ProjectApi,
 	ProjectBackend,
 	ProjectConfig,
 	ProjectDBSetup,
@@ -17,32 +18,12 @@ import type {
 	ProjectOrm,
 	ProjectPackageManager,
 	ProjectRuntime,
+	YargsArgv,
 } from "./types";
 import { displayConfig } from "./utils/display-config";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
 import { getLatestCLIVersion } from "./utils/get-latest-cli-version";
 import { renderTitle } from "./utils/render-title";
-
-type YargsArgv = {
-	projectDirectory?: string;
-
-	yes?: boolean;
-	database?: ProjectDatabase;
-	orm?: ProjectOrm;
-	auth?: boolean;
-	frontend?: ProjectFrontend[];
-	addons?: ProjectAddons[];
-	examples?: ProjectExamples[];
-	git?: boolean;
-	packageManager?: ProjectPackageManager;
-	install?: boolean;
-	dbSetup?: ProjectDBSetup;
-	backend?: ProjectBackend;
-	runtime?: ProjectRuntime;
-
-	_: (string | number)[];
-	$0: string;
-};
 
 const exit = () => process.exit(0);
 process.on("SIGINT", exit);
@@ -99,7 +80,15 @@ async function main() {
 				type: "array",
 				string: true,
 				describe: "Additional addons",
-				choices: ["pwa", "tauri", "starlight", "biome", "husky", "none"],
+				choices: [
+					"pwa",
+					"tauri",
+					"starlight",
+					"biome",
+					"husky",
+					"turborepo",
+					"none",
+				],
 			})
 			.option("examples", {
 				type: "array",
@@ -119,7 +108,7 @@ async function main() {
 			})
 			.option("install", {
 				type: "boolean",
-				describe: "Install dependencies (use --no-install to explicitly skip)",
+				describe: "Install dependencies",
 			})
 			.option("db-setup", {
 				type: "string",
@@ -135,6 +124,11 @@ async function main() {
 				type: "string",
 				describe: "Runtime",
 				choices: ["bun", "node"],
+			})
+			.option("api", {
+				type: "string",
+				describe: "API type",
+				choices: ["trpc", "orpc"],
 			})
 			.completion()
 			.recommendCommands()
@@ -188,7 +182,9 @@ async function main() {
 		const elapsedTimeInSeconds = ((Date.now() - startTime) / 1000).toFixed(2);
 		outro(
 			pc.magenta(
-				`Project created successfully in ${pc.bold(elapsedTimeInSeconds)} seconds!`,
+				`Project created successfully in ${pc.bold(
+					elapsedTimeInSeconds,
+				)} seconds!`,
 			),
 		);
 	} catch (error) {
@@ -214,10 +210,10 @@ function processAndValidateFlags(
 ): Partial<ProjectConfig> {
 	const config: Partial<ProjectConfig> = {};
 
+	// --- Database and ORM validation ---
 	if (options.database) {
 		config.database = options.database as ProjectDatabase;
 	}
-
 	if (options.orm) {
 		if (options.orm === "none") {
 			config.orm = "none";
@@ -225,7 +221,6 @@ function processAndValidateFlags(
 			config.orm = options.orm as ProjectOrm;
 		}
 	}
-
 	if (
 		(config.database ?? options.database) === "mongodb" &&
 		(config.orm ?? options.orm) === "drizzle"
@@ -332,7 +327,6 @@ function processAndValidateFlags(
 	if (options.backend) {
 		config.backend = options.backend as ProjectBackend;
 	}
-
 	if (options.runtime) {
 		config.runtime = options.runtime as ProjectRuntime;
 	}
@@ -353,12 +347,13 @@ function processAndValidateFlags(
 				(f) =>
 					f === "tanstack-router" ||
 					f === "react-router" ||
-					f === "tanstack-start",
+					f === "tanstack-start" ||
+					f === "next",
 			);
 
 			if (webFrontends.length > 1) {
 				consola.fatal(
-					"Cannot select multiple web frameworks. Choose only one of: tanstack-router, tanstack-start, react-router",
+					"Cannot select multiple web frameworks. Choose only one of: tanstack-router, tanstack-start, react-router, next",
 				);
 				process.exit(1);
 			}
@@ -366,6 +361,34 @@ function processAndValidateFlags(
 		}
 	}
 
+	if (options.api) {
+		config.api = options.api as ProjectApi;
+	}
+
+	const effectiveFrontend =
+		config.frontend ??
+		(options.frontend?.filter((f) => f !== "none") as ProjectFrontend[]) ??
+		(options.yes ? DEFAULT_CONFIG.frontend : undefined);
+
+	const includesNative = effectiveFrontend?.includes("native");
+
+	const effectiveApi =
+		config.api ?? (options.yes ? DEFAULT_CONFIG.api : undefined);
+
+	if (includesNative && effectiveApi === "orpc") {
+		consola.fatal(
+			`oRPC API is not supported when using the 'native' frontend. Please use --api trpc or remove 'native' from --frontend.`,
+		);
+		process.exit(1);
+	}
+
+	if (includesNative && effectiveApi !== "trpc") {
+		if (!options.api || (options.yes && options.api !== "orpc")) {
+			config.api = "trpc";
+		}
+	}
+
+	// --- Addons validation ---
 	if (options.addons && options.addons.length > 0) {
 		if (options.addons.includes("none")) {
 			if (options.addons.length > 1) {
@@ -382,9 +405,6 @@ function processAndValidateFlags(
 			const hasWebSpecificAddons = validOptions.some((addon) =>
 				webSpecificAddons.includes(addon),
 			);
-
-			const effectiveFrontend =
-				config.frontend ?? (options.yes ? DEFAULT_CONFIG.frontend : undefined);
 
 			const hasCompatibleWebFrontend = effectiveFrontend?.some(
 				(f) => f === "tanstack-router" || f === "react-router",
@@ -413,6 +433,7 @@ function processAndValidateFlags(
 		}
 	}
 
+	// --- Examples validation ---
 	if (options.examples && options.examples.length > 0) {
 		if (options.examples.includes("none")) {
 			if (options.examples.length > 1) {
@@ -437,25 +458,22 @@ function processAndValidateFlags(
 				process.exit(1);
 			}
 
-			const effectiveFrontend =
-				config.frontend ??
-				(options.frontend?.filter((f) => f !== "none") as ProjectFrontend[]) ??
-				(options.yes ? DEFAULT_CONFIG.frontend : undefined);
-
-			const hasWebFrontend = effectiveFrontend?.some((f) =>
-				["tanstack-router", "react-router", "tanstack-start"].includes(f),
+			const hasWebFrontendForExamples = effectiveFrontend?.some((f) =>
+				["tanstack-router", "react-router", "tanstack-start", "next"].includes(
+					f,
+				),
 			);
 
-			if (!hasWebFrontend) {
+			if (!hasWebFrontendForExamples) {
 				if (options.frontend) {
 					consola.fatal(
-						"Examples require a web frontend (tanstack-router, react-router, or tanstack-start). Cannot use --examples with your frontend selection.",
+						"Examples require a web frontend (tanstack-router, react-router, tanstack-start, or next). Cannot use --examples with your frontend selection.",
 					);
 					process.exit(1);
 				} else if (!options.yes) {
 				} else {
 					consola.fatal(
-						"Examples require a web frontend (tanstack-router, react-router, or tanstack-start) (default frontend incompatible).",
+						"Examples require a web frontend (tanstack-router, react-router, tanstack-start, or next) (default frontend incompatible).",
 					);
 					process.exit(1);
 				}
@@ -465,18 +483,16 @@ function processAndValidateFlags(
 		}
 	}
 
+	// --- Other flags ---
 	if (options.packageManager) {
 		config.packageManager = options.packageManager as ProjectPackageManager;
 	}
-
 	if (options.git !== undefined) {
 		config.git = options.git;
 	}
-
 	if (options.install !== undefined) {
-		config.noInstall = !options.install;
+		config.install = options.install;
 	}
-
 	if (projectDirectory) {
 		config.projectName = projectDirectory;
 	}

@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
 import { Code, Sliders, Terminal, TerminalSquare } from "lucide-react";
+import { motion } from "motion/react";
 import StackArchitect from "./StackArchitech";
 
 export default function CustomizableSection() {

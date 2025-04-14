@@ -3,30 +3,41 @@ import fs from "fs-extra";
 
 import { type AvailableDependencies, dependencyVersionMap } from "../constants";
 
-export const addPackageDependency = (opts: {
+export const addPackageDependency = async (opts: {
 	dependencies?: AvailableDependencies[];
 	devDependencies?: AvailableDependencies[];
 	projectDir: string;
-}) => {
+}): Promise<void> => {
 	const { dependencies = [], devDependencies = [], projectDir } = opts;
 
 	const pkgJsonPath = path.join(projectDir, "package.json");
-	const pkgJson = fs.readJSONSync(pkgJsonPath);
+
+	const pkgJson = await fs.readJson(pkgJsonPath);
 
 	if (!pkgJson.dependencies) pkgJson.dependencies = {};
 	if (!pkgJson.devDependencies) pkgJson.devDependencies = {};
 
 	for (const pkgName of dependencies) {
 		const version = dependencyVersionMap[pkgName];
-		pkgJson.dependencies[pkgName] = version;
+		if (version) {
+			pkgJson.dependencies[pkgName] = version;
+		} else {
+			console.warn(`Warning: Dependency ${pkgName} not found in version map.`);
+		}
 	}
 
 	for (const pkgName of devDependencies) {
 		const version = dependencyVersionMap[pkgName];
-		pkgJson.devDependencies[pkgName] = version;
+		if (version) {
+			pkgJson.devDependencies[pkgName] = version;
+		} else {
+			console.warn(
+				`Warning: Dev dependency ${pkgName} not found in version map.`,
+			);
+		}
 	}
 
-	fs.writeJSONSync(pkgJsonPath, pkgJson, {
+	await fs.writeJson(pkgJsonPath, pkgJson, {
 		spaces: 2,
 	});
 };

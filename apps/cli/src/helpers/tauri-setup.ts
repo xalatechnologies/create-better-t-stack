@@ -1,17 +1,17 @@
 import path from "node:path";
-import { log, spinner } from "@clack/prompts";
+import { spinner } from "@clack/prompts";
 import { consola } from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type { ProjectFrontend, ProjectPackageManager } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
+import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
 
-export async function setupTauri(
-	projectDir: string,
-	packageManager: ProjectPackageManager,
-	frontends: ProjectFrontend[],
-): Promise<void> {
+import type { ProjectConfig } from "../types";
+
+export async function setupTauri(config: ProjectConfig): Promise<void> {
+	const { projectName, packageManager, frontend } = config;
+	const projectDir = path.resolve(process.cwd(), projectName);
 	const s = spinner();
 	const clientPackageDir = path.join(projectDir, "apps/web");
 
@@ -22,7 +22,7 @@ export async function setupTauri(
 	try {
 		s.start("Setting up Tauri desktop app support...");
 
-		addPackageDependency({
+		await addPackageDependency({
 			devDependencies: ["@tauri-apps/cli"],
 			projectDir: clientPackageDir,
 		});
@@ -41,48 +41,35 @@ export async function setupTauri(
 			await fs.writeJson(clientPackageJsonPath, packageJson, { spaces: 2 });
 		}
 
-		let cmd: string;
-		let args: string[];
-
-		switch (packageManager) {
-			case "npm":
-				cmd = "npx";
-				args = ["@tauri-apps/cli@latest"];
-				break;
-			case "pnpm":
-				cmd = "pnpm";
-				args = ["dlx", "@tauri-apps/cli@latest"];
-				break;
-			case "bun":
-				cmd = "bunx";
-				args = ["@tauri-apps/cli@latest"];
-				break;
-			default:
-				cmd = "npx";
-				args = ["@tauri-apps/cli@latest"];
-		}
-
-		const hasReactRouter = frontends.includes("react-router");
+		const hasReactRouter = frontend.includes("react-router");
 		const devUrl = hasReactRouter
 			? "http://localhost:5173"
 			: "http://localhost:3001";
 
-		args = [
-			...args,
+		const tauriArgs = [
 			"init",
 			`--app-name=${path.basename(projectDir)}`,
 			`--window-title=${path.basename(projectDir)}`,
 			"--frontend-dist=../dist",
 			`--dev-url=${devUrl}`,
-			`--before-dev-command=${packageManager} run dev`,
-			`--before-build-command=${packageManager} run build`,
+			`--before-dev-command=\"${packageManager} run dev\"`,
+			`--before-build-command=\"${packageManager} run build\"`,
 		];
+		const tauriArgsString = tauriArgs.join(" ");
 
-		await execa(cmd, args, {
+		const commandWithArgs = `@tauri-apps/cli@latest ${tauriArgsString}`;
+
+		const tauriInitCommand = getPackageExecutionCommand(
+			packageManager,
+			commandWithArgs,
+		);
+
+		await execa(tauriInitCommand, {
 			cwd: clientPackageDir,
 			env: {
 				CI: "true",
 			},
+			shell: true,
 		});
 
 		s.stop("Tauri desktop app support configured successfully!");

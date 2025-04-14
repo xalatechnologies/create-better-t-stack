@@ -17,10 +17,11 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 	examples: [],
 	git: true,
 	packageManager: getUserPkgManager(),
-	noInstall: false,
+	install: true,
 	dbSetup: "none",
 	backend: "hono",
 	runtime: "bun",
+	api: "trpc",
 };
 
 export const dependencyVersionMap = {
@@ -69,10 +70,20 @@ export const dependencyVersionMap = {
 	"@types/express": "^5.0.1",
 	"@types/cors": "^2.8.17",
 
+	turbo: "^2.4.2",
+
 	ai: "^4.2.8",
 	"@ai-sdk/google": "^1.2.3",
 
 	"@prisma/extension-accelerate": "^1.3.0",
+
+	"@orpc/server": "^1.0.3",
+	"@orpc/react-query": "^1.0.3",
+	"@orpc/client": "^1.0.3",
+
+	"@trpc/tanstack-react-query": "^11.0.0",
+	"@trpc/server": "^11.0.0",
+	"@trpc/client": "^11.0.0",
 } as const;
 
 export type AvailableDependencies = keyof typeof dependencyVersionMap;

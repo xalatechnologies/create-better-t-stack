@@ -29,6 +29,11 @@ export async function getAddonsChoice(
 			label: "Husky",
 			hint: "Add Git hooks with Husky, lint-staged (requires Biome)",
 		},
+		{
+			value: "turborepo" as const,
+			label: "Turborepo",
+			hint: "Optimize builds for monorepos",
+		},
 	];
 
 	const webAddonOptions = [

@@ -1,4 +1,28 @@
 export const TECH_OPTIONS = {
+	api: [
+		{
+			id: "trpc",
+			name: "tRPC",
+			description: "End-to-end typesafe APIs",
+			icon: "🔗",
+			color: "from-blue-500 to-blue-700",
+			default: true,
+		},
+		{
+			id: "orpc",
+			name: "oRPC",
+			description: "Opinionated RPC framework",
+			icon: "🧩",
+			color: "from-indigo-400 to-indigo-600",
+		},
+		{
+			id: "none",
+			name: "No API",
+			description: "Skip API layer integration",
+			icon: "🚫",
+			color: "from-gray-400 to-gray-600",
+		},
+	],
 	frontend: [
 		{
 			id: "tanstack-router",
@@ -279,6 +303,14 @@ export const TECH_OPTIONS = {
 			color: "from-purple-500 to-purple-700",
 			default: false,
 		},
+		{
+			id: "turborepo",
+			name: "Turborepo",
+			description: "Monorepo build system",
+			icon: "🌀",
+			color: "from-gray-400 to-gray-700",
+			default: false,
+		},
 	],
 	examples: [
 		{
@@ -353,6 +385,7 @@ export const PRESET_TEMPLATES = [
 			examples: [],
 			git: "true",
 			install: "true",
+			api: "trpc",
 		},
 	},
 	{
@@ -373,6 +406,7 @@ export const PRESET_TEMPLATES = [
 			examples: [],
 			git: "true",
 			install: "true",
+			api: "trpc",
 		},
 	},
 	{
@@ -393,6 +427,7 @@ export const PRESET_TEMPLATES = [
 			examples: [],
 			git: "true",
 			install: "true",
+			api: "trpc",
 		},
 	},
 	{
@@ -409,10 +444,11 @@ export const PRESET_TEMPLATES = [
 			dbSetup: "turso",
 			auth: "true",
 			packageManager: "bun",
-			addons: ["pwa", "biome", "husky", "tauri", "starlight"],
+			addons: ["pwa", "biome", "husky", "tauri", "starlight", "turborepo"],
 			examples: ["todo", "ai"],
 			git: "true",
 			install: "true",
+			api: "trpc",
 		},
 	},
 ];
@@ -431,6 +467,7 @@ export type StackState = {
 	examples: string[];
 	git: string;
 	install: string;
+	api: string;
 };
 
 export const DEFAULT_STACK: StackState = {
@@ -447,4 +484,5 @@ export const DEFAULT_STACK: StackState = {
 	examples: [],
 	git: "true",
 	install: "true",
+	api: "trpc",
 };

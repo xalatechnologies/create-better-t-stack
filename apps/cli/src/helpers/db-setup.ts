@@ -10,50 +10,46 @@ import type {
 } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 import { setupMongoDBAtlas } from "./mongodb-atlas-setup";
-import { setupNeonPostgres } from "./neon-setup";
 import { setupPrismaPostgres } from "./prisma-postgres-setup";
 import { setupTurso } from "./turso-setup";
 
-export async function setupDatabase(
-	projectDir: string,
-	databaseType: ProjectDatabase,
-	orm: ProjectOrm,
-	packageManager: ProjectPackageManager,
-	setupTursoDb: boolean,
-	setupPrismaPostgresDb: boolean,
-	setupMongoDBAtlasDb: boolean,
-	setupNeonPostgresDb: boolean,
-): Promise<void> {
+import { setupNeonPostgres } from "./neon-setup";
+
+import type { ProjectConfig } from "../types";
+
+export async function setupDatabase(config: ProjectConfig): Promise<void> {
+	const { projectName, database, orm, packageManager, dbSetup } = config;
+	const projectDir = path.resolve(process.cwd(), projectName);
 	const s = spinner();
 	const serverDir = path.join(projectDir, "apps/server");
 
-	if (databaseType === "none") {
+	if (database === "none") {
 		await fs.remove(path.join(serverDir, "src/db"));
 		return;
 	}
 
 	try {
 		if (orm === "prisma") {
-			addPackageDependency({
+			await addPackageDependency({
 				dependencies: ["@prisma/client"],
 				devDependencies: ["prisma"],
 				projectDir: serverDir,
 			});
 		} else if (orm === "drizzle") {
-			if (databaseType === "sqlite") {
-				addPackageDependency({
+			if (database === "sqlite") {
+				await addPackageDependency({
 					dependencies: ["drizzle-orm", "@libsql/client"],
 					devDependencies: ["drizzle-kit"],
 					projectDir: serverDir,
 				});
-			} else if (databaseType === "postgres") {
-				addPackageDependency({
+			} else if (database === "postgres") {
+				await addPackageDependency({
 					dependencies: ["drizzle-orm", "pg"],
 					devDependencies: ["drizzle-kit", "@types/pg"],
 					projectDir: serverDir,
 				});
-			} else if (databaseType === "mysql") {
-				addPackageDependency({
+			} else if (database === "mysql") {
+				await addPackageDependency({
 					dependencies: ["drizzle-orm", "mysql2"],
 					devDependencies: ["drizzle-kit"],
 					projectDir: serverDir,
@@ -61,16 +57,16 @@ export async function setupDatabase(
 			}
 		}
 
-		if (databaseType === "sqlite" && setupTursoDb) {
-			await setupTurso(projectDir, orm === "drizzle");
-		} else if (databaseType === "postgres") {
-			if (orm === "prisma" && setupPrismaPostgresDb) {
-				await setupPrismaPostgres(projectDir, packageManager);
-			} else if (setupNeonPostgresDb) {
-				await setupNeonPostgres(projectDir, packageManager);
+		if (database === "sqlite" && dbSetup === "turso") {
+			await setupTurso(config);
+		} else if (database === "postgres") {
+			if (orm === "prisma" && dbSetup === "prisma-postgres") {
+				await setupPrismaPostgres(config);
+			} else if (dbSetup === "neon") {
+				await setupNeonPostgres(config);
 			}
-		} else if (databaseType === "mongodb" && setupMongoDBAtlasDb) {
-			await setupMongoDBAtlas(projectDir);
+		} else if (database === "mongodb" && dbSetup === "mongodb-atlas") {
+			await setupMongoDBAtlas(config);
 		}
 	} catch (error) {
 		s.stop(pc.red("Failed to set up database"));

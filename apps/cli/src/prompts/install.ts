@@ -2,14 +2,12 @@ import { cancel, confirm, isCancel } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
 
-export async function getNoInstallChoice(
-	noInstall?: boolean,
-): Promise<boolean> {
-	if (noInstall !== undefined) return noInstall;
+export async function getinstallChoice(install?: boolean): Promise<boolean> {
+	if (install !== undefined) return install;
 
 	const response = await confirm({
 		message: "Install dependencies?",
-		initialValue: !DEFAULT_CONFIG.noInstall,
+		initialValue: DEFAULT_CONFIG.install,
 	});
 
 	if (isCancel(response)) {
@@ -17,5 +15,5 @@ export async function getNoInstallChoice(
 		process.exit(0);
 	}
 
-	return !response;
+	return response;
 }

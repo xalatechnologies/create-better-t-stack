@@ -17,9 +17,13 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		}
 	}
 
+	if (config.api) {
+		flags.push(`--api ${config.api}`);
+	}
+
 	flags.push(config.auth ? "--auth" : "--no-auth");
 	flags.push(config.git ? "--git" : "--no-git");
-	flags.push(config.noInstall ? "--no-install" : "--install");
+	flags.push(config.install ? "--install" : "--no-install");
 
 	if (config.runtime) {
 		flags.push(`--runtime ${config.runtime}`);

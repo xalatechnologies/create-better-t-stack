@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Tweet } from "react-tweet";
 

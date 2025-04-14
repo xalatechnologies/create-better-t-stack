@@ -6,7 +6,6 @@ import {
 	type StackState,
 	TECH_OPTIONS,
 } from "@/lib/constant";
-import { motion } from "framer-motion";
 import {
 	Check,
 	Circle,
@@ -20,8 +19,9 @@ import {
 	Star,
 	Terminal,
 } from "lucide-react";
+import { motion } from "motion/react";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const validateProjectName = (name: string): string | undefined => {
 	const INVALID_CHARS = ["<", ">", ":", '"', "|", "?", "*"];
@@ -67,6 +67,27 @@ const StackArchitect = ({
 	const [showHelp, setShowHelp] = useState(false);
 	const [lastSavedStack, setLastSavedStack] = useState<StackState | null>(null);
 
+	const hasNativeFrontend = useMemo(
+		() => stack.frontend.includes("native"),
+		[stack.frontend],
+	);
+	const hasWebFrontend = useMemo(
+		() =>
+			stack.frontend.some((f) =>
+				["tanstack-router", "react-router", "tanstack-start", "next"].includes(
+					f,
+				),
+			),
+		[stack.frontend],
+	);
+	const hasPWACompatibleFrontend = useMemo(
+		() =>
+			stack.frontend.some((f) =>
+				["tanstack-router", "react-router"].includes(f),
+			),
+		[stack.frontend],
+	);
+
 	useEffect(() => {
 		const savedStack = localStorage.getItem("betterTStackPreference");
 		if (savedStack) {
@@ -79,128 +100,157 @@ const StackArchitect = ({
 		}
 	}, []);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		if (stack.database === "none") {
-			if (stack.orm !== "none") {
-				setStack((prev) => ({ ...prev, orm: "none" }));
-			}
-			if (stack.auth === "true") {
-				setStack((prev) => ({ ...prev, auth: "false" }));
-			}
-			if (stack.dbSetup !== "none") {
-				setStack((prev) => ({ ...prev, dbSetup: "none" }));
-			}
-		}
+		let changed = false;
+		const nextStack = { ...stack };
+		const originalAuth = stack.auth;
 
-		if (stack.database === "mongodb" && stack.orm === "drizzle") {
-			setStack((prev) => ({ ...prev, orm: "prisma" }));
-		}
-
-		if (stack.dbSetup === "turso") {
-			if (stack.database !== "sqlite") {
-				setStack((prev) => ({ ...prev, database: "sqlite" }));
+		if (nextStack.database === "none") {
+			if (nextStack.orm !== "none") {
+				nextStack.orm = "none";
+				changed = true;
 			}
-			if (stack.orm === "prisma") {
-				setStack((prev) => ({ ...prev, orm: "drizzle" }));
+			if (nextStack.auth === "true") {
+				nextStack.auth = "false";
+				changed = true;
 			}
-		} else if (stack.dbSetup === "prisma-postgres") {
-			if (stack.database !== "postgres") {
-				setStack((prev) => ({ ...prev, database: "postgres" }));
+			if (nextStack.dbSetup !== "none") {
+				nextStack.dbSetup = "none";
+				changed = true;
 			}
-			if (stack.orm !== "prisma") {
-				setStack((prev) => ({ ...prev, orm: "prisma" }));
-			}
-		} else if (stack.dbSetup === "mongodb-atlas") {
-			if (stack.database !== "mongodb") {
-				setStack((prev) => ({ ...prev, database: "mongodb" }));
-			}
-			if (stack.orm !== "prisma") {
-				setStack((prev) => ({ ...prev, orm: "prisma" }));
-			}
-		} else if (stack.dbSetup === "neon") {
-			if (stack.database !== "postgres") {
-				setStack((prev) => ({ ...prev, database: "postgres" }));
-			}
-		}
-	}, [stack.database, stack.orm, stack.dbSetup, stack.auth]);
-
-	useEffect(() => {
-		const cmd = generateCommand(stack);
-		setCommand(cmd);
-
-		const notes: Record<string, string[]> = {};
-		const hasWebFrontend =
-			stack.frontend.includes("tanstack-router") ||
-			stack.frontend.includes("react-router") ||
-			stack.frontend.includes("tanstack-start") ||
-			stack.frontend.includes("next");
-
-		notes.frontend = [];
-
-		notes.dbSetup = [];
-		if (stack.database === "none") {
-			notes.dbSetup.push("Database setup requires a database.");
 		} else {
-			if (stack.dbSetup === "turso") {
-				if (stack.database !== "sqlite") {
-					notes.dbSetup.push("Turso setup requires SQLite database.");
-				}
-				if (stack.orm === "prisma") {
-					notes.dbSetup.push("Turso is not compatible with Prisma ORM.");
-				}
-			} else if (stack.dbSetup === "prisma-postgres") {
-				if (stack.database !== "postgres") {
-					notes.dbSetup.push(
-						"Prisma PostgreSQL setup requires PostgreSQL database.",
-					);
-				}
-				if (stack.orm !== "prisma") {
-					notes.dbSetup.push("Prisma PostgreSQL setup requires Prisma ORM.");
-				}
-			} else if (stack.dbSetup === "mongodb-atlas") {
-				if (stack.database !== "mongodb") {
-					notes.dbSetup.push("MongoDB Atlas setup requires MongoDB database.");
-				}
-			} else if (stack.dbSetup === "neon") {
-				if (stack.database !== "postgres") {
-					notes.dbSetup.push("Neon setup requires PostgreSQL database.");
-				}
+			if (
+				nextStack.auth === "false" &&
+				(hasWebFrontend || hasNativeFrontend) &&
+				originalAuth === "false"
+			) {
 			}
 		}
 
-		notes.addons = [];
-		if (!hasWebFrontend) {
-			notes.addons.push("PWA and Tauri are only available with React Web.");
+		if (nextStack.database === "mongodb" && nextStack.orm === "drizzle") {
+			nextStack.orm = "prisma";
+			changed = true;
 		}
 
-		notes.database = [];
+		if (nextStack.dbSetup === "turso") {
+			if (nextStack.database !== "sqlite") {
+				nextStack.database = "sqlite";
+				changed = true;
+			}
+			if (nextStack.orm === "prisma") {
+				nextStack.orm = "drizzle";
+				changed = true;
+			}
+		} else if (nextStack.dbSetup === "prisma-postgres") {
+			if (nextStack.database !== "postgres") {
+				nextStack.database = "postgres";
+				changed = true;
+			}
+			if (nextStack.orm !== "prisma") {
+				nextStack.orm = "prisma";
+				changed = true;
+			}
+		} else if (nextStack.dbSetup === "mongodb-atlas") {
+			if (nextStack.database !== "mongodb") {
+				nextStack.database = "mongodb";
+				changed = true;
+			}
+			if (nextStack.orm !== "prisma") {
+				nextStack.orm = "prisma";
+				changed = true;
+			}
+		} else if (nextStack.dbSetup === "neon") {
+			if (nextStack.database !== "postgres") {
+				nextStack.database = "postgres";
+				changed = true;
+			}
+		}
 
-		notes.orm = [];
-		if (stack.database === "none") {
-			notes.orm.push(
-				"ORM options are only available when a database is selected.",
+		if (changed) {
+			setStack((currentStack) => ({
+				...currentStack,
+				database: nextStack.database,
+				orm: nextStack.orm,
+				auth: nextStack.auth,
+				dbSetup: nextStack.dbSetup,
+			}));
+		}
+	}, [
+		stack.database,
+		stack.orm,
+		stack.dbSetup,
+		stack.auth,
+		hasWebFrontend,
+		hasNativeFrontend,
+	]);
+
+	useEffect(() => {
+		let addonsChanged = false;
+		let examplesChanged = false;
+		let apiChanged = false;
+
+		const currentAddons = stack.addons;
+		const currentExamples = stack.examples;
+		const currentApi = stack.api;
+		const currentBackend = stack.backendFramework;
+
+		let nextAddons = [...currentAddons];
+		let nextExamples = [...currentExamples];
+		let nextApi = currentApi;
+
+		if (!hasPWACompatibleFrontend) {
+			const incompatibleAddons = ["pwa", "tauri"];
+			const originalLength = nextAddons.length;
+			nextAddons = nextAddons.filter(
+				(addon) => !incompatibleAddons.includes(addon),
 			);
-		} else if (stack.database === "mongodb" && stack.orm === "drizzle") {
-			notes.orm.push("MongoDB is only available with Prisma ORM.");
+			if (nextAddons.length !== originalLength) {
+				addonsChanged = true;
+			}
 		}
 
-		notes.auth = [];
-		if (stack.database === "none") {
-			notes.auth.push("Authentication requires a database.");
-		}
-
-		notes.examples = [];
 		if (!hasWebFrontend) {
-			notes.examples.push(
-				"Todo and AI examples are only available with React Web.",
+			const incompatibleExamples = ["todo", "ai"];
+			const originalLength = nextExamples.length;
+			nextExamples = nextExamples.filter(
+				(example) => !incompatibleExamples.includes(example),
 			);
-		}
-		if (stack.backendFramework === "elysia") {
-			notes.examples.push("AI example is only compatible with Hono backend.");
+			if (nextExamples.length !== originalLength) {
+				examplesChanged = true;
+			}
 		}
 
-		setCompatNotes(notes);
-	}, [stack]);
+		if (currentBackend === "elysia") {
+			const originalLength = nextExamples.length;
+			nextExamples = nextExamples.filter((example) => example !== "ai");
+			if (nextExamples.length !== originalLength) {
+				examplesChanged = true;
+			}
+		}
+
+		if (hasNativeFrontend && currentApi !== "trpc") {
+			nextApi = "trpc";
+			apiChanged = true;
+		}
+
+		if (addonsChanged || examplesChanged || apiChanged) {
+			setStack((prev) => ({
+				...prev,
+				addons: addonsChanged ? nextAddons : prev.addons,
+				examples: examplesChanged ? nextExamples : prev.examples,
+				api: apiChanged ? nextApi : prev.api,
+			}));
+		}
+	}, [
+		stack.addons,
+		stack.examples,
+		stack.api,
+		stack.backendFramework,
+		hasPWACompatibleFrontend,
+		hasWebFrontend,
+		hasNativeFrontend,
+	]);
 
 	const generateCommand = useCallback((stackState: StackState) => {
 		let base: string;
@@ -215,7 +265,10 @@ const StackArchitect = ({
 		const projectName = stackState.projectName || "my-better-t-app";
 		const flags: string[] = ["--yes"];
 
-		if (stackState.frontend.length === 1 && stackState.frontend[0] === "none") {
+		if (
+			stackState.frontend.length === 0 ||
+			(stackState.frontend.length === 1 && stackState.frontend[0] === "none")
+		) {
 			flags.push("--frontend none");
 		} else if (
 			!(
@@ -270,14 +323,129 @@ const StackArchitect = ({
 			flags.push(`--examples ${stackState.examples.join(" ")}`);
 		}
 
+		if (stackState.api && stackState.api !== "trpc") {
+			flags.push(`--api ${stackState.api}`);
+		}
+
 		return `${base} ${projectName} ${flags.join(" ")}`;
 	}, []);
+
+	useEffect(() => {
+		const cmd = generateCommand(stack);
+		setCommand(cmd);
+
+		const notes: Record<string, string[]> = {};
+
+		notes.frontend = [];
+		if (stack.frontend.includes("native") && stack.frontend.length > 1) {
+			notes.frontend.push(
+				"When using React Native alongside a web frontend, only the tRPC API option is available.",
+			);
+		}
+
+		notes.dbSetup = [];
+		if (stack.database === "none") {
+			notes.dbSetup.push("Database setup requires a database to be selected.");
+		} else {
+			if (stack.dbSetup === "turso") {
+				if (stack.database !== "sqlite") {
+					notes.dbSetup.push("Turso setup requires the SQLite database.");
+				}
+				if (stack.orm === "prisma") {
+					notes.dbSetup.push("Turso is not compatible with the Prisma ORM.");
+				}
+			} else if (stack.dbSetup === "prisma-postgres") {
+				if (stack.database !== "postgres") {
+					notes.dbSetup.push(
+						"Prisma PostgreSQL setup requires the PostgreSQL database.",
+					);
+				}
+				if (stack.orm !== "prisma") {
+					notes.dbSetup.push(
+						"Prisma PostgreSQL setup requires the Prisma ORM.",
+					);
+				}
+			} else if (stack.dbSetup === "mongodb-atlas") {
+				if (stack.database !== "mongodb") {
+					notes.dbSetup.push(
+						"MongoDB Atlas setup requires the MongoDB database.",
+					);
+				}
+			} else if (stack.dbSetup === "neon") {
+				if (stack.database !== "postgres") {
+					notes.dbSetup.push("Neon setup requires the PostgreSQL database.");
+				}
+			}
+		}
+
+		notes.addons = [];
+		if (!hasPWACompatibleFrontend) {
+			notes.addons.push(
+				"PWA and Tauri addons require TanStack Router or React Router.",
+			);
+		}
+		if (stack.addons.includes("husky") && !stack.addons.includes("biome")) {
+			notes.addons.push(
+				"Husky addon automatically enables Biome for lint-staged.",
+			);
+		}
+
+		notes.database = [];
+		if (stack.database === "mongodb" && stack.orm === "drizzle") {
+			notes.database.push("MongoDB is only compatible with the Prisma ORM.");
+		}
+
+		notes.orm = [];
+		if (stack.database === "none") {
+			notes.orm.push("ORM options require a database to be selected.");
+		} else if (stack.database === "mongodb" && stack.orm === "drizzle") {
+			notes.orm.push("MongoDB is only compatible with the Prisma ORM.");
+		} else if (
+			stack.database === "sqlite" &&
+			stack.orm === "prisma" &&
+			stack.dbSetup === "turso"
+		) {
+			notes.orm.push("Prisma ORM is not compatible with the Turso DB setup.");
+		}
+
+		notes.auth = [];
+		if (stack.database === "none") {
+			notes.auth.push("Authentication requires a database.");
+		}
+
+		notes.examples = [];
+		if (!hasWebFrontend) {
+			notes.examples.push(
+				"Todo and AI examples require a web frontend (TanStack Router, React Router, TanStack Start, or Next.js).",
+			);
+		}
+		if (stack.backendFramework === "elysia" && stack.examples.includes("ai")) {
+			notes.examples.push(
+				"The AI example is currently only compatible with the Hono backend.",
+			);
+		}
+
+		notes.api = [];
+		if (hasNativeFrontend && stack.api !== "trpc") {
+			notes.api.push("React Native frontend requires the tRPC API option.");
+		}
+
+		setCompatNotes(notes);
+	}, [
+		stack,
+		hasWebFrontend,
+		hasPWACompatibleFrontend,
+		hasNativeFrontend,
+		generateCommand,
+	]);
 
 	const handleTechSelect = useCallback(
 		(category: keyof typeof TECH_OPTIONS, techId: string) => {
 			setStack((prev) => {
+				const currentStack = { ...prev };
+
 				if (category === "frontend") {
-					const currentSelection = [...prev.frontend];
+					let currentSelection = [...currentStack.frontend];
 					const webTypes = [
 						"tanstack-router",
 						"react-router",
@@ -286,30 +454,28 @@ const StackArchitect = ({
 					];
 
 					if (techId === "none") {
-						return {
-							...prev,
-							frontend: ["none"],
-							examples: [],
-							addons: prev.addons.filter(
-								(addon) => addon !== "pwa" && addon !== "tauri",
-							),
-						};
+						return { ...currentStack, frontend: ["none"] };
+					}
+
+					if (
+						currentSelection.includes(techId) &&
+						currentSelection.length === 1
+					) {
+						return prev;
 					}
 
 					if (currentSelection.includes(techId)) {
-						if (currentSelection.length === 1) {
-							return prev;
+						currentSelection = currentSelection.filter((id) => id !== techId);
+
+						if (currentSelection.length === 0) {
 						}
-						return {
-							...prev,
-							frontend: currentSelection.filter((id) => id !== techId),
-						};
+						return { ...currentStack, frontend: currentSelection };
 					}
 
 					let newSelection = [...currentSelection];
 
 					if (newSelection.includes("none")) {
-						newSelection = [];
+						newSelection = newSelection.filter((id) => id !== "none");
 					}
 
 					if (webTypes.includes(techId)) {
@@ -318,173 +484,104 @@ const StackArchitect = ({
 
 					newSelection.push(techId);
 
-					return {
-						...prev,
-						frontend: newSelection,
-					};
+					return { ...currentStack, frontend: newSelection };
 				}
 
 				if (category === "addons" || category === "examples") {
-					const currentArray = [...(prev[category] || [])];
+					const currentArray = [...(currentStack[category] || [])];
 					const index = currentArray.indexOf(techId);
-					const hasWebFrontend =
-						prev.frontend.includes("tanstack-router") ||
-						prev.frontend.includes("react-router") ||
-						prev.frontend.includes("tanstack-start");
-
-					const hasPWACompatibleFrontend =
-						prev.frontend.includes("tanstack-router") ||
-						prev.frontend.includes("react-router");
 
 					if (index >= 0) {
 						currentArray.splice(index, 1);
 					} else {
-						if (
-							category === "examples" &&
-							(techId === "todo" || techId === "ai") &&
-							!hasWebFrontend
-						) {
-							return prev;
+						if (category === "examples") {
+							if (!hasWebFrontend && (techId === "todo" || techId === "ai"))
+								return prev;
+							if (techId === "ai" && currentStack.backendFramework === "elysia")
+								return prev;
 						}
-
-						if (
-							category === "examples" &&
-							techId === "ai" &&
-							prev.backendFramework === "elysia"
-						) {
-							return prev;
+						if (category === "addons") {
+							if (
+								!hasPWACompatibleFrontend &&
+								(techId === "pwa" || techId === "tauri")
+							)
+								return prev;
+							if (techId === "husky" && !currentArray.includes("biome")) {
+								currentArray.push("biome");
+							}
 						}
-
-						if (
-							category === "addons" &&
-							(techId === "pwa" || techId === "tauri") &&
-							!hasPWACompatibleFrontend
-						) {
-							return prev;
-						}
-
-						if (
-							category === "addons" &&
-							techId === "husky" &&
-							!currentArray.includes("biome")
-						) {
-							currentArray.push("biome");
-						}
-
 						currentArray.push(techId);
 					}
-
-					return {
-						...prev,
-						[category]: currentArray,
-					};
+					return { ...currentStack, [category]: currentArray };
 				}
 
 				if (category === "database") {
-					let updatedState = { ...prev, database: techId };
+					if (currentStack.database === techId) return prev;
+
+					const updatedState = { ...currentStack, database: techId };
 
 					if (techId === "none") {
-						updatedState = {
-							...updatedState,
-							orm: "none",
-							dbSetup: "none",
-							auth: "false",
-						};
 					} else if (prev.database === "none") {
 						updatedState.orm = techId === "mongodb" ? "prisma" : "drizzle";
 						updatedState.dbSetup = "none";
-
-						const hasCompatibleFrontend =
-							prev.frontend.length > 0 && !prev.frontend.includes("none");
-						if (hasCompatibleFrontend) {
-							updatedState.auth = "true";
-						}
 					} else {
-						if (techId === "mongodb" && updatedState.orm === "drizzle") {
-							updatedState.orm = "prisma";
-						}
-
-						if (updatedState.dbSetup !== "none") {
-							if (
-								(updatedState.dbSetup === "turso" && techId !== "sqlite") ||
-								(updatedState.dbSetup === "prisma-postgres" &&
-									techId !== "postgres") ||
-								(updatedState.dbSetup === "mongodb-atlas" &&
-									techId !== "mongodb") ||
-								(updatedState.dbSetup === "neon" && techId !== "postgres")
-							) {
-								updatedState.dbSetup = "none";
-							}
-						}
 					}
-
 					return updatedState;
 				}
 
 				if (category === "orm") {
-					if (prev.database === "none") {
+					if (currentStack.database === "none") return prev;
+					if (currentStack.database === "mongodb" && techId === "drizzle")
 						return prev;
-					}
+					if (
+						currentStack.database === "sqlite" &&
+						techId === "prisma" &&
+						currentStack.dbSetup === "turso"
+					)
+						return prev;
 
-					const updatedState = {
-						...prev,
-						orm: techId,
-					};
+					if (currentStack.orm === techId) return prev;
 
-					if (updatedState.dbSetup !== "none") {
-						if (
-							(updatedState.dbSetup === "turso" && techId === "prisma") ||
-							(updatedState.dbSetup === "prisma-postgres" &&
-								techId !== "prisma")
-						) {
-							updatedState.dbSetup = "none";
-						}
-					}
-
-					return updatedState;
+					return { ...currentStack, orm: techId };
 				}
 
 				if (category === "dbSetup") {
-					if (prev.database === "none" && techId !== "none") {
+					if (currentStack.database === "none" && techId !== "none")
 						return prev;
-					}
 
-					const updatedState = {
-						...prev,
-						dbSetup: techId,
-					};
+					if (currentStack.dbSetup === techId) return prev;
 
-					if (techId === "turso") {
-						updatedState.database = "sqlite";
-						updatedState.orm = "drizzle";
-					} else if (techId === "prisma-postgres") {
-						updatedState.database = "postgres";
-						updatedState.orm = "prisma";
-					} else if (techId === "mongodb-atlas") {
-						updatedState.database = "mongodb";
-						updatedState.orm = "prisma";
-					} else if (techId === "neon") {
-						updatedState.database = "postgres";
-					}
+					return { ...currentStack, dbSetup: techId };
+				}
 
-					return updatedState;
+				if (category === "auth") {
+					if (currentStack.database === "none" && techId === "true")
+						return prev;
+					if (currentStack.auth === techId) return prev;
+					return { ...currentStack, auth: techId };
+				}
+
+				if (category === "api") {
+					if (hasNativeFrontend && techId !== "trpc") return prev;
+					if (currentStack.api === techId) return prev;
+					return { ...currentStack, api: techId };
 				}
 
 				if (
-					category === "auth" &&
-					prev.database === "none" &&
-					techId === "true"
+					category === "runtime" ||
+					category === "backendFramework" ||
+					category === "packageManager" ||
+					category === "git" ||
+					category === "install"
 				) {
-					return prev;
+					if (currentStack[category] === techId) return prev;
+					return { ...currentStack, [category]: techId };
 				}
 
-				return {
-					...prev,
-					[category]: techId,
-				};
+				return prev;
 			});
 		},
-		[],
+		[hasWebFrontend, hasPWACompatibleFrontend, hasNativeFrontend],
 	);
 
 	const copyToClipboard = useCallback(() => {
@@ -496,24 +593,34 @@ const StackArchitect = ({
 	const resetStack = useCallback(() => {
 		setStack(DEFAULT_STACK);
 		setActiveTab("frontend");
+		setProjectNameError(undefined);
 	}, []);
 
 	const saveCurrentStack = useCallback(() => {
 		localStorage.setItem("betterTStackPreference", JSON.stringify(stack));
 		setLastSavedStack(stack);
-		const saveMessage = document.createElement("div");
-		saveMessage.textContent = "Stack preferences saved!";
-		saveMessage.className =
-			"fixed bottom-4 right-4 bg-green-500 text-white py-2 px-4 rounded-md shadow-lg z-50";
-		document.body.appendChild(saveMessage);
-		setTimeout(() => {
-			document.body.removeChild(saveMessage);
-		}, 3000);
+		setCopied(false);
+		const saveButton = document.getElementById("save-stack-button");
+		const saveTextSpan = saveButton?.querySelector("span");
+
+		if (saveButton && saveTextSpan) {
+			const originalText = saveTextSpan.textContent;
+			saveTextSpan.textContent = "Saved!";
+
+			setTimeout(() => {
+				if (saveTextSpan.textContent === "Saved!") {
+					saveTextSpan.textContent = originalText;
+				}
+			}, 2000);
+		}
 	}, [stack]);
 
 	const loadSavedStack = useCallback(() => {
 		if (lastSavedStack) {
 			setStack(lastSavedStack);
+			setProjectNameError(
+				validateProjectName(lastSavedStack.projectName || ""),
+			);
 		}
 	}, [lastSavedStack]);
 
@@ -523,87 +630,177 @@ const StackArchitect = ({
 		);
 		if (preset) {
 			setStack(preset.stack);
+			setProjectNameError(validateProjectName(preset.stack.projectName || ""));
 			setShowPresets(false);
 		}
 	}, []);
 
+	const getDisabledReason = useCallback(
+		(category: keyof typeof TECH_OPTIONS, techId: string): string | null => {
+			if (category === "api" && techId !== "trpc" && hasNativeFrontend) {
+				return "Only tRPC API is supported when React Native is selected.";
+			}
+			if (category === "orm") {
+				if (stack.database === "none")
+					return "Select a database to enable ORM options.";
+				if (stack.database === "mongodb" && techId === "drizzle")
+					return "MongoDB requires the Prisma ORM.";
+				if (
+					stack.database === "sqlite" &&
+					techId === "prisma" &&
+					stack.dbSetup === "turso"
+				)
+					return "Prisma ORM is not compatible with Turso.";
+			}
+			if (category === "dbSetup" && techId !== "none") {
+				if (stack.database === "none")
+					return "Select a database before choosing a cloud setup.";
+
+				if (techId === "turso") {
+					if (stack.orm === "prisma")
+						return "Turso is not compatible with the Prisma ORM.";
+				}
+			}
+			if (
+				category === "auth" &&
+				techId === "true" &&
+				stack.database === "none"
+			) {
+				return "Authentication requires a database.";
+			}
+			if (category === "addons") {
+				if (
+					(techId === "pwa" || techId === "tauri") &&
+					!hasPWACompatibleFrontend
+				) {
+					return "Requires TanStack Router or React Router frontend.";
+				}
+			}
+			if (category === "examples") {
+				if ((techId === "todo" || techId === "ai") && !hasWebFrontend) {
+					return "Requires a web frontend (TanStack Router, React Router, etc.).";
+				}
+				if (techId === "ai" && stack.backendFramework === "elysia") {
+					return "AI example is not compatible with Elysia backend.";
+				}
+			}
+
+			return null;
+		},
+		[
+			stack.database,
+			stack.orm,
+			stack.dbSetup,
+			stack.backendFramework,
+			hasNativeFrontend,
+			hasPWACompatibleFrontend,
+			hasWebFrontend,
+		],
+	);
+
 	return (
-		<div className={`mx-auto w-full ${fullscreen ? "max-w-none" : ""}`}>
-			<div className="overflow-hidden rounded-xl border border-gray-300 bg-gray-100 text-gray-800 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-				<div className="flex items-center justify-between bg-gray-200 px-2 py-2 sm:px-4 dark:bg-gray-800">
-					<div className="flex space-x-2">
-						<div className="h-3 w-3 rounded-full bg-red-500" />
-						<div className="h-3 w-3 rounded-full bg-yellow-500" />
-						<div className="h-3 w-3 rounded-full bg-green-500" />
-					</div>
-					<div className="hidden font-mono text-gray-600 text-xs sm:block dark:text-gray-400">
-						Stack Architect Terminal
-					</div>
-					<div className="flex space-x-2">
-						<button
-							type="button"
-							onClick={() => setShowHelp(!showHelp)}
-							className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
-							title="Help"
-						>
-							<HelpCircle className="h-4 w-4" />
-						</button>
-						<button
-							type="button"
-							onClick={() => setShowPresets(!showPresets)}
-							className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
-							title="Presets"
-						>
-							<Star className="h-4 w-4" />
-						</button>
-						<Link
-							href={fullscreen ? "/" : "/new"}
-							className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
-							title={fullscreen ? "Exit Fullscreen" : "Open Fullscreen"}
-						>
-							<Maximize2 className="h-4 w-4" />
-						</Link>
-						<button
-							type="button"
-							onClick={copyToClipboard}
-							className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
-							title="Copy command"
-						>
-							{copied ? (
-								<Check className="h-4 w-4" />
-							) : (
-								<ClipboardCopy className="h-4 w-4" />
+		<div className={`mx-auto w-full ${fullscreen ? "h-full max-w-none" : ""}`}>
+			<div
+				className={`flex h-full flex-col overflow-hidden border-gray-300 bg-gray-100 text-gray-800 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-white ${
+					fullscreen ? "rounded-none border-0" : "rounded-xl border"
+				}`}
+			>
+				<div
+					className={`flex-shrink-0 items-center justify-between bg-gray-200 px-2 py-2 sm:px-4 dark:bg-gray-800 ${
+						fullscreen ? "border-gray-300 border-b dark:border-gray-700" : ""
+					}`}
+				>
+					<div className="flex items-center justify-between">
+						<div className="flex space-x-2">
+							<div className="h-3 w-3 rounded-full bg-red-500" />
+							<div className="h-3 w-3 rounded-full bg-yellow-500" />
+							<div className="h-3 w-3 rounded-full bg-green-500" />
+						</div>
+						<div className="hidden font-mono text-gray-600 text-xs sm:block dark:text-gray-400">
+							Stack Architect Terminal
+						</div>
+						<div className="flex space-x-2">
+							<button
+								type="button"
+								onClick={() => setShowHelp(!showHelp)}
+								className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+								title="Help"
+							>
+								<HelpCircle className="h-4 w-4" />
+							</button>
+							<button
+								type="button"
+								onClick={() => setShowPresets(!showPresets)}
+								className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+								title="Presets"
+							>
+								<Star className="h-4 w-4" />
+							</button>
+							{!fullscreen && (
+								<Link
+									href="/new"
+									className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+									title="Open Fullscreen"
+								>
+									<Maximize2 className="h-4 w-4" />
+								</Link>
 							)}
-						</button>
+							<button
+								type="button"
+								onClick={copyToClipboard}
+								className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+								title="Copy command"
+							>
+								{copied ? (
+									<Check className="h-4 w-4 text-green-500" />
+								) : (
+									<ClipboardCopy className="h-4 w-4" />
+								)}
+							</button>
+						</div>
 					</div>
 				</div>
 
 				{showHelp && (
-					<div className="border-gray-300 border-b bg-blue-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-blue-900/20">
+					<div className="flex-shrink-0 border-gray-300 border-b bg-blue-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-blue-900/20">
 						<h3 className="mb-2 font-medium text-blue-800 text-sm dark:text-blue-300">
 							How to Use Stack Architect
 						</h3>
 						<ul className="list-disc space-y-1 pl-5 text-blue-700 text-xs dark:text-blue-400">
 							<li>
 								Select your preferred technologies from each category using the
-								tabs below
+								tabs below.
 							</li>
 							<li>
-								The command will automatically update based on your selections
+								Some selections may disable or automatically change other
+								options based on compatibility.
 							</li>
 							<li>
-								Click the copy button to copy the command to your clipboard
+								The command will automatically update based on your selections.
 							</li>
 							<li>
-								You can reset to defaults or choose from presets for quick setup
+								Click the copy button (
+								<ClipboardCopy className="inline h-3 w-3 align-text-bottom" />)
+								to copy the command.
 							</li>
-							<li>Save your preferences to load them later when you return</li>
+							<li>
+								Use presets (
+								<Star className="inline h-3 w-3 align-text-bottom" />) for quick
+								setup or reset (
+								<RefreshCw className="inline h-3 w-3 align-text-bottom" />) to
+								defaults.
+							</li>
+							<li>
+								Save (<Star className="inline h-3 w-3 align-text-bottom" />)
+								your preferences to load (
+								<Settings className="inline h-3 w-3 align-text-bottom" />) them
+								later.
+							</li>
 						</ul>
 					</div>
 				)}
-
 				{showPresets && (
-					<div className="border-gray-300 border-b bg-amber-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-amber-900/20">
+					<div className="flex-shrink-0 border-gray-300 border-b bg-amber-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-amber-900/20">
 						<h3 className="mb-2 font-medium text-amber-800 text-sm dark:text-amber-300">
 							Quick Start Presets
 						</h3>
@@ -627,9 +824,9 @@ const StackArchitect = ({
 					</div>
 				)}
 
-				<div className="p-3 font-mono sm:p-4">
-					<div className="mb-4 flex flex-col justify-between sm:flex-row sm:items-start">
-						<label className="mb-2 flex flex-col sm:mb-0">
+				<div className="flex-grow overflow-y-auto p-3 font-mono sm:p-4">
+					<div className="mb-4 flex flex-col justify-between gap-y-3 sm:flex-row sm:items-start">
+						<label className="flex flex-col">
 							<span className="mb-1 text-gray-600 text-xs dark:text-gray-400">
 								Project Name:
 							</span>
@@ -642,11 +839,11 @@ const StackArchitect = ({
 										setStack((prev) => ({ ...prev, projectName: newValue }));
 										setProjectNameError(validateProjectName(newValue));
 									}}
-									className={`w-full border bg-gray-200 sm:w-auto dark:bg-gray-800 ${
+									className={`w-full rounded border px-2 py-1 font-mono text-sm focus:outline-none sm:w-auto ${
 										projectNameError
-											? "border-red-500 dark:border-red-500"
-											: "border-gray-300 dark:border-gray-700"
-									} rounded px-2 py-1 font-mono text-sm focus:border-blue-500 focus:outline-none dark:focus:border-blue-400`}
+											? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+											: "border-gray-300 bg-gray-200 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-400"
+									}`}
 									placeholder="my-better-t-app"
 								/>
 							</div>
@@ -654,7 +851,6 @@ const StackArchitect = ({
 								<p className="mt-1 text-red-500 text-xs">{projectNameError}</p>
 							)}
 						</label>
-
 						<div className="flex flex-wrap gap-2">
 							<button
 								type="button"
@@ -679,29 +875,37 @@ const StackArchitect = ({
 							)}
 
 							<button
+								id="save-stack-button"
 								type="button"
 								onClick={saveCurrentStack}
 								className="flex items-center gap-1 rounded border border-green-300 bg-green-100 px-2 py-1 text-green-700 text-xs hover:bg-green-200 dark:border-green-700 dark:bg-green-900/50 dark:text-green-300 dark:hover:bg-green-800/50"
 								title="Save current preferences"
 							>
 								<Star className="h-3 w-3" />
-								Save
+								<span>Save</span>{" "}
 							</button>
 						</div>
 					</div>
-					<div className="mb-4 overflow-x-auto">
+
+					<div className="mb-4 overflow-x-auto rounded border border-gray-300 bg-gray-200 p-2 dark:border-gray-700 dark:bg-gray-800">
 						<div className="flex">
-							<span className="mr-2 text-green-600 dark:text-green-400">$</span>
+							<span className="mr-2 select-none text-green-600 dark:text-green-400">
+								$
+							</span>
 							<code className="whitespace-pre-wrap break-all text-gray-700 text-xs sm:text-sm dark:text-gray-300">
 								{command}
 							</code>
 						</div>
 					</div>
+
 					{compatNotes[activeTab] && compatNotes[activeTab].length > 0 && (
 						<div className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
 							<div className="mb-2 flex items-center gap-2 font-medium text-blue-800 text-xs sm:text-sm dark:text-blue-300">
-								<InfoIcon className="h-4 w-4" />
-								<span>Compatibility Notes</span>
+								<InfoIcon className="h-4 w-4 flex-shrink-0" />
+								<span>
+									Compatibility Notes for{" "}
+									{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+								</span>
 							</div>
 							<ul className="list-inside list-disc space-y-1 text-blue-700 text-xs dark:text-blue-400">
 								{compatNotes[activeTab].map((note) => (
@@ -710,6 +914,7 @@ const StackArchitect = ({
 							</ul>
 						</div>
 					)}
+
 					<div className="border-gray-300 border-t pt-4 dark:border-gray-700">
 						<div className="mb-3 flex items-center text-gray-600 text-sm dark:text-gray-400">
 							<Terminal className="mr-2 h-4 w-4" />
@@ -718,9 +923,8 @@ const StackArchitect = ({
 								{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
 							</span>
 						</div>
-
 						<div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
-							{TECH_OPTIONS[activeTab as keyof typeof TECH_OPTIONS].map(
+							{(TECH_OPTIONS[activeTab as keyof typeof TECH_OPTIONS] || []).map(
 								(tech) => {
 									let isSelected = false;
 									if (activeTab === "addons" || activeTab === "examples") {
@@ -732,65 +936,27 @@ const StackArchitect = ({
 											stack[activeTab as keyof StackState] === tech.id;
 									}
 
-									const hasWebFrontendSelected =
-										stack.frontend.includes("tanstack-router") ||
-										stack.frontend.includes("react-router") ||
-										stack.frontend.includes("tanstack-start");
-
-									const hasPWACompatibleFrontend =
-										stack.frontend.includes("tanstack-router") ||
-										stack.frontend.includes("react-router");
-
-									const isDisabled =
-										(activeTab === "orm" && stack.database === "none") ||
-										(activeTab === "dbSetup" &&
-											((tech.id !== "none" && stack.database === "none") ||
-												(tech.id === "turso" &&
-													(stack.database !== "sqlite" ||
-														stack.orm === "prisma")) ||
-												(tech.id === "prisma-postgres" &&
-													(stack.database !== "postgres" ||
-														stack.orm !== "prisma")) ||
-												(tech.id === "mongodb-atlas" &&
-													stack.database !== "mongodb") ||
-												(tech.id === "neon" &&
-													stack.database !== "postgres"))) ||
-										(activeTab === "examples" &&
-											(((tech.id === "todo" || tech.id === "ai") &&
-												!hasWebFrontendSelected) ||
-												(tech.id === "ai" &&
-													stack.backendFramework === "elysia"))) ||
-										(activeTab === "addons" &&
-											(tech.id === "pwa" || tech.id === "tauri") &&
-											!hasPWACompatibleFrontend) ||
-										(activeTab === "auth" &&
-											tech.id === "true" &&
-											stack.database === "none");
-
-									const compatNote = isDisabled
-										? compatNotes[activeTab]?.find((note) =>
-												note.toLowerCase().includes(tech.name.toLowerCase()),
-											)
-										: null;
+									const disabledReason = getDisabledReason(
+										activeTab as keyof typeof TECH_OPTIONS,
+										tech.id,
+									);
+									const isDisabled = !!disabledReason;
 
 									return (
 										<motion.div
 											key={tech.id}
-											className={`rounded p-2 px-3${
+											className={`rounded p-2 px-3 transition-opacity ${
 												isDisabled
 													? " cursor-not-allowed opacity-50"
 													: " cursor-pointer"
-											}
-                        ${
-													isSelected
-														? "border border-blue-300 bg-blue-100 dark:border-blue-500/50 dark:bg-blue-900/40"
-														: "border border-gray-300 hover:bg-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
-												}
-                      `}
+											} ${
+												isSelected
+													? "border border-blue-300 bg-blue-100 dark:border-blue-500/50 dark:bg-blue-900/40"
+													: `border border-gray-300 dark:border-gray-700 ${!isDisabled ? "hover:bg-gray-200 dark:hover:bg-gray-800" : ""}`
+											}`}
 											title={
 												isDisabled
-													? compatNote ||
-														"Option not available with current selection"
+													? (disabledReason ?? "Option disabled")
 													: tech.description
 											}
 											whileHover={!isDisabled ? { scale: 1.02 } : undefined}
@@ -819,7 +985,7 @@ const StackArchitect = ({
 														<span
 															className={`${
 																isSelected
-																	? "text-blue-700 dark:text-blue-300"
+																	? "font-medium text-blue-700 dark:text-blue-300"
 																	: "text-gray-700 dark:text-gray-300"
 															} text-xs sm:text-sm`}
 														>
@@ -830,8 +996,8 @@ const StackArchitect = ({
 														{tech.description}
 													</p>
 												</div>
-												{tech.default && !isSelected && (
-													<span className="ml-2 hidden text-gray-500 text-xs sm:block dark:text-gray-600">
+												{tech.default && !isSelected && !isDisabled && (
+													<span className="ml-2 hidden flex-shrink-0 text-gray-500 text-xs sm:block dark:text-gray-600">
 														Default
 													</span>
 												)}
@@ -847,151 +1013,189 @@ const StackArchitect = ({
 								<div className="text-gray-600 text-xs dark:text-gray-400">
 									Selected Stack
 								</div>
-								<button
-									type="button"
-									onClick={() => {
-										alert(
-											// biome-ignore lint/style/useTemplate: <explanation>
-											"Stack Summary:\n\n" +
-												Object.entries(stack)
-													.map(([key, value]) => {
-														if (Array.isArray(value)) {
-															return `${key}: ${value.join(", ") || "none"}`;
-														}
-														return `${key}: ${value || "none"}`;
-													})
-													.join("\n"),
-										);
-									}}
-									className="text-blue-600 text-xs hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-								>
-									Full Summary
-								</button>
 							</div>
 							<div className="flex flex-wrap gap-1">
-								{stack.frontend.map((frontendId) => {
-									const frontend = TECH_OPTIONS.frontend.find(
-										(f) => f.id === frontendId,
-									);
-									return frontend ? (
+								{stack.frontend
+									.map((id) => TECH_OPTIONS.frontend.find((f) => f.id === id))
+									.filter(Boolean)
+									.map((tech) => (
 										<span
-											key={frontendId}
-											className="inline-flex items-center rounded border border-blue-300 bg-blue-100 px-1.5 py-0.5 text-blue-800 text-xs dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300"
+											key={tech?.id}
+											className="inline-flex items-center gap-1 rounded border border-blue-300 bg-blue-100 px-1.5 py-0.5 text-blue-800 text-xs dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300"
 										>
-											{frontend.icon} {frontend.name}
+											{tech?.icon} {tech?.name}
 										</span>
-									) : null;
-								})}
-								<span className="inline-flex items-center rounded border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-amber-800 text-xs dark:border-amber-700/30 dark:bg-amber-900/30 dark:text-amber-300">
-									{
-										TECH_OPTIONS.runtime.find((t) => t.id === stack.runtime)
-											?.icon
-									}{" "}
-									{
-										TECH_OPTIONS.runtime.find((t) => t.id === stack.runtime)
-											?.name
-									}
-								</span>
-
-								<span className="inline-flex items-center rounded border border-blue-300 bg-blue-100 px-1.5 py-0.5 text-blue-800 text-xs dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300">
-									{
-										TECH_OPTIONS.backendFramework.find(
-											(t) => t.id === stack.backendFramework,
-										)?.icon
-									}{" "}
-									{
-										TECH_OPTIONS.backendFramework.find(
-											(t) => t.id === stack.backendFramework,
-										)?.name
-									}
-								</span>
-
-								<span className="inline-flex items-center rounded border border-indigo-300 bg-indigo-100 px-1.5 py-0.5 text-indigo-800 text-xs dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300">
-									{
-										TECH_OPTIONS.database.find((t) => t.id === stack.database)
-											?.icon
-									}{" "}
-									{
-										TECH_OPTIONS.database.find((t) => t.id === stack.database)
-											?.name
-									}
-								</span>
-
-								{stack.orm !== "none" && stack.database !== "none" && (
-									<span className="inline-flex items-center rounded border border-cyan-300 bg-cyan-100 px-1.5 py-0.5 text-cyan-800 text-xs dark:border-cyan-700/30 dark:bg-cyan-900/30 dark:text-cyan-300">
-										{TECH_OPTIONS.orm.find((t) => t.id === stack.orm)?.icon}{" "}
-										{TECH_OPTIONS.orm.find((t) => t.id === stack.orm)?.name}
-									</span>
-								)}
-
-								{stack.frontend[0] !== "none" &&
-									stack.database !== "none" &&
-									stack.auth === "true" && (
-										<span className="inline-flex items-center rounded border border-green-300 bg-green-100 px-1.5 py-0.5 text-green-800 text-xs dark:border-green-700/30 dark:bg-green-900/30 dark:text-green-300">
-											{TECH_OPTIONS.auth.find((t) => t.id === "true")?.icon}{" "}
-											{TECH_OPTIONS.auth.find((t) => t.id === "true")?.name}
-										</span>
-									)}
-
-								{stack.dbSetup !== "none" && (
-									<span className="inline-flex items-center rounded border border-pink-300 bg-pink-100 px-1.5 py-0.5 text-pink-800 text-xs dark:border-pink-700/30 dark:bg-pink-900/30 dark:text-pink-300">
+									))}
+								{TECH_OPTIONS.runtime.find((t) => t.id === stack.runtime) && (
+									<span className="inline-flex items-center gap-1 rounded border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-amber-800 text-xs dark:border-amber-700/30 dark:bg-amber-900/30 dark:text-amber-300">
 										{
-											TECH_OPTIONS.dbSetup.find((t) => t.id === stack.dbSetup)
+											TECH_OPTIONS.runtime.find((t) => t.id === stack.runtime)
 												?.icon
 										}{" "}
 										{
-											TECH_OPTIONS.dbSetup.find((t) => t.id === stack.dbSetup)
+											TECH_OPTIONS.runtime.find((t) => t.id === stack.runtime)
 												?.name
 										}
 									</span>
 								)}
-
-								{stack.addons.map((addonId) => {
-									const addon = TECH_OPTIONS.addons.find(
-										(a) => a.id === addonId,
-									);
-									return addon ? (
-										<span
-											key={addonId}
-											className="inline-flex items-center rounded border border-violet-300 bg-violet-100 px-1.5 py-0.5 text-violet-800 text-xs dark:border-violet-700/30 dark:bg-violet-900/30 dark:text-violet-300"
-										>
-											{addon.icon} {addon.name}
+								{TECH_OPTIONS.backendFramework.find(
+									(t) => t.id === stack.backendFramework,
+								) && (
+									<span className="inline-flex items-center gap-1 rounded border border-blue-300 bg-blue-100 px-1.5 py-0.5 text-blue-800 text-xs dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300">
+										{
+											TECH_OPTIONS.backendFramework.find(
+												(t) => t.id === stack.backendFramework,
+											)?.icon
+										}{" "}
+										{
+											TECH_OPTIONS.backendFramework.find(
+												(t) => t.id === stack.backendFramework,
+											)?.name
+										}
+									</span>
+								)}
+								{TECH_OPTIONS.api.find((t) => t.id === stack.api) && (
+									<span className="inline-flex items-center gap-1 rounded border border-indigo-300 bg-indigo-100 px-1.5 py-0.5 text-indigo-800 text-xs dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300">
+										{TECH_OPTIONS.api.find((t) => t.id === stack.api)?.icon}{" "}
+										{TECH_OPTIONS.api.find((t) => t.id === stack.api)?.name}
+									</span>
+								)}
+								{TECH_OPTIONS.database.find((t) => t.id === stack.database) &&
+									stack.database !== "none" && (
+										<span className="inline-flex items-center gap-1 rounded border border-indigo-300 bg-indigo-100 px-1.5 py-0.5 text-indigo-800 text-xs dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300">
+											{
+												TECH_OPTIONS.database.find(
+													(t) => t.id === stack.database,
+												)?.icon
+											}{" "}
+											{
+												TECH_OPTIONS.database.find(
+													(t) => t.id === stack.database,
+												)?.name
+											}
 										</span>
-									) : null;
-								})}
-
-								{stack.examples.length > 0 &&
-									stack.examples.map((exampleId) => {
-										const example = TECH_OPTIONS.examples.find(
-											(e) => e.id === exampleId,
-										);
-										return example ? (
-											<span
-												key={exampleId}
-												className="inline-flex items-center rounded border border-teal-300 bg-teal-100 px-1.5 py-0.5 text-teal-800 text-xs dark:border-teal-700/30 dark:bg-teal-900/30 dark:text-teal-300"
-											>
-												{example.icon} {example.name}
-											</span>
-										) : null;
-									})}
+									)}
+								{TECH_OPTIONS.orm.find((t) => t.id === stack.orm) &&
+									stack.orm !== "none" && (
+										<span className="inline-flex items-center gap-1 rounded border border-cyan-300 bg-cyan-100 px-1.5 py-0.5 text-cyan-800 text-xs dark:border-cyan-700/30 dark:bg-cyan-900/30 dark:text-cyan-300">
+											{TECH_OPTIONS.orm.find((t) => t.id === stack.orm)?.icon}{" "}
+											{TECH_OPTIONS.orm.find((t) => t.id === stack.orm)?.name}
+										</span>
+									)}
+								{TECH_OPTIONS.auth.find((t) => t.id === stack.auth) &&
+									stack.auth === "true" && (
+										<span className="inline-flex items-center gap-1 rounded border border-green-300 bg-green-100 px-1.5 py-0.5 text-green-800 text-xs dark:border-green-700/30 dark:bg-green-900/30 dark:text-green-300">
+											{TECH_OPTIONS.auth.find((t) => t.id === stack.auth)?.icon}{" "}
+											{TECH_OPTIONS.auth.find((t) => t.id === stack.auth)?.name}
+										</span>
+									)}
+								{TECH_OPTIONS.dbSetup.find((t) => t.id === stack.dbSetup) &&
+									stack.dbSetup !== "none" && (
+										<span className="inline-flex items-center gap-1 rounded border border-pink-300 bg-pink-100 px-1.5 py-0.5 text-pink-800 text-xs dark:border-pink-700/30 dark:bg-pink-900/30 dark:text-pink-300">
+											{
+												TECH_OPTIONS.dbSetup.find((t) => t.id === stack.dbSetup)
+													?.icon
+											}{" "}
+											{
+												TECH_OPTIONS.dbSetup.find((t) => t.id === stack.dbSetup)
+													?.name
+											}
+										</span>
+									)}
+								{stack.addons
+									.map((id) => TECH_OPTIONS.addons.find((a) => a.id === id))
+									.filter(Boolean)
+									.map((tech) => (
+										<span
+											key={tech?.id}
+											className="inline-flex items-center gap-1 rounded border border-violet-300 bg-violet-100 px-1.5 py-0.5 text-violet-800 text-xs dark:border-violet-700/30 dark:bg-violet-900/30 dark:text-violet-300"
+										>
+											{tech?.icon} {tech?.name}
+										</span>
+									))}
+								{stack.examples
+									.map((id) => TECH_OPTIONS.examples.find((e) => e.id === id))
+									.filter(Boolean)
+									.map((tech) => (
+										<span
+											key={tech?.id}
+											className="inline-flex items-center gap-1 rounded border border-teal-300 bg-teal-100 px-1.5 py-0.5 text-teal-800 text-xs dark:border-teal-700/30 dark:bg-teal-900/30 dark:text-teal-300"
+										>
+											{tech?.icon} {tech?.name}
+										</span>
+									))}
+								{TECH_OPTIONS.packageManager.find(
+									(t) => t.id === stack.packageManager,
+								) && (
+									<span className="inline-flex items-center gap-1 rounded border border-orange-300 bg-orange-100 px-1.5 py-0.5 text-orange-800 text-xs dark:border-orange-700/30 dark:bg-orange-900/30 dark:text-orange-300">
+										{
+											TECH_OPTIONS.packageManager.find(
+												(t) => t.id === stack.packageManager,
+											)?.icon
+										}{" "}
+										{
+											TECH_OPTIONS.packageManager.find(
+												(t) => t.id === stack.packageManager,
+											)?.name
+										}
+									</span>
+								)}
+								{TECH_OPTIONS.git.find((t) => t.id === stack.git) && (
+									<span className="inline-flex items-center gap-1 rounded border border-gray-300 bg-gray-100 px-1.5 py-0.5 text-gray-800 text-xs dark:border-gray-700/30 dark:bg-gray-900/30 dark:text-gray-300">
+										{TECH_OPTIONS.git.find((t) => t.id === stack.git)?.icon}{" "}
+										{TECH_OPTIONS.git.find((t) => t.id === stack.git)?.name}
+									</span>
+								)}
+								{TECH_OPTIONS.install.find((t) => t.id === stack.install) && (
+									<span className="inline-flex items-center gap-1 rounded border border-lime-300 bg-lime-100 px-1.5 py-0.5 text-lime-800 text-xs dark:border-lime-700/30 dark:bg-lime-900/30 dark:text-lime-300">
+										{
+											TECH_OPTIONS.install.find((t) => t.id === stack.install)
+												?.icon
+										}{" "}
+										{
+											TECH_OPTIONS.install.find((t) => t.id === stack.install)
+												?.name
+										}
+									</span>
+								)}
 							</div>
 						</div>
 					</div>
 				</div>
-				<div className="flex overflow-x-auto border-gray-300 border-t bg-gray-200 dark:border-gray-700 dark:bg-gray-900">
-					{Object.keys(TECH_OPTIONS).map((category) => (
+
+				<div
+					className={`flex flex-shrink-0 overflow-x-auto border-gray-300 bg-gray-200 dark:border-gray-700 dark:bg-gray-900 ${
+						fullscreen ? "border-t" : "border-t"
+					}`}
+				>
+					{[
+						"frontend",
+						"runtime",
+						"backendFramework",
+						"api",
+						"database",
+						"orm",
+						"dbSetup",
+						"auth",
+						"packageManager",
+						"addons",
+						"examples",
+						"git",
+						"install",
+					].map((category) => (
 						<button
 							type="button"
 							key={category}
-							className={`whitespace-nowrap px-2 py-2 font-mono text-[10px] sm:px-4 sm:text-xs transition-colors${
+							className={`whitespace-nowrap px-2 py-2 font-mono text-[10px] transition-colors sm:px-4 sm:text-xs ${
 								activeTab === category
 									? " border-blue-500 border-t-2 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-									: " text-gray-600 hover:bg-gray-300 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+									: " border-transparent border-t-2 text-gray-600 hover:bg-gray-300 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
 							}
-              `}
+														`}
 							onClick={() => setActiveTab(category)}
 						>
-							{category}
+							{category.charAt(0).toUpperCase() +
+								category.slice(1).replace(/([A-Z])/g, " $1")}
 						</button>
 					))}
 				</div>

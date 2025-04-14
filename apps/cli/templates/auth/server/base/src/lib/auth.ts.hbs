@@ -1,0 +1,30 @@
+import { betterAuth } from "better-auth";
+
+{{#if (eq orm "prisma")}}
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import prisma from "../../prisma";
+
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: "{{database}}"
+  }),
+  trustedOrigins: [process.env.CORS_ORIGIN || ""],
+  emailAndPassword: { enabled: true }
+});
+
+{{else if (eq orm "drizzle")}}
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { db } from "../db";
+import * as schema from "../db/schema/auth";
+
+export const auth = betterAuth({
+  database: drizzleAdapter(db, {
+    {{#if (eq database "postgresql")}}provider: "pg",{{/if}}
+    {{#if (eq database "sqlite")}}provider: "sqlite",{{/if}}
+    {{#if (eq database "mysql")}}provider: "mysql",{{/if}}
+    schema: schema
+  }),
+  trustedOrigins: [process.env.CORS_ORIGIN || ""],
+  emailAndPassword: { enabled: true }
+});
+{{/if}}

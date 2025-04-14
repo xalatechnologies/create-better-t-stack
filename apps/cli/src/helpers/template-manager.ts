@@ -1,493 +1,538 @@
 import path from "node:path";
+import consola from "consola";
 import fs from "fs-extra";
+import { globby } from "globby";
+import pc from "picocolors";
 import { PKG_ROOT } from "../constants";
-import type {
-	ProjectBackend,
-	ProjectDatabase,
-	ProjectFrontend,
-	ProjectOrm,
-} from "../types";
-import { addPackageDependency } from "../utils/add-package-deps";
+import type { ProjectConfig } from "../types";
+import { processTemplate } from "../utils/template-processor";
 
-/**
- * Copy base template structure but exclude app-specific folders that will be added based on options
- */
-export async function copyBaseTemplate(projectDir: string): Promise<void> {
-	const templateDir = path.join(PKG_ROOT, "template/base");
+async function processAndCopyFiles(
+	sourcePattern: string | string[],
+	baseSourceDir: string,
+	destDir: string,
+	context: ProjectConfig,
+	overwrite = true,
+): Promise<void> {
+	const sourceFiles = await globby(sourcePattern, {
+		cwd: baseSourceDir,
+		dot: true,
+		onlyFiles: true,
+		absolute: false,
+	});
 
-	if (!(await fs.pathExists(templateDir))) {
-		throw new Error(`Template directory not found: ${templateDir}`);
-	}
+	for (const relativeSrcPath of sourceFiles) {
+		const srcPath = path.join(baseSourceDir, relativeSrcPath);
+		let relativeDestPath = relativeSrcPath;
 
-	await fs.ensureDir(projectDir);
+		if (relativeSrcPath.endsWith(".hbs")) {
+			relativeDestPath = relativeSrcPath.slice(0, -4);
+		}
 
-	const rootFiles = await fs.readdir(templateDir);
-	for (const file of rootFiles) {
-		const srcPath = path.join(templateDir, file);
-		const destPath = path.join(projectDir, file);
+		const destPath = path.join(destDir, relativeDestPath);
 
-		if (file === "apps") continue;
+		await fs.ensureDir(path.dirname(destPath));
 
-		if (await fs.stat(srcPath).then((stat) => stat.isDirectory())) {
-			await fs.copy(srcPath, destPath);
+		if (srcPath.endsWith(".hbs")) {
+			await processTemplate(srcPath, destPath, context);
 		} else {
-			await fs.copy(srcPath, destPath);
+			if (!overwrite && (await fs.pathExists(destPath))) {
+				continue;
+			}
+			await fs.copy(srcPath, destPath, { overwrite: true });
 		}
 	}
+}
 
-	await fs.ensureDir(path.join(projectDir, "apps"));
-
-	const serverSrcDir = path.join(templateDir, "apps/server");
-	const serverDestDir = path.join(projectDir, "apps/server");
-	if (await fs.pathExists(serverSrcDir)) {
-		await fs.copy(serverSrcDir, serverDestDir);
-	}
+export async function copyBaseTemplate(
+	projectDir: string,
+	context: ProjectConfig,
+): Promise<void> {
+	const templateDir = path.join(PKG_ROOT, "templates/base");
+	await processAndCopyFiles(
+		["package.json", "_gitignore"],
+		templateDir,
+		projectDir,
+		context,
+	);
 }
 
 export async function setupFrontendTemplates(
 	projectDir: string,
-	frontends: ProjectFrontend[],
+	context: ProjectConfig,
 ): Promise<void> {
-	const hasTanstackWeb = frontends.includes("tanstack-router");
-	const hasTanstackStart = frontends.includes("tanstack-start");
-	const hasReactRouterWeb = frontends.includes("react-router");
-	const hasNextWeb = frontends.includes("next");
-	const hasNative = frontends.includes("native");
+	const webFrontends = context.frontend.filter(
+		(f) =>
+			f === "tanstack-router" ||
+			f === "react-router" ||
+			f === "tanstack-start" ||
+			f === "next",
+	);
+	const hasNative = context.frontend.includes("native");
 
-	if (hasTanstackWeb || hasReactRouterWeb || hasTanstackStart || hasNextWeb) {
-		const webDir = path.join(projectDir, "apps/web");
-		await fs.ensureDir(webDir);
+	if (webFrontends.length > 0) {
+		const webAppDir = path.join(projectDir, "apps/web");
+		await fs.ensureDir(webAppDir);
 
-		const webBaseDir = path.join(PKG_ROOT, "template/base/apps/web-base");
+		const webBaseDir = path.join(PKG_ROOT, "templates/frontend/web-base");
 		if (await fs.pathExists(webBaseDir)) {
-			await fs.copy(webBaseDir, webDir);
+			await processAndCopyFiles("**/*", webBaseDir, webAppDir, context);
 		}
 
-		if (hasTanstackWeb) {
-			const frameworkDir = path.join(
+		for (const framework of webFrontends) {
+			const frameworkSrcDir = path.join(
 				PKG_ROOT,
-				"template/base/apps/web-tanstack-router",
+				`templates/frontend/${framework}`,
 			);
-			if (await fs.pathExists(frameworkDir)) {
-				await fs.copy(frameworkDir, webDir, { overwrite: true });
-			}
-		} else if (hasTanstackStart) {
-			const frameworkDir = path.join(
-				PKG_ROOT,
-				"template/base/apps/web-tanstack-start",
-			);
-			if (await fs.pathExists(frameworkDir)) {
-				await fs.copy(frameworkDir, webDir, { overwrite: true });
-			}
-		} else if (hasReactRouterWeb) {
-			const frameworkDir = path.join(
-				PKG_ROOT,
-				"template/base/apps/web-react-router",
-			);
-			if (await fs.pathExists(frameworkDir)) {
-				await fs.copy(frameworkDir, webDir, { overwrite: true });
-			}
-		} else if (hasNextWeb) {
-			const frameworkDir = path.join(PKG_ROOT, "template/base/apps/web-next");
-			if (await fs.pathExists(frameworkDir)) {
-				await fs.copy(frameworkDir, webDir, { overwrite: true });
+			if (await fs.pathExists(frameworkSrcDir)) {
+				await processAndCopyFiles("**/*", frameworkSrcDir, webAppDir, context);
 			}
 		}
 
-		const packageJsonPath = path.join(webDir, "package.json");
-		if (await fs.pathExists(packageJsonPath)) {
-			const packageJson = await fs.readJson(packageJsonPath);
-			packageJson.name = "web";
-			await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
+		if (context.api !== "none") {
+			const webFramework = webFrontends[0];
+
+			const apiWebBaseDir = path.join(
+				PKG_ROOT,
+				`templates/api/${context.api}/web/base`,
+			);
+			if (await fs.pathExists(apiWebBaseDir)) {
+				await processAndCopyFiles("**/*", apiWebBaseDir, webAppDir, context);
+			}
+
+			const apiWebFrameworkDir = path.join(
+				PKG_ROOT,
+				`templates/api/${context.api}/web/${webFramework}`,
+			);
+			if (await fs.pathExists(apiWebFrameworkDir)) {
+				await processAndCopyFiles(
+					"**/*",
+					apiWebFrameworkDir,
+					webAppDir,
+					context,
+				);
+			}
 		}
 	}
 
 	if (hasNative) {
-		const nativeSrcDir = path.join(PKG_ROOT, "template/base/apps/native");
-		const nativeDestDir = path.join(projectDir, "apps/native");
+		const nativeAppDir = path.join(projectDir, "apps/native");
+		await fs.ensureDir(nativeAppDir);
 
-		if (await fs.pathExists(nativeSrcDir)) {
-			await fs.copy(nativeSrcDir, nativeDestDir);
+		const nativeBaseDir = path.join(PKG_ROOT, "templates/frontend/native");
+		if (await fs.pathExists(nativeBaseDir)) {
+			await processAndCopyFiles("**/*", nativeBaseDir, nativeAppDir, context);
 		}
 
-		await fs.writeFile(
-			path.join(projectDir, ".npmrc"),
-			"node-linker=hoisted\n",
-		);
+		if (context.api !== "none") {
+			const apiNativeSrcDir = path.join(
+				PKG_ROOT,
+				`templates/api/${context.api}/native`,
+			);
+
+			if (await fs.pathExists(apiNativeSrcDir)) {
+				await processAndCopyFiles(
+					"**/*",
+					apiNativeSrcDir,
+					nativeAppDir,
+					context,
+				);
+			} else {
+			}
+		}
 	}
 }
 
 export async function setupBackendFramework(
 	projectDir: string,
-	framework: ProjectBackend,
+	context: ProjectConfig,
 ): Promise<void> {
-	if (framework === "next") {
-		const serverDir = path.join(projectDir, "apps/server");
-		const nextTemplateDir = path.join(
-			PKG_ROOT,
-			"template/with-next/apps/server",
+	if ((context.backend as string) === "none") return;
+
+	const serverAppDir = path.join(projectDir, "apps/server");
+	await fs.ensureDir(serverAppDir);
+
+	const serverBaseDir = path.join(PKG_ROOT, "templates/backend/server-base");
+	if (await fs.pathExists(serverBaseDir)) {
+		await processAndCopyFiles("**/*", serverBaseDir, serverAppDir, context);
+	} else {
+		consola.warn(
+			pc.yellow(`Warning: server-base template not found at ${serverBaseDir}`),
 		);
-
-		await fs.ensureDir(serverDir);
-
-		if (await fs.pathExists(nextTemplateDir)) {
-			await fs.copy(nextTemplateDir, serverDir, { overwrite: true });
-
-			const packageJsonPath = path.join(serverDir, "package.json");
-			if (await fs.pathExists(packageJsonPath)) {
-				const packageJson = await fs.readJson(packageJsonPath);
-				packageJson.name = "server";
-				await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
-			}
-		}
-		return;
 	}
 
-	const frameworkDir = path.join(PKG_ROOT, `template/with-${framework}`);
-	if (await fs.pathExists(frameworkDir)) {
-		await fs.copy(frameworkDir, projectDir, { overwrite: true });
+	const frameworkSrcDir = path.join(
+		PKG_ROOT,
+		`templates/backend/${context.backend}`,
+	);
+	if (await fs.pathExists(frameworkSrcDir)) {
+		await processAndCopyFiles("**/*", frameworkSrcDir, serverAppDir, context);
+	} else {
+		consola.warn(
+			pc.yellow(
+				`Warning: Backend template directory not found, skipping: ${frameworkSrcDir}`,
+			),
+		);
+	}
+
+	if (context.api !== "none") {
+		const apiServerBaseDir = path.join(
+			PKG_ROOT,
+			`templates/api/${context.api}/server/base`,
+		);
+		if (await fs.pathExists(apiServerBaseDir)) {
+			await processAndCopyFiles(
+				"**/*",
+				apiServerBaseDir,
+				serverAppDir,
+				context,
+			);
+		}
+
+		const apiServerFrameworkDir = path.join(
+			PKG_ROOT,
+			`templates/api/${context.api}/server/${context.backend}`,
+		);
+		if (await fs.pathExists(apiServerFrameworkDir)) {
+			await processAndCopyFiles(
+				"**/*",
+				apiServerFrameworkDir,
+				serverAppDir,
+				context,
+			);
+		}
 	}
 }
 
-export async function setupOrmTemplate(
+export async function setupDbOrmTemplates(
 	projectDir: string,
-	orm: ProjectOrm,
-	database: ProjectDatabase,
-	auth: boolean,
+	context: ProjectConfig,
 ): Promise<void> {
-	if (orm === "none" || database === "none") return;
+	if (context.orm === "none" || context.database === "none") return;
 
-	const ormTemplateDir = path.join(PKG_ROOT, getOrmTemplateDir(orm, database));
+	const serverAppDir = path.join(projectDir, "apps/server");
+	await fs.ensureDir(serverAppDir);
 
-	if (await fs.pathExists(ormTemplateDir)) {
-		await fs.copy(ormTemplateDir, projectDir, { overwrite: true });
+	const dbOrmSrcDir = path.join(
+		PKG_ROOT,
+		`templates/db/${context.orm}/${context.database}`,
+	);
 
-		if (!auth) {
-			if (orm === "prisma") {
-				const authSchemaPath = path.join(
-					projectDir,
-					"apps/server/prisma/schema/auth.prisma",
-				);
-				if (await fs.pathExists(authSchemaPath)) {
-					await fs.remove(authSchemaPath);
-				}
-			} else if (orm === "drizzle") {
-				const authSchemaPath = path.join(
-					projectDir,
-					"apps/server/src/db/schema/auth.ts",
-				);
-				if (await fs.pathExists(authSchemaPath)) {
-					await fs.remove(authSchemaPath);
-				}
-			}
-		}
+	if (await fs.pathExists(dbOrmSrcDir)) {
+		await processAndCopyFiles("**/*", dbOrmSrcDir, serverAppDir, context);
+	} else {
+		consola.warn(
+			pc.yellow(
+				`Warning: Database/ORM template directory not found, skipping: ${dbOrmSrcDir}`,
+			),
+		);
 	}
 }
 
 export async function setupAuthTemplate(
 	projectDir: string,
-	auth: boolean,
-	framework: ProjectBackend,
-	orm: ProjectOrm,
-	database: ProjectDatabase,
-	frontends: ProjectFrontend[],
+	context: ProjectConfig,
 ): Promise<void> {
-	if (!auth) return;
+	if (!context.auth) return;
 
-	const authTemplateDir = path.join(PKG_ROOT, "template/with-auth");
-	if (await fs.pathExists(authTemplateDir)) {
-		const hasReactRouter = frontends.includes("react-router");
-		const hasTanStackRouter = frontends.includes("tanstack-router");
-		const hasTanStackStart = frontends.includes("tanstack-start");
-		const hasNextRouter = frontends.includes("next");
+	const serverAppDir = path.join(projectDir, "apps/server");
+	const webAppDir = path.join(projectDir, "apps/web");
+	const nativeAppDir = path.join(projectDir, "apps/native");
+	const webFrontends = context.frontend.filter(
+		(f) =>
+			f === "tanstack-router" ||
+			f === "react-router" ||
+			f === "tanstack-start" ||
+			f === "next",
+	);
+	const hasNative = context.frontend.includes("native");
 
-		if (
-			hasReactRouter ||
-			hasTanStackRouter ||
-			hasTanStackStart ||
-			hasNextRouter
-		) {
-			const webDir = path.join(projectDir, "apps/web");
-
-			const webBaseAuthDir = path.join(authTemplateDir, "apps/web-base");
-			if (await fs.pathExists(webBaseAuthDir)) {
-				await fs.copy(webBaseAuthDir, webDir, { overwrite: true });
-			}
-
-			if (hasReactRouter) {
-				const reactRouterAuthDir = path.join(
-					authTemplateDir,
-					"apps/web-react-router",
-				);
-				if (await fs.pathExists(reactRouterAuthDir)) {
-					await fs.copy(reactRouterAuthDir, webDir, { overwrite: true });
-				}
-			}
-
-			if (hasTanStackRouter) {
-				const tanstackAuthDir = path.join(
-					authTemplateDir,
-					"apps/web-tanstack-router",
-				);
-				if (await fs.pathExists(tanstackAuthDir)) {
-					await fs.copy(tanstackAuthDir, webDir, { overwrite: true });
-				}
-			}
-
-			if (hasTanStackStart) {
-				const tanstackStartAuthDir = path.join(
-					authTemplateDir,
-					"apps/web-tanstack-start",
-				);
-				if (await fs.pathExists(tanstackStartAuthDir)) {
-					await fs.copy(tanstackStartAuthDir, webDir, { overwrite: true });
-				}
-			}
-
-			if (hasNextRouter) {
-				const nextAuthDir = path.join(authTemplateDir, "apps/web-next");
-				if (await fs.pathExists(nextAuthDir)) {
-					await fs.copy(nextAuthDir, webDir, { overwrite: true });
-				}
-			}
+	if (await fs.pathExists(serverAppDir)) {
+		const authServerBaseSrc = path.join(PKG_ROOT, "templates/auth/server/base");
+		if (await fs.pathExists(authServerBaseSrc)) {
+			await processAndCopyFiles(
+				"**/*",
+				authServerBaseSrc,
+				serverAppDir,
+				context,
+			);
+		} else {
+			consola.warn(
+				pc.yellow(
+					`Warning: Base auth server template not found at ${authServerBaseSrc}`,
+				),
+			);
 		}
 
-		const serverAuthDir = path.join(authTemplateDir, "apps/server/src");
-		const projectServerDir = path.join(projectDir, "apps/server/src");
-
-		await fs.copy(
-			path.join(serverAuthDir, "lib/trpc.ts"),
-			path.join(projectServerDir, "lib/trpc.ts"),
-			{ overwrite: true },
-		);
-
-		await fs.copy(
-			path.join(serverAuthDir, "routers/index.ts"),
-			path.join(projectServerDir, "routers/index.ts"),
-			{ overwrite: true },
-		);
-
-		if (framework === "next") {
-			if (
-				await fs.pathExists(
-					path.join(authTemplateDir, "apps/server/src/with-next-app"),
-				)
-			) {
-				const nextAppAuthDir = path.join(
-					authTemplateDir,
-					"apps/server/src/with-next-app",
-				);
-				const nextAppDestDir = path.join(projectDir, "apps/server/src/app");
-
-				await fs.ensureDir(nextAppDestDir);
-
-				const files = await fs.readdir(nextAppAuthDir);
-				for (const file of files) {
-					const srcPath = path.join(nextAppAuthDir, file);
-					const destPath = path.join(nextAppDestDir, file);
-					await fs.copy(srcPath, destPath, { overwrite: true });
-				}
-			}
-
-			const contextFileName = "with-next-context.ts";
-			await fs.copy(
-				path.join(serverAuthDir, "lib", contextFileName),
-				path.join(projectServerDir, "lib/context.ts"),
-				{ overwrite: true },
+		const authServerNextSrc = path.join(PKG_ROOT, "templates/auth/server/next");
+		if (await fs.pathExists(authServerNextSrc)) {
+			await processAndCopyFiles(
+				"**/*",
+				authServerNextSrc,
+				serverAppDir,
+				context,
 			);
+		} else {
+			consola.warn(
+				pc.yellow(
+					`Warning: Next auth server template not found at ${authServerNextSrc}`,
+				),
+			);
+		}
 
-			const authLibFileName = getAuthLibDir(orm, database);
-			const authLibSourceDir = path.join(serverAuthDir, authLibFileName);
-			if (await fs.pathExists(authLibSourceDir)) {
-				const files = await fs.readdir(authLibSourceDir);
-				for (const file of files) {
-					await fs.copy(
-						path.join(authLibSourceDir, file),
-						path.join(projectServerDir, "lib", file),
-						{ overwrite: true },
-					);
-				}
+		if (context.orm !== "none" && context.database !== "none") {
+			const orm = context.orm;
+			const db = context.database;
+			let authDbSrc = "";
+			if (orm === "drizzle") {
+				authDbSrc = path.join(
+					PKG_ROOT,
+					`templates/auth/server/db/drizzle/${db}`,
+				);
+			} else if (orm === "prisma") {
+				authDbSrc = path.join(
+					PKG_ROOT,
+					`templates/auth/server/db/prisma/${db}`,
+				);
+			}
+			if (authDbSrc && (await fs.pathExists(authDbSrc))) {
+				await processAndCopyFiles("**/*", authDbSrc, serverAppDir, context);
+			} else {
+				consola.warn(
+					pc.yellow(
+						`Warning: Auth template for ${orm}/${db} not found at ${authDbSrc}`,
+					),
+				);
+			}
+		}
+	} else {
+		consola.warn(
+			pc.yellow(
+				"Warning: apps/server directory does not exist, skipping server-side auth setup.",
+			),
+		);
+	}
+
+	if (webFrontends.length > 0 && (await fs.pathExists(webAppDir))) {
+		const authWebBaseSrc = path.join(PKG_ROOT, "templates/auth/web/base");
+		if (await fs.pathExists(authWebBaseSrc)) {
+			await processAndCopyFiles("**/*", authWebBaseSrc, webAppDir, context);
+		} else {
+			consola.warn(
+				pc.yellow(
+					`Warning: Base auth web template not found at ${authWebBaseSrc}`,
+				),
+			);
+		}
+
+		for (const framework of webFrontends) {
+			const authWebFrameworkSrc = path.join(
+				PKG_ROOT,
+				`templates/auth/web/${framework}`,
+			);
+			if (await fs.pathExists(authWebFrameworkSrc)) {
+				await processAndCopyFiles(
+					"**/*",
+					authWebFrameworkSrc,
+					webAppDir,
+					context,
+				);
+			} else {
+				consola.warn(
+					pc.yellow(
+						`Warning: Auth web template for ${framework} not found at ${authWebFrameworkSrc}`,
+					),
+				);
+			}
+		}
+	}
+
+	if (hasNative && (await fs.pathExists(nativeAppDir))) {
+		const authNativeSrc = path.join(PKG_ROOT, "templates/auth/native");
+		if (await fs.pathExists(authNativeSrc)) {
+			await processAndCopyFiles("**/*", authNativeSrc, nativeAppDir, context);
+		} else {
+			consola.warn(
+				pc.yellow(
+					`Warning: Auth native template not found at ${authNativeSrc}`,
+				),
+			);
+		}
+	}
+}
+
+export async function setupAddonsTemplate(
+	projectDir: string,
+	context: ProjectConfig,
+): Promise<void> {
+	if (context.addons.includes("turborepo")) {
+		const turboSrcDir = path.join(PKG_ROOT, "templates/addons/turborepo");
+		if (await fs.pathExists(turboSrcDir)) {
+			await processAndCopyFiles("**/*", turboSrcDir, projectDir, context);
+		} else {
+			consola.warn(pc.yellow("Warning: Turborepo addon template not found."));
+		}
+	}
+
+	if (context.addons.includes("husky")) {
+		const huskySrcDir = path.join(PKG_ROOT, "templates/addons/husky");
+		if (await fs.pathExists(huskySrcDir)) {
+			await processAndCopyFiles("**/*", huskySrcDir, projectDir, context);
+		} else {
+			consola.warn(pc.yellow("Warning: Husky addon template not found."));
+		}
+	}
+
+	if (context.addons.includes("biome")) {
+		const biomeSrcDir = path.join(PKG_ROOT, "templates/addons/biome");
+		if (await fs.pathExists(biomeSrcDir)) {
+			await processAndCopyFiles("**/*", biomeSrcDir, projectDir, context);
+		} else {
+			consola.warn(pc.yellow("Warning: Biome addon template not found."));
+		}
+	}
+
+	if (context.addons.includes("pwa")) {
+		const pwaSrcDir = path.join(PKG_ROOT, "templates/addons/pwa/apps/web");
+		const webAppDir = path.join(projectDir, "apps/web");
+		if (await fs.pathExists(pwaSrcDir)) {
+			if (await fs.pathExists(webAppDir)) {
+				await processAndCopyFiles("**/*", pwaSrcDir, webAppDir, context);
+			} else {
+				consola.warn(
+					pc.yellow(
+						"Warning: apps/web directory not found, cannot setup PWA addon.",
+					),
+				);
 			}
 		} else {
-			const contextFileName = `with-${framework}-context.ts`;
-			await fs.copy(
-				path.join(serverAuthDir, "lib", contextFileName),
-				path.join(projectServerDir, "lib/context.ts"),
-				{ overwrite: true },
-			);
+			consola.warn(pc.yellow("Warning: PWA addon template not found."));
+		}
+	}
+}
 
-			const indexFileName = `with-${framework}-index.ts`;
-			await fs.copy(
-				path.join(serverAuthDir, indexFileName),
-				path.join(projectServerDir, "index.ts"),
-				{ overwrite: true },
-			);
+export async function setupExamplesTemplate(
+	projectDir: string,
+	context: ProjectConfig,
+): Promise<void> {
+	if (!context.examples || context.examples.length === 0) return;
 
-			const authLibFileName = getAuthLibDir(orm, database);
-			const authLibSourceDir = path.join(serverAuthDir, authLibFileName);
-			if (await fs.pathExists(authLibSourceDir)) {
-				const files = await fs.readdir(authLibSourceDir);
-				for (const file of files) {
-					await fs.copy(
-						path.join(authLibSourceDir, file),
-						path.join(projectServerDir, "lib", file),
-						{ overwrite: true },
+	const serverAppDir = path.join(projectDir, "apps/server");
+	const webAppDir = path.join(projectDir, "apps/web");
+
+	for (const example of context.examples) {
+		const exampleBaseDir = path.join(PKG_ROOT, `templates/examples/${example}`);
+
+		if (await fs.pathExists(serverAppDir)) {
+			const exampleServerSrc = path.join(exampleBaseDir, "server");
+			if (await fs.pathExists(exampleServerSrc)) {
+				if (context.orm !== "none") {
+					const exampleOrmBaseSrc = path.join(
+						exampleServerSrc,
+						context.orm,
+						"base",
 					);
+					if (await fs.pathExists(exampleOrmBaseSrc)) {
+						await processAndCopyFiles(
+							"**/*",
+							exampleOrmBaseSrc,
+							serverAppDir,
+							context,
+							false,
+						);
+					}
+
+					if (context.database !== "none") {
+						const exampleDbSchemaSrc = path.join(
+							exampleServerSrc,
+							context.orm,
+							context.database,
+						);
+						if (await fs.pathExists(exampleDbSchemaSrc)) {
+							await processAndCopyFiles(
+								"**/*",
+								exampleDbSchemaSrc,
+								serverAppDir,
+								context,
+								false,
+							);
+						}
+					}
 				}
 			}
 		}
 
-		if (frontends.includes("native")) {
-			const nativeAuthDir = path.join(authTemplateDir, "apps/native");
-			const projectNativeDir = path.join(projectDir, "apps/native");
-
-			if (await fs.pathExists(nativeAuthDir)) {
-				await fs.copy(nativeAuthDir, projectNativeDir, { overwrite: true });
+		if (await fs.pathExists(webAppDir)) {
+			const exampleWebSrc = path.join(exampleBaseDir, "web");
+			if (await fs.pathExists(exampleWebSrc)) {
+				const webFrameworks = context.frontend.filter((f) =>
+					[
+						"next",
+						"react-router",
+						"tanstack-router",
+						"tanstack-start",
+					].includes(f),
+				);
+				for (const framework of webFrameworks) {
+					const exampleWebFrameworkSrc = path.join(exampleWebSrc, framework);
+					if (await fs.pathExists(exampleWebFrameworkSrc)) {
+						await processAndCopyFiles(
+							"**/*",
+							exampleWebFrameworkSrc,
+							webAppDir,
+							context,
+							false,
+						);
+					}
+				}
 			}
-
-			addPackageDependency({
-				dependencies: ["@better-auth/expo"],
-				projectDir: path.join(projectDir, "apps/server"),
-			});
-
-			await updateAuthConfigWithExpoPlugin(projectDir, orm, database);
 		}
 	}
 }
 
-// Need to find a better way to handle this
-async function updateAuthConfigWithExpoPlugin(
+export async function fixGitignoreFiles(
 	projectDir: string,
-	orm: ProjectOrm,
-	database: ProjectDatabase,
+	context: ProjectConfig,
 ): Promise<void> {
-	const serverDir = path.join(projectDir, "apps/server");
+	const gitignoreFiles = await globby(["**/.gitignore.hbs", "**/_gitignore"], {
+		cwd: projectDir,
+		dot: true,
+		onlyFiles: true,
+		absolute: true,
+		ignore: ["**/node_modules/**", "**/.git/**"],
+	});
 
-	let authFilePath: string | undefined;
-	if (orm === "drizzle") {
-		if (database === "sqlite") {
-			authFilePath = path.join(serverDir, "src/lib/auth.ts");
-		} else if (database === "postgres") {
-			authFilePath = path.join(serverDir, "src/lib/auth.ts");
-		}
-	} else if (orm === "prisma") {
-		if (database === "sqlite") {
-			authFilePath = path.join(serverDir, "src/lib/auth.ts");
-		} else if (database === "postgres") {
-			authFilePath = path.join(serverDir, "src/lib/auth.ts");
-		}
-	}
+	for (const currentPath of gitignoreFiles) {
+		const dir = path.dirname(currentPath);
+		const filename = path.basename(currentPath);
+		const destPath = path.join(dir, ".gitignore");
 
-	if (authFilePath && (await fs.pathExists(authFilePath))) {
-		let authFileContent = await fs.readFile(authFilePath, "utf8");
-
-		if (!authFileContent.includes("@better-auth/expo")) {
-			const importLine = 'import { expo } from "@better-auth/expo";\n';
-
-			const lastImportIndex = authFileContent.lastIndexOf("import");
-			const afterLastImport =
-				authFileContent.indexOf("\n", lastImportIndex) + 1;
-
-			authFileContent =
-				authFileContent.substring(0, afterLastImport) +
-				importLine +
-				authFileContent.substring(afterLastImport);
-		}
-
-		if (!authFileContent.includes("plugins:")) {
-			authFileContent = authFileContent.replace(
-				/}\);/,
-				"  plugins: [expo()],\n});",
-			);
-		} else if (!authFileContent.includes("expo()")) {
-			authFileContent = authFileContent.replace(
-				/plugins: \[(.*?)\]/s,
-				(match, plugins) => {
-					return `plugins: [${plugins}${plugins.trim() ? ", " : ""}expo()]`;
-				},
-			);
-		}
-
-		if (!authFileContent.includes("my-better-t-app://")) {
-			authFileContent = authFileContent.replace(
-				/trustedOrigins: \[(.*?)\]/s,
-				(match, origins) => {
-					return `trustedOrigins: [${origins}${origins.trim() ? ", " : ""}"my-better-t-app://"]`;
-				},
-			);
-		}
-
-		await fs.writeFile(authFilePath, authFileContent);
-	}
-}
-
-export async function fixGitignoreFiles(projectDir: string): Promise<void> {
-	const gitignorePaths = await findGitignoreFiles(projectDir);
-
-	for (const gitignorePath of gitignorePaths) {
-		if (await fs.pathExists(gitignorePath)) {
-			const targetPath = path.join(path.dirname(gitignorePath), ".gitignore");
-			await fs.move(gitignorePath, targetPath, { overwrite: true });
-		}
-	}
-}
-
-/**
- * Find all _gitignore files in the project recursively
- */
-async function findGitignoreFiles(dir: string): Promise<string[]> {
-	const gitignoreFiles: string[] = [];
-
-	const gitignorePath = path.join(dir, "_gitignore");
-	if (await fs.pathExists(gitignorePath)) {
-		gitignoreFiles.push(gitignorePath);
-	}
-
-	try {
-		const entries = await fs.readdir(dir, { withFileTypes: true });
-
-		for (const entry of entries) {
-			if (entry.isDirectory() && entry.name !== "node_modules") {
-				const subDirPath = path.join(dir, entry.name);
-				const subDirFiles = await findGitignoreFiles(subDirPath);
-				gitignoreFiles.push(...subDirFiles);
+		try {
+			if (filename === ".gitignore.hbs") {
+				await processTemplate(currentPath, destPath, context);
+				await fs.remove(currentPath);
+			} else if (filename === "_gitignore") {
+				await fs.move(currentPath, destPath, { overwrite: true });
 			}
+		} catch (error) {
+			consola.error(`Error processing gitignore file ${currentPath}:`, error);
 		}
-	} catch (error) {}
-
-	return gitignoreFiles;
+	}
 }
 
-function getOrmTemplateDir(orm: ProjectOrm, database: ProjectDatabase): string {
-	if (orm === "drizzle") {
-		if (database === "sqlite") return "template/with-drizzle-sqlite";
-		if (database === "postgres") return "template/with-drizzle-postgres";
-		if (database === "mysql") return "template/with-drizzle-mysql";
+export async function handleExtras(
+	projectDir: string,
+	context: ProjectConfig,
+): Promise<void> {
+	if (context.packageManager === "pnpm") {
+		const src = path.join(PKG_ROOT, "templates/extras/pnpm-workspace.yaml");
+		const dest = path.join(projectDir, "pnpm-workspace.yaml");
+		if (await fs.pathExists(src)) {
+			await fs.copy(src, dest);
+		} else {
+			consola.warn(
+				pc.yellow("Warning: pnpm-workspace.yaml template not found."),
+			);
+		}
 	}
-
-	if (orm === "prisma") {
-		if (database === "sqlite") return "template/with-prisma-sqlite";
-		if (database === "postgres") return "template/with-prisma-postgres";
-		if (database === "mysql") return "template/with-prisma-mysql";
-		if (database === "mongodb") return "template/with-prisma-mongodb";
-	}
-
-	return "template/base";
-}
-
-function getAuthLibDir(orm: ProjectOrm, database: ProjectDatabase): string {
-	if (orm === "drizzle") {
-		if (database === "sqlite") return "with-drizzle-sqlite-lib";
-		if (database === "postgres") return "with-drizzle-postgres-lib";
-		if (database === "mysql") return "with-drizzle-mysql-lib";
-	}
-
-	if (orm === "prisma") {
-		if (database === "sqlite") return "with-prisma-sqlite-lib";
-		if (database === "postgres") return "with-prisma-postgres-lib";
-		if (database === "mysql") return "with-prisma-mysql-lib";
-		if (database === "mongodb") return "with-prisma-mongodb-lib";
-	}
-
-	throw new Error("Invalid ORM or database configuration for auth setup");
 }

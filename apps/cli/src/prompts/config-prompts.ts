@@ -1,7 +1,8 @@
-import { cancel, group, log } from "@clack/prompts";
+import { cancel, group } from "@clack/prompts";
 import pc from "picocolors";
 import type {
 	ProjectAddons,
+	ProjectApi,
 	ProjectBackend,
 	ProjectConfig,
 	ProjectDBSetup,
@@ -13,6 +14,7 @@ import type {
 	ProjectRuntime,
 } from "../types";
 import { getAddonsChoice } from "./addons";
+import { getApiChoice } from "./api";
 import { getAuthChoice } from "./auth";
 import { getBackendFrameworkChoice } from "./backend-framework";
 import { getDatabaseChoice } from "./database";
@@ -20,7 +22,7 @@ import { getDBSetupChoice } from "./db-setup";
 import { getExamplesChoice } from "./examples";
 import { getFrontendChoice } from "./frontend-option";
 import { getGitChoice } from "./git";
-import { getNoInstallChoice } from "./install";
+import { getinstallChoice } from "./install";
 import { getORMChoice } from "./orm";
 import { getPackageManagerChoice } from "./package-manager";
 import { getProjectName } from "./project-name";
@@ -35,11 +37,12 @@ type PromptGroupResults = {
 	examples: ProjectExamples[];
 	git: boolean;
 	packageManager: ProjectPackageManager;
-	noInstall: boolean;
+	install: boolean;
 	dbSetup: ProjectDBSetup;
 	backend: ProjectBackend;
 	runtime: ProjectRuntime;
 	frontend: ProjectFrontend[];
+	api: ProjectApi;
 };
 
 export async function gatherConfig(
@@ -57,12 +60,9 @@ export async function gatherConfig(
 			database: () => getDatabaseChoice(flags.database),
 			orm: ({ results }) =>
 				getORMChoice(flags.orm, results.database !== "none", results.database),
+			api: ({ results }) => getApiChoice(flags.api, results.frontend),
 			auth: ({ results }) =>
-				getAuthChoice(
-					flags.auth,
-					results.database !== "none",
-					results.frontend,
-				),
+				getAuthChoice(flags.auth, results.database !== "none"),
 			addons: ({ results }) => getAddonsChoice(flags.addons, results.frontend),
 			examples: ({ results }) =>
 				getExamplesChoice(
@@ -79,7 +79,7 @@ export async function gatherConfig(
 				),
 			git: () => getGitChoice(flags.git),
 			packageManager: () => getPackageManagerChoice(flags.packageManager),
-			noInstall: () => getNoInstallChoice(flags.noInstall),
+			install: () => getinstallChoice(flags.install),
 		},
 		{
 			onCancel: () => {
@@ -99,9 +99,10 @@ export async function gatherConfig(
 		examples: result.examples,
 		git: result.git,
 		packageManager: result.packageManager,
-		noInstall: result.noInstall,
+		install: result.install,
 		dbSetup: result.dbSetup,
 		backend: result.backend,
 		runtime: result.runtime,
+		api: result.api,
 	};
 }

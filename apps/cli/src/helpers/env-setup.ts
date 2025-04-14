@@ -42,9 +42,11 @@ async function addEnvVariablesToFile(
 }
 
 export async function setupEnvironmentVariables(
-	projectDir: string,
-	options: ProjectConfig,
+	config: ProjectConfig,
 ): Promise<void> {
+	const { projectName } = config;
+	const projectDir = path.resolve(process.cwd(), projectName);
+	const options = config;
 	const serverDir = path.join(projectDir, "apps/server");
 	const envPath = path.join(serverDir, ".env");
 

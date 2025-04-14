@@ -1,6 +1,6 @@
 "use client";
-import { motion } from "framer-motion";
 import { Check, ClipboardCopy, Terminal } from "lucide-react";
+import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 const CodeContainer = () => {

@@ -6,6 +6,7 @@ import fs from "fs-extra";
 import pc from "picocolors";
 import type { ProjectPackageManager } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
+import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
 
 type PrismaConfig = {
 	databaseUrl: string;
@@ -22,18 +23,17 @@ async function initPrismaDatabase(
 		const prismaDir = path.join(serverDir, "prisma");
 		await fs.ensureDir(prismaDir);
 
-		const initCmd =
-			packageManager === "npm"
-				? "npx"
-				: packageManager === "pnpm"
-					? "pnpm dlx"
-					: "bunx";
-
 		s.stop("Initializing Prisma. Follow the prompts below:");
 
-		await execa(initCmd, ["prisma", "init", "--db"], {
+		const prismaInitCommand = getPackageExecutionCommand(
+			packageManager,
+			"prisma init --db",
+		);
+
+		await execa(prismaInitCommand, {
 			cwd: serverDir,
 			stdio: "inherit",
+			shell: true,
 		});
 
 		log.info(
@@ -112,7 +112,7 @@ DATABASE_URL="your_database_url"`);
 
 async function addPrismaAccelerateExtension(serverDir: string) {
 	try {
-		addPackageDependency({
+		await addPackageDependency({
 			dependencies: ["@prisma/extension-accelerate"],
 			projectDir: serverDir,
 		});
@@ -152,10 +152,11 @@ export default prisma;
 	}
 }
 
-export async function setupPrismaPostgres(
-	projectDir: string,
-	packageManager: ProjectPackageManager = "npm",
-) {
+import type { ProjectConfig } from "../types";
+
+export async function setupPrismaPostgres(config: ProjectConfig) {
+	const { projectName, packageManager } = config;
+	const projectDir = path.resolve(process.cwd(), projectName);
 	const serverDir = path.join(projectDir, "apps/server");
 	const s = spinner();
 	s.start("Setting up Prisma PostgreSQL");
@@ -184,7 +185,9 @@ export async function setupPrismaPostgres(
 		s.stop(pc.red("Prisma PostgreSQL setup failed"));
 		consola.error(
 			pc.red(
-				`Error during Prisma PostgreSQL setup: ${error instanceof Error ? error.message : String(error)}`,
+				`Error during Prisma PostgreSQL setup: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
 			),
 		);
 

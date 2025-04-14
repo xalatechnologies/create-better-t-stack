@@ -1,9 +1,10 @@
 import path from "node:path";
-import { cancel, spinner } from "@clack/prompts";
+import { cancel, log, spinner } from "@clack/prompts";
 import fs from "fs-extra";
 import pc from "picocolors";
 import type { ProjectConfig } from "../types";
 import { setupAddons } from "./addons-setup";
+import { setupApi } from "./api-setup";
 import { setupAuth } from "./auth-setup";
 import { setupBackendDependencies } from "./backend-framework-setup";
 import { createReadme } from "./create-readme";
@@ -17,10 +18,13 @@ import { setupRuntime } from "./runtime-setup";
 import {
 	copyBaseTemplate,
 	fixGitignoreFiles,
+	handleExtras,
+	setupAddonsTemplate,
 	setupAuthTemplate,
 	setupBackendFramework,
+	setupDbOrmTemplates,
+	setupExamplesTemplate,
 	setupFrontendTemplates,
-	setupOrmTemplate,
 } from "./template-manager";
 
 export async function createProject(options: ProjectConfig): Promise<string> {
@@ -30,74 +34,47 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 	try {
 		await fs.ensureDir(projectDir);
 
-		await copyBaseTemplate(projectDir);
-		await setupFrontendTemplates(projectDir, options.frontend);
+		await copyBaseTemplate(projectDir, options);
+		await setupFrontendTemplates(projectDir, options);
 
-		await fixGitignoreFiles(projectDir);
+		await setupBackendFramework(projectDir, options);
+		await setupBackendDependencies(options);
 
-		await setupBackendFramework(projectDir, options.backend);
-		await setupBackendDependencies(
-			projectDir,
-			options.backend,
-			options.runtime,
-		);
+		await setupDbOrmTemplates(projectDir, options);
 
-		await setupOrmTemplate(
-			projectDir,
-			options.orm,
-			options.database,
-			options.auth,
-		);
+		await setupDatabase(options);
 
-		await setupDatabase(
-			projectDir,
-			options.database,
-			options.orm,
-			options.packageManager,
-			options.dbSetup === "turso",
-			options.dbSetup === "prisma-postgres",
-			options.dbSetup === "mongodb-atlas",
-			options.dbSetup === "neon",
-		);
+		await setupAuthTemplate(projectDir, options);
+		await setupAuth(options);
 
-		await setupAuthTemplate(
-			projectDir,
-			options.auth,
-			options.backend,
-			options.orm,
-			options.database,
-			options.frontend,
-		);
-		await setupAuth(projectDir, options.auth, options.frontend);
-
-		await setupRuntime(projectDir, options.runtime, options.backend);
-
-		await setupExamples(
-			projectDir,
-			options.examples,
-			options.orm,
-			options.auth,
-			options.backend,
-			options.frontend,
-		);
-
-		await setupEnvironmentVariables(projectDir, options);
-
-		await initializeGit(projectDir, options.git);
-
-		if (options.addons.length > 0) {
-			await setupAddons(
-				projectDir,
-				options.addons,
-				options.packageManager,
-				options.frontend,
-			);
+		await setupAddonsTemplate(projectDir, options);
+		if (options.addons.length > 0 && options.addons[0] !== "none") {
+			await setupAddons(options);
 		}
+
+		await setupExamplesTemplate(projectDir, options);
+		await handleExtras(projectDir, options);
+
+		if (options.examples.length > 0 && options.examples[0] !== "none") {
+			await setupExamples(options);
+		}
+
+		await setupApi(options);
+
+		await setupRuntime(options);
+
+		await setupEnvironmentVariables(options);
 
 		await updatePackageConfigurations(projectDir, options);
 		await createReadme(projectDir, options);
 
-		if (!options.noInstall) {
+		await initializeGit(projectDir, options.git);
+
+		await fixGitignoreFiles(projectDir, options);
+
+		log.success("Project template successfully scaffolded!");
+
+		if (options.install) {
 			await installDependencies({
 				projectDir,
 				packageManager: options.packageManager,
@@ -105,22 +82,17 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 			});
 		}
 
-		displayPostInstallInstructions(
-			options.database,
-			options.projectName,
-			options.packageManager,
-			!options.noInstall,
-			options.orm,
-			options.addons,
-			options.runtime,
-			options.frontend,
-		);
+		displayPostInstallInstructions({
+			...options,
+			depsInstalled: options.install,
+		});
 
 		return projectDir;
 	} catch (error) {
-		s.message(pc.red("Failed"));
+		s.stop(pc.red("Failed"));
 		if (error instanceof Error) {
 			cancel(pc.red(`Error during project creation: ${error.message}`));
+			console.error(error.stack);
 			process.exit(1);
 		}
 		throw error;

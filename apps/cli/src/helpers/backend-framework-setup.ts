@@ -3,11 +3,14 @@ import type { AvailableDependencies } from "../constants";
 import type { ProjectBackend, ProjectRuntime } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
+import type { ProjectConfig } from "../types";
+
 export async function setupBackendDependencies(
-	projectDir: string,
-	framework: ProjectBackend,
-	runtime: ProjectRuntime,
+	config: ProjectConfig,
 ): Promise<void> {
+	const { projectName, backend, runtime } = config;
+	const projectDir = path.resolve(process.cwd(), projectName);
+	const framework = backend;
 	const serverDir = path.join(projectDir, "apps/server");
 
 	const dependencies: AvailableDependencies[] = [];
@@ -40,7 +43,7 @@ export async function setupBackendDependencies(
 		devDependencies.push("@types/bun");
 	}
 
-	addPackageDependency({
+	await addPackageDependency({
 		dependencies,
 		devDependencies,
 		projectDir: serverDir,

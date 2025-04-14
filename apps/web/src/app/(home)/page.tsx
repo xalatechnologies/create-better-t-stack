@@ -1,86 +1,166 @@
 "use client";
 import ShinyText from "@/app/(home)/_components/ShinyText";
+import { motion } from "motion/react";
 import React from "react";
 import BackgroundGradients from "./_components/BackgroundGradients";
 import CodeContainer from "./_components/CodeContainer";
 import CustomizableSection from "./_components/CustomizableSection";
+import Footer from "./_components/Footer";
+import Navbar from "./_components/Navbar";
 import NpmPackage from "./_components/NpmPackage";
 import Testimonials from "./_components/Testimonials";
 
 export default function HomePage() {
+	const containerVariants = {
+		hidden: { opacity: 0 },
+		visible: {
+			opacity: 1,
+			transition: {
+				staggerChildren: 0.15,
+			},
+		},
+	};
+
+	const itemVariants = {
+		hidden: { opacity: 0, y: 20 },
+		visible: {
+			opacity: 1,
+			y: 0,
+			transition: {
+				duration: 0.5,
+				ease: "easeOut",
+			},
+		},
+	};
+
+	const sectionVariants = {
+		hidden: { opacity: 0, y: 30 },
+		visible: {
+			opacity: 1,
+			y: 0,
+			transition: {
+				duration: 0.6,
+				ease: "easeOut",
+			},
+		},
+	};
+
 	return (
-		<main className="flex flex-col items-center justify-start px-0 pt-12 pb-10 sm:px-4 sm:pb-16 md:px-8 md:pt-16 lg:pt-20">
-			<BackgroundGradients />
-			<div className="relative z-10 mx-auto mb-10 max-w-5xl text-center sm:mb-16">
-				<div className="px-1 sm:px-6 lg:px-8">
-					<div className="flex flex-col items-center justify-center space-y-3 text-center sm:space-y-4">
-						<h1 className="font-bold font-mono text-4xl xs:text-5xl tracking-tight sm:text-6xl md:text-7xl">
-							<span className="border-blue-500 border-b-2 pb-1 text-gray-900 dark:text-blue-100">
-								Better-T Stack
-							</span>
-						</h1>
+		<>
+			<Navbar />
+			<main className="flex min-h-screen flex-col items-center justify-start overflow-x-hidden px-0 pt-24 pb-10 sm:px-4 sm:pb-16 md:px-8 md:pt-28 lg:pt-32">
+				<BackgroundGradients />
 
-						<div className="mb-1 sm:mb-2">
-							<NpmPackage />
+				<motion.div
+					className="relative z-10 mx-auto mb-16 max-w-5xl text-center sm:mb-20"
+					initial="hidden"
+					animate="visible"
+					variants={containerVariants}
+				>
+					<div className="px-1 sm:px-6 lg:px-8">
+						<div className="flex flex-col items-center justify-center space-y-4 text-center sm:space-y-5">
+							<motion.h1
+								className="font-bold font-mono text-4xl xs:text-5xl tracking-tight sm:text-6xl md:text-7xl"
+								variants={itemVariants}
+							>
+								<span className="border-blue-500 border-b-2 pb-1 text-gray-900 dark:text-blue-100">
+									Better-T Stack
+								</span>
+							</motion.h1>
+
+							<motion.div className="mb-1 sm:mb-2" variants={itemVariants}>
+								<NpmPackage />
+							</motion.div>
+
+							<motion.p
+								className="max-w-2xl px-1 font-mono text-gray-600 text-lg sm:text-xl dark:text-gray-300"
+								variants={itemVariants}
+							>
+								A modern CLI tool for scaffolding end-to-end type-safe
+								TypeScript projects with best practices and customizable
+								configurations
+							</motion.p>
+
+							<motion.div
+								className="mx-auto mt-2 w-full max-w-3xl sm:mt-3"
+								variants={itemVariants}
+							>
+								<CodeContainer />
+							</motion.div>
+
+							<motion.div variants={itemVariants}>
+								<ShinyText
+									text="Type-safe. Modern. Minimal. Fast."
+									speed={3}
+									className="font-mono text-gray-600 text-xs xs:text-sm sm:text-base dark:text-gray-400"
+								/>
+							</motion.div>
 						</div>
-
-						<p className="max-w-2xl px-1 font-mono text-gray-600 text-lg sm:text-xl dark:text-gray-300">
-							A modern CLI tool for scaffolding end-to-end type-safe TypeScript
-							projects with best practices and customizable configurations
-						</p>
-
-						<div className="mx-auto mt-1 w-full max-w-3xl sm:mt-2">
-							<CodeContainer />
-						</div>
-
-						<ShinyText
-							text="Type-safe. Modern. Minimal. Fast."
-							speed={3}
-							className="font-mono text-gray-600 text-xs xs:text-sm sm:text-base dark:text-gray-400"
-						/>
 					</div>
-				</div>
-			</div>
+				</motion.div>
 
-			<CustomizableSection />
+				<motion.div
+					className="w-full"
+					initial="hidden"
+					whileInView="visible"
+					viewport={{ once: true, amount: 0.2 }}
+					variants={sectionVariants}
+				>
+					<CustomizableSection />
+				</motion.div>
 
-			<div className="relative w-full pt-8 sm:pt-12">
-				<div className="relative mx-auto max-w-5xl">
-					<div className="flex items-center justify-center">
-						<div className="hidden w-1/3 items-center sm:flex">
-							<div className="h-px flex-grow bg-gradient-to-r from-transparent to-blue-500/40" />
-							<div className="h-2 w-2 rounded-full bg-blue-500/50" />
-						</div>
+				<motion.div
+					className="relative w-full pt-10 sm:pt-16"
+					initial="hidden"
+					whileInView="visible"
+					viewport={{ once: true, amount: 0.5 }}
+					variants={sectionVariants}
+				>
+					<div className="relative mx-auto max-w-5xl">
+						<div className="flex items-center justify-center">
+							<div className="hidden w-1/3 items-center sm:flex">
+								<div className="h-px flex-grow bg-gradient-to-r from-transparent via-blue-500/30 to-blue-500/50" />
+								<div className="h-2 w-2 rounded-full bg-blue-500/60 shadow-sm" />
+							</div>
 
-						<div className="px-4 sm:px-6">
-							<div className="flex h-7 w-7 items-center justify-center rounded-full border border-blue-500 bg-white sm:h-8 sm:w-8 dark:bg-gray-900">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									className="h-3.5 w-3.5 text-blue-500 sm:h-4 sm:w-4"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-								>
-									<title>Code Icon</title>
-									<path
-										fillRule="evenodd"
-										d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z"
-										clipRule="evenodd"
-									/>
-								</svg>
+							<div className="px-4 sm:px-6">
+								<div className="flex h-8 w-8 items-center justify-center rounded-full border border-blue-500/80 bg-white shadow-md sm:h-9 sm:w-9 dark:border-blue-400/70 dark:bg-gray-900">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="h-4 w-4 text-blue-500 sm:h-5 sm:w-5 dark:text-blue-400"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<title>Code Icon</title>
+										<path
+											fillRule="evenodd"
+											d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z"
+											clipRule="evenodd"
+										/>
+									</svg>
+								</div>
+							</div>
+
+							<div className="hidden w-1/3 items-center sm:flex">
+								<div className="h-2 w-2 rounded-full bg-blue-500/60 shadow-sm" />
+								<div className="h-px flex-grow bg-gradient-to-l from-transparent via-blue-500/30 to-blue-500/50" />
 							</div>
 						</div>
-
-						<div className="hidden w-1/3 items-center sm:flex">
-							<div className="h-2 w-2 rounded-full bg-blue-500/50" />
-							<div className="h-px flex-grow bg-gradient-to-l from-transparent to-blue-500/40" />
-						</div>
+						<div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-blue-500/30 to-transparent sm:hidden" />
 					</div>
+				</motion.div>
 
-					<div className="mt-6 h-px w-full bg-blue-500/20 sm:hidden" />
-				</div>
-			</div>
-
-			<Testimonials />
-		</main>
+				<motion.div
+					className="w-full"
+					initial="hidden"
+					whileInView="visible"
+					viewport={{ once: true, amount: 0.15 }}
+					variants={sectionVariants}
+				>
+					<Testimonials />
+				</motion.div>
+			</main>
+			<Footer />
+		</>
 	);
 }

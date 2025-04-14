@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
+import Link from "next/link";
 import { useEffect } from "react";
 import StackArchitect from "../_components/StackArchitech";
 
@@ -13,44 +14,34 @@ export default function FullScreenStackArchitect() {
 
 		setVh();
 		window.addEventListener("resize", setVh);
-		return () => window.removeEventListener("resize", setVh);
+		document.body.style.overflow = "hidden";
+
+		return () => {
+			window.removeEventListener("resize", setVh);
+			document.body.style.overflow = "";
+		};
 	}, []);
 
 	return (
-		<div className="flex min-h-[calc(var(--vh,1vh)*100)] flex-col bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900">
+		<div className="flex h-[calc(var(--vh,1vh)*100)] flex-col bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900">
 			<motion.div
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
-				transition={{ duration: 0.5 }}
-				className="flex-1 px-4 py-8"
+				transition={{ duration: 0.3 }}
+				className="w-full flex-1"
 			>
-				<div className="mx-auto max-w-6xl">
-					<div className="mb-8 max-w-3xl">
-						<h1 className="mb-3 font-bold font-mono text-2xl sm:text-3xl md:text-4xl">
-							Design Your Ideal Full Stack
-						</h1>
-						<p className="text-gray-700 text-lg dark:text-gray-300">
-							Configure every aspect of your TypeScript application with the
-							interactive stack architect. Choose your technologies, add
-							features, and generate your startup command.
-						</p>
-					</div>
-
-					<StackArchitect fullscreen={true} />
-
-					<div className="mt-8 rounded-lg border border-blue-100 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-900/20">
-						<h3 className="mb-2 font-medium text-blue-800 dark:text-blue-300">
-							Need help getting started?
-						</h3>
-						<p className="text-blue-700 dark:text-blue-400">
-							Select a preset template for common configurations, or customize
-							each component of your stack. When you are ready, copy the
-							generated command and run it in your terminal to create your
-							project.
-						</p>
-					</div>
-				</div>
+				<StackArchitect fullscreen={true} />
 			</motion.div>
+
+			<div className="flex-shrink-0 border-gray-200 border-t bg-blue-50/80 p-2 px-4 text-xs sm:p-3 dark:border-gray-800 dark:bg-blue-950/50">
+				<p className="text-center text-blue-700 dark:text-blue-400">
+					Tip: Use presets (⭐), save (💾), reset (🔄), or copy (📋) the
+					command.{" "}
+					<Link href="/" className="underline hover:text-blue-500">
+						Exit Fullscreen
+					</Link>
+				</p>
+			</div>
 		</div>
 	);
 }

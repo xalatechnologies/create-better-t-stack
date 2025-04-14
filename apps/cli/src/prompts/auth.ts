@@ -6,7 +6,6 @@ import type { ProjectFrontend } from "../types";
 export async function getAuthChoice(
 	auth: boolean | undefined,
 	hasDatabase: boolean,
-	frontends?: ProjectFrontend[],
 ): Promise<boolean> {
 	if (!hasDatabase) return false;
 

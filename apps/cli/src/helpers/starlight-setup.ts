@@ -1,42 +1,20 @@
 import path from "node:path";
-import { log, spinner } from "@clack/prompts";
+import { spinner } from "@clack/prompts";
 import consola from "consola";
 import { execa } from "execa";
 import pc from "picocolors";
-import type { ProjectPackageManager } from "../types";
+import type { ProjectConfig } from "../types";
+import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
 
-export async function setupStarlight(
-	projectDir: string,
-	packageManager: ProjectPackageManager,
-): Promise<void> {
+export async function setupStarlight(config: ProjectConfig): Promise<void> {
+	const { projectName, packageManager } = config;
+	const projectDir = path.resolve(process.cwd(), projectName);
 	const s = spinner();
 
 	try {
-		s.start("Setting up Starlight documentation site...");
+		s.start("Setting up Starlight docs...");
 
-		let cmd: string;
-		let args: string[];
-
-		switch (packageManager) {
-			case "npm":
-				cmd = "npx";
-				args = ["create-astro@latest"];
-				break;
-			case "pnpm":
-				cmd = "pnpm";
-				args = ["dlx", "create-astro@latest"];
-				break;
-			case "bun":
-				cmd = "bunx";
-				args = ["create-astro@latest"];
-				break;
-			default:
-				cmd = "npx";
-				args = ["create-astro@latest"];
-		}
-
-		args = [
-			...args,
+		const starlightArgs = [
 			"docs",
 			"--template",
 			"starlight",
@@ -46,17 +24,26 @@ export async function setupStarlight(
 			"--no-git",
 			"--skip-houston",
 		];
+		const starlightArgsString = starlightArgs.join(" ");
 
-		await execa(cmd, args, {
+		const commandWithArgs = `create-astro@latest ${starlightArgsString}`;
+
+		const starlightInitCommand = getPackageExecutionCommand(
+			packageManager,
+			commandWithArgs,
+		);
+
+		await execa(starlightInitCommand, {
 			cwd: path.join(projectDir, "apps"),
 			env: {
 				CI: "true",
 			},
+			shell: true,
 		});
 
-		s.stop("Starlight documentation site setup successfully!");
+		s.stop("Starlight docs setup successfully!");
 	} catch (error) {
-		s.stop(pc.red("Failed to set up Starlight documentation site"));
+		s.stop(pc.red("Failed to set up Starlight docs"));
 		if (error instanceof Error) {
 			consola.error(pc.red(error.message));
 		}

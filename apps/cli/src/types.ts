@@ -12,6 +12,7 @@ export type ProjectAddons =
 	| "tauri"
 	| "husky"
 	| "starlight"
+	| "turborepo"
 	| "none";
 export type ProjectBackend = "hono" | "elysia" | "express" | "next";
 export type ProjectRuntime = "node" | "bun";
@@ -29,6 +30,7 @@ export type ProjectDBSetup =
 	| "mongodb-atlas"
 	| "neon"
 	| "none";
+export type ProjectApi = "trpc" | "orpc" | "none";
 
 export interface ProjectConfig {
 	projectName: string;
@@ -41,23 +43,30 @@ export interface ProjectConfig {
 	examples: ProjectExamples[];
 	git: boolean;
 	packageManager: ProjectPackageManager;
-	noInstall: boolean;
+	install: boolean;
 	dbSetup: ProjectDBSetup;
 	frontend: ProjectFrontend[];
+	api: ProjectApi;
 }
 
-export type CLIOptions = {
+export type YargsArgv = {
+	projectDirectory?: string;
+
 	yes?: boolean;
-	database?: string;
-	orm?: string;
+	database?: ProjectDatabase;
+	orm?: ProjectOrm;
 	auth?: boolean;
-	frontend?: string[];
-	addons?: string[];
-	examples?: string[] | boolean;
+	frontend?: ProjectFrontend[];
+	addons?: ProjectAddons[];
+	examples?: ProjectExamples[];
 	git?: boolean;
-	packageManager?: string;
+	packageManager?: ProjectPackageManager;
 	install?: boolean;
-	dbSetup?: string;
-	backend?: string;
-	runtime?: string;
+	dbSetup?: ProjectDBSetup;
+	backend?: ProjectBackend;
+	runtime?: ProjectRuntime;
+	api?: ProjectApi;
+
+	_: (string | number)[];
+	$0: string;
 };

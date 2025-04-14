@@ -1,0 +1,102 @@
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { createRouter as createTanstackRouter } from "@tanstack/react-router";
+import Loader from "./components/loader";
+import "./index.css";
+import { routeTree } from "./routeTree.gen";
+{{#if (eq api "trpc")}}
+import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import { toast } from "sonner";
+import type { AppRouter } from "../../server/src/routers";
+import { TRPCProvider } from "./utils/trpc";
+{{/if}}
+{{#if (eq api "orpc")}}
+import { orpc, ORPCContext, queryClient } from "./utils/orpc";
+{{/if}}
+
+{{#if (eq api "trpc")}}
+export const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      toast.error(error.message, {
+        action: {
+          label: "retry",
+          onClick: () => {
+            queryClient.invalidateQueries();
+          },
+        },
+      });
+    },
+  }),
+  defaultOptions: { queries: { staleTime: 60 * 1000 } },
+});
+
+const trpcClient = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      {{#if (includes frontend 'next')}}
+      url: `${process.env.NEXT_PUBLIC_SERVER_URL}/trpc`,
+      {{else}}
+      url: `${import.meta.env.VITE_SERVER_URL}/trpc`,
+      {{/if}}
+      {{#if auth}}
+      fetch(url, options) {
+        return fetch(url, {
+          ...options,
+          credentials: "include",
+        });
+      },
+      {{/if}}
+    }),
+  ],
+});
+
+const trpc = createTRPCOptionsProxy({
+  client: trpcClient,
+  queryClient: queryClient,
+});
+{{/if}}
+
+
+export const createRouter = () => {
+  const router = createTanstackRouter({
+    routeTree,
+    scrollRestoration: true,
+    defaultPreloadStaleTime: 0,
+    {{#if (eq api "trpc")}}
+    context: { trpc, queryClient },
+{{/if}}
+{{#if (eq api "orpc")}}
+    context: { orpc, queryClient },
+{{/if}}
+    defaultPendingComponent: () => <Loader />,
+    defaultNotFoundComponent: () => <div>Not Found</div>,
+    Wrap: ({ children }) => (
+      <QueryClientProvider client={queryClient}>
+        {{#if (eq api "trpc")}}
+        <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
+          {children}
+        </TRPCProvider>
+        {{/if}}
+        {{#if (eq api "orpc")}}
+        <ORPCContext.Provider value={orpc}>
+          {children}
+        </ORPCContext.Provider>
+        {{/if}}
+      </QueryClientProvider>
+    ),
+  });
+
+  return router;
+};
+
+// Register the router instance for type safety
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: ReturnType<typeof createRouter>;
+  }
+}

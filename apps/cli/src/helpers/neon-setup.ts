@@ -5,6 +5,7 @@ import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
 import type { ProjectPackageManager } from "../types";
+import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
 
 type NeonConfig = {
 	connectionString: string;
@@ -13,41 +14,20 @@ type NeonConfig = {
 	roleName: string;
 };
 
-function buildNeonCommand(
-	packageManager: string,
-	args: string[],
-): { cmd: string; cmdArgs: string[] } {
-	let cmd: string;
-	let cmdArgs: string[];
-
-	switch (packageManager) {
-		case "pnpm":
-			cmd = "pnpm";
-			cmdArgs = ["dlx", "neonctl", ...args];
-			break;
-		case "bun":
-			cmd = "bunx";
-			cmdArgs = ["neonctl", ...args];
-			break;
-		default:
-			cmd = "npx";
-			cmdArgs = ["neonctl", ...args];
-	}
-
-	return { cmd, cmdArgs };
-}
-
 async function executeNeonCommand(
-	packageManager: string,
-	args: string[],
+	packageManager: ProjectPackageManager,
+	commandArgsString: string,
 	spinnerText?: string,
 ) {
-	const s = spinnerText ? spinner() : null;
+	const s = spinner();
 	try {
-		const { cmd, cmdArgs } = buildNeonCommand(packageManager, args);
+		const fullCommand = getPackageExecutionCommand(
+			packageManager,
+			commandArgsString,
+		);
 
 		if (s) s.start(spinnerText);
-		const result = await execa(cmd, cmdArgs);
+		const result = await execa(fullCommand, { shell: true });
 		if (s) s.stop(spinnerText);
 
 		return result;
@@ -57,13 +37,10 @@ async function executeNeonCommand(
 	}
 }
 
-async function isNeonAuthenticated(packageManager: string) {
+async function isNeonAuthenticated(packageManager: ProjectPackageManager) {
 	try {
-		const { cmd, cmdArgs } = buildNeonCommand(packageManager, [
-			"projects",
-			"list",
-		]);
-		const result = await execa(cmd, cmdArgs);
+		const commandArgsString = "neonctl projects list";
+		const result = await executeNeonCommand(packageManager, commandArgsString);
 		return (
 			!result.stdout.includes("not authenticated") &&
 			!result.stdout.includes("error")
@@ -73,11 +50,11 @@ async function isNeonAuthenticated(packageManager: string) {
 	}
 }
 
-async function authenticateWithNeon(packageManager: string) {
+async function authenticateWithNeon(packageManager: ProjectPackageManager) {
 	try {
 		await executeNeonCommand(
 			packageManager,
-			["auth"],
+			"neonctl auth",
 			"Authenticating with Neon...",
 		);
 		log.success("Authenticated with Neon successfully!");
@@ -90,12 +67,13 @@ async function authenticateWithNeon(packageManager: string) {
 
 async function createNeonProject(
 	projectName: string,
-	packageManager: string,
+	packageManager: ProjectPackageManager,
 ): Promise<NeonConfig | null> {
 	try {
+		const commandArgsString = `neonctl projects create --name "${projectName}" --output json`;
 		const { stdout } = await executeNeonCommand(
 			packageManager,
-			["projects", "create", "--name", projectName, "--output", "json"],
+			commandArgsString,
 			`Creating Neon project "${projectName}"...`,
 		);
 
@@ -150,10 +128,11 @@ function displayManualSetupInstructions() {
 DATABASE_URL="your_connection_string"`);
 }
 
-export async function setupNeonPostgres(
-	projectDir: string,
-	packageManager: ProjectPackageManager,
-) {
+import type { ProjectConfig } from "../types";
+
+export async function setupNeonPostgres(config: ProjectConfig): Promise<void> {
+	const { projectName, packageManager } = config;
+	const projectDir = path.resolve(process.cwd(), projectName);
 	const setupSpinner = spinner();
 	setupSpinner.start("Setting up Neon PostgreSQL");
 

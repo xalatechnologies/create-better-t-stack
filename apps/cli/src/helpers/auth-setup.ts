@@ -15,40 +15,40 @@ export function generateAuthSecret(length = 32): string {
 	return result;
 }
 
-export async function setupAuth(
-	projectDir: string,
-	enableAuth: boolean,
-	frontends: ProjectFrontend[] = [],
-): Promise<void> {
-	if (!enableAuth) {
+import type { ProjectConfig } from "../types";
+
+export async function setupAuth(config: ProjectConfig): Promise<void> {
+	const { projectName, auth, frontend } = config;
+	if (!auth) {
 		return;
 	}
 
+	const projectDir = path.resolve(process.cwd(), projectName);
 	const serverDir = path.join(projectDir, "apps/server");
 	const clientDir = path.join(projectDir, "apps/web");
 	const nativeDir = path.join(projectDir, "apps/native");
 
 	try {
-		addPackageDependency({
+		await addPackageDependency({
 			dependencies: ["better-auth"],
 			projectDir: serverDir,
 		});
 		if (
-			frontends.includes("react-router") ||
-			frontends.includes("tanstack-router") ||
-			frontends.includes("tanstack-start")
+			frontend.includes("react-router") ||
+			frontend.includes("tanstack-router") ||
+			frontend.includes("tanstack-start")
 		) {
-			addPackageDependency({
+			await addPackageDependency({
 				dependencies: ["better-auth"],
 				projectDir: clientDir,
 			});
 		}
-		if (frontends.includes("native")) {
-			addPackageDependency({
+		if (frontend.includes("native")) {
+			await addPackageDependency({
 				dependencies: ["better-auth", "@better-auth/expo"],
 				projectDir: nativeDir,
 			});
-			addPackageDependency({
+			await addPackageDependency({
 				dependencies: ["@better-auth/expo"],
 				projectDir: serverDir,
 			});

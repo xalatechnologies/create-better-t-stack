@@ -4,6 +4,7 @@ import consola from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
+import type { ProjectConfig } from "../types";
 import { commandExists } from "../utils/command-exists";
 
 type MongoDBConfig = {
@@ -129,7 +130,9 @@ ${pc.green("MongoDB Atlas Manual Setup Instructions:")}
 `);
 }
 
-export async function setupMongoDBAtlas(projectDir: string) {
+export async function setupMongoDBAtlas(config: ProjectConfig) {
+	const { projectName } = config;
+	const projectDir = path.resolve(process.cwd(), projectName);
 	const mainSpinner = spinner();
 	mainSpinner.start("Setting up MongoDB Atlas");
 

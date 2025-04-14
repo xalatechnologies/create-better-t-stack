@@ -202,29 +202,22 @@ DATABASE_URL=your_database_url
 DATABASE_AUTH_TOKEN=your_auth_token`);
 }
 
-export async function setupTurso(
-	projectDir: string,
-	shouldSetupTurso: boolean,
-) {
+import type { ProjectConfig } from "../types";
+
+export async function setupTurso(config: ProjectConfig): Promise<void> {
+	const { projectName, orm } = config;
+	const projectDir = path.resolve(process.cwd(), projectName);
+	const isDrizzle = orm === "drizzle";
 	const setupSpinner = spinner();
 	setupSpinner.start("Setting up Turso database");
 
 	try {
-		if (!shouldSetupTurso) {
-			setupSpinner.stop("Skipping Turso setup");
-			await writeEnvFile(projectDir);
-			log.info(
-				pc.blue("Skipping Turso setup. Setting up empty configuration."),
-			);
-			displayManualSetupInstructions();
-			return;
-		}
-
 		const platform = os.platform();
 		const isMac = platform === "darwin";
-		const canInstallCLI = platform !== "win32";
+		const isLinux = platform === "linux";
+		const isWindows = platform === "win32";
 
-		if (!canInstallCLI) {
+		if (isWindows) {
 			setupSpinner.stop(pc.yellow("Turso setup not supported on Windows"));
 			log.warn(pc.yellow("Automatic Turso setup is not supported on Windows."));
 			await writeEnvFile(projectDir);

@@ -3,7 +3,6 @@ import { log } from "@clack/prompts";
 import { $, execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
-import { PKG_ROOT } from "../constants";
 import type { ProjectConfig } from "../types";
 
 export async function updatePackageConfigurations(
@@ -23,24 +22,71 @@ async function updateRootPackageJson(
 		const packageJson = await fs.readJson(rootPackageJsonPath);
 		packageJson.name = options.projectName;
 
+		// Define script sets
+		const turboScripts = {
+			dev: "turbo dev",
+			build: "turbo build",
+			"check-types": "turbo check-types",
+			"dev:native": "turbo -F native dev",
+			"dev:web": "turbo -F web dev",
+			"dev:server": "turbo -F server dev",
+			"db:push": "turbo -F server db:push",
+			"db:studio": "turbo -F server db:studio",
+		};
+
+		const pnpmScripts = {
+			dev: "pnpm -r --parallel dev",
+			build: "pnpm -r build",
+			"check-types": "pnpm -r check-types",
+			"dev:native": "pnpm --filter native dev",
+			"dev:web": "pnpm --filter web dev",
+			"dev:server": "pnpm --filter server dev",
+			"db:push": "pnpm --filter server db:push",
+			"db:studio": "pnpm --filter server db:studio",
+		};
+
+		const npmScripts = {
+			dev: "npm run dev --workspaces",
+			build: "npm run build --workspaces",
+			"check-types": "npm run check-types --workspaces",
+			"dev:native": "npm run dev --workspace native",
+			"dev:web": "npm run dev --workspace web",
+			"dev:server": "npm run dev --workspace server",
+			"db:push": "npm run db:push --workspace server",
+			"db:studio": "npm run db:studio --workspace server",
+		};
+
+		const bunScripts = {
+			dev: "bun run --filter '*' dev",
+			build: "bun run --filter '*' build",
+			"check-types": "bun run --filter '*' check-types",
+			"dev:native": "bun run --filter native dev",
+			"dev:web": "bun run --filter web dev",
+			"dev:server": "bun run --filter server dev",
+			"db:push": "bun run --filter server db:push",
+			"db:studio": "bun run --filter server db:studio",
+		};
+
+		if (options.addons.includes("turborepo")) {
+			packageJson.scripts = turboScripts;
+		} else {
+			if (options.packageManager === "pnpm") {
+				packageJson.scripts = pnpmScripts;
+			} else if (options.packageManager === "npm") {
+				packageJson.scripts = npmScripts;
+			} else if (options.packageManager === "bun") {
+				packageJson.scripts = bunScripts;
+			} else {
+				packageJson.scripts = {};
+			}
+		}
+
 		const { stdout } = await execa(options.packageManager, ["-v"], {
 			cwd: projectDir,
 		});
 		packageJson.packageManager = `${options.packageManager}@${stdout.trim()}`;
 
 		await fs.writeJson(rootPackageJsonPath, packageJson, { spaces: 2 });
-
-		if (options.packageManager === "pnpm") {
-			const pnpmWorkspaceTemplatePath = path.join(
-				PKG_ROOT,
-				"template/with-pnpm/pnpm-workspace.yaml",
-			);
-			const targetWorkspacePath = path.join(projectDir, "pnpm-workspace.yaml");
-
-			if (await fs.pathExists(pnpmWorkspaceTemplatePath)) {
-				await fs.copy(pnpmWorkspaceTemplatePath, targetWorkspacePath);
-			}
-		}
 	}
 }
 
@@ -57,7 +103,7 @@ async function updateServerPackageJson(
 		const serverPackageJson = await fs.readJson(serverPackageJsonPath);
 
 		if (options.database !== "none") {
-			if (options.database === "sqlite") {
+			if (options.database === "sqlite" && options.orm === "drizzle") {
 				serverPackageJson.scripts["db:local"] = "turso dev --db-file local.db";
 			}
 
