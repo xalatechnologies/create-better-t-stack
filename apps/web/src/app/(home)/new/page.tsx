@@ -2,28 +2,11 @@
 
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useEffect } from "react";
 import StackArchitect from "../_components/StackArchitech";
 
 export default function FullScreenStackArchitect() {
-	useEffect(() => {
-		const setVh = () => {
-			const vh = window.innerHeight * 0.01;
-			document.documentElement.style.setProperty("--vh", `${vh}px`);
-		};
-
-		setVh();
-		window.addEventListener("resize", setVh);
-		document.body.style.overflow = "hidden";
-
-		return () => {
-			window.removeEventListener("resize", setVh);
-			document.body.style.overflow = "";
-		};
-	}, []);
-
 	return (
-		<div className="flex h-[calc(var(--vh,1vh)*100)] flex-col bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900">
+		<div className="flex h-svh flex-col bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900">
 			<motion.div
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
