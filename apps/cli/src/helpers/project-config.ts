@@ -35,7 +35,7 @@ async function updateRootPackageJson(
 		};
 
 		const pnpmScripts = {
-			dev: "pnpm -r --parallel dev",
+			dev: "pnpm -r dev",
 			build: "pnpm -r build",
 			"check-types": "pnpm -r check-types",
 			"dev:native": "pnpm --filter native dev",
