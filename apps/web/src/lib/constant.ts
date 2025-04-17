@@ -175,13 +175,6 @@ export const TECH_OPTIONS = {
 			icon: "◮",
 			color: "from-purple-400 to-purple-600",
 		},
-		{
-			id: "none",
-			name: "No ORM",
-			description: "Skip ORM integration",
-			icon: "🚫",
-			color: "from-gray-400 to-gray-600",
-		},
 	],
 	dbSetup: [
 		{

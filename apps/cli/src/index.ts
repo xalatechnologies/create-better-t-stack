@@ -1,11 +1,14 @@
+import path from "node:path";
 import { cancel, intro, log, outro } from "@clack/prompts";
 import { consola } from "consola";
+import fs from "fs-extra";
 import pc from "picocolors";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { DEFAULT_CONFIG } from "./constants";
 import { createProject } from "./helpers/create-project";
 import { gatherConfig } from "./prompts/config-prompts";
+import { getProjectName } from "./prompts/project-name";
 import type {
 	ProjectAddons,
 	ProjectApi,
@@ -155,18 +158,28 @@ async function main() {
 			log.message("");
 		}
 
-		const config = options.yes
-			? {
-					...DEFAULT_CONFIG,
-					projectName: projectDirectory ?? DEFAULT_CONFIG.projectName,
-					...flagConfig,
-				}
-			: await gatherConfig(flagConfig);
-
+		let config: ProjectConfig;
 		if (options.yes) {
-			log.info(pc.yellow("Using these default options:"));
+			config = {
+				...DEFAULT_CONFIG,
+				projectName: projectDirectory ?? DEFAULT_CONFIG.projectName,
+				...flagConfig,
+			};
+			log.info(pc.yellow("Using these default/flag options:"));
 			log.message(displayConfig(config));
 			log.message("");
+		} else {
+			config = await gatherConfig(flagConfig);
+		}
+
+		const projectDir = path.resolve(process.cwd(), config.projectName);
+
+		if (
+			fs.pathExistsSync(projectDir) &&
+			fs.readdirSync(projectDir).length > 0
+		) {
+			const newProjectName = await getProjectName();
+			config.projectName = newProjectName;
 		}
 
 		await createProject(config);
@@ -210,7 +223,6 @@ function processAndValidateFlags(
 ): Partial<ProjectConfig> {
 	const config: Partial<ProjectConfig> = {};
 
-	// --- Database and ORM validation ---
 	if (options.database) {
 		config.database = options.database as ProjectDatabase;
 	}
@@ -388,7 +400,6 @@ function processAndValidateFlags(
 		}
 	}
 
-	// --- Addons validation ---
 	if (options.addons && options.addons.length > 0) {
 		if (options.addons.includes("none")) {
 			if (options.addons.length > 1) {
@@ -433,7 +444,6 @@ function processAndValidateFlags(
 		}
 	}
 
-	// --- Examples validation ---
 	if (options.examples && options.examples.length > 0) {
 		if (options.examples.includes("none")) {
 			if (options.examples.length > 1) {
@@ -483,7 +493,6 @@ function processAndValidateFlags(
 		}
 	}
 
-	// --- Other flags ---
 	if (options.packageManager) {
 		config.packageManager = options.packageManager as ProjectPackageManager;
 	}

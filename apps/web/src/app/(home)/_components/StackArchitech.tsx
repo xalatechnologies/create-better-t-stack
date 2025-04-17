@@ -100,7 +100,7 @@ const StackArchitect = ({
 		}
 	}, []);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Intentionally managing complex dependencies
 	useEffect(() => {
 		let changed = false;
 		const nextStack = { ...stack };
@@ -371,6 +371,12 @@ const StackArchitect = ({
 						"MongoDB Atlas setup requires the MongoDB database.",
 					);
 				}
+
+				if (stack.orm !== "prisma") {
+					notes.dbSetup.push(
+						"MongoDB Atlas setup requires the Prisma ORM (implicitly selected).",
+					);
+				}
 			} else if (stack.dbSetup === "neon") {
 				if (stack.database !== "postgres") {
 					notes.dbSetup.push("Neon setup requires the PostgreSQL database.");
@@ -393,6 +399,11 @@ const StackArchitect = ({
 		notes.database = [];
 		if (stack.database === "mongodb" && stack.orm === "drizzle") {
 			notes.database.push("MongoDB is only compatible with the Prisma ORM.");
+		}
+		if (stack.dbSetup !== "none") {
+			notes.database.push(
+				`Changing the database might reset the '${TECH_OPTIONS.dbSetup.find((db) => db.id === stack.dbSetup)?.name}' setup if it becomes incompatible.`,
+			);
 		}
 
 		notes.orm = [];
@@ -445,7 +456,7 @@ const StackArchitect = ({
 				const currentStack = { ...prev };
 
 				if (category === "frontend") {
-					let currentSelection = [...currentStack.frontend];
+					const currentSelection = [...currentStack.frontend];
 					const webTypes = [
 						"tanstack-router",
 						"react-router",
@@ -464,25 +475,25 @@ const StackArchitect = ({
 						return prev;
 					}
 
-					if (currentSelection.includes(techId)) {
-						currentSelection = currentSelection.filter((id) => id !== techId);
-
-						if (currentSelection.length === 0) {
-						}
-						return { ...currentStack, frontend: currentSelection };
-					}
-
 					let newSelection = [...currentSelection];
 
 					if (newSelection.includes("none")) {
 						newSelection = newSelection.filter((id) => id !== "none");
 					}
 
-					if (webTypes.includes(techId)) {
-						newSelection = newSelection.filter((id) => !webTypes.includes(id));
-					}
+					if (newSelection.includes(techId)) {
+						newSelection = newSelection.filter((id) => id !== techId);
 
-					newSelection.push(techId);
+						if (newSelection.length === 0) {
+						}
+					} else {
+						if (webTypes.includes(techId)) {
+							newSelection = newSelection.filter(
+								(id) => !webTypes.includes(id),
+							);
+						}
+						newSelection.push(techId);
+					}
 
 					return { ...currentStack, frontend: newSelection };
 				}
@@ -490,9 +501,12 @@ const StackArchitect = ({
 				if (category === "addons" || category === "examples") {
 					const currentArray = [...(currentStack[category] || [])];
 					const index = currentArray.indexOf(techId);
+					const nextArray = [...currentArray];
 
 					if (index >= 0) {
-						currentArray.splice(index, 1);
+						nextArray.splice(index, 1);
+						if (techId === "biome" && nextArray.includes("husky")) {
+						}
 					} else {
 						if (category === "examples") {
 							if (!hasWebFrontend && (techId === "todo" || techId === "ai"))
@@ -506,27 +520,56 @@ const StackArchitect = ({
 								(techId === "pwa" || techId === "tauri")
 							)
 								return prev;
-							if (techId === "husky" && !currentArray.includes("biome")) {
-								currentArray.push("biome");
+							if (techId === "husky" && !nextArray.includes("biome")) {
+								nextArray.push("biome");
 							}
 						}
-						currentArray.push(techId);
+						nextArray.push(techId);
 					}
-					return { ...currentStack, [category]: currentArray };
+					return { ...currentStack, [category]: nextArray };
 				}
 
 				if (category === "database") {
 					if (currentStack.database === techId) return prev;
 
-					const updatedState = { ...currentStack, database: techId };
+					const updatedState: Partial<StackState> = { database: techId };
+					const currentDbSetup = currentStack.dbSetup;
+
+					let resetDbSetup = false;
+					if (currentDbSetup === "turso" && techId !== "sqlite")
+						resetDbSetup = true;
+					if (currentDbSetup === "prisma-postgres" && techId !== "postgres")
+						resetDbSetup = true;
+					if (currentDbSetup === "mongodb-atlas" && techId !== "mongodb")
+						resetDbSetup = true;
+					if (currentDbSetup === "neon" && techId !== "postgres")
+						resetDbSetup = true;
+					if (techId === "none") resetDbSetup = true;
+
+					if (resetDbSetup && currentDbSetup !== "none") {
+						updatedState.dbSetup = "none";
+					}
 
 					if (techId === "none") {
-					} else if (prev.database === "none") {
-						updatedState.orm = techId === "mongodb" ? "prisma" : "drizzle";
-						updatedState.dbSetup = "none";
+						updatedState.orm = "none";
+						updatedState.auth = "false";
 					} else {
+						if (prev.database === "none") {
+							updatedState.orm = techId === "mongodb" ? "prisma" : "drizzle";
+						} else {
+							if (techId === "mongodb" && currentStack.orm === "drizzle") {
+								updatedState.orm = "prisma";
+							} else if (
+								techId !== "mongodb" &&
+								currentStack.orm === "prisma" &&
+								currentDbSetup === "turso" &&
+								techId === "sqlite"
+							) {
+							}
+						}
 					}
-					return updatedState;
+
+					return { ...currentStack, ...updatedState };
 				}
 
 				if (category === "orm") {
@@ -541,7 +584,6 @@ const StackArchitect = ({
 						return prev;
 
 					if (currentStack.orm === techId) return prev;
-
 					return { ...currentStack, orm: techId };
 				}
 
@@ -549,8 +591,19 @@ const StackArchitect = ({
 					if (currentStack.database === "none" && techId !== "none")
 						return prev;
 
-					if (currentStack.dbSetup === techId) return prev;
+					if (techId === "turso") {
+						if (currentStack.database !== "sqlite") return prev;
+						if (currentStack.orm === "prisma") return prev;
+					} else if (techId === "prisma-postgres") {
+						if (currentStack.database !== "postgres") return prev;
+						if (currentStack.orm !== "prisma") return prev;
+					} else if (techId === "mongodb-atlas") {
+						if (currentStack.database !== "mongodb") return prev;
+					} else if (techId === "neon") {
+						if (currentStack.database !== "postgres") return prev;
+					}
 
+					if (currentStack.dbSetup === techId) return prev;
 					return { ...currentStack, dbSetup: techId };
 				}
 
@@ -575,7 +628,19 @@ const StackArchitect = ({
 					category === "install"
 				) {
 					if (currentStack[category] === techId) return prev;
-					return { ...currentStack, [category]: techId };
+
+					const updatedState: Partial<StackState> = { [category]: techId };
+					if (category === "backendFramework" && techId === "elysia") {
+						const currentExamples = currentStack.examples || [];
+						if (currentExamples.includes("ai")) {
+							updatedState.examples = currentExamples.filter(
+								(ex) => ex !== "ai",
+							);
+						}
+					} else if (category === "backendFramework" && techId === "hono") {
+					}
+
+					return { ...currentStack, ...updatedState };
 				}
 
 				return prev;
@@ -606,10 +671,14 @@ const StackArchitect = ({
 		if (saveButton && saveTextSpan) {
 			const originalText = saveTextSpan.textContent;
 			saveTextSpan.textContent = "Saved!";
+			saveButton.classList.add("bg-green-200", "dark:bg-green-800/70");
+			saveButton.classList.remove("bg-green-100", "dark:bg-green-900/50");
 
 			setTimeout(() => {
 				if (saveTextSpan.textContent === "Saved!") {
 					saveTextSpan.textContent = originalText;
+					saveButton.classList.remove("bg-green-200", "dark:bg-green-800/70");
+					saveButton.classList.add("bg-green-100", "dark:bg-green-900/50");
 				}
 			}, 2000);
 		}
@@ -621,6 +690,7 @@ const StackArchitect = ({
 			setProjectNameError(
 				validateProjectName(lastSavedStack.projectName || ""),
 			);
+			setActiveTab("frontend");
 		}
 	}, [lastSavedStack]);
 
@@ -632,6 +702,7 @@ const StackArchitect = ({
 			setStack(preset.stack);
 			setProjectNameError(validateProjectName(preset.stack.projectName || ""));
 			setShowPresets(false);
+			setActiveTab("frontend");
 		}
 	}, []);
 
@@ -650,15 +721,25 @@ const StackArchitect = ({
 					techId === "prisma" &&
 					stack.dbSetup === "turso"
 				)
-					return "Prisma ORM is not compatible with Turso.";
+					return "Prisma ORM is not compatible with Turso DB setup (requires Drizzle).";
 			}
 			if (category === "dbSetup" && techId !== "none") {
 				if (stack.database === "none")
 					return "Select a database before choosing a cloud setup.";
 
 				if (techId === "turso") {
-					if (stack.orm === "prisma")
-						return "Turso is not compatible with the Prisma ORM.";
+					if (stack.database !== "sqlite")
+						return "Turso requires SQLite database.";
+					if (stack.orm === "prisma") return "Turso requires Drizzle ORM.";
+				} else if (techId === "prisma-postgres") {
+					if (stack.database !== "postgres")
+						return "Requires PostgreSQL database.";
+					if (stack.orm !== "prisma") return "Requires Prisma ORM.";
+				} else if (techId === "mongodb-atlas") {
+					if (stack.database !== "mongodb") return "Requires MongoDB database.";
+				} else if (techId === "neon") {
+					if (stack.database !== "postgres")
+						return "Requires PostgreSQL database.";
 				}
 			}
 			if (
@@ -716,9 +797,11 @@ const StackArchitect = ({
 							<div className="h-3 w-3 rounded-full bg-yellow-500" />
 							<div className="h-3 w-3 rounded-full bg-green-500" />
 						</div>
+
 						<div className="hidden font-mono text-gray-600 text-xs sm:block dark:text-gray-400">
 							Stack Architect Terminal
 						</div>
+
 						<div className="flex space-x-2">
 							<button
 								type="button"
@@ -773,7 +856,7 @@ const StackArchitect = ({
 							</li>
 							<li>
 								Some selections may disable or automatically change other
-								options based on compatibility.
+								options based on compatibility (check notes!).
 							</li>
 							<li>
 								The command will automatically update based on your selections.
@@ -799,6 +882,7 @@ const StackArchitect = ({
 						</ul>
 					</div>
 				)}
+
 				{showPresets && (
 					<div className="flex-shrink-0 border-gray-300 border-b bg-amber-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-amber-900/20">
 						<h3 className="mb-2 font-medium text-amber-800 text-sm dark:text-amber-300">
@@ -855,7 +939,7 @@ const StackArchitect = ({
 							<button
 								type="button"
 								onClick={resetStack}
-								className="flex items-center gap-1 rounded border border-gray-300 bg-gray-200 px-2 py-1 text-gray-700 text-xs hover:bg-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+								className="flex items-center gap-1 rounded border border-gray-300 bg-gray-200 px-2 py-1 text-gray-700 text-xs transition-colors hover:bg-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
 								title="Reset to defaults"
 							>
 								<RefreshCw className="h-3 w-3" />
@@ -866,7 +950,7 @@ const StackArchitect = ({
 								<button
 									type="button"
 									onClick={loadSavedStack}
-									className="flex items-center gap-1 rounded border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700 text-xs hover:bg-blue-200 dark:border-blue-700 dark:bg-blue-900/50 dark:text-blue-300 dark:hover:bg-blue-800/50"
+									className="flex items-center gap-1 rounded border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700 text-xs transition-colors hover:bg-blue-200 dark:border-blue-700 dark:bg-blue-900/50 dark:text-blue-300 dark:hover:bg-blue-800/50"
 									title="Load saved preferences"
 								>
 									<Settings className="h-3 w-3" />
@@ -878,7 +962,7 @@ const StackArchitect = ({
 								id="save-stack-button"
 								type="button"
 								onClick={saveCurrentStack}
-								className="flex items-center gap-1 rounded border border-green-300 bg-green-100 px-2 py-1 text-green-700 text-xs hover:bg-green-200 dark:border-green-700 dark:bg-green-900/50 dark:text-green-300 dark:hover:bg-green-800/50"
+								className="flex items-center gap-1 rounded border border-green-300 bg-green-100 px-2 py-1 text-green-700 text-xs transition-colors hover:bg-green-200 dark:border-green-700 dark:bg-green-900/50 dark:text-green-300 dark:hover:bg-green-800/50"
 								title="Save current preferences"
 							>
 								<Star className="h-3 w-3" />
@@ -920,7 +1004,8 @@ const StackArchitect = ({
 							<Terminal className="mr-2 h-4 w-4" />
 							<span>
 								Configure{" "}
-								{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+								{activeTab.charAt(0).toUpperCase() +
+									activeTab.slice(1).replace(/([A-Z])/g, " $1")}
 							</span>
 						</div>
 						<div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
@@ -928,9 +1013,11 @@ const StackArchitect = ({
 								(tech) => {
 									let isSelected = false;
 									if (activeTab === "addons" || activeTab === "examples") {
-										isSelected = stack[activeTab].includes(tech.id);
+										isSelected = (
+											stack[activeTab as "addons" | "examples"] || []
+										).includes(tech.id);
 									} else if (activeTab === "frontend") {
-										isSelected = stack.frontend.includes(tech.id);
+										isSelected = (stack.frontend || []).includes(tech.id);
 									} else {
 										isSelected =
 											stack[activeTab as keyof StackState] === tech.id;
@@ -1015,149 +1102,38 @@ const StackArchitect = ({
 								</div>
 							</div>
 							<div className="flex flex-wrap gap-1">
-								{stack.frontend
-									.map((id) => TECH_OPTIONS.frontend.find((f) => f.id === id))
-									.filter(Boolean)
-									.map((tech) => (
-										<span
-											key={tech?.id}
-											className="inline-flex items-center gap-1 rounded border border-blue-300 bg-blue-100 px-1.5 py-0.5 text-blue-800 text-xs dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300"
-										>
-											{tech?.icon} {tech?.name}
-										</span>
-									))}
-								{TECH_OPTIONS.runtime.find((t) => t.id === stack.runtime) && (
-									<span className="inline-flex items-center gap-1 rounded border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-amber-800 text-xs dark:border-amber-700/30 dark:bg-amber-900/30 dark:text-amber-300">
-										{
-											TECH_OPTIONS.runtime.find((t) => t.id === stack.runtime)
-												?.icon
-										}{" "}
-										{
-											TECH_OPTIONS.runtime.find((t) => t.id === stack.runtime)
-												?.name
-										}
-									</span>
-								)}
-								{TECH_OPTIONS.backendFramework.find(
-									(t) => t.id === stack.backendFramework,
-								) && (
-									<span className="inline-flex items-center gap-1 rounded border border-blue-300 bg-blue-100 px-1.5 py-0.5 text-blue-800 text-xs dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300">
-										{
-											TECH_OPTIONS.backendFramework.find(
-												(t) => t.id === stack.backendFramework,
-											)?.icon
-										}{" "}
-										{
-											TECH_OPTIONS.backendFramework.find(
-												(t) => t.id === stack.backendFramework,
-											)?.name
-										}
-									</span>
-								)}
-								{TECH_OPTIONS.api.find((t) => t.id === stack.api) && (
-									<span className="inline-flex items-center gap-1 rounded border border-indigo-300 bg-indigo-100 px-1.5 py-0.5 text-indigo-800 text-xs dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300">
-										{TECH_OPTIONS.api.find((t) => t.id === stack.api)?.icon}{" "}
-										{TECH_OPTIONS.api.find((t) => t.id === stack.api)?.name}
-									</span>
-								)}
-								{TECH_OPTIONS.database.find((t) => t.id === stack.database) &&
-									stack.database !== "none" && (
-										<span className="inline-flex items-center gap-1 rounded border border-indigo-300 bg-indigo-100 px-1.5 py-0.5 text-indigo-800 text-xs dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300">
-											{
-												TECH_OPTIONS.database.find(
-													(t) => t.id === stack.database,
-												)?.icon
-											}{" "}
-											{
-												TECH_OPTIONS.database.find(
-													(t) => t.id === stack.database,
-												)?.name
-											}
-										</span>
-									)}
-								{TECH_OPTIONS.orm.find((t) => t.id === stack.orm) &&
-									stack.orm !== "none" && (
-										<span className="inline-flex items-center gap-1 rounded border border-cyan-300 bg-cyan-100 px-1.5 py-0.5 text-cyan-800 text-xs dark:border-cyan-700/30 dark:bg-cyan-900/30 dark:text-cyan-300">
-											{TECH_OPTIONS.orm.find((t) => t.id === stack.orm)?.icon}{" "}
-											{TECH_OPTIONS.orm.find((t) => t.id === stack.orm)?.name}
-										</span>
-									)}
-								{TECH_OPTIONS.auth.find((t) => t.id === stack.auth) &&
-									stack.auth === "true" && (
-										<span className="inline-flex items-center gap-1 rounded border border-green-300 bg-green-100 px-1.5 py-0.5 text-green-800 text-xs dark:border-green-700/30 dark:bg-green-900/30 dark:text-green-300">
-											{TECH_OPTIONS.auth.find((t) => t.id === stack.auth)?.icon}{" "}
-											{TECH_OPTIONS.auth.find((t) => t.id === stack.auth)?.name}
-										</span>
-									)}
-								{TECH_OPTIONS.dbSetup.find((t) => t.id === stack.dbSetup) &&
-									stack.dbSetup !== "none" && (
-										<span className="inline-flex items-center gap-1 rounded border border-pink-300 bg-pink-100 px-1.5 py-0.5 text-pink-800 text-xs dark:border-pink-700/30 dark:bg-pink-900/30 dark:text-pink-300">
-											{
-												TECH_OPTIONS.dbSetup.find((t) => t.id === stack.dbSetup)
-													?.icon
-											}{" "}
-											{
-												TECH_OPTIONS.dbSetup.find((t) => t.id === stack.dbSetup)
-													?.name
-											}
-										</span>
-									)}
-								{stack.addons
-									.map((id) => TECH_OPTIONS.addons.find((a) => a.id === id))
-									.filter(Boolean)
-									.map((tech) => (
-										<span
-											key={tech?.id}
-											className="inline-flex items-center gap-1 rounded border border-violet-300 bg-violet-100 px-1.5 py-0.5 text-violet-800 text-xs dark:border-violet-700/30 dark:bg-violet-900/30 dark:text-violet-300"
-										>
-											{tech?.icon} {tech?.name}
-										</span>
-									))}
-								{stack.examples
-									.map((id) => TECH_OPTIONS.examples.find((e) => e.id === id))
-									.filter(Boolean)
-									.map((tech) => (
-										<span
-											key={tech?.id}
-											className="inline-flex items-center gap-1 rounded border border-teal-300 bg-teal-100 px-1.5 py-0.5 text-teal-800 text-xs dark:border-teal-700/30 dark:bg-teal-900/30 dark:text-teal-300"
-										>
-											{tech?.icon} {tech?.name}
-										</span>
-									))}
-								{TECH_OPTIONS.packageManager.find(
-									(t) => t.id === stack.packageManager,
-								) && (
-									<span className="inline-flex items-center gap-1 rounded border border-orange-300 bg-orange-100 px-1.5 py-0.5 text-orange-800 text-xs dark:border-orange-700/30 dark:bg-orange-900/30 dark:text-orange-300">
-										{
-											TECH_OPTIONS.packageManager.find(
-												(t) => t.id === stack.packageManager,
-											)?.icon
-										}{" "}
-										{
-											TECH_OPTIONS.packageManager.find(
-												(t) => t.id === stack.packageManager,
-											)?.name
-										}
-									</span>
-								)}
-								{TECH_OPTIONS.git.find((t) => t.id === stack.git) && (
-									<span className="inline-flex items-center gap-1 rounded border border-gray-300 bg-gray-100 px-1.5 py-0.5 text-gray-800 text-xs dark:border-gray-700/30 dark:bg-gray-900/30 dark:text-gray-300">
-										{TECH_OPTIONS.git.find((t) => t.id === stack.git)?.icon}{" "}
-										{TECH_OPTIONS.git.find((t) => t.id === stack.git)?.name}
-									</span>
-								)}
-								{TECH_OPTIONS.install.find((t) => t.id === stack.install) && (
-									<span className="inline-flex items-center gap-1 rounded border border-lime-300 bg-lime-100 px-1.5 py-0.5 text-lime-800 text-xs dark:border-lime-700/30 dark:bg-lime-900/30 dark:text-lime-300">
-										{
-											TECH_OPTIONS.install.find((t) => t.id === stack.install)
-												?.icon
-										}{" "}
-										{
-											TECH_OPTIONS.install.find((t) => t.id === stack.install)
-												?.name
-										}
-									</span>
-								)}
+								{Object.entries(TECH_OPTIONS).flatMap(([category, options]) => {
+									const categoryKey = category as keyof StackState;
+									const selectedValue = stack[categoryKey];
+
+									if (Array.isArray(selectedValue)) {
+										return selectedValue
+											.map((id) => options.find((opt) => opt.id === id))
+											.filter(Boolean)
+											.map((tech) => (
+												<span
+													key={`${category}-${tech?.id}`}
+													className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-xs ${getBadgeColors(category)}`}
+												>
+													{tech?.icon} {tech?.name}
+												</span>
+											));
+									}
+									const tech = options.find((opt) => opt.id === selectedValue);
+
+									if (tech && tech.id !== "none" && tech.id !== "false") {
+										return (
+											<span
+												key={`${category}-${tech.id}`}
+												className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-xs ${getBadgeColors(category)}`}
+											>
+												{tech.icon} {tech.name}
+											</span>
+										);
+									}
+
+									return [];
+								})}
 							</div>
 						</div>
 					</div>
@@ -1202,6 +1178,39 @@ const StackArchitect = ({
 			</div>
 		</div>
 	);
+};
+
+const getBadgeColors = (category: string): string => {
+	switch (category) {
+		case "frontend":
+			return "border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300";
+		case "runtime":
+			return "border-amber-300 bg-amber-100 text-amber-800 dark:border-amber-700/30 dark:bg-amber-900/30 dark:text-amber-300";
+		case "backendFramework":
+			return "border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300";
+		case "api":
+			return "border-indigo-300 bg-indigo-100 text-indigo-800 dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300";
+		case "database":
+			return "border-indigo-300 bg-indigo-100 text-indigo-800 dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300";
+		case "orm":
+			return "border-cyan-300 bg-cyan-100 text-cyan-800 dark:border-cyan-700/30 dark:bg-cyan-900/30 dark:text-cyan-300";
+		case "auth":
+			return "border-green-300 bg-green-100 text-green-800 dark:border-green-700/30 dark:bg-green-900/30 dark:text-green-300";
+		case "dbSetup":
+			return "border-pink-300 bg-pink-100 text-pink-800 dark:border-pink-700/30 dark:bg-pink-900/30 dark:text-pink-300";
+		case "addons":
+			return "border-violet-300 bg-violet-100 text-violet-800 dark:border-violet-700/30 dark:bg-violet-900/30 dark:text-violet-300";
+		case "examples":
+			return "border-teal-300 bg-teal-100 text-teal-800 dark:border-teal-700/30 dark:bg-teal-900/30 dark:text-teal-300";
+		case "packageManager":
+			return "border-orange-300 bg-orange-100 text-orange-800 dark:border-orange-700/30 dark:bg-orange-900/30 dark:text-orange-300";
+		case "git":
+			return "border-gray-300 bg-gray-100 text-gray-800 dark:border-gray-700/30 dark:bg-gray-900/30 dark:text-gray-300";
+		case "install":
+			return "border-lime-300 bg-lime-100 text-lime-800 dark:border-lime-700/30 dark:bg-lime-900/30 dark:text-lime-300";
+		default:
+			return "border-gray-300 bg-gray-100 text-gray-800 dark:border-gray-700/30 dark:bg-gray-900/30 dark:text-gray-300";
+	}
 };
 
 export default StackArchitect;
