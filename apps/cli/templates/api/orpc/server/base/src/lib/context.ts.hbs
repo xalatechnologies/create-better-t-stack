@@ -70,13 +70,12 @@ export async function createContext({ context }: CreateContextOptions) {
 }
 
 {{else if (eq backend 'express')}}
-import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 {{#if auth}}
 import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "./auth";
 {{/if}}
 
-export async function createContext(opts: CreateExpressContextOptions) {
+export async function createContext(opts: any) {
 {{#if auth}}
 	const session = await auth.api.getSession({
 		headers: fromNodeHeaders(opts.req.headers),
