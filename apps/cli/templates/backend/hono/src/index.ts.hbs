@@ -1,3 +1,4 @@
+import "dotenv/config";
 {{#if (eq api "orpc")}}
 import { RPCHandler } from "@orpc/server/fetch";
 import { createContext } from "./lib/context";
@@ -9,7 +10,6 @@ import { auth } from "./lib/auth";
 {{#if (eq api "trpc")}}
 import { trpcServer } from "@hono/trpc-server";
 {{/if}}
-import "dotenv/config";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
@@ -74,7 +74,7 @@ app.use("/trpc/*", trpcServer({
 app.post("/ai", async (c) => {
   const body = await c.req.json();
   const messages = body.messages || [];
-  
+
   const result = streamText({
     model: google("gemini-1.5-flash"),
     messages,
@@ -82,7 +82,7 @@ app.post("/ai", async (c) => {
 
   c.header("X-Vercel-AI-Data-Stream", "v1");
   c.header("Content-Type", "text/plain; charset=utf-8");
-  
+
   return stream(c, (stream) => stream.pipe(result.toDataStream()));
 });
 {{/if}}
