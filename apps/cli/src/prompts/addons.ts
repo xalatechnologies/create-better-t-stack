@@ -15,6 +15,11 @@ export async function getAddonsChoice(
 
 	const addonOptions = [
 		{
+			value: "turborepo" as const,
+			label: "Turborepo (Recommended)",
+			hint: "Optimize builds for monorepos",
+		},
+		{
 			value: "starlight" as const,
 			label: "Starlight",
 			hint: "Add Astro Starlight documentation site",
@@ -28,11 +33,6 @@ export async function getAddonsChoice(
 			value: "husky" as const,
 			label: "Husky",
 			hint: "Add Git hooks with Husky, lint-staged (requires Biome)",
-		},
-		{
-			value: "turborepo" as const,
-			label: "Turborepo",
-			hint: "Optimize builds for monorepos",
 		},
 	];
 

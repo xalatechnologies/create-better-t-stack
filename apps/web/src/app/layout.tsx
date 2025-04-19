@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 		email: false,
 		telephone: false,
 	},
-	metadataBase: new URL("https://better-t-stack.pages.dev"),
+	metadataBase: new URL("https://better-t-stack.amanv.dev"),
 	alternates: {
 		canonical: "/",
 	},
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 		title: "Better-T Stack",
 		description:
 			"A modern CLI tool for scaffolding end-to-end type-safe TypeScript projects with best practices and customizable configurations",
-		url: "https://better-t-stack.pages.dev",
+		url: "https://better-t-stack.amanv.dev",
 		siteName: "Better-T Stack",
 		images: [
 			{
