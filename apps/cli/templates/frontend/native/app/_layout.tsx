@@ -3,7 +3,7 @@ import { Stack } from "expo-router";
 import {
   DarkTheme,
   DefaultTheme,
-  Theme,
+  type Theme,
   ThemeProvider,
 } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";

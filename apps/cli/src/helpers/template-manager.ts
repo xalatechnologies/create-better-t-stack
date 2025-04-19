@@ -217,6 +217,11 @@ export async function setupAuthTemplate(
 	const serverAppDir = path.join(projectDir, "apps/server");
 	const webAppDir = path.join(projectDir, "apps/web");
 	const nativeAppDir = path.join(projectDir, "apps/native");
+
+	const serverAppDirExists = await fs.pathExists(serverAppDir);
+	const webAppDirExists = await fs.pathExists(webAppDir);
+	const nativeAppDirExists = await fs.pathExists(nativeAppDir);
+
 	const webFrontends = context.frontend.filter(
 		(f) =>
 			f === "tanstack-router" ||
@@ -226,7 +231,7 @@ export async function setupAuthTemplate(
 	);
 	const hasNative = context.frontend.includes("native");
 
-	if (await fs.pathExists(serverAppDir)) {
+	if (serverAppDirExists) {
 		const authServerBaseSrc = path.join(PKG_ROOT, "templates/auth/server/base");
 		if (await fs.pathExists(authServerBaseSrc)) {
 			await processAndCopyFiles(
@@ -243,20 +248,25 @@ export async function setupAuthTemplate(
 			);
 		}
 
-		const authServerNextSrc = path.join(PKG_ROOT, "templates/auth/server/next");
-		if (await fs.pathExists(authServerNextSrc)) {
-			await processAndCopyFiles(
-				"**/*",
-				authServerNextSrc,
-				serverAppDir,
-				context,
+		if (context.backend === "next") {
+			const authServerNextSrc = path.join(
+				PKG_ROOT,
+				"templates/auth/server/next",
 			);
-		} else {
-			consola.warn(
-				pc.yellow(
-					`Warning: Next auth server template not found at ${authServerNextSrc}`,
-				),
-			);
+			if (await fs.pathExists(authServerNextSrc)) {
+				await processAndCopyFiles(
+					"**/*",
+					authServerNextSrc,
+					serverAppDir,
+					context,
+				);
+			} else {
+				consola.warn(
+					pc.yellow(
+						`Warning: Next auth server template not found at ${authServerNextSrc}`,
+					),
+				);
+			}
 		}
 
 		if (context.orm !== "none" && context.database !== "none") {
@@ -287,12 +297,12 @@ export async function setupAuthTemplate(
 	} else {
 		consola.warn(
 			pc.yellow(
-				"Warning: apps/server directory does not exist, skipping server-side auth setup.",
+				"Warning: apps/server directory does not exist, skipping server-side auth template setup.",
 			),
 		);
 	}
 
-	if (webFrontends.length > 0 && (await fs.pathExists(webAppDir))) {
+	if (webFrontends.length > 0 && webAppDirExists) {
 		const authWebBaseSrc = path.join(PKG_ROOT, "templates/auth/web/base");
 		if (await fs.pathExists(authWebBaseSrc)) {
 			await processAndCopyFiles("**/*", authWebBaseSrc, webAppDir, context);
@@ -326,7 +336,7 @@ export async function setupAuthTemplate(
 		}
 	}
 
-	if (hasNative && (await fs.pathExists(nativeAppDir))) {
+	if (hasNative && nativeAppDirExists) {
 		const authNativeSrc = path.join(PKG_ROOT, "templates/auth/native");
 		if (await fs.pathExists(authNativeSrc)) {
 			await processAndCopyFiles("**/*", authNativeSrc, nativeAppDir, context);
@@ -374,13 +384,15 @@ export async function setupAddonsTemplate(
 	if (context.addons.includes("pwa")) {
 		const pwaSrcDir = path.join(PKG_ROOT, "templates/addons/pwa/apps/web");
 		const webAppDir = path.join(projectDir, "apps/web");
+		const webAppDirExists = await fs.pathExists(webAppDir);
+
 		if (await fs.pathExists(pwaSrcDir)) {
-			if (await fs.pathExists(webAppDir)) {
+			if (webAppDirExists) {
 				await processAndCopyFiles("**/*", pwaSrcDir, webAppDir, context);
 			} else {
 				consola.warn(
 					pc.yellow(
-						"Warning: apps/web directory not found, cannot setup PWA addon.",
+						"Warning: apps/web directory not found, cannot setup PWA addon template.",
 					),
 				);
 			}
@@ -399,10 +411,13 @@ export async function setupExamplesTemplate(
 	const serverAppDir = path.join(projectDir, "apps/server");
 	const webAppDir = path.join(projectDir, "apps/web");
 
+	const serverAppDirExists = await fs.pathExists(serverAppDir);
+	const webAppDirExists = await fs.pathExists(webAppDir);
+
 	for (const example of context.examples) {
 		const exampleBaseDir = path.join(PKG_ROOT, `templates/examples/${example}`);
 
-		if (await fs.pathExists(serverAppDir)) {
+		if (serverAppDirExists) {
 			const exampleServerSrc = path.join(exampleBaseDir, "server");
 			if (await fs.pathExists(exampleServerSrc)) {
 				if (context.orm !== "none") {
@@ -441,7 +456,7 @@ export async function setupExamplesTemplate(
 			}
 		}
 
-		if (await fs.pathExists(webAppDir)) {
+		if (webAppDirExists) {
 			const exampleWebSrc = path.join(exampleBaseDir, "web");
 			if (await fs.pathExists(exampleWebSrc)) {
 				const webFrameworks = context.frontend.filter((f) =>

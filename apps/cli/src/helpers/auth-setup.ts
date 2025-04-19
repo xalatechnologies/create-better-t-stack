@@ -1,20 +1,9 @@
 import path from "node:path";
 import consola from "consola";
+import fs from "fs-extra";
 import pc from "picocolors";
-import { addPackageDependency } from "../utils/add-package-deps";
-
-export function generateAuthSecret(length = 32): string {
-	const characters =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	let result = "";
-	const charactersLength = characters.length;
-	for (let i = 0; i < length; i++) {
-		result += characters.charAt(Math.floor(Math.random() * charactersLength));
-	}
-	return result;
-}
-
 import type { ProjectConfig } from "../types";
+import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupAuth(config: ProjectConfig): Promise<void> {
 	const { projectName, auth, frontend } = config;
@@ -27,22 +16,29 @@ export async function setupAuth(config: ProjectConfig): Promise<void> {
 	const clientDir = path.join(projectDir, "apps/web");
 	const nativeDir = path.join(projectDir, "apps/native");
 
+	const clientDirExists = await fs.pathExists(clientDir);
+	const nativeDirExists = await fs.pathExists(nativeDir);
+
 	try {
 		await addPackageDependency({
 			dependencies: ["better-auth"],
 			projectDir: serverDir,
 		});
-		if (
+
+		const hasWebFrontend =
 			frontend.includes("react-router") ||
 			frontend.includes("tanstack-router") ||
-			frontend.includes("tanstack-start")
-		) {
+			frontend.includes("tanstack-start") ||
+			frontend.includes("next");
+
+		if (hasWebFrontend && clientDirExists) {
 			await addPackageDependency({
 				dependencies: ["better-auth"],
 				projectDir: clientDir,
 			});
 		}
-		if (frontend.includes("native")) {
+
+		if (frontend.includes("native") && nativeDirExists) {
 			await addPackageDependency({
 				dependencies: ["better-auth", "@better-auth/expo"],
 				projectDir: nativeDir,
@@ -53,10 +49,20 @@ export async function setupAuth(config: ProjectConfig): Promise<void> {
 			});
 		}
 	} catch (error) {
-		consola.error(pc.red("Failed to configure authentication"));
+		consola.error(pc.red("Failed to configure authentication dependencies"));
 		if (error instanceof Error) {
 			consola.error(pc.red(error.message));
 		}
-		throw error;
 	}
+}
+
+export function generateAuthSecret(length = 32): string {
+	const characters =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	let result = "";
+	const charactersLength = characters.length;
+	for (let i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
 }
