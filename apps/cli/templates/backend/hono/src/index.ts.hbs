@@ -70,7 +70,6 @@ app.use("/trpc/*", trpcServer({
 {{/if}}
 
 {{#if (includes examples "ai")}}
-// AI chat endpoint
 app.post("/ai", async (c) => {
   const body = await c.req.json();
   const messages = body.messages || [];

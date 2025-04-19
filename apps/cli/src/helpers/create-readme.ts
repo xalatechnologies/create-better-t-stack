@@ -43,8 +43,7 @@ function generateReadmeContent(options: ProjectConfig): string {
 	const packageManagerRunCmd =
 		packageManager === "npm" ? "npm run" : packageManager;
 
-	// Determine the web port based on the frontend framework
-	let webPort = "3001"; // Default for TanStack Router and TanStack Start
+	let webPort = "3001";
 	if (hasReactRouter) {
 		webPort = "5173";
 	} else if (hasNext) {
