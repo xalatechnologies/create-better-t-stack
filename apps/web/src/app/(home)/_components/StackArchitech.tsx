@@ -808,7 +808,7 @@ const StackArchitect = () => {
 				</div>
 			)}
 
-			<div className="flex-shrink-0 p-3 font-mono sm:p-4">
+			<div className="flex-shrink-0 p-3 pb-0 font-mono sm:p-4 sm:pb-0">
 				<div className="mb-3 flex flex-col justify-between gap-y-3 sm:flex-row sm:items-start">
 					<label className="flex flex-col">
 						<span className="mb-1 text-gray-600 text-xs dark:text-gray-400">
@@ -891,9 +891,9 @@ const StackArchitect = () => {
 				</div>
 
 				<div className="mb-4">
-					<h3 className="mb-2 font-semibold text-gray-600 text-sm dark:text-gray-400">
+					{/* <h3 className="mb-2 font-semibold text-gray-600 text-sm dark:text-gray-400">
 						Selected Stack Summary
-					</h3>
+					</h3> */}
 					<div className="flex flex-wrap gap-1.5">
 						{CATEGORY_ORDER.flatMap((category) => {
 							const categoryKey = category as keyof StackState;
@@ -949,7 +949,7 @@ const StackArchitect = () => {
 			</div>
 
 			<div className="flex flex-grow overflow-hidden">
-				<nav className="w-48 flex-shrink-0 overflow-y-auto border-gray-300 border-r bg-gray-200/50 p-2 dark:border-gray-700 dark:bg-gray-800/50">
+				<nav className="hidden w-48 flex-shrink-0 overflow-y-auto border-gray-300 border-r bg-gray-200/50 p-2 md:flex dark:border-gray-700 dark:bg-gray-800/50">
 					<ul className="space-y-1">
 						{CATEGORY_ORDER.map((category) => (
 							<li key={category}>
