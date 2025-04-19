@@ -19,7 +19,7 @@ export async function getDatabaseChoice(
 			{
 				value: "sqlite",
 				label: "SQLite",
-				hint: "lightweight, server-less, embedded relational database management system",
+				hint: "lightweight, server-less, embedded relational database",
 			},
 			{
 				value: "postgres",

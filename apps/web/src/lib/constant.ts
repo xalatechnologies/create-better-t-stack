@@ -15,13 +15,6 @@ export const TECH_OPTIONS = {
 			icon: "🧩",
 			color: "from-indigo-400 to-indigo-600",
 		},
-		{
-			id: "none",
-			name: "No API",
-			description: "Skip API layer integration",
-			icon: "🚫",
-			color: "from-gray-400 to-gray-600",
-		},
 	],
 	frontend: [
 		{

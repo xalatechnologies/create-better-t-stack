@@ -1,7 +1,6 @@
 import path from "node:path";
 import consola from "consola";
 import pc from "picocolors";
-import type { ProjectFrontend } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
 export function generateAuthSecret(length = 32): string {

@@ -1,14 +1,6 @@
 import { consola } from "consola";
 import pc from "picocolors";
-import type {
-	ProjectAddons,
-	ProjectDBSetup,
-	ProjectDatabase,
-	ProjectFrontend,
-	ProjectOrm,
-	ProjectPackageManager,
-	ProjectRuntime,
-} from "../types";
+import type { ProjectDatabase, ProjectOrm, ProjectRuntime } from "../types";
 import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
 
 import type { ProjectConfig } from "../types";
@@ -25,7 +17,6 @@ export function displayPostInstallInstructions(
 		addons,
 		runtime,
 		frontend,
-		dbSetup,
 	} = config;
 	const runCmd = packageManager === "npm" ? "npm run" : packageManager;
 	const cdCmd = `cd ${projectName}`;

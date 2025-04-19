@@ -2,6 +2,7 @@ import { cancel, isCancel, multiselect } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
 import type {
+	ProjectApi,
 	ProjectBackend,
 	ProjectDatabase,
 	ProjectExamples,

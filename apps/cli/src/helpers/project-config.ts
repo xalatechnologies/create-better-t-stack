@@ -22,7 +22,6 @@ async function updateRootPackageJson(
 		const packageJson = await fs.readJson(rootPackageJsonPath);
 		packageJson.name = options.projectName;
 
-		// Define script sets
 		const turboScripts = {
 			dev: "turbo dev",
 			build: "turbo build",

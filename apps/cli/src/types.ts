@@ -30,7 +30,7 @@ export type ProjectDBSetup =
 	| "mongodb-atlas"
 	| "neon"
 	| "none";
-export type ProjectApi = "trpc" | "orpc" | "none";
+export type ProjectApi = "trpc" | "orpc";
 
 export interface ProjectConfig {
 	projectName: string;

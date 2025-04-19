@@ -1,9 +1,8 @@
 import * as path from "node:path";
-import type { ProjectApi, ProjectConfig } from "../types";
+import type { ProjectConfig } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupApi(config: ProjectConfig): Promise<void> {
-	if (config.api === "none") return;
 	const { api, projectName } = config;
 	const projectDir = path.resolve(process.cwd(), projectName);
 	const webDir = path.join(projectDir, "apps/web");

@@ -4,10 +4,10 @@ import { DEFAULT_CONFIG } from "../constants";
 import type { ProjectAddons, ProjectFrontend } from "../types";
 
 export async function getAddonsChoice(
-	Addons?: ProjectAddons[],
+	addons?: ProjectAddons[],
 	frontends?: ProjectFrontend[],
 ): Promise<ProjectAddons[]> {
-	if (Addons !== undefined) return Addons;
+	if (addons !== undefined) return addons;
 
 	const hasCompatibleWebFrontend =
 		frontends?.includes("react-router") ||
@@ -50,7 +50,7 @@ export async function getAddonsChoice(
 	];
 
 	const options = hasCompatibleWebFrontend
-		? [...webAddonOptions, ...addonOptions]
+		? [...addonOptions, ...webAddonOptions]
 		: addonOptions;
 
 	const initialValues = DEFAULT_CONFIG.addons.filter(

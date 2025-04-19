@@ -8,7 +8,7 @@ import { setupTauri } from "./tauri-setup";
 import type { ProjectConfig } from "../types";
 
 export async function setupAddons(config: ProjectConfig) {
-	const { projectName, addons, packageManager, frontend } = config;
+	const { projectName, addons, frontend } = config;
 	const projectDir = path.resolve(process.cwd(), projectName);
 	const hasWebFrontend =
 		frontend.includes("react-router") || frontend.includes("tanstack-router");

@@ -22,11 +22,6 @@ export async function getApiChoice(
 			label: "oRPC",
 			hint: "End-to-end type-safe APIs that adhere to OpenAPI standards",
 		},
-		{
-			value: "none" as const,
-			label: "None",
-			hint: "No API integration (skip API setup)",
-		},
 	];
 
 	if (includesNative) {

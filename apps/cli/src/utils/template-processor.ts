@@ -1,4 +1,5 @@
 import path from "node:path";
+import consola from "consola";
 import fs from "fs-extra";
 import handlebars from "handlebars";
 import type { ProjectConfig } from "../types";
@@ -22,7 +23,7 @@ export async function processTemplate(
 		await fs.ensureDir(path.dirname(destPath));
 		await fs.writeFile(destPath, processedContent);
 	} catch (error) {
-		console.error(`Error processing template ${srcPath}:`, error);
+		consola.error(`Error processing template ${srcPath}:`, error);
 		throw new Error(`Failed to process template ${srcPath}`);
 	}
 }

@@ -1,13 +1,8 @@
 import path from "node:path";
-import { log, spinner } from "@clack/prompts";
+import { spinner } from "@clack/prompts";
 import consola from "consola";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type {
-	ProjectDatabase,
-	ProjectOrm,
-	ProjectPackageManager,
-} from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 import { setupMongoDBAtlas } from "./mongodb-atlas-setup";
 import { setupPrismaPostgres } from "./prisma-postgres-setup";
@@ -18,7 +13,7 @@ import { setupNeonPostgres } from "./neon-setup";
 import type { ProjectConfig } from "../types";
 
 export async function setupDatabase(config: ProjectConfig): Promise<void> {
-	const { projectName, database, orm, packageManager, dbSetup } = config;
+	const { projectName, database, orm, dbSetup } = config;
 	const projectDir = path.resolve(process.cwd(), projectName);
 	const s = spinner();
 	const serverDir = path.join(projectDir, "apps/server");

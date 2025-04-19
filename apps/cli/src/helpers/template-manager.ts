@@ -89,29 +89,22 @@ export async function setupFrontendTemplates(
 			}
 		}
 
-		if (context.api !== "none") {
-			const webFramework = webFrontends[0];
+		const webFramework = webFrontends[0];
 
-			const apiWebBaseDir = path.join(
-				PKG_ROOT,
-				`templates/api/${context.api}/web/base`,
-			);
-			if (await fs.pathExists(apiWebBaseDir)) {
-				await processAndCopyFiles("**/*", apiWebBaseDir, webAppDir, context);
-			}
+		const apiWebBaseDir = path.join(
+			PKG_ROOT,
+			`templates/api/${context.api}/web/base`,
+		);
+		if (await fs.pathExists(apiWebBaseDir)) {
+			await processAndCopyFiles("**/*", apiWebBaseDir, webAppDir, context);
+		}
 
-			const apiWebFrameworkDir = path.join(
-				PKG_ROOT,
-				`templates/api/${context.api}/web/${webFramework}`,
-			);
-			if (await fs.pathExists(apiWebFrameworkDir)) {
-				await processAndCopyFiles(
-					"**/*",
-					apiWebFrameworkDir,
-					webAppDir,
-					context,
-				);
-			}
+		const apiWebFrameworkDir = path.join(
+			PKG_ROOT,
+			`templates/api/${context.api}/web/${webFramework}`,
+		);
+		if (await fs.pathExists(apiWebFrameworkDir)) {
+			await processAndCopyFiles("**/*", apiWebFrameworkDir, webAppDir, context);
 		}
 	}
 
@@ -124,21 +117,14 @@ export async function setupFrontendTemplates(
 			await processAndCopyFiles("**/*", nativeBaseDir, nativeAppDir, context);
 		}
 
-		if (context.api !== "none") {
-			const apiNativeSrcDir = path.join(
-				PKG_ROOT,
-				`templates/api/${context.api}/native`,
-			);
+		const apiNativeSrcDir = path.join(
+			PKG_ROOT,
+			`templates/api/${context.api}/native`,
+		);
 
-			if (await fs.pathExists(apiNativeSrcDir)) {
-				await processAndCopyFiles(
-					"**/*",
-					apiNativeSrcDir,
-					nativeAppDir,
-					context,
-				);
-			} else {
-			}
+		if (await fs.pathExists(apiNativeSrcDir)) {
+			await processAndCopyFiles("**/*", apiNativeSrcDir, nativeAppDir, context);
+		} else {
 		}
 	}
 }
@@ -175,32 +161,25 @@ export async function setupBackendFramework(
 		);
 	}
 
-	if (context.api !== "none") {
-		const apiServerBaseDir = path.join(
-			PKG_ROOT,
-			`templates/api/${context.api}/server/base`,
-		);
-		if (await fs.pathExists(apiServerBaseDir)) {
-			await processAndCopyFiles(
-				"**/*",
-				apiServerBaseDir,
-				serverAppDir,
-				context,
-			);
-		}
+	const apiServerBaseDir = path.join(
+		PKG_ROOT,
+		`templates/api/${context.api}/server/base`,
+	);
+	if (await fs.pathExists(apiServerBaseDir)) {
+		await processAndCopyFiles("**/*", apiServerBaseDir, serverAppDir, context);
+	}
 
-		const apiServerFrameworkDir = path.join(
-			PKG_ROOT,
-			`templates/api/${context.api}/server/${context.backend}`,
+	const apiServerFrameworkDir = path.join(
+		PKG_ROOT,
+		`templates/api/${context.api}/server/${context.backend}`,
+	);
+	if (await fs.pathExists(apiServerFrameworkDir)) {
+		await processAndCopyFiles(
+			"**/*",
+			apiServerFrameworkDir,
+			serverAppDir,
+			context,
 		);
-		if (await fs.pathExists(apiServerFrameworkDir)) {
-			await processAndCopyFiles(
-				"**/*",
-				apiServerFrameworkDir,
-				serverAppDir,
-				context,
-			);
-		}
 	}
 }
 
