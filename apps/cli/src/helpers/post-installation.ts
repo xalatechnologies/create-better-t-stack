@@ -43,6 +43,16 @@ export function displayPostInstallInstructions(
 	const starlightInstructions = addons?.includes("starlight")
 		? getStarlightInstructions(runCmd)
 		: "";
+	const hasWeb = frontend?.some((f) =>
+		["tanstack-router", "react-router", "next", "tanstack-start"].includes(f),
+	);
+	const hasNative = frontend?.includes("native");
+	const bunWebNativeWarning =
+		packageManager === "bun" && hasNative && hasWeb
+			? getBunWebNativeWarning()
+			: "";
+	const noOrmWarning =
+		database !== "none" && orm === "none" ? getNoOrmWarning() : "";
 
 	const hasTanstackRouter = frontend?.includes("tanstack-router");
 	const hasTanstackStart = frontend?.includes("tanstack-start");
@@ -83,7 +93,7 @@ ${
 	lintingInstructions ? `\n${lintingInstructions.trim()}` : ""
 }${pwaInstructions ? `\n${pwaInstructions.trim()}` : ""}${
 	starlightInstructions ? `\n${starlightInstructions.trim()}` : ""
-}
+}${noOrmWarning ? `\n${noOrmWarning.trim()}` : ""}${bunWebNativeWarning ? `\n${bunWebNativeWarning.trim()}` : ""}
 
 ${pc.bold("Update all dependencies:\n")}${pc.cyan(tazeCommand)}
 
@@ -164,4 +174,12 @@ function getStarlightInstructions(runCmd?: string): string {
 	)} Start docs site: ${`cd apps/docs && ${runCmd} dev`}\n${pc.cyan(
 		"•",
 	)} Build docs site: ${`cd apps/docs && ${runCmd} build`}\n`;
+}
+
+function getNoOrmWarning(): string {
+	return `\n${pc.yellow("WARNING:")} Database selected without an ORM. Features requiring database access (e.g., examples, auth) need manual setup.\n`;
+}
+
+function getBunWebNativeWarning(): string {
+	return `\n${pc.yellow("WARNING:")} 'bun' might cause issues with web + native apps in a monorepo. Use 'pnpm' if problems arise.\n`;
 }

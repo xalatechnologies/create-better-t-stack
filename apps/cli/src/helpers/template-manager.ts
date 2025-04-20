@@ -519,14 +519,23 @@ export async function handleExtras(
 	context: ProjectConfig,
 ): Promise<void> {
 	if (context.packageManager === "pnpm") {
-		const src = path.join(PKG_ROOT, "templates/extras/pnpm-workspace.yaml");
-		const dest = path.join(projectDir, "pnpm-workspace.yaml");
-		if (await fs.pathExists(src)) {
-			await fs.copy(src, dest);
+		const pnpmWorkspaceSrc = path.join(
+			PKG_ROOT,
+			"templates/extras/pnpm-workspace.yaml",
+		);
+		const pnpmWorkspaceDest = path.join(projectDir, "pnpm-workspace.yaml");
+		if (await fs.pathExists(pnpmWorkspaceSrc)) {
+			await fs.copy(pnpmWorkspaceSrc, pnpmWorkspaceDest);
 		} else {
-			consola.warn(
-				pc.yellow("Warning: pnpm-workspace.yaml template not found."),
-			);
+		}
+	}
+
+	if (context.frontend.includes("native")) {
+		const npmrcSrc = path.join(PKG_ROOT, "templates/extras/.npmrc");
+		const npmrcDest = path.join(projectDir, ".npmrc");
+		if (await fs.pathExists(npmrcSrc)) {
+			await fs.copy(npmrcSrc, npmrcDest);
+		} else {
 		}
 	}
 }
