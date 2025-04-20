@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
@@ -94,11 +95,10 @@ export default function Testimonials() {
 					className="relative"
 				>
 					<h2 className="font-bold font-mono text-xl tracking-tight sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl">
-						<span className="border-blue-500 border-b-2 pb-1 text-gray-900 dark:text-blue-100">
+						<span className="border-primary border-b-2 pb-1 text-foreground dark:text-primary">
 							Developer Feedback
 						</span>
 					</h2>
-					<div className="-inset-x-1/4 -inset-y-1/2 -z-10 absolute bg-gradient-to-r from-blue-300/0 via-blue-300/10 to-blue-300/0 blur-3xl dark:from-blue-800/0 dark:via-blue-800/10 dark:to-blue-800/0" />
 				</motion.div>
 
 				<motion.p
@@ -106,7 +106,7 @@ export default function Testimonials() {
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-100px" }}
 					transition={{ duration: 0.5, delay: 0.2 }}
-					className="mx-auto max-w-3xl font-mono text-base text-gray-700 leading-relaxed sm:text-lg md:text-xl dark:text-gray-300"
+					className="mx-auto max-w-3xl font-mono text-base text-muted-foreground leading-relaxed sm:text-lg md:text-xl"
 				>
 					what devs are saying about Better-T-Stack
 				</motion.p>
@@ -119,14 +119,14 @@ export default function Testimonials() {
 				transition={{ duration: 0.5, delay: 0.3 }}
 				className="relative mt-4 sm:mt-8"
 			>
-				<div className="overflow-hidden rounded-xl border border-gray-300 bg-gray-100 shadow-xl dark:border-gray-700 dark:bg-gray-900">
-					<div className="flex items-center justify-between bg-gray-200 px-2 py-2 sm:px-4 dark:bg-gray-800">
+				<div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+					<div className="flex items-center justify-between bg-muted px-2 py-2 sm:px-4">
 						<div className="flex space-x-1 sm:space-x-2">
 							<div className="h-2 w-2 rounded-full bg-red-500 sm:h-3 sm:w-3" />
 							<div className="h-2 w-2 rounded-full bg-yellow-500 sm:h-3 sm:w-3" />
 							<div className="h-2 w-2 rounded-full bg-green-500 sm:h-3 sm:w-3" />
 						</div>
-						<div className="font-mono text-[10px] text-gray-600 sm:text-xs dark:text-gray-400">
+						<div className="font-mono text-[10px] text-muted-foreground sm:text-xs">
 							Developer Feedback
 						</div>
 						<div className="flex items-center gap-1 sm:gap-2">
@@ -134,7 +134,7 @@ export default function Testimonials() {
 								whileHover={{ scale: 1.05 }}
 								whileTap={{ scale: 0.95 }}
 								onClick={handlePrev}
-								className="flex h-5 w-5 items-center justify-center rounded bg-gray-300 text-gray-700 transition-colors hover:bg-gray-400 sm:h-6 sm:w-6 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+								className="flex h-5 w-5 items-center justify-center rounded bg-secondary text-secondary-foreground transition-colors hover:bg-muted sm:h-6 sm:w-6"
 								title="Previous testimonials"
 								aria-label="Previous testimonials"
 							>
@@ -145,7 +145,7 @@ export default function Testimonials() {
 								whileHover={{ scale: 1.05 }}
 								whileTap={{ scale: 0.95 }}
 								onClick={handleNext}
-								className="flex h-5 w-5 items-center justify-center rounded bg-gray-300 text-gray-700 transition-colors hover:bg-gray-400 sm:h-6 sm:w-6 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+								className="flex h-5 w-5 items-center justify-center rounded bg-secondary text-secondary-foreground transition-colors hover:bg-muted sm:h-6 sm:w-6"
 								title="Next testimonials"
 								aria-label="Next testimonials"
 							>
@@ -162,9 +162,9 @@ export default function Testimonials() {
 						</div>
 					</div>
 
-					<div className="flex items-center justify-between border-gray-300 border-t bg-gray-200 px-2 py-2 sm:p-3 dark:border-gray-700 dark:bg-gray-800">
+					<div className="flex items-center justify-between border-border border-t bg-muted px-2 py-2 sm:p-3">
 						<div className="flex items-center">
-							<span className="text-[10px] text-gray-700 sm:text-xs dark:text-gray-300">
+							<span className="text-[10px] text-muted-foreground sm:text-xs">
 								{currentPage}/{totalPages}
 							</span>
 						</div>
@@ -172,24 +172,33 @@ export default function Testimonials() {
 						<div className="flex items-center gap-2 sm:gap-3">
 							<div className="flex items-center gap-1">
 								{Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
-									const isActive = i === Math.min(currentPage - 1, 4);
+									const pageNum =
+										totalPages <= 5
+											? i
+											: currentPage <= 3
+												? i
+												: currentPage >= totalPages - 1
+													? totalPages - 5 + i
+													: currentPage - 3 + i;
+									const isActive = pageNum === currentPage - 1;
 									return (
 										<button
 											type="button"
-											// biome-ignore lint/suspicious/noArrayIndexKey: pagination indicator
+											// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 											key={i}
-											onClick={() => setStartIndex(i * tweetsPerPage)}
-											className={`h-1 w-1 rounded-full transition-colors sm:h-1.5 sm:w-1.5 ${
+											onClick={() => setStartIndex(pageNum * tweetsPerPage)}
+											className={cn(
+												"h-1 w-1 rounded-full transition-colors sm:h-1.5 sm:w-1.5",
 												isActive
-													? "bg-blue-500"
-													: "bg-gray-400 hover:bg-gray-500 dark:bg-gray-600"
-											}`}
-											aria-label={`Go to page ${i + 1}`}
+													? "bg-primary"
+													: "bg-muted-foreground/50 hover:bg-muted-foreground/70",
+											)}
+											aria-label={`Go to page ${pageNum + 1}`}
 										/>
 									);
 								})}
 								{totalPages > 5 && (
-									<span className="text-[8px] text-gray-500 sm:text-[10px] dark:text-gray-400">
+									<span className="text-[8px] text-muted-foreground sm:text-[10px]">
 										...
 									</span>
 								)}
@@ -197,8 +206,6 @@ export default function Testimonials() {
 						</div>
 					</div>
 				</div>
-
-				<div className="-z-10 absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-indigo-500/5 blur-3xl" />
 			</motion.div>
 		</section>
 	);

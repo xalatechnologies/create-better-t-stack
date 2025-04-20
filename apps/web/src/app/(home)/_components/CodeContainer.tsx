@@ -1,4 +1,5 @@
 "use client";
+import { cn } from "@/lib/utils";
 import { Check, ClipboardCopy, Terminal } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -51,28 +52,26 @@ const CodeContainer = () => {
 
 	return (
 		<div className="mx-auto mt-4 w-full max-w-3xl">
-			<div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md dark:border-gray-800 dark:bg-gray-950">
-				<div className="flex items-center justify-between bg-gray-100 px-3 py-2 dark:bg-gray-900">
+			<div className="overflow-hidden rounded-lg border border-border bg-card shadow-md">
+				<div className="flex items-center justify-between bg-muted px-3 py-2">
 					<div className="flex gap-1.5">
 						<div className="h-2.5 w-2.5 rounded-full bg-red-500" />
 						<div className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
 						<div className="h-2.5 w-2.5 rounded-full bg-green-500" />
 					</div>
 
-					<div className="text-gray-600 text-xs dark:text-gray-400">
-						Terminal
-					</div>
+					<div className="text-muted-foreground text-xs">Terminal</div>
 
 					<div className="relative" ref={menuRef}>
 						<button
 							type="button"
 							onClick={() => setIsOpen(!isOpen)}
-							className="flex items-center gap-1 rounded border border-gray-200 bg-white px-2 py-1 text-gray-700 text-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+							className="flex items-center gap-1 rounded border border-border bg-card px-2 py-1 text-foreground text-xs hover:bg-muted"
 						>
-							<Terminal className="h-3 w-3 text-gray-600 dark:text-gray-400" />
+							<Terminal className="h-3 w-3 text-muted-foreground" />
 							<span>{selectedPM}</span>
 							<svg
-								className="h-3 w-3 text-gray-500"
+								className="h-3 w-3 text-muted-foreground"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -91,17 +90,16 @@ const CodeContainer = () => {
 							<motion.div
 								initial={{ opacity: 0, y: -5 }}
 								animate={{ opacity: 1, y: 0 }}
-								className="absolute right-0 z-50 mt-1 w-28 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+								className="absolute right-0 z-50 mt-1 w-28 rounded-md border border-border bg-card shadow-lg"
 							>
 								{(["npm", "pnpm", "bun"] as const).map((pm) => (
 									<button
 										type="button"
 										key={pm}
-										className={`block w-full px-3 py-1.5 text-left text-xs ${
-											selectedPM === pm
-												? "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-												: "text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700/50"
-										}`}
+										className={cn(
+											"block w-full px-3 py-1.5 text-left text-foreground text-xs",
+											selectedPM === pm ? "bg-muted" : "hover:bg-muted/50",
+										)}
 										onClick={() => copyToClipboard(pm)}
 									>
 										{pm === "bun" ? "🥟 bun" : pm}
@@ -112,26 +110,27 @@ const CodeContainer = () => {
 					</div>
 				</div>
 
-				<div className="bg-gray-50 p-4 text-left font-mono text-sm dark:bg-gray-900">
+				<div className="bg-card p-4 text-left font-mono text-sm">
 					<div className="flex items-center">
-						<span className="mr-2 text-gray-600 dark:text-gray-400">$</span>
+						<span className="mr-2 text-muted-foreground">$</span>
 						<div className="flex-grow">
-							<span className="text-gray-800 dark:text-gray-200">
-								{commands[selectedPM]}
-							</span>
+							<span className="text-foreground">{commands[selectedPM]}</span>
 							{step === 0 && (
 								<span
-									className={`ml-0.5 inline-block h-4 w-2 bg-gray-800 dark:bg-white ${showCursor ? "opacity-100" : "opacity-0"}`}
+									className={cn(
+										"ml-0.5 inline-block h-4 w-2 bg-foreground",
+										showCursor ? "opacity-100" : "opacity-0",
+									)}
 								/>
 							)}
 						</div>
 						<button
 							type="button"
 							onClick={() => copyToClipboard(selectedPM)}
-							className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+							className="text-muted-foreground hover:text-foreground"
 						>
 							{copied ? (
-								<Check className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+								<Check className="h-4 w-4 text-[--color-chart-4]" />
 							) : (
 								<ClipboardCopy className="h-4 w-4" />
 							)}
@@ -141,55 +140,47 @@ const CodeContainer = () => {
 					{step > 0 && (
 						<div className="mt-3 space-y-1.5 text-sm">
 							{step > 0 && (
-								<div className="text-gray-600 dark:text-gray-400">
+								<div className="text-muted-foreground">
 									Creating a new Better-T-Stack project
 								</div>
 							)}
 
 							{step > 1 && (
-								<div className="ml-2 grid grid-cols-[80px_1fr] gap-x-2 text-gray-700 text-xs dark:text-gray-300">
+								<div className="ml-2 grid grid-cols-[80px_1fr] gap-x-2 text-muted-foreground text-xs">
 									<span>Project:</span>
-									<span className="text-gray-800 dark:text-gray-200">
-										my-app
-									</span>
+									<span className="text-foreground">my-app</span>
 									<span>Frontend:</span>
-									<span className="text-gray-800 dark:text-gray-200">
-										React Web
-									</span>
+									<span className="text-foreground">React Web</span>
 									<span>Backend:</span>
-									<span className="text-gray-800 dark:text-gray-200">Hono</span>
+									<span className="text-foreground">Hono</span>
 									<span>Database:</span>
-									<span className="text-gray-800 dark:text-gray-200">
-										SQLite + Drizzle
-									</span>
+									<span className="text-foreground">SQLite + Drizzle</span>
 								</div>
 							)}
 
 							{step > 2 && (
-								<div className="text-gray-600 dark:text-gray-400">
+								<div className="text-muted-foreground">
 									✓ Creating project structure
 								</div>
 							)}
 
 							{step > 3 && (
-								<div className="text-gray-600 dark:text-gray-400">
+								<div className="text-muted-foreground">
 									✓ Installing dependencies
 								</div>
 							)}
 
 							{step > 4 && (
-								<div className="mt-2 border-gray-400 border-l-2 bg-gray-100 py-2 pl-3 text-xs dark:border-gray-600 dark:bg-gray-800">
-									<span className="font-semibold text-gray-800 dark:text-gray-200">
+								<div className="mt-2 border-border border-l-2 bg-muted py-2 pl-3 text-xs">
+									<span className="font-semibold text-foreground">
 										Project created successfully! Run:
 									</span>
 									<div className="mt-1 flex flex-wrap gap-1">
-										<code className="rounded bg-gray-200 px-1 py-0.5 text-gray-800 dark:bg-gray-700 dark:text-white">
+										<code className="rounded bg-secondary px-1 py-0.5 text-secondary-foreground">
 											cd my-app
 										</code>
-										<span className="text-gray-700 dark:text-gray-300">
-											and
-										</span>
-										<code className="rounded bg-gray-200 px-1 py-0.5 text-gray-800 dark:bg-gray-700 dark:text-white">
+										<span className="text-muted-foreground">and</span>
+										<code className="rounded bg-secondary px-1 py-0.5 text-secondary-foreground">
 											{selectedPM === "npm"
 												? "npm run dev"
 												: selectedPM === "pnpm"
@@ -204,17 +195,20 @@ const CodeContainer = () => {
 
 					{step > 4 && (
 						<div className="mt-3 flex items-center">
-							<span className="mr-2 text-gray-600 dark:text-gray-400">$</span>
+							<span className="mr-2 text-muted-foreground">$</span>
 							<span
-								className={`inline-block h-4 w-2 bg-gray-800 dark:bg-white ${showCursor ? "opacity-100" : "opacity-0"}`}
+								className={cn(
+									"inline-block h-4 w-2 bg-foreground",
+									showCursor ? "opacity-100" : "opacity-0",
+								)}
 							/>
 						</div>
 					)}
 				</div>
 
-				<div className="border-gray-200 border-t bg-gray-50 px-4 py-1.5 text-left text-gray-600 text-xs dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
+				<div className="border-border border-t bg-muted px-4 py-1.5 text-left text-muted-foreground text-xs">
 					For customization options:{" "}
-					<code className="rounded bg-gray-200 px-1 py-0.5 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+					<code className="rounded bg-secondary px-1 py-0.5 text-secondary-foreground">
 						{selectedPM === "npm"
 							? "npx"
 							: selectedPM === "pnpm"

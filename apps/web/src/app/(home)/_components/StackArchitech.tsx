@@ -1,16 +1,19 @@
 "use client";
 
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
 	DEFAULT_STACK,
 	PRESET_TEMPLATES,
 	type StackState,
 	TECH_OPTIONS,
 } from "@/lib/constant";
+import { cn } from "@/lib/utils";
 import {
 	Check,
 	Circle,
 	CircleCheck,
 	ClipboardCopy,
+	Github,
 	HelpCircle,
 	InfoIcon,
 	RefreshCw,
@@ -20,6 +23,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const validateProjectName = (name: string): string | undefined => {
@@ -158,7 +162,6 @@ const StackArchitect = () => {
 			const isPWACompat = hasPWACompatibleFrontend(nextStack.frontend);
 			const isNative = hasNativeFrontend(nextStack.frontend);
 
-			// Database/ORM/Auth/DB Setup auto-fix
 			if (nextStack.database === "none") {
 				if (nextStack.orm !== "none") {
 					nextStack.orm = "none";
@@ -212,13 +215,11 @@ const StackArchitect = () => {
 				changed = true;
 			}
 
-			// API auto-fix for Native
 			if (isNative && nextStack.api !== "trpc") {
 				nextStack.api = "trpc";
 				changed = true;
 			}
 
-			// Addons auto-fix
 			const incompatibleAddons: string[] = [];
 			if (!isPWACompat) incompatibleAddons.push("pwa", "tauri");
 			const originalAddonsLength = nextStack.addons.length;
@@ -235,7 +236,6 @@ const StackArchitect = () => {
 				changed = true;
 			}
 
-			// Examples auto-fix
 			const incompatibleExamples: string[] = [];
 			if (!isWeb) incompatibleExamples.push("todo", "ai");
 			if (nextStack.database === "none") incompatibleExamples.push("todo");
@@ -608,18 +608,13 @@ const StackArchitect = () => {
 			const catKey = category as keyof StackState;
 
 			if (
-				(catKey === "frontend" ||
-					catKey === "addons" ||
-					catKey === "examples") &&
+				catKey === "frontend" &&
 				Array.isArray(stack[catKey]) &&
 				(stack[catKey] as string[]).length === 1 &&
-				(stack[catKey] as string[])[0] === techId
+				(stack[catKey] as string[])[0] === techId &&
+				techId !== "none"
 			) {
-				if (catKey === "frontend" && techId === "none") {
-				} else if (catKey !== "frontend") {
-				} else {
-					return "At least one frontend option must be selected.";
-				}
+				return "At least one frontend option must be selected.";
 			}
 
 			if (
@@ -630,7 +625,9 @@ const StackArchitect = () => {
 				) &&
 				stack[catKey] === techId
 			) {
-				return "This option is currently selected.";
+				if (techId !== "none" && techId !== "false") {
+					return "This option is currently selected.";
+				}
 			}
 
 			if (catKey === "api" && techId !== "trpc" && currentHasNativeFrontend) {
@@ -769,21 +766,27 @@ const StackArchitect = () => {
 	};
 
 	return (
-		<div className="flex h-screen flex-col overflow-hidden border-gray-300 bg-gray-100 text-gray-800 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-			<div className="flex flex-shrink-0 items-center justify-between border-gray-300 border-b bg-gray-200 px-2 py-2 sm:px-4 dark:border-gray-700 dark:bg-gray-800">
-				<div className="flex space-x-2">
-					<div className="h-3 w-3 rounded-full bg-red-500" />
-					<div className="h-3 w-3 rounded-full bg-yellow-500" />
-					<div className="h-3 w-3 rounded-full bg-green-500" />
-				</div>
-				<div className="hidden font-mono text-gray-600 text-xs sm:block dark:text-gray-400">
-					Stack Architect Terminal
+		<div
+			className={cn(
+				"flex h-screen flex-col overflow-hidden border-border bg-background text-foreground shadow-xl",
+			)}
+		>
+			<div
+				className={cn(
+					"flex flex-shrink-0 items-center justify-between border-border border-b bg-card px-2 py-2 sm:px-4",
+				)}
+			>
+				<div className="font-mono text-muted-foreground text-xs">Home</div>
+				<div className="hidden font-mono text-muted-foreground text-xs sm:block">
+					Create Better T Stack
 				</div>
 				<div className="flex space-x-2">
 					<button
 						type="button"
 						onClick={() => setShowHelp(!showHelp)}
-						className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+						className={cn(
+							"text-muted-foreground transition-colors hover:text-foreground",
+						)}
 						title="Help"
 					>
 						<HelpCircle className="h-4 w-4" />
@@ -791,20 +794,37 @@ const StackArchitect = () => {
 					<button
 						type="button"
 						onClick={() => setShowPresets(!showPresets)}
-						className="text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+						className={cn(
+							"text-muted-foreground transition-colors hover:text-foreground",
+						)}
 						title="Presets"
 					>
 						<Star className="h-4 w-4" />
+					</button>
+					<button
+						type="button"
+						onClick={() => setShowPresets(!showPresets)}
+						className={cn(
+							"text-muted-foreground transition-colors hover:text-foreground",
+						)}
+						title="Presets"
+					>
+						<Link
+							href={"https://github.com/AmanVarshney01/create-better-t-stack"}
+							target="_blank"
+						>
+							<Github className="h-4 w-4" />
+						</Link>
 					</button>
 				</div>
 			</div>
 
 			{showHelp && (
-				<div className="flex-shrink-0 border-gray-300 border-b bg-blue-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-blue-900/20">
-					<h3 className="mb-2 font-medium text-blue-800 text-sm dark:text-blue-300">
+				<div className="flex-shrink-0 border-border border-b bg-background p-3 text-foreground sm:p-4">
+					<h3 className="mb-2 font-medium text-sm">
 						How to Use Stack Architect
 					</h3>
-					<ul className="list-disc space-y-1 pl-5 text-blue-700 text-xs dark:text-blue-400">
+					<ul className="list-disc space-y-1 pl-5 text-xs">
 						<li>Use the sidebar to navigate between configuration sections.</li>
 						<li>Select your preferred technologies in the main area.</li>
 						<li>
@@ -832,8 +852,8 @@ const StackArchitect = () => {
 			)}
 
 			{showPresets && (
-				<div className="flex-shrink-0 border-gray-300 border-b bg-amber-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-amber-900/20">
-					<h3 className="mb-2 font-medium text-amber-800 text-sm dark:text-amber-300">
+				<div className="flex-shrink-0 border-border border-b bg-background p-3 sm:p-4">
+					<h3 className="mb-2 font-medium text-foreground text-sm">
 						Quick Start Presets
 					</h3>
 					<div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -842,12 +862,12 @@ const StackArchitect = () => {
 								type="button"
 								key={preset.id}
 								onClick={() => applyPreset(preset.id)}
-								className="rounded border border-amber-200 p-2 text-left transition-colors hover:bg-amber-100 dark:border-amber-700 dark:hover:bg-amber-800/30"
+								className="rounded border border-border bg-card p-2 text-left transition-colors hover:bg-muted"
 							>
-								<div className="font-medium text-amber-700 text-sm dark:text-amber-300">
+								<div className="font-medium text-foreground text-sm">
 									{preset.name}
 								</div>
-								<div className="text-amber-600 text-xs dark:text-amber-400">
+								<div className="text-muted-foreground text-xs">
 									{preset.description}
 								</div>
 							</button>
@@ -859,7 +879,7 @@ const StackArchitect = () => {
 			<div className="flex-shrink-0 p-3 pb-0 font-mono sm:p-4 sm:pb-0">
 				<div className="mb-3 flex flex-col justify-between gap-y-3 sm:flex-row sm:items-start">
 					<label className="flex flex-col">
-						<span className="mb-1 text-gray-600 text-xs dark:text-gray-400">
+						<span className="mb-1 text-muted-foreground text-xs">
 							Project Name:
 						</span>
 						<input
@@ -870,22 +890,25 @@ const StackArchitect = () => {
 								setStack((prev) => ({ ...prev, projectName: newValue }));
 								setProjectNameError(validateProjectName(newValue));
 							}}
-							className={`w-full rounded border px-2 py-1 font-mono text-sm focus:outline-none sm:w-auto ${
+							className={cn(
+								"w-full rounded border bg-card px-2 py-1 font-mono text-sm focus:outline-none sm:w-auto",
 								projectNameError
-									? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
-									: "border-gray-300 bg-gray-200 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-400"
-							}`}
+									? "border-destructive bg-destructive/10 text-destructive-foreground"
+									: "border-border focus:border-primary",
+							)}
 							placeholder="my-better-t-app"
 						/>
 						{projectNameError && (
-							<p className="mt-1 text-red-500 text-xs">{projectNameError}</p>
+							<p className="mt-1 text-destructive text-xs">
+								{projectNameError}
+							</p>
 						)}
 					</label>
 					<div className="flex flex-wrap gap-2">
 						<button
 							type="button"
 							onClick={resetStack}
-							className="flex items-center gap-1 rounded border border-gray-300 bg-gray-200 px-2 py-1 text-gray-700 text-xs transition-colors hover:bg-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+							className="flex items-center gap-1 rounded border border-border bg-card px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
 							title="Reset to defaults"
 						>
 							<RefreshCw className="h-3 w-3" />
@@ -895,7 +918,7 @@ const StackArchitect = () => {
 							<button
 								type="button"
 								onClick={loadSavedStack}
-								className="flex items-center gap-1 rounded border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700 text-xs transition-colors hover:bg-blue-200 dark:border-blue-700 dark:bg-blue-900/50 dark:text-blue-300 dark:hover:bg-blue-800/50"
+								className="flex items-center gap-1 rounded border border-primary bg-primary/10 px-2 py-1 text-primary text-xs transition-colors hover:bg-primary/20"
 								title="Load saved preferences"
 							>
 								<Settings className="h-3 w-3" />
@@ -906,7 +929,7 @@ const StackArchitect = () => {
 							id="save-stack-button"
 							type="button"
 							onClick={saveCurrentStack}
-							className="flex items-center gap-1 rounded border border-green-300 bg-green-100 px-2 py-1 text-green-700 text-xs transition-colors hover:bg-green-200 dark:border-green-700 dark:bg-green-900/50 dark:text-green-300 dark:hover:bg-green-800/50"
+							className="flex items-center gap-1 rounded border border-[--color-chart-4] bg-[--color-chart-4]/10 px-2 py-1 text-[--color-chart-4] text-xs transition-colors hover:bg-[--color-chart-4]/20"
 							title="Save current preferences"
 						>
 							<Star className="h-3 w-3" />
@@ -915,23 +938,21 @@ const StackArchitect = () => {
 					</div>
 				</div>
 
-				<div className="relative mb-4 overflow-hidden rounded border border-gray-300 bg-gray-200 p-2 dark:border-gray-700 dark:bg-gray-800">
+				<div className="relative mb-4 overflow-hidden rounded border border-border bg-card p-2">
 					<div className="flex overflow-x-auto pr-10">
-						<span className="mr-2 select-none text-green-600 dark:text-green-400">
-							$
-						</span>
-						<code className="no-scrollbar inline-flex items-center overflow-x-auto whitespace-pre break-words text-gray-700 text-xs sm:text-sm dark:text-gray-300">
+						<span className="mr-2 select-none text-[--color-chart-4]">$</span>
+						<code className="no-scrollbar inline-flex items-center overflow-x-auto whitespace-pre break-words text-muted-foreground text-xs sm:text-sm">
 							{command}
 						</code>
 					</div>
 					<button
 						type="button"
 						onClick={copyToClipboard}
-						className="-translate-y-1/2 absolute top-1/2 right-1 rounded p-1 text-gray-500 transition-colors hover:bg-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+						className="-translate-y-1/2 absolute top-1/2 right-1 rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 						title={copied ? "Copied!" : "Copy command"}
 					>
 						{copied ? (
-							<Check className="h-4 w-4 text-green-500" />
+							<Check className="h-4 w-4 text-[--color-chart-4]" />
 						) : (
 							<ClipboardCopy className="h-4 w-4" />
 						)}
@@ -960,9 +981,10 @@ const StackArchitect = () => {
 									.map((tech) => (
 										<span
 											key={`${category}-${tech.id}`}
-											className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs ${getBadgeColors(
-												category,
-											)}`}
+											className={cn(
+												"inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs",
+												getBadgeColors(category),
+											)}
 										>
 											<TechIcon
 												icon={tech.icon}
@@ -994,9 +1016,10 @@ const StackArchitect = () => {
 							return (
 								<span
 									key={`${category}-${tech.id}`}
-									className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs ${getBadgeColors(
-										category,
-									)}`}
+									className={cn(
+										"inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs",
+										getBadgeColors(category),
+									)}
 								>
 									<TechIcon
 										icon={tech.icon}
@@ -1012,23 +1035,24 @@ const StackArchitect = () => {
 			</div>
 
 			<div className="flex flex-grow overflow-hidden">
-				<nav className="hidden w-48 flex-shrink-0 overflow-y-auto border-gray-300 border-r bg-gray-200/50 p-2 md:flex dark:border-gray-700 dark:bg-gray-800/50">
+				<nav className="hidden w-48 flex-shrink-0 overflow-y-auto border-border border-r p-2 md:flex">
 					<ul className="space-y-1">
 						{CATEGORY_ORDER.map((category) => (
 							<li key={category}>
 								<button
 									type="button"
 									onClick={() => handleSidebarClick(category)}
-									className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-left font-mono text-xs transition-colors ${
+									className={cn(
+										"flex w-full items-center justify-between rounded px-2 py-1.5 text-left font-mono text-xs transition-colors",
 										activeCategory === category
-											? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
-											: "text-gray-600 hover:bg-gray-300/50 dark:text-gray-400 dark:hover:bg-gray-700/50"
-									}`}
+											? "bg-primary/10 text-primary"
+											: "text-muted-foreground hover:bg-muted/50",
+									)}
 								>
 									<span>{getCategoryDisplayName(category)}</span>
 									{compatNotes[category]?.hasIssue && (
 										<span title="Compatibility issue affects this section">
-											<InfoIcon className="h-3 w-3 flex-shrink-0 text-orange-500 dark:text-orange-400" />
+											<InfoIcon className="h-3 w-3 flex-shrink-0 text-[--color-chart-5]" />{" "}
 										</span>
 									)}
 								</button>
@@ -1037,170 +1061,175 @@ const StackArchitect = () => {
 					</ul>
 				</nav>
 
-				<main
-					ref={contentRef}
-					className="flex-grow overflow-y-auto scroll-smooth p-4"
-				>
-					{CATEGORY_ORDER.map((categoryKey) => {
-						const categoryOptions =
-							TECH_OPTIONS[categoryKey as keyof typeof TECH_OPTIONS] || [];
-						const categoryDisplayName = getCategoryDisplayName(categoryKey);
-						const notesInfo = compatNotes[categoryKey];
+				<ScrollArea className="flex-1">
+					<main
+						ref={contentRef}
+						className="flex-grow overflow-y-auto scroll-smooth p-4"
+					>
+						{CATEGORY_ORDER.map((categoryKey) => {
+							const categoryOptions =
+								TECH_OPTIONS[categoryKey as keyof typeof TECH_OPTIONS] || [];
+							const categoryDisplayName = getCategoryDisplayName(categoryKey);
+							const notesInfo = compatNotes[categoryKey];
 
-						return (
-							<section
-								ref={(el) => {
-									sectionRefs.current[categoryKey] = el;
-								}}
-								key={categoryKey}
-								id={`section-${categoryKey}`}
-								className="mb-8 scroll-mt-4"
-							>
-								<div className="mb-3 flex items-center border-gray-300 border-b pb-2 text-gray-700 dark:border-gray-700 dark:text-gray-300">
-									<Terminal className="mr-2 h-5 w-5 flex-shrink-0" />
-									<h2 className="font-semibold text-base">
-										{categoryDisplayName}
-									</h2>
-								</div>
-
-								{notesInfo?.notes && notesInfo.notes.length > 0 && (
-									<div
-										className={`mb-4 rounded-md border p-3 ${
-											notesInfo.hasIssue
-												? "border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20"
-												: "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20"
-										}`}
-									>
-										<div
-											className={`mb-1 flex items-center gap-2 font-medium text-xs sm:text-sm ${
-												notesInfo.hasIssue
-													? "text-orange-800 dark:text-orange-300"
-													: "text-blue-800 dark:text-blue-300"
-											}`}
-										>
-											<InfoIcon className="h-4 w-4 flex-shrink-0" />
-											<span>
-												{notesInfo.hasIssue
-													? "Compatibility Issues / Auto-Adjustments"
-													: "Notes"}
-											</span>
-										</div>
-										<ul
-											className={`list-inside list-disc space-y-1 text-xs ${
-												notesInfo.hasIssue
-													? "text-orange-700 dark:text-orange-400"
-													: "text-blue-700 dark:text-blue-400"
-											}`}
-										>
-											{notesInfo.notes.map((note, index) => (
-												// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-												<li key={index}>{note}</li>
-											))}
-										</ul>
+							return (
+								<section
+									ref={(el) => {
+										sectionRefs.current[categoryKey] = el;
+									}}
+									key={categoryKey}
+									id={`section-${categoryKey}`}
+									className="mb-8 scroll-mt-4"
+								>
+									<div className="mb-3 flex items-center border-border border-b pb-2 text-muted-foreground">
+										<Terminal className="mr-2 h-5 w-5 flex-shrink-0" />
+										<h2 className="font-semibold text-base text-foreground">
+											{categoryDisplayName}
+										</h2>
 									</div>
-								)}
 
-								<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-									{categoryOptions.map((tech) => {
-										let isSelected = false;
-										const category = categoryKey as keyof StackState;
-
-										if (
-											category === "addons" ||
-											category === "examples" ||
-											category === "frontend"
-										) {
-											isSelected = (
-												(stack[category] as string[]) || []
-											).includes(tech.id);
-										} else {
-											isSelected = stack[category] === tech.id;
-										}
-
-										const disabledReason = getDisabledReason(
-											categoryKey as keyof typeof TECH_OPTIONS,
-											tech.id,
-										);
-										const isDisabled = !!disabledReason && !isSelected;
-
-										return (
-											<motion.div
-												key={tech.id}
-												className={`relative rounded border p-3 transition-all ${
-													isDisabled
-														? "cursor-not-allowed opacity-60"
-														: "cursor-pointer"
-												} ${
-													isSelected
-														? "border-blue-400 bg-blue-100 ring-1 ring-blue-300 dark:border-blue-600 dark:bg-blue-900/40 dark:ring-blue-700"
-														: `border-gray-300 dark:border-gray-700 ${
-																!isDisabled
-																	? "hover:border-gray-400 hover:bg-gray-200/50 dark:hover:border-gray-600 dark:hover:bg-gray-800/50"
-																	: ""
-															}`
-												}`}
-												title={
-													isDisabled
-														? (disabledReason ?? "Option disabled")
-														: tech.description
-												}
-												whileHover={!isDisabled ? { scale: 1.02 } : undefined}
-												whileTap={!isDisabled ? { scale: 0.98 } : undefined}
-												onClick={() =>
-													!isDisabled &&
-													handleTechSelect(
-														categoryKey as keyof typeof TECH_OPTIONS,
-														tech.id,
-													)
-												}
-											>
-												<div className="flex items-start">
-													<div className="mt-1 mr-3 flex-shrink-0">
-														{isSelected ? (
-															<CircleCheck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-														) : (
-															<Circle className="h-5 w-5 text-gray-400 dark:text-gray-600" />
-														)}
-													</div>
-													<div className="flex-grow">
-														<div className="flex items-center justify-between">
-															<div className="flex items-center">
-																<TechIcon
-																	icon={tech.icon}
-																	name={tech.name}
-																	className="mr-2 h-5 w-5"
-																/>
-																<span
-																	className={`font-medium ${
-																		isSelected
-																			? "text-blue-800 dark:text-blue-300"
-																			: "text-gray-800 dark:text-gray-200"
-																	} text-sm`}
-																>
-																	{tech.name}
-																</span>
-															</div>
-														</div>
-														<p className="mt-1 text-gray-600 text-xs dark:text-gray-400">
-															{tech.description}
-														</p>
-													</div>
-												</div>
-												{tech.default && !isSelected && !isDisabled && (
-													<span className="absolute top-1 right-1 ml-2 flex-shrink-0 rounded bg-gray-300 px-1 py-0.5 text-[10px] text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-														Default
-													</span>
+									{notesInfo?.notes && notesInfo.notes.length > 0 && (
+										<div
+											className={cn(
+												"mb-4 rounded-md border p-3",
+												notesInfo.hasIssue
+													? "border-[--color-chart-5] bg-[--color-chart-5]/10"
+													: "border-primary bg-primary/10",
+											)}
+										>
+											<div
+												className={cn(
+													"mb-1 flex items-center gap-2 font-medium text-xs sm:text-sm",
+													notesInfo.hasIssue
+														? "text-[--color-chart-5]"
+														: "text-primary",
 												)}
-											</motion.div>
-										);
-									})}
-								</div>
-							</section>
-						);
-					})}
+											>
+												<InfoIcon className="h-4 w-4 flex-shrink-0" />
+												<span>
+													{notesInfo.hasIssue
+														? "Compatibility Issues / Auto-Adjustments"
+														: "Notes"}
+												</span>
+											</div>
+											<ul
+												className={cn(
+													"list-inside list-disc space-y-1 text-xs",
+													notesInfo.hasIssue
+														? "text-[--color-chart-5]/90"
+														: "text-primary/90",
+												)}
+											>
+												{notesInfo.notes.map((note, index) => (
+													// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+													<li key={index}>{note}</li>
+												))}
+											</ul>
+										</div>
+									)}
 
-					<div className="h-10" />
-				</main>
+									<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+										{categoryOptions.map((tech) => {
+											let isSelected = false;
+											const category = categoryKey as keyof StackState;
+
+											if (
+												category === "addons" ||
+												category === "examples" ||
+												category === "frontend"
+											) {
+												isSelected = (
+													(stack[category] as string[]) || []
+												).includes(tech.id);
+											} else {
+												isSelected = stack[category] === tech.id;
+											}
+
+											const disabledReason = getDisabledReason(
+												categoryKey as keyof typeof TECH_OPTIONS,
+												tech.id,
+											);
+											const isDisabled = !!disabledReason && !isSelected;
+
+											return (
+												<motion.div
+													key={tech.id}
+													className={cn(
+														"relative rounded border p-3 transition-all",
+														isDisabled
+															? "cursor-not-allowed opacity-60"
+															: "cursor-pointer",
+														isSelected
+															? "border-primary bg-primary/10 ring-1 ring-primary"
+															: `border-border ${
+																	!isDisabled
+																		? "hover:border-muted hover:bg-muted"
+																		: ""
+																}`,
+													)}
+													title={
+														isDisabled
+															? (disabledReason ?? "Option disabled")
+															: tech.description
+													}
+													whileHover={!isDisabled ? { scale: 1.02 } : undefined}
+													whileTap={!isDisabled ? { scale: 0.98 } : undefined}
+													onClick={() =>
+														!isDisabled &&
+														handleTechSelect(
+															categoryKey as keyof typeof TECH_OPTIONS,
+															tech.id,
+														)
+													}
+												>
+													<div className="flex items-start">
+														<div className="mt-1 mr-3 flex-shrink-0">
+															{isSelected ? (
+																<CircleCheck className="h-5 w-5 text-primary" />
+															) : (
+																<Circle className="h-5 w-5 text-muted-foreground" />
+															)}
+														</div>
+														<div className="flex-grow">
+															<div className="flex items-center justify-between">
+																<div className="flex items-center">
+																	<TechIcon
+																		icon={tech.icon}
+																		name={tech.name}
+																		className="mr-2 h-5 w-5"
+																	/>
+																	<span
+																		className={cn(
+																			"font-medium text-sm",
+																			isSelected
+																				? "text-primary"
+																				: "text-foreground",
+																		)}
+																	>
+																		{tech.name}
+																	</span>
+																</div>
+															</div>
+															<p className="mt-1 text-muted-foreground text-xs">
+																{tech.description}
+															</p>
+														</div>
+													</div>
+													{tech.default && !isSelected && !isDisabled && (
+														<span className="absolute top-1 right-1 ml-2 flex-shrink-0 rounded bg-muted px-1 py-0.5 text-[10px] text-muted-foreground">
+															Default
+														</span>
+													)}
+												</motion.div>
+											);
+										})}
+									</div>
+								</section>
+							);
+						})}
+						<div className="h-10" />
+					</main>
+				</ScrollArea>
 			</div>
 		</div>
 	);

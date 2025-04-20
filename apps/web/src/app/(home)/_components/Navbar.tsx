@@ -1,4 +1,5 @@
 "use client";
+import { cn } from "@/lib/utils";
 import { Github, Maximize2, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -47,33 +48,34 @@ const Navbar = () => {
 	return (
 		<>
 			<nav
-				className={`fixed top-0 z-[100] flex w-full items-center justify-between px-4 py-4 transition-all duration-300 sm:px-8 ${
-					scrolled
-						? "bg-transparent"
-						: "bg-gray-50/80 backdrop-blur-xl dark:bg-gray-950/80"
-				}`}
+				className={cn(
+					"fixed top-0 z-[100] flex w-full items-center justify-between px-4 py-4 transition-all duration-300 sm:px-8",
+					scrolled ? "bg-transparent" : "bg-background/80 backdrop-blur-xl",
+				)}
 			>
 				<div
-					className={`flex flex-row items-center space-x-3 transition-opacity duration-300 ${
-						scrolled ? "opacity-0" : "opacity-100"
-					}`}
+					className={cn(
+						"flex flex-row items-center space-x-3 transition-opacity duration-300",
+						scrolled ? "opacity-0" : "opacity-100",
+					)}
 				>
 					<div className="flex h-4 w-4 items-center justify-center rounded-sm">
-						<span className="text-blue-600 text-md dark:text-blue-500">$_</span>
+						<span className="text-md text-primary">$_</span>
 					</div>
-					<span className="font-semibold text-gray-600 text-md dark:text-gray-100">
+					<span className="font-semibold text-foreground text-md">
 						Better-T Stack
 					</span>
 				</div>
 
 				<div className="-translate-x-1/2 absolute left-1/2 hidden transform md:block">
 					<div
-						className={`relative flex items-center rounded-lg border border-gray-200 bg-gray-100/90 px-1.5 py-1 text-sm backdrop-blur-sm transition-all duration-500 ease-out dark:border-gray-800 dark:bg-gray-900/90 ${
-							scrolled ? "w-[352px]" : "w-[245px]"
-						}`}
+						className={cn(
+							"relative flex items-center rounded-lg border border-border bg-muted/90 px-1.5 py-1 text-sm backdrop-blur-sm transition-all duration-500 ease-out",
+							scrolled ? "w-[352px]" : "w-[245px]",
+						)}
 					>
 						<div
-							className="absolute rounded-md bg-white shadow-sm transition-all duration-200 ease-in-out dark:bg-gray-800"
+							className="absolute rounded-md bg-card shadow-sm transition-all duration-200 ease-in-out"
 							style={bgStyles}
 						/>
 						<Link
@@ -82,9 +84,9 @@ const Navbar = () => {
 								linkRefs.current.home = ref;
 							}}
 							onMouseOver={() => setActiveLink("home")}
-							className="relative flex items-center gap-1 rounded-md px-4 py-2 font-mono text-gray-700 transition-colors hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-300"
+							className="relative flex items-center gap-1 rounded-md px-4 py-2 font-mono text-muted-foreground transition-colors hover:text-primary"
 						>
-							<span className="text-blue-600 dark:text-blue-400">~/</span>
+							<span className="text-primary">~/</span>
 							home
 						</Link>
 
@@ -96,7 +98,7 @@ const Navbar = () => {
 							}}
 							onMouseOver={() => setActiveLink("demo")}
 							onMouseLeave={() => setActiveLink("home")}
-							className="relative flex items-center gap-2 rounded-md px-4 py-2 font-mono text-gray-700 transition-colors hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-300"
+							className="relative flex items-center gap-2 rounded-md px-4 py-2 font-mono text-muted-foreground transition-colors hover:text-primary"
 						>
 							<span>demo</span>
 						</Link>
@@ -109,7 +111,7 @@ const Navbar = () => {
 							}}
 							onMouseOver={() => setActiveLink("npm")}
 							onMouseLeave={() => setActiveLink("home")}
-							className="relative flex items-center gap-2 rounded-md px-4 py-2 font-mono text-gray-700 transition-colors hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-300"
+							className="relative flex items-center gap-2 rounded-md px-4 py-2 font-mono text-muted-foreground transition-colors hover:text-primary"
 						>
 							<PackageIcon pm="npm" className="h-4 w-4 rounded-full" />{" "}
 							<span>npm</span>
@@ -123,11 +125,12 @@ const Navbar = () => {
 							}}
 							onMouseOver={() => setActiveLink("github")}
 							onMouseLeave={() => setActiveLink("home")}
-							className={`relative flex items-center gap-2 rounded-md px-4 py-2 font-mono text-gray-700 transition-colors hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-300 ${
+							className={cn(
+								"relative flex items-center gap-2 rounded-md px-4 py-2 font-mono text-muted-foreground transition-colors hover:text-primary",
 								scrolled
 									? "translate-y-0 opacity-100"
-									: "pointer-events-none opacity-0"
-							}`}
+									: "pointer-events-none opacity-0",
+							)}
 						>
 							<Github className="size-4">
 								<title>GitHub</title>
@@ -138,13 +141,14 @@ const Navbar = () => {
 				</div>
 
 				<div
-					className={`hidden justify-end gap-2 transition-opacity duration-300 md:flex ${
-						scrolled ? "pointer-events-none opacity-0" : "opacity-100"
-					}`}
+					className={cn(
+						"hidden justify-end gap-2 transition-opacity duration-300 md:flex",
+						scrolled ? "pointer-events-none opacity-0" : "opacity-100",
+					)}
 				>
 					<Link
 						href="/new"
-						className="inline-flex items-center rounded-lg border border-blue-300 bg-blue-100/90 px-4 py-1 font-mono text-blue-700 text-sm backdrop-blur-sm transition-colors hover:bg-blue-200 dark:border-blue-800 dark:bg-blue-900/90 dark:text-blue-300 dark:hover:bg-blue-800/50"
+						className="inline-flex items-center rounded-lg border border-primary/50 bg-primary/10 px-4 py-1 font-mono text-primary text-sm backdrop-blur-sm transition-colors hover:bg-primary/20"
 					>
 						<Maximize2 className="mr-1 size-4" />
 						Stack Builder
@@ -152,7 +156,7 @@ const Navbar = () => {
 					<Link
 						href="https://www.github.com/better-t-stack/create-better-t-stack"
 						target="_blank"
-						className="inline-flex items-center rounded-lg border border-gray-200 bg-gray-100/90 px-4 py-1 font-mono text-gray-700 text-sm backdrop-blur-sm transition-colors hover:text-blue-600 dark:border-gray-800 dark:bg-gray-900/90 dark:text-gray-300 dark:hover:text-blue-300"
+						className="inline-flex items-center rounded-lg border border-border bg-muted/90 px-4 py-1 font-mono text-muted-foreground text-sm backdrop-blur-sm transition-colors hover:bg-muted hover:text-primary"
 					>
 						<Github className="mr-1 size-4">
 							<title>GitHub</title>
@@ -164,7 +168,7 @@ const Navbar = () => {
 				<button
 					type="button"
 					onClick={toggleMobileMenu}
-					className="flex items-center justify-center rounded-md p-2 text-gray-700 hover:bg-gray-100/50 focus:outline-none md:hidden dark:text-gray-300 dark:hover:bg-gray-800/50"
+					className="flex items-center justify-center rounded-md p-2 text-foreground hover:bg-muted/50 focus:outline-none md:hidden"
 					aria-expanded={mobileMenuOpen}
 				>
 					{mobileMenuOpen ? (
@@ -177,39 +181,38 @@ const Navbar = () => {
 			</nav>
 
 			<div
-				className={`fixed inset-0 z-[99] pt-16 backdrop-blur-md transition-all duration-300 ease-in-out md:hidden ${
+				className={cn(
+					"fixed inset-0 z-[99] pt-16 backdrop-blur-md transition-all duration-300 ease-in-out md:hidden",
 					mobileMenuOpen
 						? "pointer-events-auto opacity-100"
-						: "pointer-events-none opacity-0"
-				}`}
+						: "pointer-events-none opacity-0",
+				)}
 			>
-				<div className="mx-4 mt-4 overflow-hidden rounded-lg border border-gray-300 bg-gray-100/95 shadow-lg dark:border-gray-700 dark:bg-gray-900/95">
-					<div className="flex items-center bg-gray-200 px-4 py-2 dark:bg-gray-800">
+				<div className="mx-4 mt-4 overflow-hidden rounded-lg border border-border bg-card/95 shadow-lg">
+					<div className="flex items-center bg-muted px-4 py-2">
 						<div className="mr-4 flex space-x-2">
 							<div className="h-3 w-3 rounded-full bg-red-500" />
 							<div className="h-3 w-3 rounded-full bg-yellow-500" />
 							<div className="h-3 w-3 rounded-full bg-green-500" />
 						</div>
-						<div className="font-mono text-gray-600 text-sm dark:text-gray-300">
+						<div className="font-mono text-muted-foreground text-sm">
 							better-t-stack:~
 						</div>
 					</div>
 
 					<div className="p-4 font-mono text-sm">
 						<div className="pb-3">
-							<span className="text-green-600 dark:text-green-500">
+							<span className="text-[--color-chart-4]">
 								user@better-t-stack
 							</span>
-							<span className="text-gray-600 dark:text-gray-400">:~$</span>
-							<span className="ml-2 text-gray-800 dark:text-gray-200">
-								ls -la
-							</span>
+							<span className="text-muted-foreground">:~$</span>
+							<span className="ml-2 text-foreground">ls -la</span>
 						</div>
 
-						<div className="space-y-2 border-gray-300 border-l-2 pl-4 dark:border-gray-700">
+						<div className="space-y-2 border-border border-l-2 pl-4">
 							<Link
 								href="/"
-								className="block text-blue-600 hover:underline dark:text-blue-400"
+								className="block text-primary hover:underline"
 								onClick={() => setMobileMenuOpen(false)}
 							>
 								~/home
@@ -218,7 +221,7 @@ const Navbar = () => {
 							<Link
 								href="https://my-better-t-app-client.pages.dev/"
 								target="_blank"
-								className="block text-blue-600 hover:underline dark:text-blue-400"
+								className="block text-primary hover:underline"
 								onClick={() => setMobileMenuOpen(false)}
 							>
 								~/demo
@@ -229,7 +232,7 @@ const Navbar = () => {
 								<Link
 									href="https://www.npmjs.com/package/create-better-t-stack"
 									target="_blank"
-									className="block text-blue-600 hover:underline dark:text-blue-400"
+									className="block text-primary hover:underline"
 									onClick={() => setMobileMenuOpen(false)}
 								>
 									~/npm
@@ -237,11 +240,11 @@ const Navbar = () => {
 							</div>
 
 							<div className="flex items-center">
-								<Github className="mr-1 size-4 text-gray-700 dark:text-gray-300" />
+								<Github className="mr-1 size-4 text-foreground" />
 								<Link
 									href="https://www.github.com/better-t-stack/create-better-t-stack"
 									target="_blank"
-									className="block text-blue-600 hover:underline dark:text-blue-400"
+									className="block text-primary hover:underline"
 									onClick={() => setMobileMenuOpen(false)}
 								>
 									~/github
@@ -250,20 +253,18 @@ const Navbar = () => {
 						</div>
 
 						<div className="mt-6 pb-3">
-							<span className="text-green-600 dark:text-green-500">
+							<span className="text-[--color-chart-4]">
 								user@better-t-stack
 							</span>
-							<span className="text-gray-600 dark:text-gray-400">:~$</span>
-							<span className="ml-2 text-gray-800 dark:text-gray-200">
-								star-repo
-							</span>
+							<span className="text-muted-foreground">:~$</span>
+							<span className="ml-2 text-foreground">star-repo</span>
 						</div>
 
-						<div className="border-gray-300 border-l-2 pb-2 pl-4 dark:border-gray-700">
+						<div className="border-border border-l-2 pb-2 pl-4">
 							<Link
 								href="https://www.github.com/better-t-stack/create-better-t-stack"
 								target="_blank"
-								className="inline-flex items-center rounded-md bg-gray-200 px-4 py-2 text-gray-800 transition-colors hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+								className="inline-flex items-center rounded-md bg-muted px-4 py-2 text-foreground transition-colors hover:bg-muted/80"
 								onClick={() => setMobileMenuOpen(false)}
 							>
 								<Github className="mr-1 size-5" />
@@ -272,11 +273,11 @@ const Navbar = () => {
 						</div>
 
 						<div className="mt-4">
-							<span className="text-green-600 dark:text-green-500">
+							<span className="text-[--color-chart-4]">
 								user@better-t-stack
 							</span>
-							<span className="text-gray-600 dark:text-gray-400">:~$</span>
-							<span className="ml-2 animate-pulse">█</span>
+							<span className="text-muted-foreground">:~$</span>
+							<span className="ml-2 animate-pulse text-foreground">█</span>
 						</div>
 					</div>
 				</div>

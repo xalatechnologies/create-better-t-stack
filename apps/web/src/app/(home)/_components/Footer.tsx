@@ -3,14 +3,14 @@ import Link from "next/link";
 
 const Footer = () => {
 	return (
-		<footer className="relative w-full border-gray-200 border-t font-mono dark:border-gray-800">
+		<footer className="relative w-full border-border border-t font-mono">
 			<div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
 				<div className="mb-12 grid gap-8 md:grid-cols-3">
 					<div>
-						<h3 className="mb-4 flex items-center gap-2 font-bold text-gray-900 text-lg dark:text-white">
+						<h3 className="mb-4 flex items-center gap-2 font-bold text-foreground text-lg">
 							<span>Better-T Stack</span>
 						</h3>
-						<p className="text-gray-600 leading-relaxed dark:text-gray-400">
+						<p className="text-muted-foreground leading-relaxed">
 							Type-safe, modern TypeScript scaffolding for full-stack web
 							development
 						</p>
@@ -19,7 +19,7 @@ const Footer = () => {
 							<Link
 								href="https://github.com/better-t-stack/create-better-t-stack"
 								target="_blank"
-								className="text-gray-500 transition-colors hover:text-gray-900 dark:hover:text-white"
+								className="text-muted-foreground transition-colors hover:text-foreground"
 								aria-label="GitHub"
 							>
 								<Github size={18} />
@@ -27,7 +27,7 @@ const Footer = () => {
 							<Link
 								href="https://www.npmjs.com/package/create-better-t-stack"
 								target="_blank"
-								className="text-gray-500 transition-colors hover:text-gray-900 dark:hover:text-white"
+								className="text-muted-foreground transition-colors hover:text-foreground"
 								aria-label="NPM"
 							>
 								<svg
@@ -44,15 +44,15 @@ const Footer = () => {
 					</div>
 
 					<div>
-						<h3 className="mb-4 font-bold text-gray-900 text-lg dark:text-white">
+						<h3 className="mb-4 font-bold text-foreground text-lg">
 							Resources
 						</h3>
-						<ul className="space-y-2.5 text-gray-600 dark:text-gray-400">
+						<ul className="space-y-2.5 text-muted-foreground">
 							<li>
 								<Link
 									target="_blank"
 									href="https://github.com/better-t-stack/create-better-t-stack"
-									className="transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+									className="transition-colors hover:text-primary"
 								>
 									GitHub Repository
 								</Link>
@@ -61,7 +61,7 @@ const Footer = () => {
 								<Link
 									target="_blank"
 									href="https://www.npmjs.com/package/create-better-t-stack"
-									className="transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+									className="transition-colors hover:text-primary"
 								>
 									NPM Package
 								</Link>
@@ -70,30 +70,30 @@ const Footer = () => {
 								<Link
 									target="_blank"
 									href="https://my-better-t-app-client.pages.dev/"
-									className="transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+									className="transition-colors hover:text-primary"
 								>
 									Demo Application
 								</Link>
 							</li>
-							{/* <li>
+							{/*
+							<li>
 								<Link
 									target="_blank"
 									href="https://github.com/better-t-stack/create-better-t-stack#readme"
-									className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+									className="hover:text-primary transition-colors"
 								>
 									Documentation
 								</Link>
-							</li> */}
+							</li>
+							*/}
 						</ul>
 					</div>
 
 					<div>
-						<h3 className="mb-4 font-bold text-gray-900 text-lg dark:text-white">
-							Contact
-						</h3>
-						<div className="space-y-2.5 text-gray-600 dark:text-gray-400">
+						<h3 className="mb-4 font-bold text-foreground text-lg">Contact</h3>
+						<div className="space-y-2.5 text-muted-foreground">
 							<p className="flex items-center">
-								<span className="mr-2 rounded bg-gray-100 px-2 py-1 font-mono text-sm dark:bg-gray-800">
+								<span className="mr-2 rounded bg-muted px-2 py-1 font-mono text-sm">
 									$
 								</span>
 								<span>amanvarshney.work@gmail.com</span>
@@ -106,13 +106,13 @@ const Footer = () => {
 					</div>
 				</div>
 
-				<div className="mt-12 flex flex-col items-center justify-between gap-4 border-gray-200 border-t pt-6 sm:flex-row dark:border-gray-800">
-					<p className="text-gray-500 text-sm">
+				<div className="mt-12 flex flex-col items-center justify-between gap-4 border-border border-t pt-6 sm:flex-row">
+					<p className="text-muted-foreground text-sm">
 						© {new Date().getFullYear()} Better-T Stack. All rights reserved.
 					</p>
-					<p className="flex items-center gap-1.5 text-gray-500 text-sm">
+					<p className="flex items-center gap-1.5 text-muted-foreground text-sm">
 						Built with
-						<span className="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text font-medium text-transparent">
+						<span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text font-medium text-transparent">
 							TypeScript
 						</span>
 					</p>

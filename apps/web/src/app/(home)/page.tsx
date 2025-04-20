@@ -1,8 +1,8 @@
 "use client";
 import ShinyText from "@/app/(home)/_components/ShinyText";
+import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import React from "react";
-import BackgroundGradients from "./_components/BackgroundGradients";
 import CodeContainer from "./_components/CodeContainer";
 import CustomizableSection from "./_components/CustomizableSection";
 import Footer from "./_components/Footer";
@@ -48,9 +48,7 @@ export default function HomePage() {
 	return (
 		<>
 			<Navbar />
-			<main className="flex min-h-screen flex-col items-center justify-start overflow-x-hidden px-0 pt-24 pb-10 sm:px-4 sm:pb-16 md:px-8 md:pt-28 lg:pt-32">
-				<BackgroundGradients />
-
+			<main className="flex min-h-screen flex-col items-center justify-start overflow-x-hidden bg-background px-0 pt-24 pb-10 sm:px-4 sm:pb-16 md:px-8 md:pt-28 lg:pt-32">
 				<motion.div
 					className="relative z-10 mx-auto mb-16 max-w-5xl text-center sm:mb-20"
 					initial="hidden"
@@ -63,7 +61,7 @@ export default function HomePage() {
 								className="font-bold font-mono text-4xl xs:text-5xl tracking-tight sm:text-6xl md:text-7xl"
 								variants={itemVariants}
 							>
-								<span className="border-blue-500 border-b-2 pb-1 text-gray-900 dark:text-blue-100">
+								<span className="border-primary border-b-2 pb-1 text-foreground dark:text-primary">
 									Better-T Stack
 								</span>
 							</motion.h1>
@@ -73,7 +71,7 @@ export default function HomePage() {
 							</motion.div>
 
 							<motion.p
-								className="max-w-2xl px-1 font-mono text-gray-600 text-lg sm:text-xl dark:text-gray-300"
+								className="max-w-2xl px-1 font-mono text-lg text-muted-foreground sm:text-xl"
 								variants={itemVariants}
 							>
 								A modern CLI tool for scaffolding end-to-end type-safe
@@ -92,7 +90,7 @@ export default function HomePage() {
 								<ShinyText
 									text="Type-safe. Modern. Minimal. Fast."
 									speed={3}
-									className="font-mono text-gray-600 text-xs xs:text-sm sm:text-base dark:text-gray-400"
+									className="font-mono text-muted-foreground text-xs xs:text-sm sm:text-base"
 								/>
 							</motion.div>
 						</div>
@@ -119,15 +117,20 @@ export default function HomePage() {
 					<div className="relative mx-auto max-w-5xl">
 						<div className="flex items-center justify-center">
 							<div className="hidden w-1/3 items-center sm:flex">
-								<div className="h-px flex-grow bg-gradient-to-r from-transparent via-blue-500/30 to-blue-500/50" />
-								<div className="h-2 w-2 rounded-full bg-blue-500/60 shadow-sm" />
+								<div className="h-px flex-grow bg-gradient-to-r from-transparent via-primary/30 to-primary/50" />
+
+								<div className="h-2 w-2 rounded-full bg-primary/60 shadow-sm" />
 							</div>
 
 							<div className="px-4 sm:px-6">
-								<div className="flex h-8 w-8 items-center justify-center rounded-full border border-blue-500/80 bg-white shadow-md sm:h-9 sm:w-9 dark:border-blue-400/70 dark:bg-gray-900">
+								<div
+									className={cn(
+										"flex h-8 w-8 items-center justify-center rounded-full border border-primary/80 bg-card shadow-md sm:h-9 sm:w-9",
+									)}
+								>
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
-										className="h-4 w-4 text-blue-500 sm:h-5 sm:w-5 dark:text-blue-400"
+										className="h-4 w-4 text-primary sm:h-5 sm:w-5"
 										viewBox="0 0 20 20"
 										fill="currentColor"
 									>
@@ -142,11 +145,13 @@ export default function HomePage() {
 							</div>
 
 							<div className="hidden w-1/3 items-center sm:flex">
-								<div className="h-2 w-2 rounded-full bg-blue-500/60 shadow-sm" />
-								<div className="h-px flex-grow bg-gradient-to-l from-transparent via-blue-500/30 to-blue-500/50" />
+								<div className="h-2 w-2 rounded-full bg-primary/60 shadow-sm" />
+
+								<div className="h-px flex-grow bg-gradient-to-l from-transparent via-primary/30 to-primary/50" />
 							</div>
 						</div>
-						<div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-blue-500/30 to-transparent sm:hidden" />
+
+						<div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-primary/30 to-transparent sm:hidden" />
 					</div>
 				</motion.div>
 

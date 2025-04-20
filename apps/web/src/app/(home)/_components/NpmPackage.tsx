@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 const NpmPackage = () => {
@@ -9,21 +10,33 @@ const NpmPackage = () => {
 	useEffect(() => {
 		const getLatestVersion = async () => {
 			setVersionLoading(true);
-			const res = await fetch(
-				"https://registry.npmjs.org/create-better-t-stack/latest",
-			);
-			const data = await res.json();
-			setVersionLoading(false);
-			setVersion(data.version);
+			try {
+				const res = await fetch(
+					"https://registry.npmjs.org/create-better-t-stack/latest",
+				);
+				if (!res.ok) throw new Error("Failed to fetch version");
+				const data = await res.json();
+				setVersion(data.version);
+			} catch (error) {
+				console.error("Error fetching NPM version:", error);
+				setVersion("?.?.?");
+			} finally {
+				setVersionLoading(false);
+			}
 		};
 		getLatestVersion();
 	}, []);
 
 	return (
 		<div className="mt-2 flex items-center justify-center">
-			<span className="mr-2 inline-block h-5 w-3 animate-pulse bg-blue-400 dark:bg-blue-500" />
-			<span className="font-mono text-gray-700 text-xl dark:text-gray-300">
-				{versionLoading ? "[v1.0.0]" : `[v${version}]`}
+			<span
+				className={cn(
+					"mr-2 inline-block h-5 w-3 bg-primary",
+					versionLoading && "animate-pulse",
+				)}
+			/>
+			<span className="font-mono text-muted-foreground text-xl">
+				{versionLoading ? "[v?.?.?]" : `[v${version}]`}
 			</span>
 		</div>
 	);
