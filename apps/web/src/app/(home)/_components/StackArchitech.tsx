@@ -19,6 +19,7 @@ import {
 	Terminal,
 } from "lucide-react";
 import { motion } from "motion/react";
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const validateProjectName = (name: string): string | undefined => {
@@ -72,6 +73,29 @@ const hasPWACompatibleFrontend = (frontend: string[]) =>
 
 const hasNativeFrontend = (frontend: string[]) => frontend.includes("native");
 
+const TechIcon = ({
+	icon,
+	name,
+	className,
+}: { icon: string; name: string; className?: string }) => {
+	if (icon.startsWith("/icon/")) {
+		return (
+			<Image
+				src={icon}
+				alt={`${name} icon`}
+				width={20}
+				height={20}
+				className={`inline-block ${className || ""}`}
+				unoptimized
+			/>
+		);
+	}
+
+	return (
+		<span className={`inline-block text-lg ${className || ""}`}>{icon}</span>
+	);
+};
+
 const StackArchitect = () => {
 	const [stack, setStack] = useState<StackState>(DEFAULT_STACK);
 	const [command, setCommand] = useState("");
@@ -118,7 +142,7 @@ const StackArchitect = () => {
 		}
 	}, []);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: Dependencies are logically required for validation inside updater
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		setStack((currentStack) => {
 			const nextStack = { ...currentStack };
@@ -255,7 +279,7 @@ const StackArchitect = () => {
 		}
 
 		const projectName = stackState.projectName || "my-better-t-app";
-		const flags: string[] = [];
+		const flags: string[] = ["--yes"];
 
 		const isDefault = <K extends keyof StackState>(
 			key: K,
@@ -584,6 +608,32 @@ const StackArchitect = () => {
 		(category: keyof typeof TECH_OPTIONS, techId: string): string | null => {
 			const catKey = category as keyof StackState;
 
+			if (
+				(catKey === "frontend" ||
+					catKey === "addons" ||
+					catKey === "examples") &&
+				Array.isArray(stack[catKey]) &&
+				(stack[catKey] as string[]).length === 1 &&
+				(stack[catKey] as string[])[0] === techId
+			) {
+				if (catKey === "frontend" && techId === "none") {
+				} else if (catKey !== "frontend") {
+				} else {
+					return "At least one frontend option must be selected.";
+				}
+			}
+
+			if (
+				!(
+					catKey === "frontend" ||
+					catKey === "addons" ||
+					catKey === "examples"
+				) &&
+				stack[catKey] === techId
+			) {
+				return "This option is currently selected.";
+			}
+
 			if (catKey === "api" && techId !== "trpc" && currentHasNativeFrontend) {
 				return "Only tRPC API is supported with React Native.";
 			}
@@ -595,6 +645,8 @@ const StackArchitect = () => {
 					return "MongoDB requires the Prisma ORM.";
 				if (stack.dbSetup === "turso" && techId === "prisma")
 					return "Turso DB setup requires the Drizzle ORM.";
+				if (techId === "none" && stack.database === "mongodb")
+					return "MongoDB requires Prisma ORM.";
 			}
 
 			if (catKey === "dbSetup" && techId !== "none") {
@@ -646,10 +698,7 @@ const StackArchitect = () => {
 			return null;
 		},
 		[
-			stack.database,
-			stack.orm,
-			stack.dbSetup,
-			stack.backendFramework,
+			stack,
 			currentHasNativeFrontend,
 			currentHasPWACompatibleFrontend,
 			currentHasWebFrontend,
@@ -891,9 +940,6 @@ const StackArchitect = () => {
 				</div>
 
 				<div className="mb-4">
-					{/* <h3 className="mb-2 font-semibold text-gray-600 text-sm dark:text-gray-400">
-						Selected Stack Summary
-					</h3> */}
 					<div className="flex flex-wrap gap-1.5">
 						{CATEGORY_ORDER.flatMap((category) => {
 							const categoryKey = category as keyof StackState;
@@ -915,9 +961,14 @@ const StackArchitect = () => {
 									.map((tech) => (
 										<span
 											key={`${category}-${tech.id}`}
-											className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${getBadgeColors(category)}`}
+											className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs ${getBadgeColors(category)}`}
 										>
-											{tech.icon} {tech.name}
+											<TechIcon
+												icon={tech.icon}
+												name={tech.name}
+												className="h-3 w-3"
+											/>
+											{tech.name}
 										</span>
 									));
 							}
@@ -938,9 +989,14 @@ const StackArchitect = () => {
 							return (
 								<span
 									key={`${category}-${tech.id}`}
-									className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${getBadgeColors(category)}`}
+									className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs ${getBadgeColors(category)}`}
 								>
-									{tech.icon} {tech.name}
+									<TechIcon
+										icon={tech.icon}
+										name={tech.name}
+										className="h-3 w-3"
+									/>
+									{tech.name}
 								</span>
 							);
 						})}
@@ -1018,7 +1074,7 @@ const StackArchitect = () => {
 											className={`list-inside list-disc space-y-1 text-xs ${notesInfo.hasIssue ? "text-orange-700 dark:text-orange-400" : "text-blue-700 dark:text-blue-400"}`}
 										>
 											{notesInfo.notes.map((note, index) => (
-												// biome-ignore lint/suspicious/noArrayIndexKey: Static notes per render
+												// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 												<li key={index}>{note}</li>
 											))}
 										</ul>
@@ -1086,9 +1142,11 @@ const StackArchitect = () => {
 													<div className="flex-grow">
 														<div className="flex items-center justify-between">
 															<div className="flex items-center">
-																<span className="mr-2 text-lg">
-																	{tech.icon}
-																</span>
+																<TechIcon
+																	icon={tech.icon}
+																	name={tech.name}
+																	className="mr-2 h-5 w-5"
+																/>
 																<span
 																	className={`font-medium ${
 																		isSelected
