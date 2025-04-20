@@ -77,7 +77,11 @@ const TechIcon = ({
 	icon,
 	name,
 	className,
-}: { icon: string; name: string; className?: string }) => {
+}: {
+	icon: string;
+	name: string;
+	className?: string;
+}) => {
 	if (icon.startsWith("/icon/")) {
 		return (
 			<Image
@@ -154,6 +158,7 @@ const StackArchitect = () => {
 			const isPWACompat = hasPWACompatibleFrontend(nextStack.frontend);
 			const isNative = hasNativeFrontend(nextStack.frontend);
 
+			// Database/ORM/Auth/DB Setup auto-fix
 			if (nextStack.database === "none") {
 				if (nextStack.orm !== "none") {
 					nextStack.orm = "none";
@@ -167,13 +172,11 @@ const StackArchitect = () => {
 					nextStack.dbSetup = "none";
 					changed = true;
 				}
-			} else if (nextStack.database === "mongodb") {
-				if (nextStack.orm !== "prisma") {
-					nextStack.orm = "prisma";
-					changed = true;
-				}
 			}
-
+			if (nextStack.database === "mongodb" && nextStack.orm !== "prisma") {
+				nextStack.orm = "prisma";
+				changed = true;
+			}
 			if (nextStack.dbSetup === "turso") {
 				if (nextStack.database !== "sqlite") {
 					nextStack.database = "sqlite";
@@ -183,7 +186,8 @@ const StackArchitect = () => {
 					nextStack.orm = "drizzle";
 					changed = true;
 				}
-			} else if (nextStack.dbSetup === "prisma-postgres") {
+			}
+			if (nextStack.dbSetup === "prisma-postgres") {
 				if (nextStack.database !== "postgres") {
 					nextStack.database = "postgres";
 					changed = true;
@@ -192,7 +196,8 @@ const StackArchitect = () => {
 					nextStack.orm = "prisma";
 					changed = true;
 				}
-			} else if (nextStack.dbSetup === "mongodb-atlas") {
+			}
+			if (nextStack.dbSetup === "mongodb-atlas") {
 				if (nextStack.database !== "mongodb") {
 					nextStack.database = "mongodb";
 					changed = true;
@@ -201,29 +206,26 @@ const StackArchitect = () => {
 					nextStack.orm = "prisma";
 					changed = true;
 				}
-			} else if (nextStack.dbSetup === "neon") {
-				if (nextStack.database !== "postgres") {
-					nextStack.database = "postgres";
-					changed = true;
-				}
+			}
+			if (nextStack.dbSetup === "neon" && nextStack.database !== "postgres") {
+				nextStack.database = "postgres";
+				changed = true;
 			}
 
+			// API auto-fix for Native
 			if (isNative && nextStack.api !== "trpc") {
 				nextStack.api = "trpc";
 				changed = true;
 			}
 
+			// Addons auto-fix
 			const incompatibleAddons: string[] = [];
-			if (!isPWACompat) {
-				incompatibleAddons.push("pwa", "tauri");
-			}
+			if (!isPWACompat) incompatibleAddons.push("pwa", "tauri");
 			const originalAddonsLength = nextStack.addons.length;
 			nextStack.addons = nextStack.addons.filter(
 				(addon) => !incompatibleAddons.includes(addon),
 			);
-			if (nextStack.addons.length !== originalAddonsLength) {
-				changed = true;
-			}
+			if (nextStack.addons.length !== originalAddonsLength) changed = true;
 			if (
 				nextStack.addons.includes("husky") &&
 				!nextStack.addons.includes("biome")
@@ -233,24 +235,17 @@ const StackArchitect = () => {
 				changed = true;
 			}
 
+			// Examples auto-fix
 			const incompatibleExamples: string[] = [];
-			if (!isWeb) {
-				incompatibleExamples.push("todo", "ai");
-			}
-			if (nextStack.database === "none") {
-				incompatibleExamples.push("todo");
-			}
-			if (nextStack.backendFramework === "elysia") {
+			if (!isWeb) incompatibleExamples.push("todo", "ai");
+			if (nextStack.database === "none") incompatibleExamples.push("todo");
+			if (nextStack.backendFramework === "elysia")
 				incompatibleExamples.push("ai");
-			}
-
 			const originalExamplesLength = nextStack.examples.length;
 			nextStack.examples = nextStack.examples.filter(
 				(ex) => !incompatibleExamples.includes(ex),
 			);
-			if (nextStack.examples.length !== originalExamplesLength) {
-				changed = true;
-			}
+			if (nextStack.examples.length !== originalExamplesLength) changed = true;
 
 			return changed ? nextStack : currentStack;
 		});
@@ -368,7 +363,9 @@ const StackArchitect = () => {
 			}
 		}
 
-		return `${base} ${projectName}${flags.length > 0 ? ` ${flags.join(" ")}` : ""}`;
+		return `${base} ${projectName}${
+			flags.length > 0 ? ` ${flags.join(" ")}` : ""
+		}`;
 	}, []);
 
 	useEffect(() => {
@@ -386,7 +383,7 @@ const StackArchitect = () => {
 
 		if (isNative && stack.frontend.length > 1) {
 			notes.frontend.notes.push(
-				"React Native requires the tRPC API when used with other frontends. oRPC will be disabled.",
+				"React Native requires the tRPC API when used with other frontends. oRPC will be disabled. (temporarily)",
 			);
 			if (stack.api !== "trpc") notes.frontend.hasIssue = true;
 		}
@@ -963,7 +960,9 @@ const StackArchitect = () => {
 									.map((tech) => (
 										<span
 											key={`${category}-${tech.id}`}
-											className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs ${getBadgeColors(category)}`}
+											className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs ${getBadgeColors(
+												category,
+											)}`}
 										>
 											<TechIcon
 												icon={tech.icon}
@@ -995,7 +994,9 @@ const StackArchitect = () => {
 							return (
 								<span
 									key={`${category}-${tech.id}`}
-									className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs ${getBadgeColors(category)}`}
+									className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs ${getBadgeColors(
+										category,
+									)}`}
 								>
 									<TechIcon
 										icon={tech.icon}
@@ -1064,10 +1065,18 @@ const StackArchitect = () => {
 
 								{notesInfo?.notes && notesInfo.notes.length > 0 && (
 									<div
-										className={`mb-4 rounded-md border p-3 ${notesInfo.hasIssue ? "border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20" : "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20"}`}
+										className={`mb-4 rounded-md border p-3 ${
+											notesInfo.hasIssue
+												? "border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20"
+												: "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20"
+										}`}
 									>
 										<div
-											className={`mb-1 flex items-center gap-2 font-medium text-xs sm:text-sm ${notesInfo.hasIssue ? "text-orange-800 dark:text-orange-300" : "text-blue-800 dark:text-blue-300"}`}
+											className={`mb-1 flex items-center gap-2 font-medium text-xs sm:text-sm ${
+												notesInfo.hasIssue
+													? "text-orange-800 dark:text-orange-300"
+													: "text-blue-800 dark:text-blue-300"
+											}`}
 										>
 											<InfoIcon className="h-4 w-4 flex-shrink-0" />
 											<span>
@@ -1077,7 +1086,11 @@ const StackArchitect = () => {
 											</span>
 										</div>
 										<ul
-											className={`list-inside list-disc space-y-1 text-xs ${notesInfo.hasIssue ? "text-orange-700 dark:text-orange-400" : "text-blue-700 dark:text-blue-400"}`}
+											className={`list-inside list-disc space-y-1 text-xs ${
+												notesInfo.hasIssue
+													? "text-orange-700 dark:text-orange-400"
+													: "text-blue-700 dark:text-blue-400"
+											}`}
 										>
 											{notesInfo.notes.map((note, index) => (
 												// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
@@ -1108,7 +1121,7 @@ const StackArchitect = () => {
 											categoryKey as keyof typeof TECH_OPTIONS,
 											tech.id,
 										);
-										const isDisabled = !!disabledReason;
+										const isDisabled = !!disabledReason && !isSelected;
 
 										return (
 											<motion.div
@@ -1120,7 +1133,11 @@ const StackArchitect = () => {
 												} ${
 													isSelected
 														? "border-blue-400 bg-blue-100 ring-1 ring-blue-300 dark:border-blue-600 dark:bg-blue-900/40 dark:ring-blue-700"
-														: `border-gray-300 dark:border-gray-700 ${!isDisabled ? "hover:border-gray-400 hover:bg-gray-200/50 dark:hover:border-gray-600 dark:hover:bg-gray-800/50" : ""}`
+														: `border-gray-300 dark:border-gray-700 ${
+																!isDisabled
+																	? "hover:border-gray-400 hover:bg-gray-200/50 dark:hover:border-gray-600 dark:hover:bg-gray-800/50"
+																	: ""
+															}`
 												}`}
 												title={
 													isDisabled

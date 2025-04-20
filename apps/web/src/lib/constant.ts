@@ -35,8 +35,9 @@ export const TECH_OPTIONS = {
 		},
 		{
 			id: "tanstack-start",
-			name: "TanStack Start",
-			description: "Quick starter template from TanStack",
+			name: "TanStack Start (beta)",
+			description:
+				"Full-stack React and Solid framework powered by TanStack Router",
 			icon: "/icon/tanstack.svg",
 			color: "from-purple-400 to-purple-600",
 			default: false,
@@ -61,7 +62,7 @@ export const TECH_OPTIONS = {
 			id: "none",
 			name: "No Frontend",
 			description: "API-only backend",
-			icon: "⚙️", // Keep emoji for missing icon
+			icon: "⚙️",
 			color: "from-gray-400 to-gray-600",
 			default: false,
 		},
@@ -181,7 +182,7 @@ export const TECH_OPTIONS = {
 			id: "turso",
 			name: "Turso",
 			description: "SQLite cloud database powered by libSQL",
-			icon: "/icon/sqlite.svg",
+			icon: "/icon/turso.svg",
 			color: "from-pink-400 to-pink-600",
 		},
 		{
@@ -195,7 +196,7 @@ export const TECH_OPTIONS = {
 			id: "prisma-postgres",
 			name: "Prisma PostgreSQL",
 			description: "Set up PostgreSQL with Prisma",
-			icon: "/icon/postgres.svg",
+			icon: "/icon/prisma.svg",
 			color: "from-indigo-400 to-indigo-600",
 		},
 		{
