@@ -12,6 +12,7 @@
 	"dependencies": {
 		"@heroicons/react": "^2.2.0",
 		"@radix-ui/react-scroll-area": "^1.2.5",
+		"@radix-ui/react-switch": "^1.2.2",
 		"@xyflow/react": "^12.5.5",
 		"babel-plugin-react-compiler": "^19.0.0-beta-e993439-20250405",
 		"class-variance-authority": "^0.7.1",
@@ -22,6 +23,7 @@
 		"lucide-react": "^0.501.0",
 		"motion": "^12.7.4",
 		"next": "15.2.3",
+		"nuqs": "^2.4.3",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
 		"react-tweet": "^3.2.2",

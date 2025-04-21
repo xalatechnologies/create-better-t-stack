@@ -52,7 +52,7 @@ const CodeContainer = () => {
 
 	return (
 		<div className="mx-auto mt-4 w-full max-w-3xl">
-			<div className="overflow-hidden rounded-lg border border-border bg-card shadow-md">
+			<div className="overflow-hidden rounded-lg border border-border bg-background">
 				<div className="flex items-center justify-between bg-muted px-3 py-2">
 					<div className="flex gap-1.5">
 						<div className="h-2.5 w-2.5 rounded-full bg-red-500" />
@@ -66,7 +66,7 @@ const CodeContainer = () => {
 						<button
 							type="button"
 							onClick={() => setIsOpen(!isOpen)}
-							className="flex items-center gap-1 rounded border border-border bg-card px-2 py-1 text-foreground text-xs hover:bg-muted"
+							className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-foreground text-xs hover:bg-muted"
 						>
 							<Terminal className="h-3 w-3 text-muted-foreground" />
 							<span>{selectedPM}</span>
@@ -90,7 +90,7 @@ const CodeContainer = () => {
 							<motion.div
 								initial={{ opacity: 0, y: -5 }}
 								animate={{ opacity: 1, y: 0 }}
-								className="absolute right-0 z-50 mt-1 w-28 rounded-md border border-border bg-card shadow-lg"
+								className="absolute right-0 z-50 mt-1 w-28 rounded-md border border-border bg-background"
 							>
 								{(["npm", "pnpm", "bun"] as const).map((pm) => (
 									<button
@@ -110,7 +110,7 @@ const CodeContainer = () => {
 					</div>
 				</div>
 
-				<div className="bg-card p-4 text-left font-mono text-sm">
+				<div className="bg-background p-4 text-left font-mono text-sm">
 					<div className="flex items-center">
 						<span className="mr-2 text-muted-foreground">$</span>
 						<div className="flex-grow">

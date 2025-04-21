@@ -75,7 +75,7 @@ const Navbar = () => {
 						)}
 					>
 						<div
-							className="absolute rounded-md bg-card shadow-sm transition-all duration-200 ease-in-out"
+							className="absolute rounded-md bg-background transition-all duration-200 ease-in-out"
 							style={bgStyles}
 						/>
 						<Link
@@ -188,7 +188,7 @@ const Navbar = () => {
 						: "pointer-events-none opacity-0",
 				)}
 			>
-				<div className="mx-4 mt-4 overflow-hidden rounded-lg border border-border bg-card/95 shadow-lg">
+				<div className="mx-4 mt-4 overflow-hidden rounded-lg border border-border bg-background/95">
 					<div className="flex items-center bg-muted px-4 py-2">
 						<div className="mr-4 flex space-x-2">
 							<div className="h-3 w-3 rounded-full bg-red-500" />

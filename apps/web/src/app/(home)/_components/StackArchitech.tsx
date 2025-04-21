@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeToggle } from "@/components/theme-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
 	DEFAULT_STACK,
@@ -7,6 +8,7 @@ import {
 	type StackState,
 	TECH_OPTIONS,
 } from "@/lib/constant";
+import { stackParsers, stackQueryStatesOptions } from "@/lib/stack-url-state";
 import { cn } from "@/lib/utils";
 import {
 	Check,
@@ -24,6 +26,7 @@ import {
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useQueryStates } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const validateProjectName = (name: string): string | undefined => {
@@ -106,8 +109,44 @@ const TechIcon = ({
 	);
 };
 
+const getBadgeColors = (category: string): string => {
+	switch (category) {
+		case "frontend":
+			return "border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300";
+		case "runtime":
+			return "border-amber-300 bg-amber-100 text-amber-800 dark:border-amber-700/30 dark:bg-amber-900/30 dark:text-amber-300";
+		case "backendFramework":
+			return "border-sky-300 bg-sky-100 text-sky-800 dark:border-sky-700/30 dark:bg-sky-900/30 dark:text-sky-300";
+		case "api":
+			return "border-indigo-300 bg-indigo-100 text-indigo-800 dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300";
+		case "database":
+			return "border-emerald-300 bg-emerald-100 text-emerald-800 dark:border-emerald-700/30 dark:bg-emerald-900/30 dark:text-emerald-300";
+		case "orm":
+			return "border-cyan-300 bg-cyan-100 text-cyan-800 dark:border-cyan-700/30 dark:bg-cyan-900/30 dark:text-cyan-300";
+		case "auth":
+			return "border-green-300 bg-green-100 text-green-800 dark:border-green-700/30 dark:bg-green-900/30 dark:text-green-300";
+		case "dbSetup":
+			return "border-pink-300 bg-pink-100 text-pink-800 dark:border-pink-700/30 dark:bg-pink-900/30 dark:text-pink-300";
+		case "addons":
+			return "border-violet-300 bg-violet-100 text-violet-800 dark:border-violet-700/30 dark:bg-violet-900/30 dark:text-violet-300";
+		case "examples":
+			return "border-teal-300 bg-teal-100 text-teal-800 dark:border-teal-700/30 dark:bg-teal-900/30 dark:text-teal-300";
+		case "packageManager":
+			return "border-orange-300 bg-orange-100 text-orange-800 dark:border-orange-700/30 dark:bg-orange-900/30 dark:text-orange-300";
+		case "git":
+		case "install":
+			return "border-gray-300 bg-gray-100 text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400";
+		default:
+			return "border-gray-300 bg-gray-100 text-gray-800 dark:border-gray-700/30 dark:bg-gray-900/30 dark:text-gray-300";
+	}
+};
+
 const StackArchitect = () => {
-	const [stack, setStack] = useState<StackState>(DEFAULT_STACK);
+	const [stack, setStack] = useQueryStates(
+		stackParsers,
+		stackQueryStatesOptions,
+	);
+
 	const [command, setCommand] = useState("");
 	const [copied, setCopied] = useState(false);
 	const [compatNotes, setCompatNotes] = useState<
@@ -154,7 +193,9 @@ const StackArchitect = () => {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		setStack((currentStack) => {
+		const calculateAdjustedStack = (
+			currentStack: StackState,
+		): StackState | null => {
 			const nextStack = { ...currentStack };
 			let changed = false;
 
@@ -247,8 +288,13 @@ const StackArchitect = () => {
 			);
 			if (nextStack.examples.length !== originalExamplesLength) changed = true;
 
-			return changed ? nextStack : currentStack;
-		});
+			return changed ? nextStack : null;
+		};
+
+		const adjustedStack = calculateAdjustedStack(stack);
+		if (adjustedStack) {
+			setStack(adjustedStack);
+		}
 	}, [
 		stack.database,
 		stack.orm,
@@ -259,6 +305,7 @@ const StackArchitect = () => {
 		stack.addons,
 		stack.examples,
 		stack.backendFramework,
+		setStack,
 	]);
 
 	const generateCommand = useCallback((stackState: StackState) => {
@@ -282,7 +329,7 @@ const StackArchitect = () => {
 			key: K,
 			value: StackState[K],
 		) => {
-			const defaultValue = DEFAULT_STACK[key];
+			const defaultValue = stackParsers[key]?.defaultValue;
 
 			if (Array.isArray(defaultValue) && Array.isArray(value)) {
 				return (
@@ -550,9 +597,9 @@ const StackArchitect = () => {
 
 	const handleTechSelect = useCallback(
 		(category: keyof typeof TECH_OPTIONS, techId: string) => {
-			setStack((prev) => {
-				const currentStack = { ...prev };
+			setStack((currentStack) => {
 				const catKey = category as keyof StackState;
+				const update: Partial<StackState> = {};
 
 				if (
 					catKey === "frontend" ||
@@ -575,7 +622,7 @@ const StackArchitect = () => {
 						} else if (isSelected) {
 							nextArray = nextArray.filter((id) => id !== techId);
 							if (nextArray.length === 0) {
-								return prev;
+								return {};
 							}
 						} else {
 							nextArray = nextArray.filter((id) => id !== "none");
@@ -591,16 +638,23 @@ const StackArchitect = () => {
 							nextArray.push(techId);
 						}
 					}
-					return { ...currentStack, [catKey]: [...new Set(nextArray)] };
+
+					if (
+						JSON.stringify([...new Set(nextArray)].sort()) !==
+						JSON.stringify(currentArray.sort())
+					) {
+						update[catKey] = [...new Set(nextArray)];
+					}
+				} else {
+					if (currentStack[catKey] !== techId) {
+						update[catKey] = techId;
+					}
 				}
 
-				if (currentStack[catKey] === techId) {
-					return prev;
-				}
-				return { ...currentStack, [catKey]: techId };
+				return update;
 			});
 		},
-		[],
+		[setStack],
 	);
 
 	const getDisabledReason = useCallback(
@@ -709,12 +763,11 @@ const StackArchitect = () => {
 
 	const resetStack = useCallback(() => {
 		setStack(DEFAULT_STACK);
-		setProjectNameError(validateProjectName(DEFAULT_STACK.projectName || ""));
 		setShowHelp(false);
 		setShowPresets(false);
 		setActiveCategory(CATEGORY_ORDER[0]);
 		contentRef.current?.scrollTo(0, 0);
-	}, []);
+	}, [setStack]);
 
 	useEffect(() => {
 		setProjectNameError(validateProjectName(stack.projectName || ""));
@@ -728,29 +781,28 @@ const StackArchitect = () => {
 	const loadSavedStack = useCallback(() => {
 		if (lastSavedStack) {
 			setStack(lastSavedStack);
-			setProjectNameError(
-				validateProjectName(lastSavedStack.projectName || ""),
-			);
 			setShowHelp(false);
 			setShowPresets(false);
 			setActiveCategory(CATEGORY_ORDER[0]);
 			contentRef.current?.scrollTo(0, 0);
 		}
-	}, [lastSavedStack]);
+	}, [lastSavedStack, setStack]);
 
-	const applyPreset = useCallback((presetId: string) => {
-		const preset = PRESET_TEMPLATES.find(
-			(template) => template.id === presetId,
-		);
-		if (preset) {
-			setStack(preset.stack);
-			setProjectNameError(validateProjectName(preset.stack.projectName || ""));
-			setShowPresets(false);
-			setShowHelp(false);
-			setActiveCategory(CATEGORY_ORDER[0]);
-			contentRef.current?.scrollTo(0, 0);
-		}
-	}, []);
+	const applyPreset = useCallback(
+		(presetId: string) => {
+			const preset = PRESET_TEMPLATES.find(
+				(template) => template.id === presetId,
+			);
+			if (preset) {
+				setStack(preset.stack);
+				setShowPresets(false);
+				setShowHelp(false);
+				setActiveCategory(CATEGORY_ORDER[0]);
+				contentRef.current?.scrollTo(0, 0);
+			}
+		},
+		[setStack],
+	);
 
 	const handleSidebarClick = (category: string) => {
 		setActiveCategory(category);
@@ -768,19 +820,23 @@ const StackArchitect = () => {
 	return (
 		<div
 			className={cn(
-				"flex h-screen flex-col overflow-hidden border-border bg-background text-foreground shadow-xl",
+				"flex h-screen flex-col overflow-hidden border-border bg-background text-foreground",
 			)}
 		>
 			<div
 				className={cn(
-					"flex flex-shrink-0 items-center justify-between border-border border-b bg-card px-2 py-2 sm:px-4",
+					"grid w-full flex-shrink-0 grid-cols-3 items-center justify-center border-border border-b bg-background px-2 py-2 sm:px-4",
 				)}
 			>
-				<div className="font-mono text-muted-foreground text-xs">Home</div>
-				<div className="hidden font-mono text-muted-foreground text-xs sm:block">
+				<Link href={"/"}>
+					<div className="mr-auto font-mono text-muted-foreground text-xs">
+						Home
+					</div>
+				</Link>
+				<div className="mx-auto hidden font-mono text-muted-foreground text-xs sm:block">
 					Create Better T Stack
 				</div>
-				<div className="flex space-x-2">
+				<div className="ml-auto flex space-x-2">
 					<button
 						type="button"
 						onClick={() => setShowHelp(!showHelp)}
@@ -803,11 +859,10 @@ const StackArchitect = () => {
 					</button>
 					<button
 						type="button"
-						onClick={() => setShowPresets(!showPresets)}
 						className={cn(
 							"text-muted-foreground transition-colors hover:text-foreground",
 						)}
-						title="Presets"
+						title="GitHub Repository"
 					>
 						<Link
 							href={"https://github.com/AmanVarshney01/create-better-t-stack"}
@@ -816,6 +871,7 @@ const StackArchitect = () => {
 							<Github className="h-4 w-4" />
 						</Link>
 					</button>
+					<ThemeToggle />
 				</div>
 			</div>
 
@@ -862,7 +918,7 @@ const StackArchitect = () => {
 								type="button"
 								key={preset.id}
 								onClick={() => applyPreset(preset.id)}
-								className="rounded border border-border bg-card p-2 text-left transition-colors hover:bg-muted"
+								className="rounded border border-border bg-background p-2 text-left transition-colors hover:bg-muted"
 							>
 								<div className="font-medium text-foreground text-sm">
 									{preset.name}
@@ -876,7 +932,7 @@ const StackArchitect = () => {
 				</div>
 			)}
 
-			<div className="flex-shrink-0 p-3 pb-0 font-mono sm:p-4 sm:pb-0">
+			<div className="flex-shrink-0 bg-background p-3 pb-0 font-mono sm:p-4 sm:pb-0">
 				<div className="mb-3 flex flex-col justify-between gap-y-3 sm:flex-row sm:items-start">
 					<label className="flex flex-col">
 						<span className="mb-1 text-muted-foreground text-xs">
@@ -887,11 +943,10 @@ const StackArchitect = () => {
 							value={stack.projectName || ""}
 							onChange={(e) => {
 								const newValue = e.target.value;
-								setStack((prev) => ({ ...prev, projectName: newValue }));
-								setProjectNameError(validateProjectName(newValue));
+								setStack({ projectName: newValue });
 							}}
 							className={cn(
-								"w-full rounded border bg-card px-2 py-1 font-mono text-sm focus:outline-none sm:w-auto",
+								"w-full rounded border bg-background px-2 py-1 font-mono text-sm focus:outline-none sm:w-auto",
 								projectNameError
 									? "border-destructive bg-destructive/10 text-destructive-foreground"
 									: "border-border focus:border-primary",
@@ -908,7 +963,7 @@ const StackArchitect = () => {
 						<button
 							type="button"
 							onClick={resetStack}
-							className="flex items-center gap-1 rounded border border-border bg-card px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+							className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
 							title="Reset to defaults"
 						>
 							<RefreshCw className="h-3 w-3" />
@@ -918,7 +973,7 @@ const StackArchitect = () => {
 							<button
 								type="button"
 								onClick={loadSavedStack}
-								className="flex items-center gap-1 rounded border border-primary bg-primary/10 px-2 py-1 text-primary text-xs transition-colors hover:bg-primary/20"
+								className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
 								title="Load saved preferences"
 							>
 								<Settings className="h-3 w-3" />
@@ -929,7 +984,7 @@ const StackArchitect = () => {
 							id="save-stack-button"
 							type="button"
 							onClick={saveCurrentStack}
-							className="flex items-center gap-1 rounded border border-[--color-chart-4] bg-[--color-chart-4]/10 px-2 py-1 text-[--color-chart-4] text-xs transition-colors hover:bg-[--color-chart-4]/20"
+							className="flex items-center gap-1 rounded border border-chart-4 bg-chart-4/10 px-2 py-1 text-chart-4 text-xs transition-colors hover:bg-chart-4/20"
 							title="Save current preferences"
 						>
 							<Star className="h-3 w-3" />
@@ -937,10 +992,9 @@ const StackArchitect = () => {
 						</button>
 					</div>
 				</div>
-
-				<div className="relative mb-4 overflow-hidden rounded border border-border bg-card p-2">
-					<div className="flex overflow-x-auto pr-10">
-						<span className="mr-2 select-none text-[--color-chart-4]">$</span>
+				<div className="relative mb-4 overflow-hidden rounded border border-border bg-background p-2 pr-16 sm:pr-20">
+					<div className="flex overflow-x-auto">
+						<span className="mr-2 select-none text-chart-4">$</span>
 						<code className="no-scrollbar inline-flex items-center overflow-x-auto whitespace-pre break-words text-muted-foreground text-xs sm:text-sm">
 							{command}
 						</code>
@@ -948,13 +1002,24 @@ const StackArchitect = () => {
 					<button
 						type="button"
 						onClick={copyToClipboard}
-						className="-translate-y-1/2 absolute top-1/2 right-1 rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+						className={cn(
+							"-translate-y-1/2 absolute top-1/2 right-1 flex items-center gap-1 rounded px-2 py-1 text-xs transition-colors",
+							copied
+								? "bg-muted text-chart-4"
+								: "text-muted-foreground hover:bg-muted hover:text-foreground",
+						)}
 						title={copied ? "Copied!" : "Copy command"}
 					>
 						{copied ? (
-							<Check className="h-4 w-4 text-[--color-chart-4]" />
+							<>
+								<Check className="h-3 w-3 flex-shrink-0" />
+								<span>Copied</span>
+							</>
 						) : (
-							<ClipboardCopy className="h-4 w-4" />
+							<>
+								<ClipboardCopy className="h-3 w-3 flex-shrink-0" />
+								<span>Copy</span>
+							</>
 						)}
 					</button>
 				</div>
@@ -1052,7 +1117,7 @@ const StackArchitect = () => {
 									<span>{getCategoryDisplayName(category)}</span>
 									{compatNotes[category]?.hasIssue && (
 										<span title="Compatibility issue affects this section">
-											<InfoIcon className="h-3 w-3 flex-shrink-0 text-[--color-chart-5]" />{" "}
+											<InfoIcon className="h-3 w-3 flex-shrink-0 text-chart-5" />{" "}
 										</span>
 									)}
 								</button>
@@ -1093,16 +1158,14 @@ const StackArchitect = () => {
 											className={cn(
 												"mb-4 rounded-md border p-3",
 												notesInfo.hasIssue
-													? "border-[--color-chart-5] bg-[--color-chart-5]/10"
+													? "border-chart-5 bg-chart-5/10"
 													: "border-primary bg-primary/10",
 											)}
 										>
 											<div
 												className={cn(
 													"mb-1 flex items-center gap-2 font-medium text-xs sm:text-sm",
-													notesInfo.hasIssue
-														? "text-[--color-chart-5]"
-														: "text-primary",
+													notesInfo.hasIssue ? "text-chart-5" : "text-primary",
 												)}
 											>
 												<InfoIcon className="h-4 w-4 flex-shrink-0" />
@@ -1116,7 +1179,7 @@ const StackArchitect = () => {
 												className={cn(
 													"list-inside list-disc space-y-1 text-xs",
 													notesInfo.hasIssue
-														? "text-[--color-chart-5]/90"
+														? "text-chart-5/90"
 														: "text-primary/90",
 												)}
 											>
@@ -1233,38 +1296,6 @@ const StackArchitect = () => {
 			</div>
 		</div>
 	);
-};
-
-const getBadgeColors = (category: string): string => {
-	switch (category) {
-		case "frontend":
-			return "border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300";
-		case "runtime":
-			return "border-amber-300 bg-amber-100 text-amber-800 dark:border-amber-700/30 dark:bg-amber-900/30 dark:text-amber-300";
-		case "backendFramework":
-			return "border-sky-300 bg-sky-100 text-sky-800 dark:border-sky-700/30 dark:bg-sky-900/30 dark:text-sky-300";
-		case "api":
-			return "border-indigo-300 bg-indigo-100 text-indigo-800 dark:border-indigo-700/30 dark:bg-indigo-900/30 dark:text-indigo-300";
-		case "database":
-			return "border-emerald-300 bg-emerald-100 text-emerald-800 dark:border-emerald-700/30 dark:bg-emerald-900/30 dark:text-emerald-300";
-		case "orm":
-			return "border-cyan-300 bg-cyan-100 text-cyan-800 dark:border-cyan-700/30 dark:bg-cyan-900/30 dark:text-cyan-300";
-		case "auth":
-			return "border-green-300 bg-green-100 text-green-800 dark:border-green-700/30 dark:bg-green-900/30 dark:text-green-300";
-		case "dbSetup":
-			return "border-pink-300 bg-pink-100 text-pink-800 dark:border-pink-700/30 dark:bg-pink-900/30 dark:text-pink-300";
-		case "addons":
-			return "border-violet-300 bg-violet-100 text-violet-800 dark:border-violet-700/30 dark:bg-violet-900/30 dark:text-violet-300";
-		case "examples":
-			return "border-teal-300 bg-teal-100 text-teal-800 dark:border-teal-700/30 dark:bg-teal-900/30 dark:text-teal-300";
-		case "packageManager":
-			return "border-orange-300 bg-orange-100 text-orange-800 dark:border-orange-700/30 dark:bg-orange-900/30 dark:text-orange-300";
-		case "git":
-		case "install":
-			return "border-gray-300 bg-gray-100 text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400";
-		default:
-			return "border-gray-300 bg-gray-100 text-gray-800 dark:border-gray-700/30 dark:bg-gray-900/30 dark:text-gray-300";
-	}
 };
 
 export default StackArchitect;

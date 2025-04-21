@@ -1,6 +1,7 @@
 import { RootProvider } from "fumadocs-ui/provider";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
 import "./global.css";
 
@@ -94,7 +95,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 						enableSystem: true,
 					}}
 				>
-					{children}
+					<NuqsAdapter>{children}</NuqsAdapter>
 				</RootProvider>
 			</body>
 		</html>

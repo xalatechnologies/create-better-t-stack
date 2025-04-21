@@ -119,13 +119,13 @@ export default function HomePage() {
 							<div className="hidden w-1/3 items-center sm:flex">
 								<div className="h-px flex-grow bg-gradient-to-r from-transparent via-primary/30 to-primary/50" />
 
-								<div className="h-2 w-2 rounded-full bg-primary/60 shadow-sm" />
+								<div className="h-2 w-2 rounded-full bg-primary/60" />
 							</div>
 
 							<div className="px-4 sm:px-6">
 								<div
 									className={cn(
-										"flex h-8 w-8 items-center justify-center rounded-full border border-primary/80 bg-card shadow-md sm:h-9 sm:w-9",
+										"flex h-8 w-8 items-center justify-center rounded-full border border-primary/80 bg-card sm:h-9 sm:w-9",
 									)}
 								>
 									<svg
@@ -145,7 +145,7 @@ export default function HomePage() {
 							</div>
 
 							<div className="hidden w-1/3 items-center sm:flex">
-								<div className="h-2 w-2 rounded-full bg-primary/60 shadow-sm" />
+								<div className="h-2 w-2 rounded-full bg-primary/60" />
 
 								<div className="h-px flex-grow bg-gradient-to-l from-transparent via-primary/30 to-primary/50" />
 							</div>

@@ -119,7 +119,7 @@ export default function Testimonials() {
 				transition={{ duration: 0.5, delay: 0.3 }}
 				className="relative mt-4 sm:mt-8"
 			>
-				<div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+				<div className="overflow-hidden rounded-xl border border-border bg-background">
 					<div className="flex items-center justify-between bg-muted px-2 py-2 sm:px-4">
 						<div className="flex space-x-1 sm:space-x-2">
 							<div className="h-2 w-2 rounded-full bg-red-500 sm:h-3 sm:w-3" />
