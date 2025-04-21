@@ -531,7 +531,7 @@ export async function handleExtras(
 	}
 
 	if (context.frontend.includes("native")) {
-		const npmrcSrc = path.join(PKG_ROOT, "templates/extras/.npmrc");
+		const npmrcSrc = path.join(PKG_ROOT, "templates/extras/_npmrc");
 		const npmrcDest = path.join(projectDir, ".npmrc");
 		if (await fs.pathExists(npmrcSrc)) {
 			await fs.copy(npmrcSrc, npmrcDest);

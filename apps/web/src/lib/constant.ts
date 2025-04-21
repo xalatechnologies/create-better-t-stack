@@ -11,7 +11,7 @@ export const TECH_OPTIONS = {
 		{
 			id: "orpc",
 			name: "oRPC",
-			description: "Opinionated RPC framework",
+			description: "Typesafe APIs Made Simple",
 			icon: "/icon/orpc.svg",
 			color: "from-indigo-400 to-indigo-600",
 		},
