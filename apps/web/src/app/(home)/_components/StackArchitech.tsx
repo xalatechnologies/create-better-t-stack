@@ -825,7 +825,7 @@ const StackArchitect = () => {
 		>
 			<div
 				className={cn(
-					"grid w-full flex-shrink-0 grid-cols-3 items-center justify-center border-border border-b bg-background px-2 py-2 sm:px-4",
+					"grid w-full flex-shrink-0 grid-cols-2 items-center justify-center border-border border-b bg-background px-2 py-2 sm:grid-cols-3 sm:px-4",
 				)}
 			>
 				<Link href={"/"}>
