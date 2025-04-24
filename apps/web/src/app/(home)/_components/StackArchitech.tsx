@@ -215,7 +215,6 @@ const StackArchitect = () => {
 			const isWeb = hasWebFrontend(nextStack.frontend);
 			const isPWACompat = hasPWACompatibleFrontend(nextStack.frontend);
 			const isTauriCompat = hasTauriCompatibleFrontend(nextStack.frontend);
-			const isNative = hasNativeFrontend(nextStack.frontend);
 			const isNuxt = nextStack.frontend.includes("nuxt");
 
 			if (nextStack.database === "none") {
@@ -433,6 +432,7 @@ const StackArchitect = () => {
 		}`;
 	}, []);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		const cmd = generateCommand(stack);
 		setCommand(cmd);
@@ -445,7 +445,6 @@ const StackArchitect = () => {
 		const isWeb = currentHasWebFrontend;
 		const isPWACompat = currentHasPWACompatibleFrontend;
 		const isTauriCompat = currentHasTauriCompatibleFrontend;
-		const isNative = currentHasNativeFrontend;
 		const isNuxt = stack.frontend.includes("nuxt");
 
 		if (!isPWACompat && stack.addons.includes("pwa")) {
