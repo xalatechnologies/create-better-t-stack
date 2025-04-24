@@ -1,13 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import {
-	BookMarked,
-	BookMarkedIcon,
-	Github,
-	Maximize2,
-	Menu,
-	X,
-} from "lucide-react";
+import { BookMarked, Github, Maximize2, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import PackageIcon from "./Icons";
