@@ -11,7 +11,7 @@
 
 .react-tweet-theme {
 	--tweet-container-margin: 0 !important;
-	@apply !bg-background;
+	@apply !bg-background !border-none !h-full !border-transparent;
 }
 
 .shiny-text {
