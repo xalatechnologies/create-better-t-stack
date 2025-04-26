@@ -78,14 +78,23 @@ const CATEGORY_ORDER: Array<keyof typeof TECH_OPTIONS> = [
 
 const hasWebFrontend = (frontend: string[]) =>
 	frontend.some((f) =>
-		["tanstack-router", "react-router", "tanstack-start", "next"].includes(f),
+		[
+			"tanstack-router",
+			"react-router",
+			"tanstack-start",
+			"next",
+			"nuxt",
+			"svelte",
+		].includes(f),
 	);
 
 const hasPWACompatibleFrontend = (frontend: string[]) =>
 	frontend.some((f) => ["tanstack-router", "react-router"].includes(f));
 
 const hasTauriCompatibleFrontend = (frontend: string[]) =>
-	frontend.some((f) => ["tanstack-router", "react-router", "nuxt"].includes(f));
+	frontend.some((f) =>
+		["tanstack-router", "react-router", "nuxt", "svelte"].includes(f),
+	);
 
 const hasNativeFrontend = (frontend: string[]) => frontend.includes("native");
 
@@ -216,6 +225,7 @@ const StackArchitect = () => {
 			const isPWACompat = hasPWACompatibleFrontend(nextStack.frontend);
 			const isTauriCompat = hasTauriCompatibleFrontend(nextStack.frontend);
 			const isNuxt = nextStack.frontend.includes("nuxt");
+			const isSvelte = nextStack.frontend.includes("svelte");
 
 			if (nextStack.database === "none") {
 				if (nextStack.orm !== "none") {
@@ -270,7 +280,7 @@ const StackArchitect = () => {
 				changed = true;
 			}
 
-			if (isNuxt && nextStack.api === "trpc") {
+			if ((isNuxt || isSvelte) && nextStack.api === "trpc") {
 				nextStack.api = "orpc";
 				changed = true;
 			}
@@ -446,6 +456,7 @@ const StackArchitect = () => {
 		const isPWACompat = currentHasPWACompatibleFrontend;
 		const isTauriCompat = currentHasTauriCompatibleFrontend;
 		const isNuxt = stack.frontend.includes("nuxt");
+		const isSvelte = stack.frontend.includes("svelte");
 
 		if (!isPWACompat && stack.addons.includes("pwa")) {
 			notes.frontend.notes.push("PWA addon requires TanStack or React Router.");
@@ -466,9 +477,12 @@ const StackArchitect = () => {
 			notes.examples.hasIssue = true;
 		}
 
-		if (isNuxt && stack.api === "trpc") {
+		if ((isNuxt || isSvelte) && stack.api === "trpc") {
 			notes.api.notes.push(
 				"Nuxt requires oRPC. It will be selected automatically.",
+				`${
+					isNuxt ? "Nuxt" : "Svelte"
+				} requires oRPC. It will be selected automatically.`,
 			);
 			notes.api.hasIssue = true;
 			notes.frontend.hasIssue = true;
@@ -630,6 +644,7 @@ const StackArchitect = () => {
 						"tanstack-start",
 						"next",
 						"nuxt",
+						"svelte",
 					];
 
 					if (techId === "none") {
@@ -717,6 +732,9 @@ const StackArchitect = () => {
 			if (catKey === "api") {
 				if (techId === "trpc" && stack.frontend.includes("nuxt")) {
 					return "tRPC is not supported with Nuxt. Use oRPC instead.";
+				}
+				if (techId === "trpc" && stack.frontend.includes("svelte")) {
+					return "tRPC is not supported with Svelte. Use oRPC instead.";
 				}
 			}
 

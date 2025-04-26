@@ -39,7 +39,7 @@ export function displayPostInstallInstructions(
 	const pwaInstructions =
 		addons?.includes("pwa") &&
 		(frontend?.includes("react-router") ||
-			frontend?.includes("tanstack-router")) // Exclude Nuxt from PWA instructions
+			frontend?.includes("tanstack-router"))
 			? getPwaInstructions()
 			: "";
 	const starlightInstructions = addons?.includes("starlight")
@@ -51,7 +51,7 @@ export function displayPostInstallInstructions(
 			"react-router",
 			"next",
 			"tanstack-start",
-			"nuxt", // Include Nuxt here
+			"nuxt",
 		].includes(f),
 	);
 	const hasNative = frontend?.includes("native");
@@ -65,13 +65,13 @@ export function displayPostInstallInstructions(
 	const hasTanstackRouter = frontend?.includes("tanstack-router");
 	const hasTanstackStart = frontend?.includes("tanstack-start");
 	const hasReactRouter = frontend?.includes("react-router");
-	const hasNuxt = frontend?.includes("nuxt"); // Add Nuxt check
+	const hasNuxt = frontend?.includes("nuxt");
 	const hasWebFrontend =
-		hasTanstackRouter || hasReactRouter || hasTanstackStart || hasNuxt; // Include Nuxt
+		hasTanstackRouter || hasReactRouter || hasTanstackStart || hasNuxt;
 	const hasNativeFrontend = frontend?.includes("native");
 	const hasFrontend = hasWebFrontend || hasNativeFrontend;
 
-	const webPort = hasReactRouter ? "5173" : "3001"; // Nuxt uses 3001, same as others
+	const webPort = hasReactRouter ? "5173" : "3001";
 	const tazeCommand = getPackageExecutionCommand(packageManager, "taze -r");
 
 	consola.box(
