@@ -52,6 +52,7 @@ export function displayPostInstallInstructions(
 			"next",
 			"tanstack-start",
 			"nuxt",
+			"svelte",
 		].includes(f),
 	);
 	const hasNative = frontend?.includes("native");
@@ -66,14 +67,18 @@ export function displayPostInstallInstructions(
 	const hasTanstackStart = frontend?.includes("tanstack-start");
 	const hasReactRouter = frontend?.includes("react-router");
 	const hasNuxt = frontend?.includes("nuxt");
+	const hasSvelte = frontend?.includes("svelte");
 	const hasWebFrontend =
-		hasTanstackRouter || hasReactRouter || hasTanstackStart || hasNuxt;
+		hasTanstackRouter ||
+		hasReactRouter ||
+		hasTanstackStart ||
+		hasNuxt ||
+		hasSvelte;
 	const hasNativeFrontend = frontend?.includes("native");
 	const hasFrontend = hasWebFrontend || hasNativeFrontend;
 
-	const webPort = hasReactRouter ? "5173" : "3001";
+	const webPort = hasReactRouter || hasSvelte ? "5173" : "3001";
 	const tazeCommand = getPackageExecutionCommand(packageManager, "taze -r");
-
 	consola.box(
 		`${pc.bold("Next steps")}\n${pc.cyan("1.")} ${cdCmd}
 ${
