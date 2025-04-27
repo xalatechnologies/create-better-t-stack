@@ -26,8 +26,7 @@ import {
 	setupFrontendTemplates,
 } from "./template-manager";
 
-export async function createProject(options: ProjectConfig): Promise<string> {
-	const s = spinner();
+export async function createProject(options: ProjectConfig) {
 	const projectDir = path.resolve(process.cwd(), options.projectName);
 
 	try {
@@ -86,12 +85,10 @@ export async function createProject(options: ProjectConfig): Promise<string> {
 
 		return projectDir;
 	} catch (error) {
-		s.stop(pc.red("Failed"));
 		if (error instanceof Error) {
 			cancel(pc.red(`Error during project creation: ${error.message}`));
 			console.error(error.stack);
 			process.exit(1);
 		}
-		throw error;
 	}
 }
