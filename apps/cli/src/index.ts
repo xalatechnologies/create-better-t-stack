@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import path from "node:path";
 import { cancel, intro, log, outro } from "@clack/prompts";
 import { consola } from "consola";
