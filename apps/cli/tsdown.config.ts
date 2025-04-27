@@ -7,4 +7,7 @@ export default defineConfig({
 	shims: true,
 	minify: true,
 	outDir: "dist",
+	outputOptions: {
+		banner: "#!/usr/bin/env node",
+	},
 });
