@@ -1,13 +1,18 @@
 import { cancel, isCancel, log, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { ProjectDatabase, ProjectOrm } from "../types";
+import type { ProjectBackend, ProjectDatabase, ProjectOrm } from "../types";
 
 export async function getORMChoice(
 	orm: ProjectOrm | undefined,
 	hasDatabase: boolean,
 	database?: ProjectDatabase,
+	backend?: ProjectBackend,
 ): Promise<ProjectOrm> {
+	if (backend === "convex") {
+		return "none";
+	}
+
 	if (!hasDatabase) return "none";
 	if (orm !== undefined) return orm;
 

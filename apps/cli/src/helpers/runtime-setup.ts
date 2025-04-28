@@ -5,12 +5,17 @@ import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupRuntime(config: ProjectConfig): Promise<void> {
 	const { projectName, runtime, backend } = config;
-	const projectDir = path.resolve(process.cwd(), projectName);
-	if (backend === "next") {
+
+	if (backend === "convex" || backend === "next" || runtime === "none") {
 		return;
 	}
 
+	const projectDir = path.resolve(process.cwd(), projectName);
 	const serverDir = path.join(projectDir, "apps/server");
+
+	if (!(await fs.pathExists(serverDir))) {
+		return;
+	}
 
 	if (runtime === "bun") {
 		await setupBunRuntime(serverDir, backend);
@@ -24,6 +29,8 @@ async function setupBunRuntime(
 	backend: ProjectBackend,
 ): Promise<void> {
 	const packageJsonPath = path.join(serverDir, "package.json");
+	if (!(await fs.pathExists(packageJsonPath))) return;
+
 	const packageJson = await fs.readJson(packageJsonPath);
 
 	packageJson.scripts = {
@@ -45,6 +52,8 @@ async function setupNodeRuntime(
 	backend: ProjectBackend,
 ): Promise<void> {
 	const packageJsonPath = path.join(serverDir, "package.json");
+	if (!(await fs.pathExists(packageJsonPath))) return;
+
 	const packageJson = await fs.readJson(packageJsonPath);
 
 	packageJson.scripts = {

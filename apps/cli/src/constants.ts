@@ -88,6 +88,12 @@ export const dependencyVersionMap = {
 	"@trpc/tanstack-react-query": "^11.0.0",
 	"@trpc/server": "^11.0.0",
 	"@trpc/client": "^11.0.0",
+
+	convex: "^1.23.0",
+	"@convex-dev/react-query": "^0.0.0-alpha.8",
+
+	"@tanstack/react-query-devtools": "^5.69.0",
+	"@tanstack/react-query": "^5.69.0",
 } as const;
 
 export type AvailableDependencies = keyof typeof dependencyVersionMap;

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { z } from 'zod'
-// import { authClient } from "~/lib/auth-client";
 const {$authClient} = useNuxtApp()
 import type { FormSubmitEvent } from '#ui/types'
 

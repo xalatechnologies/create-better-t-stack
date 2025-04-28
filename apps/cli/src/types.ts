@@ -14,8 +14,8 @@ export type ProjectAddons =
 	| "starlight"
 	| "turborepo"
 	| "none";
-export type ProjectBackend = "hono" | "elysia" | "express" | "next";
-export type ProjectRuntime = "node" | "bun";
+export type ProjectBackend = "hono" | "elysia" | "express" | "next" | "convex";
+export type ProjectRuntime = "node" | "bun" | "none";
 export type ProjectExamples = "todo" | "ai" | "none";
 export type ProjectFrontend =
 	| "react-router"
@@ -32,7 +32,7 @@ export type ProjectDBSetup =
 	| "mongodb-atlas"
 	| "neon"
 	| "none";
-export type ProjectApi = "trpc" | "orpc";
+export type ProjectApi = "trpc" | "orpc" | "none";
 
 export interface ProjectConfig {
 	projectName: string;

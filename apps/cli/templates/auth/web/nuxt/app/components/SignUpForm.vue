@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
-// import { authClient } from "~/lib/auth-client";
 const {$authClient} = useNuxtApp()
 
 const emit = defineEmits(['switchToSignIn'])

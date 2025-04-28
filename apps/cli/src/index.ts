@@ -123,17 +123,17 @@ async function main() {
 			.option("backend", {
 				type: "string",
 				describe: "Backend framework",
-				choices: ["hono", "express", "next", "elysia"],
+				choices: ["hono", "express", "next", "elysia", "convex"],
 			})
 			.option("runtime", {
 				type: "string",
 				describe: "Runtime",
-				choices: ["bun", "node"],
+				choices: ["bun", "node", "none"],
 			})
 			.option("api", {
 				type: "string",
 				describe: "API type",
-				choices: ["trpc", "orpc"],
+				choices: ["trpc", "orpc", "none"],
 			})
 			.completion()
 			.recommendCommands()
@@ -168,11 +168,17 @@ async function main() {
 				...flagConfig,
 			};
 
-			if (config.database === "none") {
+			if (config.backend === "convex") {
+				config.auth = false;
+				config.database = "none";
+				config.orm = "none";
+				config.api = "none";
+				config.runtime = "none";
+				config.dbSetup = "none";
+			} else if (config.database === "none") {
 				config.orm = "none";
 				config.auth = false;
 				config.dbSetup = "none";
-				config.examples = config.examples.filter((ex) => ex !== "todo");
 			}
 
 			log.info(pc.yellow("Using these default/flag options:"));
@@ -216,7 +222,9 @@ async function main() {
 				cancel(pc.red(`Invalid arguments: ${error.message}`));
 			} else {
 				consola.error(`An unexpected error occurred: ${error.message}`);
-				consola.error(error.stack);
+				if (!error.message.includes("is only supported with")) {
+					consola.error(error.stack);
+				}
 			}
 			process.exit(1);
 		} else {
@@ -232,6 +240,32 @@ function processAndValidateFlags(
 	projectDirectory?: string,
 ): Partial<ProjectConfig> {
 	const config: Partial<ProjectConfig> = {};
+	const providedFlags: Set<string> = new Set(
+		Object.keys(options).filter((key) => key !== "_" && key !== "$0"),
+	);
+
+	if (options.backend) {
+		config.backend = options.backend as ProjectBackend;
+	}
+
+	if (
+		providedFlags.has("backend") &&
+		config.backend &&
+		config.backend !== "convex"
+	) {
+		if (providedFlags.has("api") && options.api === "none") {
+			consola.fatal(
+				`'--api none' is only supported with '--backend convex'. Please choose 'trpc', 'orpc', or remove the --api flag.`,
+			);
+			process.exit(1);
+		}
+		if (providedFlags.has("runtime") && options.runtime === "none") {
+			consola.fatal(
+				`'--runtime none' is only supported with '--backend convex'. Please choose 'bun', 'node', or remove the --runtime flag.`,
+			);
+			process.exit(1);
+		}
+	}
 
 	if (options.database) {
 		config.database = options.database as ProjectDatabase;
@@ -248,12 +282,22 @@ function processAndValidateFlags(
 	if (options.install !== undefined) {
 		config.install = options.install;
 	}
-	if (options.backend) {
-		config.backend = options.backend as ProjectBackend;
-	}
 	if (options.runtime) {
 		config.runtime = options.runtime as ProjectRuntime;
 	}
+	if (options.api) {
+		config.api = options.api as ProjectApi;
+	}
+	if (options.dbSetup) {
+		config.dbSetup = options.dbSetup as ProjectDBSetup;
+	}
+	if (options.packageManager) {
+		config.packageManager = options.packageManager as ProjectPackageManager;
+	}
+	if (projectDirectory) {
+		config.projectName = projectDirectory;
+	}
+
 	if (options.frontend && options.frontend.length > 0) {
 		if (options.frontend.includes("none")) {
 			if (options.frontend.length > 1) {
@@ -283,9 +327,6 @@ function processAndValidateFlags(
 			config.frontend = validOptions;
 		}
 	}
-	if (options.api) {
-		config.api = options.api as ProjectApi;
-	}
 	if (options.addons && options.addons.length > 0) {
 		if (options.addons.includes("none")) {
 			if (options.addons.length > 1) {
@@ -310,231 +351,283 @@ function processAndValidateFlags(
 			config.examples = options.examples.filter(
 				(ex): ex is ProjectExamples => ex !== "none",
 			);
+			if (config.backend !== "convex" && options.examples.includes("none")) {
+				config.examples = [];
+			} else {
+				config.examples = ["todo"];
+			}
 		}
 	}
-	if (options.packageManager) {
-		config.packageManager = options.packageManager as ProjectPackageManager;
-	}
-	if (projectDirectory) {
-		config.projectName = projectDirectory;
-	}
-	if (options.dbSetup) {
-		config.dbSetup = options.dbSetup as ProjectDBSetup;
-	}
 
-	const effectiveDatabase =
-		config.database ?? (options.yes ? DEFAULT_CONFIG.database : undefined);
-	const effectiveOrm =
-		config.orm ?? (options.yes ? DEFAULT_CONFIG.orm : undefined);
-	const effectiveAuth =
-		config.auth ?? (options.yes ? DEFAULT_CONFIG.auth : undefined);
-	const effectiveDbSetup =
-		config.dbSetup ?? (options.yes ? DEFAULT_CONFIG.dbSetup : undefined);
-	const effectiveExamples =
-		config.examples ?? (options.yes ? DEFAULT_CONFIG.examples : undefined);
-	const effectiveFrontend =
-		config.frontend ?? (options.yes ? DEFAULT_CONFIG.frontend : undefined);
-	const effectiveApi =
-		config.api ?? (options.yes ? DEFAULT_CONFIG.api : undefined);
-	const effectiveBackend =
-		config.backend ?? (options.yes ? DEFAULT_CONFIG.backend : undefined);
+	if (config.backend === "convex") {
+		const incompatibleFlags: string[] = [];
 
-	if (effectiveDatabase === "none") {
-		if (effectiveOrm && effectiveOrm !== "none") {
+		if (providedFlags.has("auth") && options.auth === true)
+			incompatibleFlags.push("--auth");
+		if (providedFlags.has("database") && options.database !== "none")
+			incompatibleFlags.push(`--database ${options.database}`);
+		if (providedFlags.has("orm") && options.orm !== "none")
+			incompatibleFlags.push(`--orm ${options.orm}`);
+		if (providedFlags.has("api") && options.api !== "none")
+			incompatibleFlags.push(`--api ${options.api}`);
+		if (providedFlags.has("runtime") && options.runtime !== "none")
+			incompatibleFlags.push(`--runtime ${options.runtime}`);
+		if (providedFlags.has("dbSetup") && options.dbSetup !== "none")
+			incompatibleFlags.push(`--db-setup ${options.dbSetup}`);
+		if (providedFlags.has("examples")) {
+			incompatibleFlags.push("--examples");
+		}
+
+		if (incompatibleFlags.length > 0) {
 			consola.fatal(
-				`Cannot use ORM '--orm ${effectiveOrm}' when database is 'none'.`,
+				`The following flags are incompatible with '--backend convex': ${incompatibleFlags.join(
+					", ",
+				)}. Please remove them. The 'todo' example is included automatically with Convex.`,
 			);
 			process.exit(1);
 		}
-		config.orm = "none";
 
-		if (effectiveAuth === true) {
-			consola.fatal(
-				"Authentication requires a database. Cannot use --auth when database is 'none'.",
-			);
-			process.exit(1);
-		}
 		config.auth = false;
-
-		if (effectiveDbSetup && effectiveDbSetup !== "none") {
-			consola.fatal(
-				`Database setup '--db-setup ${effectiveDbSetup}' requires a database. Cannot use when database is 'none'.`,
-			);
-			process.exit(1);
-		}
+		config.database = "none";
+		config.orm = "none";
+		config.api = "none";
+		config.runtime = "none";
 		config.dbSetup = "none";
+		config.examples = ["todo"];
+	} else {
+		const effectiveDatabase =
+			config.database ?? (options.yes ? DEFAULT_CONFIG.database : undefined);
+		const effectiveOrm =
+			config.orm ?? (options.yes ? DEFAULT_CONFIG.orm : undefined);
+		const effectiveAuth =
+			config.auth ?? (options.yes ? DEFAULT_CONFIG.auth : undefined);
+		const effectiveDbSetup =
+			config.dbSetup ?? (options.yes ? DEFAULT_CONFIG.dbSetup : undefined);
+		const effectiveExamples =
+			config.examples ?? (options.yes ? DEFAULT_CONFIG.examples : undefined);
+		const effectiveFrontend =
+			config.frontend ?? (options.yes ? DEFAULT_CONFIG.frontend : undefined);
+		const effectiveApi =
+			config.api ?? (options.yes ? DEFAULT_CONFIG.api : undefined);
+		const effectiveBackend =
+			config.backend ?? (options.yes ? DEFAULT_CONFIG.backend : undefined);
 
-		if (effectiveExamples?.includes("todo")) {
+		if (effectiveDatabase === "none") {
+			if (providedFlags.has("orm") && options.orm !== "none") {
+				consola.fatal(
+					`Cannot use ORM '--orm ${options.orm}' when database is 'none'.`,
+				);
+				process.exit(1);
+			}
+			config.orm = "none";
+
+			if (providedFlags.has("auth") && options.auth === true) {
+				consola.fatal(
+					"Authentication requires a database. Cannot use --auth when database is 'none'.",
+				);
+				process.exit(1);
+			}
+			config.auth = false;
+
+			if (providedFlags.has("dbSetup") && options.dbSetup !== "none") {
+				consola.fatal(
+					`Database setup '--db-setup ${options.dbSetup}' requires a database. Cannot use when database is 'none'.`,
+				);
+				process.exit(1);
+			}
+			config.dbSetup = "none";
+		}
+
+		if (effectiveDatabase === "mongodb" && effectiveOrm === "drizzle") {
 			consola.fatal(
-				"The 'todo' example requires a database. Cannot use --examples todo when database is 'none'.",
+				"MongoDB is only available with Prisma. Cannot use --database mongodb with --orm drizzle",
 			);
 			process.exit(1);
 		}
-		if (config.examples) {
-			config.examples = config.examples.filter((ex) => ex !== "todo");
+
+		if (config.dbSetup && config.dbSetup !== "none") {
+			const dbSetup = config.dbSetup;
+			if (dbSetup === "turso") {
+				if (effectiveDatabase && effectiveDatabase !== "sqlite") {
+					consola.fatal(
+						`Turso setup requires SQLite. Cannot use --db-setup turso with --database ${effectiveDatabase}`,
+					);
+					process.exit(1);
+				}
+				if (effectiveOrm === "prisma") {
+					consola.fatal(
+						"Turso setup is not compatible with Prisma. Cannot use --db-setup turso with --orm prisma",
+					);
+					process.exit(1);
+				}
+				config.database = "sqlite";
+				config.orm = "drizzle";
+			} else if (dbSetup === "prisma-postgres") {
+				if (effectiveDatabase && effectiveDatabase !== "postgres") {
+					consola.fatal(
+						`Prisma PostgreSQL setup requires PostgreSQL. Cannot use --db-setup prisma-postgres with --database ${effectiveDatabase}.`,
+					);
+					process.exit(1);
+				}
+				if (
+					effectiveOrm &&
+					effectiveOrm !== "prisma" &&
+					effectiveOrm !== "none"
+				) {
+					consola.fatal(
+						`Prisma PostgreSQL setup requires Prisma ORM. Cannot use --db-setup prisma-postgres with --orm ${effectiveOrm}.`,
+					);
+					process.exit(1);
+				}
+				config.database = "postgres";
+				config.orm = "prisma";
+			} else if (dbSetup === "mongodb-atlas") {
+				if (effectiveDatabase && effectiveDatabase !== "mongodb") {
+					consola.fatal(
+						`MongoDB Atlas setup requires MongoDB. Cannot use --db-setup mongodb-atlas with --database ${effectiveDatabase}.`,
+					);
+					process.exit(1);
+				}
+				if (
+					effectiveOrm &&
+					effectiveOrm !== "prisma" &&
+					effectiveOrm !== "none"
+				) {
+					consola.fatal(
+						`MongoDB Atlas setup requires Prisma ORM. Cannot use --db-setup mongodb-atlas with --orm ${effectiveOrm}.`,
+					);
+					process.exit(1);
+				}
+				config.database = "mongodb";
+				config.orm = "prisma";
+			} else if (dbSetup === "neon") {
+				if (effectiveDatabase && effectiveDatabase !== "postgres") {
+					consola.fatal(
+						`Neon PostgreSQL setup requires PostgreSQL. Cannot use --db-setup neon with --database ${effectiveDatabase}.`,
+					);
+					process.exit(1);
+				}
+				config.database = "postgres";
+			}
 		}
-	}
 
-	if (effectiveDatabase === "mongodb" && effectiveOrm === "drizzle") {
-		consola.fatal(
-			"MongoDB is only available with Prisma. Cannot use --database mongodb with --orm drizzle",
-		);
-		process.exit(1);
-	}
+		const includesNuxt = effectiveFrontend?.includes("nuxt");
+		const includesSvelte = effectiveFrontend?.includes("svelte");
 
-	if (config.dbSetup && config.dbSetup !== "none") {
-		const dbSetup = config.dbSetup;
-		if (dbSetup === "turso") {
-			if (effectiveDatabase && effectiveDatabase !== "sqlite") {
+		if ((includesNuxt || includesSvelte) && effectiveApi === "trpc") {
+			consola.fatal(
+				`tRPC API is not supported with '${
+					includesNuxt ? "nuxt" : "svelte"
+				}' frontend. Please use --api orpc or remove '${
+					includesNuxt ? "nuxt" : "svelte"
+				}' from --frontend.`,
+			);
+			process.exit(1);
+		}
+		if (
+			(includesNuxt || includesSvelte) &&
+			effectiveApi !== "orpc" &&
+			(!options.api || (options.yes && options.api !== "trpc"))
+		) {
+			if (config.api !== "none") {
+				config.api = "orpc";
+			}
+		}
+
+		if (config.addons && config.addons.length > 0) {
+			const webSpecificAddons = ["pwa", "tauri"];
+			const hasWebSpecificAddons = config.addons.some((addon) =>
+				webSpecificAddons.includes(addon),
+			);
+			const hasCompatibleWebFrontend = effectiveFrontend?.some(
+				(f) =>
+					f === "tanstack-router" ||
+					f === "react-router" ||
+					(f === "nuxt" &&
+						config.addons?.includes("tauri") &&
+						!config.addons?.includes("pwa")) ||
+					(f === "svelte" &&
+						config.addons?.includes("tauri") &&
+						!config.addons?.includes("pwa")),
+			);
+
+			if (hasWebSpecificAddons && !hasCompatibleWebFrontend) {
+				let incompatibleAddon = "";
+				if (config.addons.includes("pwa") && includesNuxt) {
+					incompatibleAddon = "PWA addon is not compatible with Nuxt.";
+				} else if (
+					config.addons.includes("pwa") ||
+					config.addons.includes("tauri")
+				) {
+					incompatibleAddon =
+						"PWA and Tauri addons require tanstack-router, react-router, or Nuxt/Svelte (Tauri only).";
+				}
 				consola.fatal(
-					`Turso setup requires SQLite. Cannot use --db-setup turso with --database ${effectiveDatabase}`,
+					`${incompatibleAddon} Cannot use these addons with your frontend selection.`,
 				);
 				process.exit(1);
 			}
-			if (effectiveOrm === "prisma") {
-				consola.fatal(
-					"Turso setup is not compatible with Prisma. Cannot use --db-setup turso with --orm prisma",
+
+			if (config.addons.includes("husky") && !config.addons.includes("biome")) {
+				consola.warn(
+					"Husky addon is recommended to be used with Biome for lint-staged configuration.",
 				);
-				process.exit(1);
 			}
-			config.database = "sqlite";
-			config.orm = "drizzle";
-		} else if (dbSetup === "prisma-postgres") {
-			if (effectiveDatabase && effectiveDatabase !== "postgres") {
-				consola.fatal(
-					`Prisma PostgreSQL setup requires PostgreSQL. Cannot use --db-setup prisma-postgres with --database ${effectiveDatabase}.`,
-				);
-				process.exit(1);
-			}
+			config.addons = [...new Set(config.addons)];
+		}
+
+		const onlyNativeFrontend =
+			effectiveFrontend &&
+			effectiveFrontend.length === 1 &&
+			effectiveFrontend[0] === "native";
+
+		if (
+			onlyNativeFrontend &&
+			config.examples &&
+			config.examples.length > 0 &&
+			!config.examples.includes("none")
+		) {
+			consola.fatal(
+				"Examples are not supported when only the 'native' frontend is selected.",
+			);
+			process.exit(1);
+		}
+
+		if (
+			config.examples &&
+			config.examples.length > 0 &&
+			!config.examples.includes("none")
+		) {
 			if (
-				effectiveOrm &&
-				effectiveOrm !== "prisma" &&
-				effectiveOrm !== "none"
+				config.examples.includes("todo") &&
+				effectiveBackend !== "convex" &&
+				effectiveDatabase === "none"
 			) {
 				consola.fatal(
-					`Prisma PostgreSQL setup requires Prisma ORM. Cannot use --db-setup prisma-postgres with --orm ${effectiveOrm}.`,
+					"The 'todo' example requires a database (unless using Convex). Cannot use --examples todo when database is 'none'.",
 				);
 				process.exit(1);
 			}
-			config.database = "postgres";
-			config.orm = "prisma";
-		} else if (dbSetup === "mongodb-atlas") {
-			if (effectiveDatabase && effectiveDatabase !== "mongodb") {
+
+			if (config.examples.includes("ai") && effectiveBackend === "elysia") {
 				consola.fatal(
-					`MongoDB Atlas setup requires MongoDB. Cannot use --db-setup mongodb-atlas with --database ${effectiveDatabase}.`,
+					"The 'ai' example is not compatible with the Elysia backend.",
 				);
 				process.exit(1);
 			}
-			if (
-				effectiveOrm &&
-				effectiveOrm !== "prisma" &&
-				effectiveOrm !== "none"
-			) {
-				consola.fatal(
-					`MongoDB Atlas setup requires Prisma ORM. Cannot use --db-setup mongodb-atlas with --orm ${effectiveOrm}.`,
-				);
-				process.exit(1);
-			}
-			config.database = "mongodb";
-			config.orm = "prisma";
-		} else if (dbSetup === "neon") {
-			if (effectiveDatabase && effectiveDatabase !== "postgres") {
-				consola.fatal(
-					`Neon PostgreSQL setup requires PostgreSQL. Cannot use --db-setup neon with --database ${effectiveDatabase}.`,
-				);
-				process.exit(1);
-			}
-			config.database = "postgres";
-		}
-	}
 
-	const includesNuxt = effectiveFrontend?.includes("nuxt");
-	const includesSvelte = effectiveFrontend?.includes("svelte");
-
-	if ((includesNuxt || includesSvelte) && effectiveApi === "trpc") {
-		consola.fatal(
-			`tRPC API is not supported with '${
-				includesNuxt ? "nuxt" : "svelte"
-			}' frontend. Please use --api orpc or remove '${
-				includesNuxt ? "nuxt" : "svelte"
-			}' from --frontend.`,
-		);
-		process.exit(1);
-	}
-	if (
-		(includesNuxt || includesSvelte) &&
-		effectiveApi !== "orpc" &&
-		(!options.api || (options.yes && options.api !== "trpc"))
-	) {
-		config.api = "orpc";
-	}
-
-	if (config.addons && config.addons.length > 0) {
-		const webSpecificAddons = ["pwa", "tauri"];
-		const hasWebSpecificAddons = config.addons.some((addon) =>
-			webSpecificAddons.includes(addon),
-		);
-		const hasCompatibleWebFrontend = effectiveFrontend?.some(
-			(f) =>
-				f === "tanstack-router" ||
-				f === "react-router" ||
-				(f === "nuxt" &&
-					config.addons?.includes("tauri") &&
-					!config.addons?.includes("pwa")) ||
-				(f === "svelte" &&
-					config.addons?.includes("tauri") &&
-					!config.addons?.includes("pwa")),
-		);
-
-		if (hasWebSpecificAddons && !hasCompatibleWebFrontend) {
-			let incompatibleAddon = "";
-			if (config.addons.includes("pwa") && includesNuxt) {
-				incompatibleAddon = "PWA addon is not compatible with Nuxt.";
-			} else if (
-				config.addons.includes("pwa") ||
-				config.addons.includes("tauri")
-			) {
-				incompatibleAddon =
-					"PWA and Tauri addons require tanstack-router, react-router, or Nuxt/Svelte (Tauri only).";
-			}
-			consola.fatal(
-				`${incompatibleAddon} Cannot use these addons with your frontend selection.`,
+			const hasWebFrontendForExamples = effectiveFrontend?.some((f) =>
+				[
+					"tanstack-router",
+					"react-router",
+					"tanstack-start",
+					"next",
+					"nuxt",
+					"svelte",
+				].includes(f),
 			);
-			process.exit(1);
-		}
-
-		if (config.addons.includes("husky") && !config.addons.includes("biome")) {
-			consola.warn(
-				"Husky addon is recommended to be used with Biome for lint-staged configuration.",
-			);
-		}
-		config.addons = [...new Set(config.addons)];
-	}
-
-	if (config.examples && config.examples.length > 0) {
-		if (config.examples.includes("ai") && effectiveBackend === "elysia") {
-			consola.fatal(
-				"The 'ai' example is not compatible with the Elysia backend.",
-			);
-			process.exit(1);
-		}
-
-		const hasWebFrontendForExamples = effectiveFrontend?.some((f) =>
-			[
-				"tanstack-router",
-				"react-router",
-				"tanstack-start",
-				"next",
-				"nuxt",
-				"svelte",
-			].includes(f),
-		);
-
-		if (config.examples.length > 0 && !hasWebFrontendForExamples) {
-			consola.fatal(
-				"Examples require a web frontend (tanstack-router, react-router, tanstack-start, next, nuxt, or svelte).",
-			);
-			process.exit(1);
+			const noFrontendSelected =
+				!effectiveFrontend || effectiveFrontend.length === 0;
 		}
 	}
 
@@ -544,7 +637,14 @@ function processAndValidateFlags(
 main().catch((err) => {
 	consola.error("Aborting installation due to unexpected error...");
 	if (err instanceof Error) {
-		consola.error(err.message);
+		if (
+			!err.message.includes("is only supported with") &&
+			!err.message.includes("incompatible with")
+		) {
+			consola.error(err.message);
+			consola.error(err.stack);
+		} else {
+		}
 	} else {
 		console.error(err);
 	}
