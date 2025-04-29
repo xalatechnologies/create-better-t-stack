@@ -100,7 +100,7 @@ export const TECH_OPTIONS = {
 			color: "from-green-400 to-green-600",
 		},
 	],
-	backendFramework: [
+	backend: [
 		{
 			id: "hono",
 			name: "Hono",
@@ -129,6 +129,13 @@ export const TECH_OPTIONS = {
 			description: "Popular Node.js framework",
 			icon: "/icon/express.svg",
 			color: "from-gray-500 to-gray-700",
+		},
+		{
+			id: "convex",
+			name: "Convex",
+			description: "Reactive backend-as-a-service",
+			icon: "/icon/convex.svg",
+			color: "from-pink-500 to-pink-700",
 		},
 	],
 	database: [
@@ -385,7 +392,7 @@ export const PRESET_TEMPLATES = [
 			projectName: "my-better-t-app",
 			frontend: ["tanstack-router"],
 			runtime: "bun",
-			backendFramework: "hono",
+			backend: "hono",
 			database: "sqlite",
 			orm: "drizzle",
 			dbSetup: "none",
@@ -399,14 +406,35 @@ export const PRESET_TEMPLATES = [
 		},
 	},
 	{
+		id: "convex-react",
+		name: "Convex + React",
+		description: "Reactive full-stack app with Convex and TanStack Router",
+		stack: {
+			projectName: "my-convex-app",
+			frontend: ["tanstack-router"],
+			backend: "convex",
+			runtime: "none",
+			database: "none",
+			orm: "none",
+			dbSetup: "none",
+			auth: "false",
+			packageManager: "bun",
+			addons: [],
+			examples: ["todo"],
+			git: "true",
+			install: "true",
+			api: "none",
+		},
+	},
+	{
 		id: "native-app",
 		name: "Mobile App",
 		description: "React Native with Expo and SQLite database",
 		stack: {
-			projectName: "my-better-t-app",
+			projectName: "my-native-app",
 			frontend: ["native"],
 			runtime: "bun",
-			backendFramework: "hono",
+			backend: "hono",
 			database: "sqlite",
 			orm: "drizzle",
 			dbSetup: "none",
@@ -424,10 +452,10 @@ export const PRESET_TEMPLATES = [
 		name: "API Only",
 		description: "Backend API with Hono and PostgreSQL",
 		stack: {
-			projectName: "my-better-t-app",
+			projectName: "my-api",
 			frontend: ["none"],
 			runtime: "bun",
-			backendFramework: "hono",
+			backend: "hono",
 			database: "postgres",
 			orm: "drizzle",
 			dbSetup: "none",
@@ -443,12 +471,12 @@ export const PRESET_TEMPLATES = [
 	{
 		id: "full-featured",
 		name: "Full Featured",
-		description: "Complete setup with all the bells and whistles",
+		description: "Complete setup with web, native, Turso, and addons",
 		stack: {
-			projectName: "my-better-t-app",
+			projectName: "my-full-app",
 			frontend: ["tanstack-router", "native"],
 			runtime: "bun",
-			backendFramework: "hono",
+			backend: "hono",
 			database: "sqlite",
 			orm: "drizzle",
 			dbSetup: "turso",
@@ -467,7 +495,7 @@ export type StackState = {
 	projectName: string;
 	frontend: string[];
 	runtime: string;
-	backendFramework: string;
+	backend: string;
 	database: string;
 	orm: string;
 	dbSetup: string;
@@ -484,7 +512,7 @@ export const DEFAULT_STACK: StackState = {
 	projectName: "my-better-t-app",
 	frontend: ["tanstack-router"],
 	runtime: "bun",
-	backendFramework: "hono",
+	backend: "hono",
 	database: "sqlite",
 	orm: "drizzle",
 	dbSetup: "none",
