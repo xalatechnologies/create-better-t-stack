@@ -91,7 +91,9 @@ export const dependencyVersionMap = {
 
 	convex: "^1.23.0",
 	"@convex-dev/react-query": "^0.0.0-alpha.8",
+	"convex-svelte": "^0.0.11",
 
+	"@tanstack/svelte-query": "^5.74.4",
 	"@tanstack/react-query-devtools": "^5.69.0",
 	"@tanstack/react-query": "^5.69.0",
 } as const;

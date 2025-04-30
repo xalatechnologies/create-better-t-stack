@@ -1,5 +1,4 @@
 import path from "node:path";
-import consola from "consola"; // Import consola
 import fs from "fs-extra";
 import type { AvailableDependencies } from "../constants";
 import type { ProjectConfig, ProjectFrontend } from "../types";
@@ -14,15 +13,15 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 	const webDirExists = await fs.pathExists(webDir);
 	const nativeDirExists = await fs.pathExists(nativeDir);
 
+	const hasReactWeb = frontend.some((f) =>
+		["tanstack-router", "react-router", "tanstack-start", "next"].includes(f),
+	);
+	const hasNuxtWeb = frontend.includes("nuxt");
+	const hasSvelteWeb = frontend.includes("svelte");
+
 	if (!isConvex && api !== "none") {
 		const serverDir = path.join(projectDir, "apps/server");
 		const serverDirExists = await fs.pathExists(serverDir);
-
-		const hasReactWeb = frontend.some((f) =>
-			["tanstack-router", "react-router", "tanstack-start", "next"].includes(f),
-		);
-		const hasNuxtWeb = frontend.includes("nuxt");
-		const hasSvelteWeb = frontend.includes("svelte");
 
 		if (serverDirExists) {
 			if (api === "orpc") {
@@ -81,6 +80,7 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 							"@orpc/svelte-query",
 							"@orpc/client",
 							"@orpc/server",
+							"@tanstack/svelte-query",
 						],
 						projectDir: webDir,
 					});
@@ -153,7 +153,6 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 			} else {
 			}
 		}
-	} else if (needsReactQuery && isConvex) {
 	}
 
 	if (isConvex) {
@@ -164,6 +163,9 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 					const webDepsToAdd: AvailableDependencies[] = ["convex"];
 					if (frontend.includes("tanstack-start")) {
 						webDepsToAdd.push("@convex-dev/react-query");
+					}
+					if (hasSvelteWeb) {
+						webDepsToAdd.push("convex-svelte");
 					}
 
 					await addPackageDependency({

@@ -578,32 +578,28 @@ export async function setupExamplesTemplate(
 					}
 				}
 			} else if (hasNuxtWeb) {
-				if (context.api === "orpc") {
-					const exampleWebNuxtSrc = path.join(exampleBaseDir, "web/nuxt");
-					if (await fs.pathExists(exampleWebNuxtSrc)) {
-						await processAndCopyFiles(
-							"**/*",
-							exampleWebNuxtSrc,
-							webAppDir,
-							context,
-							false,
-						);
-					} else {
-					}
+				const exampleWebNuxtSrc = path.join(exampleBaseDir, "web/nuxt");
+				if (await fs.pathExists(exampleWebNuxtSrc)) {
+					await processAndCopyFiles(
+						"**/*",
+						exampleWebNuxtSrc,
+						webAppDir,
+						context,
+						false,
+					);
+				} else {
 				}
 			} else if (hasSvelteWeb) {
-				if (context.api === "orpc") {
-					const exampleWebSvelteSrc = path.join(exampleBaseDir, "web/svelte");
-					if (await fs.pathExists(exampleWebSvelteSrc)) {
-						await processAndCopyFiles(
-							"**/*",
-							exampleWebSvelteSrc,
-							webAppDir,
-							context,
-							false,
-						);
-					} else {
-					}
+				const exampleWebSvelteSrc = path.join(exampleBaseDir, "web/svelte");
+				if (await fs.pathExists(exampleWebSvelteSrc)) {
+					await processAndCopyFiles(
+						"**/*",
+						exampleWebSvelteSrc,
+						webAppDir,
+						context,
+						false,
+					);
+				} else {
 				}
 			}
 		}
