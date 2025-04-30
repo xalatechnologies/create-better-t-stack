@@ -494,6 +494,20 @@ export async function setupExamplesTemplate(
 
 		const exampleBaseDir = path.join(PKG_ROOT, `templates/examples/${example}`);
 
+		if (example === "ai" && context.backend === "next" && serverAppDirExists) {
+			const aiNextServerSrc = path.join(exampleBaseDir, "server/next");
+
+			if (await fs.pathExists(aiNextServerSrc)) {
+				await processAndCopyFiles(
+					"**/*",
+					aiNextServerSrc,
+					serverAppDir,
+					context,
+					false,
+				);
+			}
+		}
+
 		if (serverAppDirExists) {
 			const exampleServerSrc = path.join(exampleBaseDir, "server");
 			if (await fs.pathExists(exampleServerSrc)) {

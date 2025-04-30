@@ -353,8 +353,6 @@ function processAndValidateFlags(
 			);
 			if (config.backend !== "convex" && options.examples.includes("none")) {
 				config.examples = [];
-			} else {
-				config.examples = ["todo"];
 			}
 		}
 	}
