@@ -26,9 +26,9 @@ async function executeNeonCommand(
 			commandArgsString,
 		);
 
-		if (s) s.start(spinnerText);
+		if (spinnerText) s.start(spinnerText);
 		const result = await execa(fullCommand, { shell: true });
-		if (s) s.stop(spinnerText);
+		if (spinnerText) s.stop(pc.green("Completed"));
 		return result;
 	} catch (error) {
 		if (s) s.stop(pc.red(`Failed: ${spinnerText}`));
