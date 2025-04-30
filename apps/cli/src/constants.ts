@@ -37,8 +37,8 @@ export const dependencyVersionMap = {
 
 	mysql2: "^3.14.0",
 
-	"@prisma/client": "^6.6.0",
-	prisma: "^6.6.0",
+	"@prisma/client": "^6.7.0",
+	prisma: "^6.7.0",
 
 	"vite-plugin-pwa": "^0.21.2",
 	"@vite-pwa/assets-generator": "^0.2.6",
