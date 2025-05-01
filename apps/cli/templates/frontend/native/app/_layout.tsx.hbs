@@ -35,7 +35,6 @@ const DARK_THEME: Theme = {
 };
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "(drawer)",
 };
 
@@ -56,7 +55,6 @@ export default function RootLayout() {
     }
 
     if (Platform.OS === "web") {
-      // Adds the background color to the html element to prevent white background on overscroll.
       document.documentElement.classList.add("bg-background");
     }
     setAndroidNavigationBar(colorScheme);

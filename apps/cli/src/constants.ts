@@ -79,11 +79,11 @@ export const dependencyVersionMap = {
 
 	"@prisma/extension-accelerate": "^1.3.0",
 
-	"@orpc/server": "^1.1.0",
-	"@orpc/client": "^1.1.0",
-	"@orpc/react-query": "^1.1.0",
-	"@orpc/vue-query": "^1.1.0",
-	"@orpc/svelte-query": "^1.1.0",
+	"@orpc/server": "^1.1.1",
+	"@orpc/client": "^1.1.1",
+	"@orpc/react-query": "^1.1.1",
+	"@orpc/vue-query": "^1.1.1",
+	"@orpc/svelte-query": "^1.1.1",
 
 	"@trpc/tanstack-react-query": "^11.0.0",
 	"@trpc/server": "^11.0.0",
