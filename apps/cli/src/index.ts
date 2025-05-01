@@ -244,6 +244,19 @@ function processAndValidateFlags(
 		Object.keys(options).filter((key) => key !== "_" && key !== "$0"),
 	);
 
+	if (options.api) {
+		config.api = options.api as ProjectApi;
+		if (options.api === "none") {
+			if (options.backend && options.backend !== "convex") {
+				consola.fatal(
+					`'--api none' is only supported with '--backend convex'. Please choose a different API setting or use '--backend convex'.`,
+				);
+				process.exit(1);
+			}
+			config.backend = "convex";
+		}
+	}
+
 	if (options.backend) {
 		config.backend = options.backend as ProjectBackend;
 	}
@@ -284,9 +297,6 @@ function processAndValidateFlags(
 	}
 	if (options.runtime) {
 		config.runtime = options.runtime as ProjectRuntime;
-	}
-	if (options.api) {
-		config.api = options.api as ProjectApi;
 	}
 	if (options.dbSetup) {
 		config.dbSetup = options.dbSetup as ProjectDBSetup;
