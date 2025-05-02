@@ -300,7 +300,7 @@ export const TECH_OPTIONS = {
 			id: "starlight",
 			name: "Starlight",
 			description: "Documentation site with Astro",
-			icon: "/icon/astro.svg",
+			icon: "/icon/starlight.svg",
 			color: "from-teal-500 to-teal-700",
 			default: false,
 		},
