@@ -808,7 +808,7 @@ const StackArchitect = () => {
 	const [activeCategory, setActiveCategory] = useState<string | null>(
 		CATEGORY_ORDER[0],
 	);
-	const [lastChanges, setLastChanges] = useState<
+	const [, setLastChanges] = useState<
 		Array<{ category: string; message: string }>
 	>([]);
 
