@@ -371,7 +371,7 @@ export async function setupAuthTemplate(
 				authDbSrc = path.join(
 					PKG_ROOT,
 					`templates/auth/server/db/mongoose/${db}`,
-				)
+				);
 			}
 			if (authDbSrc && (await fs.pathExists(authDbSrc))) {
 				await processAndCopyFiles("**/*", authDbSrc, serverAppDir, context);

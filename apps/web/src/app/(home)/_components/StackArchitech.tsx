@@ -34,7 +34,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useQueryStates } from "nuqs";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 const validateProjectName = (name: string): string | undefined => {
 	const INVALID_CHARS = ["<", ">", ":", '"', "|", "?", "*"];
@@ -164,12 +165,15 @@ const getCategoryDisplayName = (categoryKey: string): string => {
 interface CompatibilityResult {
 	adjustedStack: StackState | null;
 	notes: Record<string, { notes: string[]; hasIssue: boolean }>;
+	changes: Array<{ category: string; message: string }>;
 }
 
 const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 	const nextStack = { ...stack };
 	let changed = false;
 	const notes: CompatibilityResult["notes"] = {};
+	const changes: Array<{ category: string; message: string }> = [];
+
 	for (const cat of CATEGORY_ORDER) {
 		notes[cat] = { notes: [], hasIssue: false };
 	}
@@ -190,20 +194,25 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 		for (const [key, value] of Object.entries(convexOverrides)) {
 			const catKey = key as keyof StackState;
 			if (JSON.stringify(nextStack[catKey]) !== JSON.stringify(value)) {
+				const displayName = getCategoryDisplayName(catKey);
+				const valueDisplay = Array.isArray(value) ? value.join(", ") : value;
+				const message = `${displayName} set to '${valueDisplay}'`;
+
 				notes[catKey].notes.push(
-					`Convex backend selected: ${getCategoryDisplayName(
-						catKey,
-					)} will be set to '${Array.isArray(value) ? value.join(", ") : value}'.`,
+					`Convex backend selected: ${displayName} will be set to '${valueDisplay}'.`,
 				);
 				notes.backend.notes.push(
-					`Convex requires ${getCategoryDisplayName(catKey)} to be '${
-						Array.isArray(value) ? value.join(", ") : value
-					}'.`,
+					`Convex requires ${displayName} to be '${valueDisplay}'.`,
 				);
 				notes[catKey].hasIssue = true;
 				notes.backend.hasIssue = true;
 				(nextStack[catKey] as string | string[]) = value;
 				changed = true;
+
+				changes.push({
+					category: "convex",
+					message,
+				});
 			}
 		}
 	} else {
@@ -214,6 +223,10 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 			notes.runtime.hasIssue = true;
 			nextStack.runtime = DEFAULT_STACK.runtime;
 			changed = true;
+			changes.push({
+				category: "runtime",
+				message: "Runtime set to 'Bun' (None is only for Convex)",
+			});
 		}
 		if (nextStack.api === "none") {
 			notes.api.notes.push(
@@ -222,160 +235,225 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 			notes.api.hasIssue = true;
 			nextStack.api = DEFAULT_STACK.api;
 			changed = true;
+			changes.push({
+				category: "api",
+				message: "API set to 'tRPC' (None is only for Convex)",
+			});
 		}
 
-	if (nextStack.database === "none") {
-		if (nextStack.orm !== "none") {
-			notes.database.notes.push(
-				"Database 'None' selected: ORM will be set to 'None'.",
-			);
-			notes.orm.notes.push(
-				"ORM requires a database. It will be set to 'None'.",
-			);
-			notes.database.hasIssue = true;
-			notes.orm.hasIssue = true;
-			nextStack.orm = "none";
-			changed = true;
+		if (nextStack.database === "none") {
+			if (nextStack.orm !== "none") {
+				notes.database.notes.push(
+					"Database 'None' selected: ORM will be set to 'None'.",
+				);
+				notes.orm.notes.push(
+					"ORM requires a database. It will be set to 'None'.",
+				);
+				notes.database.hasIssue = true;
+				notes.orm.hasIssue = true;
+				nextStack.orm = "none";
+				changed = true;
+				changes.push({
+					category: "database",
+					message: "ORM set to 'None' (requires a database)",
+				});
+			}
+			if (nextStack.auth === "true") {
+				notes.database.notes.push(
+					"Database 'None' selected: Auth will be disabled.",
+				);
+				notes.auth.notes.push(
+					"Authentication requires a database. It will be disabled.",
+				);
+				notes.database.hasIssue = true;
+				notes.auth.hasIssue = true;
+				nextStack.auth = "false";
+				changed = true;
+				changes.push({
+					category: "database",
+					message: "Authentication disabled (requires a database)",
+				});
+			}
+			if (nextStack.dbSetup !== "none") {
+				notes.database.notes.push(
+					"Database 'None' selected: DB Setup will be set to 'Basic'.",
+				);
+				notes.dbSetup.notes.push(
+					"DB Setup requires a database. It will be set to 'Basic Setup'.",
+				);
+				notes.database.hasIssue = true;
+				notes.dbSetup.hasIssue = true;
+				nextStack.dbSetup = "none";
+				changed = true;
+				changes.push({
+					category: "database",
+					message: "DB Setup set to 'None' (requires a database)",
+				});
+			}
+		} else if (nextStack.database === "mongodb") {
+			if (nextStack.orm !== "prisma" && nextStack.orm !== "mongoose") {
+				notes.database.notes.push(
+					"MongoDB requires Prisma or Mongoose ORM. Prisma will be selected.",
+				);
+				notes.orm.notes.push(
+					"MongoDB requires Prisma or Mongoose ORM. Prisma will be selected.",
+				);
+				notes.database.hasIssue = true;
+				notes.orm.hasIssue = true;
+				nextStack.orm = "prisma";
+				changed = true;
+				changes.push({
+					category: "database",
+					message: "ORM set to 'Prisma' (MongoDB requires Prisma or Mongoose)",
+				});
+			}
+		} else {
+			if (nextStack.orm === "mongoose") {
+				notes.database.notes.push(
+					"Relational databases are not compatible with Mongoose ORM",
+				);
+				notes.orm.notes.push(
+					"Relational databases are not compatible with Mongoose ORM",
+				);
+				notes.database.hasIssue = true;
+				notes.orm.hasIssue = true;
+				nextStack.orm = "prisma";
+				changed = true;
+				changes.push({
+					category: "database",
+					message: "ORM set to 'Prisma' (Mongoose only works with MongoDB)",
+				});
+			}
+			if (nextStack.dbSetup === "mongodb-atlas") {
+				notes.database.notes.push(
+					"Relational databases are not compatible with MongoDB Atlas setup. DB Setup will be reset.",
+				);
+				notes.dbSetup.notes.push(
+					"MongoDB Atlas setup requires MongoDB. It will be reset to 'Basic Setup'.",
+				);
+				notes.database.hasIssue = true;
+				notes.dbSetup.hasIssue = true;
+				nextStack.dbSetup = "none";
+				changed = true;
+				changes.push({
+					category: "database",
+					message: "DB Setup reset to 'None' (MongoDB Atlas requires MongoDB)",
+				});
+			}
 		}
-		if (nextStack.auth === "true") {
-			notes.database.notes.push(
-				"Database 'None' selected: Auth will be disabled.",
-			);
-			notes.auth.notes.push(
-				"Authentication requires a database. It will be disabled.",
-			);
-			notes.database.hasIssue = true;
-			notes.auth.hasIssue = true;
-			nextStack.auth = "false";
-			changed = true;
-		}
-		if (nextStack.dbSetup !== "none") {
-			notes.database.notes.push(
-				"Database 'None' selected: DB Setup will be set to 'Basic'.",
-			);
-			notes.dbSetup.notes.push(
-				"DB Setup requires a database. It will be set to 'Basic Setup'.",
-			);
-			notes.database.hasIssue = true;
-			notes.dbSetup.hasIssue = true;
-			nextStack.dbSetup = "none";
-			changed = true;
-		}
-	} else if (nextStack.database === "mongodb") {
-		if (nextStack.orm !== "prisma" && nextStack.orm !== "mongoose") {
-			notes.database.notes.push(
-				"MongoDB requires Prisma or Mongoose ORM. Prisma will be selected.",
-			);
-			notes.orm.notes.push("MongoDB requires Prisma or Mongoose ORM. Prisma will be selected.");
-			notes.database.hasIssue = true;
-			notes.orm.hasIssue = true;
-			nextStack.orm = "prisma";
-			changed = true;
-		}
-	} else {
-		if (nextStack.orm === "mongoose") {
-			notes.database.notes.push(
-				"Relational databases are not compatible with Mongoose ORM",
-			);
-			notes.orm.notes.push("Relational databases are not compatible with Mongoose ORM");
-			notes.database.hasIssue = true;
-			notes.orm.hasIssue = true;
-			nextStack.orm = "prisma";
-			changed = true;
-		}
-		if (nextStack.dbSetup === "mongodb-atlas") {
-			 notes.database.notes.push(
-				"Relational databases are not compatible with MongoDB Atlas setup. DB Setup will be reset.",
-			 );
-			 notes.dbSetup.notes.push(
-				 "MongoDB Atlas setup requires MongoDB. It will be reset to 'Basic Setup'.",
-			 );
-			 notes.database.hasIssue = true;
-			 notes.dbSetup.hasIssue = true;
-			 nextStack.dbSetup = "none";
-			 changed = true;
-		}
-	}
 
-	if (nextStack.dbSetup === "turso") {
-		if (nextStack.database !== "sqlite") {
-			notes.dbSetup.notes.push("Turso requires SQLite. It will be selected.");
-			notes.database.notes.push(
-				"Turso DB setup requires SQLite. It will be selected.",
-			);
-			notes.dbSetup.hasIssue = true;
-			notes.database.hasIssue = true;
-			nextStack.database = "sqlite";
-			changed = true;
+		if (nextStack.dbSetup === "turso") {
+			if (nextStack.database !== "sqlite") {
+				notes.dbSetup.notes.push("Turso requires SQLite. It will be selected.");
+				notes.database.notes.push(
+					"Turso DB setup requires SQLite. It will be selected.",
+				);
+				notes.dbSetup.hasIssue = true;
+				notes.database.hasIssue = true;
+				nextStack.database = "sqlite";
+				changed = true;
+				changes.push({
+					category: "dbSetup",
+					message: "Database set to 'SQLite' (required by Turso)",
+				});
+			}
+			if (nextStack.orm !== "drizzle") {
+				notes.dbSetup.notes.push(
+					"Turso requires Drizzle ORM. It will be selected.",
+				);
+				notes.orm.notes.push(
+					"Turso DB setup requires Drizzle ORM. It will be selected.",
+				);
+				notes.dbSetup.hasIssue = true;
+				notes.orm.hasIssue = true;
+				nextStack.orm = "drizzle";
+				changed = true;
+				changes.push({
+					category: "dbSetup",
+					message: "ORM set to 'Drizzle' (required by Turso)",
+				});
+			}
+		} else if (nextStack.dbSetup === "prisma-postgres") {
+			if (nextStack.database !== "postgres") {
+				notes.dbSetup.notes.push("Requires PostgreSQL. It will be selected.");
+				notes.database.notes.push(
+					"Prisma PostgreSQL setup requires PostgreSQL. It will be selected.",
+				);
+				notes.dbSetup.hasIssue = true;
+				notes.database.hasIssue = true;
+				nextStack.database = "postgres";
+				changed = true;
+				changes.push({
+					category: "dbSetup",
+					message:
+						"Database set to 'PostgreSQL' (required by Prisma PostgreSQL setup)",
+				});
+			}
+			if (nextStack.orm !== "prisma") {
+				notes.dbSetup.notes.push("Requires Prisma ORM. It will be selected.");
+				notes.orm.notes.push(
+					"Prisma PostgreSQL setup requires Prisma ORM. It will be selected.",
+				);
+				notes.dbSetup.hasIssue = true;
+				notes.orm.hasIssue = true;
+				nextStack.orm = "prisma";
+				changed = true;
+				changes.push({
+					category: "dbSetup",
+					message: "ORM set to 'Prisma' (required by Prisma PostgreSQL setup)",
+				});
+			}
+		} else if (nextStack.dbSetup === "mongodb-atlas") {
+			if (nextStack.database !== "mongodb") {
+				notes.dbSetup.notes.push("Requires MongoDB. It will be selected.");
+				notes.database.notes.push(
+					"MongoDB Atlas setup requires MongoDB. It will be selected.",
+				);
+				notes.dbSetup.hasIssue = true;
+				notes.database.hasIssue = true;
+				nextStack.database = "mongodb";
+				changed = true;
+				changes.push({
+					category: "dbSetup",
+					message:
+						"Database set to 'MongoDB' (required by MongoDB Atlas setup)",
+				});
+			}
+			if (nextStack.orm !== "prisma" && nextStack.orm !== "mongoose") {
+				notes.dbSetup.notes.push(
+					"Requires Prisma or Mongoose ORM. Prisma will be selected.",
+				);
+				notes.orm.notes.push(
+					"MongoDB Atlas setup requires Prisma or Mongoose ORM. Prisma will be selected.",
+				);
+				notes.dbSetup.hasIssue = true;
+				notes.orm.hasIssue = true;
+				nextStack.orm = "prisma";
+				changed = true;
+				changes.push({
+					category: "dbSetup",
+					message:
+						"ORM set to 'Prisma' (MongoDB Atlas requires Prisma or Mongoose)",
+				});
+			}
+		} else if (nextStack.dbSetup === "neon") {
+			if (nextStack.database !== "postgres") {
+				notes.dbSetup.notes.push(
+					"Neon requires PostgreSQL. It will be selected.",
+				);
+				notes.database.notes.push(
+					"Neon DB setup requires PostgreSQL. It will be selected.",
+				);
+				notes.dbSetup.hasIssue = true;
+				notes.database.hasIssue = true;
+				nextStack.database = "postgres";
+				changed = true;
+				changes.push({
+					category: "dbSetup",
+					message: "Database set to 'PostgreSQL' (required by Neon)",
+				});
+			}
 		}
-		if (nextStack.orm !== "drizzle") {
-			notes.dbSetup.notes.push(
-				"Turso requires Drizzle ORM. It will be selected.",
-			);
-			notes.orm.notes.push(
-				"Turso DB setup requires Drizzle ORM. It will be selected.",
-			);
-			notes.dbSetup.hasIssue = true;
-			notes.orm.hasIssue = true;
-			nextStack.orm = "drizzle";
-			changed = true;
-		}
-	} else if (nextStack.dbSetup === "prisma-postgres") {
-		if (nextStack.database !== "postgres") {
-			notes.dbSetup.notes.push("Requires PostgreSQL. It will be selected.");
-			notes.database.notes.push(
-				"Prisma PostgreSQL setup requires PostgreSQL. It will be selected.",
-			);
-			notes.dbSetup.hasIssue = true;
-			notes.database.hasIssue = true;
-			nextStack.database = "postgres";
-			changed = true;
-		}
-		if (nextStack.orm !== "prisma") {
-			notes.dbSetup.notes.push("Requires Prisma ORM. It will be selected.");
-			notes.orm.notes.push(
-				"Prisma PostgreSQL setup requires Prisma ORM. It will be selected.",
-			);
-			notes.dbSetup.hasIssue = true;
-			notes.orm.hasIssue = true;
-			nextStack.orm = "prisma";
-			changed = true;
-		}
-	} else if (nextStack.dbSetup === "mongodb-atlas") {
-		if (nextStack.database !== "mongodb") {
-			notes.dbSetup.notes.push("Requires MongoDB. It will be selected.");
-			notes.database.notes.push(
-				"MongoDB Atlas setup requires MongoDB. It will be selected.",
-			);
-			notes.dbSetup.hasIssue = true;
-			notes.database.hasIssue = true;
-			nextStack.database = "mongodb";
-			changed = true;
-		}
-		if (nextStack.orm !== "prisma" && nextStack.orm !== "mongoose") {
-			notes.dbSetup.notes.push("Requires Prisma or Mongoose ORM. Prisma will be selected.");
-			notes.orm.notes.push(
-				"MongoDB Atlas setup requires Prisma or Mongoose ORM. Prisma will be selected.",
-			);
-			notes.dbSetup.hasIssue = true;
-			notes.orm.hasIssue = true;
-			nextStack.orm = "prisma";
-			changed = true;
-		}
-	} else if (nextStack.dbSetup === "neon") {
-		if (nextStack.database !== "postgres") {
-			notes.dbSetup.notes.push(
-				"Neon requires PostgreSQL. It will be selected.",
-			);
-			notes.database.notes.push(
-				"Neon DB setup requires PostgreSQL. It will be selected.",
-			);
-			notes.dbSetup.hasIssue = true;
-			notes.database.hasIssue = true;
-			nextStack.database = "postgres";
-			changed = true;
-		}
-	}
 
 		const isNuxt = nextStack.frontend.includes("nuxt");
 		const isSvelte = nextStack.frontend.includes("svelte");
@@ -391,6 +469,10 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 			notes.frontend.hasIssue = true;
 			nextStack.api = "orpc";
 			changed = true;
+			changes.push({
+				category: "api",
+				message: `API set to 'oRPC' (required by ${frontendName})`,
+			});
 		}
 
 		const incompatibleAddons: string[] = [];
@@ -407,6 +489,10 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 			);
 			notes.frontend.hasIssue = true;
 			notes.addons.hasIssue = true;
+			changes.push({
+				category: "addons",
+				message: "PWA addon removed (requires TanStack or React Router)",
+			});
 		}
 		if (!isTauriCompat && nextStack.addons.includes("tauri")) {
 			incompatibleAddons.push("tauri");
@@ -418,6 +504,10 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 			);
 			notes.frontend.hasIssue = true;
 			notes.addons.hasIssue = true;
+			changes.push({
+				category: "addons",
+				message: "Tauri addon removed (requires compatible frontend)",
+			});
 		}
 
 		const originalAddonsLength = nextStack.addons.length;
@@ -453,66 +543,89 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 				notes.frontend.hasIssue = true;
 				notes.examples.hasIssue = true;
 				incompatibleExamples.push(...nextStack.examples);
+				changes.push({
+					category: "examples",
+					message: "Examples removed (not supported with Native-only frontend)",
+				});
 			}
 		} else {
 			if (!isWeb) {
-				if (nextStack.examples.includes("todo"))
+				if (nextStack.examples.includes("todo")) {
 					incompatibleExamples.push("todo");
-				if (nextStack.examples.includes("ai")) incompatibleExamples.push("ai");
+					changes.push({
+						category: "examples",
+						message: "Todo example removed (requires web frontend)",
+					});
+				}
+				if (nextStack.examples.includes("ai")) {
+					incompatibleExamples.push("ai");
+					changes.push({
+						category: "examples",
+						message: "AI example removed (requires web frontend)",
+					});
+				}
 			}
 			if (
 				nextStack.database === "none" &&
 				nextStack.examples.includes("todo")
 			) {
 				incompatibleExamples.push("todo");
+				changes.push({
+					category: "examples",
+					message: "Todo example removed (requires a database)",
+				});
 			}
 			if (nextStack.backend === "elysia" && nextStack.examples.includes("ai")) {
 				incompatibleExamples.push("ai");
+				changes.push({
+					category: "examples",
+					message: "AI example removed (not compatible with Elysia)",
+				});
 			}
 		}
 
-	const uniqueIncompatibleExamples = [...new Set(incompatibleExamples)];
-	if (uniqueIncompatibleExamples.length > 0) {
-		if (
-			!isWeb &&
-			(uniqueIncompatibleExamples.includes("todo") ||
-				uniqueIncompatibleExamples.includes("ai"))
-		) {
-			notes.frontend.notes.push(
-				"Examples require a web frontend. Incompatible examples will be removed.",
-			);
-			notes.examples.notes.push(
-				"Requires a web frontend. Incompatible examples will be removed.",
-			);
-			notes.frontend.hasIssue = true;
-			notes.examples.hasIssue = true;
-		}
-		if (
-			nextStack.database === "none" &&
-			uniqueIncompatibleExamples.includes("todo")
-		) {
-			notes.database.notes.push(
-				"Todo example requires a database. It will be removed.",
-			);
-			notes.examples.notes.push(
-				"Todo example requires a database. It will be removed.",
-			);
-			notes.database.hasIssue = true;
-			notes.examples.hasIssue = true;
-		}
-		if (
-			nextStack.backend === "elysia" &&
-			uniqueIncompatibleExamples.includes("ai")
-		) {
-			notes.backendFramework.notes.push(
-				"AI example is not compatible with Elysia. It will be removed.",
-			);
-			notes.examples.notes.push(
-				"AI example is not compatible with Elysia. It will be removed.",
-			);
-			notes.backendFramework.hasIssue = true;
-			notes.examples.hasIssue = true;
-		}
+		const uniqueIncompatibleExamples = [...new Set(incompatibleExamples)];
+		if (uniqueIncompatibleExamples.length > 0) {
+			if (
+				!isWeb &&
+				(uniqueIncompatibleExamples.includes("todo") ||
+					uniqueIncompatibleExamples.includes("ai"))
+			) {
+				notes.frontend.notes.push(
+					"Examples require a web frontend. Incompatible examples will be removed.",
+				);
+				notes.examples.notes.push(
+					"Requires a web frontend. Incompatible examples will be removed.",
+				);
+				notes.frontend.hasIssue = true;
+				notes.examples.hasIssue = true;
+			}
+			if (
+				nextStack.database === "none" &&
+				uniqueIncompatibleExamples.includes("todo")
+			) {
+				notes.database.notes.push(
+					"Todo example requires a database. It will be removed.",
+				);
+				notes.examples.notes.push(
+					"Todo example requires a database. It will be removed.",
+				);
+				notes.database.hasIssue = true;
+				notes.examples.hasIssue = true;
+			}
+			if (
+				nextStack.backend === "elysia" &&
+				uniqueIncompatibleExamples.includes("ai")
+			) {
+				notes.backend.notes.push(
+					"AI example is not compatible with Elysia. It will be removed.",
+				);
+				notes.examples.notes.push(
+					"AI example is not compatible with Elysia. It will be removed.",
+				);
+				notes.backend.hasIssue = true;
+				notes.examples.hasIssue = true;
+			}
 
 			const originalExamplesLength = nextStack.examples.length;
 			nextStack.examples = nextStack.examples.filter(
@@ -525,6 +638,25 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 	return {
 		adjustedStack: changed ? nextStack : null,
 		notes,
+		changes,
+	};
+};
+
+const getCompatibilityRules = (stack: StackState) => {
+	const isConvex = stack.backend === "convex";
+	const hasWebFrontendSelected = hasWebFrontend(stack.frontend);
+	const hasNativeOnly =
+		hasNativeFrontend(stack.frontend) && !hasWebFrontendSelected;
+
+	return {
+		isConvex,
+		hasWebFrontend: hasWebFrontendSelected,
+		hasNativeFrontend: hasNativeFrontend(stack.frontend),
+		hasNativeOnly,
+		hasPWACompatible: hasPWACompatibleFrontend(stack.frontend),
+		hasTauriCompatible: hasTauriCompatibleFrontend(stack.frontend),
+		hasNuxtOrSvelte:
+			stack.frontend.includes("nuxt") || stack.frontend.includes("svelte"),
 	};
 };
 
@@ -676,215 +808,286 @@ const StackArchitect = () => {
 	const [activeCategory, setActiveCategory] = useState<string | null>(
 		CATEGORY_ORDER[0],
 	);
+	const [lastChanges, setLastChanges] = useState<
+		Array<{ category: string; message: string }>
+	>([]);
 
 	const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 	const contentRef = useRef<HTMLDivElement>(null);
 
-	const compatibilityAnalysis = analyzeStackCompatibility(stack);
-	const isConvexSelected = stack.backend === "convex";
-	const currentHasWebFrontend = hasWebFrontend(stack.frontend);
-	const currentHasNativeFrontend = hasNativeFrontend(stack.frontend);
-	const currentHasPWACompatibleFrontend = hasPWACompatibleFrontend(
-		stack.frontend,
-	);
-	const currentHasTauriCompatibleFrontend = hasTauriCompatibleFrontend(
-		stack.frontend,
+	const compatibilityAnalysis = useMemo(
+		() => analyzeStackCompatibility(stack),
+		[stack],
 	);
 
-	const disabledReasons = (() => {
+	const rules = useMemo(() => getCompatibilityRules(stack), [stack]);
+
+	const disabledReasons = useMemo(() => {
 		const reasons = new Map<string, string>();
-		const currentStack = stack;
+
+		const addRule = (category: string, techId: string, reason: string) => {
+			reasons.set(`${category}-${techId}`, reason);
+		};
 
 		for (const category of CATEGORY_ORDER) {
-			const categoryOptions = TECH_OPTIONS[category] || [];
+			const options = TECH_OPTIONS[category] || [];
 			const catKey = category as keyof StackState;
 
-			for (const tech of categoryOptions) {
-				let reason: string | null = null;
+			for (const tech of options) {
 				const techId = tech.id;
 
-				if (isConvexSelected) {
+				if (rules.isConvex) {
 					if (
-						[
-							"runtime",
-							"database",
-							"orm",
-							"api",
-							"auth",
-							"dbSetup",
-							"examples",
-						].includes(catKey)
+						["runtime", "database", "orm", "api", "auth", "dbSetup"].includes(
+							catKey,
+						)
 					) {
-						const convexDefaults: Record<string, string | string[]> = {
+						const convexDefaults: Record<string, string> = {
 							runtime: "none",
 							database: "none",
 							orm: "none",
 							api: "none",
 							auth: "false",
 							dbSetup: "none",
-							examples: ["todo"],
 						};
-						const requiredValue = convexDefaults[catKey];
-						if (
-							typeof requiredValue === "string" &&
-							techId !== requiredValue &&
-							techId !== "none"
-						) {
-							if (!(catKey === "dbSetup" && techId === "none")) {
-								reason = `Convex backend requires ${getCategoryDisplayName(
-									catKey,
-								)} to be '${requiredValue}'.`;
-							}
-						} else if (Array.isArray(requiredValue)) {
-							if (catKey === "examples" && techId !== "todo") {
-								reason = "Convex backend only supports the 'Todo' example.";
-							}
-						}
-					}
-				} else {
-					if (catKey === "runtime" && techId === "none")
-						reason =
-							"Runtime 'None' is only available with the Convex backend.";
-					if (catKey === "api" && techId === "none")
-						reason = "API 'None' is only available with the Convex backend.";
 
-					if (catKey === "api") {
-						if (
-							techId === "trpc" &&
-							(currentStack.frontend.includes("nuxt") ||
-								currentStack.frontend.includes("svelte"))
-						) {
-							reason = `tRPC is not supported with ${
-								currentStack.frontend.includes("nuxt") ? "Nuxt" : "Svelte"
-							}. Use oRPC instead.`;
+						const requiredValue = convexDefaults[catKey as string];
+						if (techId !== requiredValue && techId !== "none") {
+							addRule(
+								category,
+								techId,
+								`Convex backend requires ${getCategoryDisplayName(catKey)} to be '${requiredValue}'.`,
+							);
 						}
 					}
 
-					if (catKey === "orm") {
-						if (currentStack.database === "none" && techId !== "none")
-							reason = "Select a database to enable ORM options.";
-						if (
-							currentStack.database === "mongodb" &&
-							techId !== "prisma" &&
-							techId !== "mongoose" &&
-							techId !== "none"
-						)
-							reason = "MongoDB requires the Prisma or Mongoose ORM.";
-						if (
-							currentStack.dbSetup === "turso" &&
-							techId !== "drizzle" &&
-							techId !== "none"
-						)
-							reason = "Turso DB setup requires the Drizzle ORM.";
-						if (
-							currentStack.dbSetup === "prisma-postgres" &&
-							techId !== "prisma" &&
-							techId !== "none"
-						)
-							reason = "Prisma PostgreSQL setup requires Prisma ORM.";
-						if (
-							currentStack.dbSetup === "mongodb-atlas" &&
-							techId !== "prisma" &&
-							techId !== "mongoose" &&
-							techId !== "none"
-						)
-							reason = "MongoDB Atlas setup requires Prisma or Mongoose ORM.";
+					if (catKey === "examples" && techId !== "todo") {
+						addRule(
+							category,
+							techId,
+							"Convex backend only supports the 'Todo' example.",
+						);
+					}
+					continue;
+				}
 
-						if (techId === "none") {
-							if (currentStack.database === "mongodb")
-								reason =  "MongoDB requires Prisma or Mongoose ORM.";
-							if (currentStack.dbSetup === "turso")
-								reason = "Turso DB setup requires Drizzle ORM.";
-							if (currentStack.dbSetup === "prisma-postgres")
-								reason = "This DB setup requires Prisma ORM.";
-						}
+				if (catKey === "runtime" && techId === "none") {
+					addRule(
+						category,
+						techId,
+						"Runtime 'None' is only available with the Convex backend.",
+					);
+				}
 
-						if (techId === "mongoose" && (currentStack.database !== "mongodb")) {
-							reason = "Mongoose ORM is not compatible with relational databases.";
-						}
+				if (catKey === "api") {
+					if (techId === "none") {
+						addRule(
+							category,
+							techId,
+							"API 'None' is only available with the Convex backend.",
+						);
 					}
 
-					if (catKey === "dbSetup" && techId !== "none") {
-						if (currentStack.database === "none")
-							reason = "Select a database before choosing a cloud setup.";
+					if (techId === "trpc" && rules.hasNuxtOrSvelte) {
+						const frontendName = stack.frontend.includes("nuxt")
+							? "Nuxt"
+							: "Svelte";
+						addRule(
+							category,
+							techId,
+							`tRPC is not supported with ${frontendName}. Use oRPC instead.`,
+						);
+					}
+				}
 
-						if (techId === "turso") {
-							if (
-								currentStack.database !== "sqlite" &&
-								currentStack.database !== "none"
-							)
-								reason = "Turso requires SQLite database.";
-							if (currentStack.orm !== "drizzle" && currentStack.orm !== "none")
-								reason = "Turso requires Drizzle ORM.";
-						} else if (techId === "prisma-postgres") {
-							if (
-								currentStack.database !== "postgres" &&
-								currentStack.database !== "none"
-							)
-								reason = "Requires PostgreSQL database.";
-							if (currentStack.orm !== "prisma" && currentStack.orm !== "none")
-								reason = "Requires Prisma ORM.";
-						} else if (techId === "mongodb-atlas") {
-							if (
-								currentStack.database !== "mongodb" &&
-								currentStack.database !== "none"
-							)
-								reason = "Requires MongoDB database.";
-							if (currentStack.orm !== "prisma" && currentStack.orm !== "mongoose" && currentStack.orm !== "none")
-								reason = "Requires Prisma or Mongoose ORM.";
-						} else if (techId === "neon") {
-							if (
-								currentStack.database !== "postgres" &&
-								currentStack.database !== "none"
-							)
-								reason = "Requires PostgreSQL database.";
-						}
+				if (catKey === "orm") {
+					if (stack.database === "none" && techId !== "none") {
+						addRule(
+							category,
+							techId,
+							"Select a database to enable ORM options.",
+						);
 					}
 
 					if (
-						catKey === "auth" &&
-						techId === "true" &&
-						currentStack.database === "none"
+						stack.database === "mongodb" &&
+						techId !== "prisma" &&
+						techId !== "mongoose" &&
+						techId !== "none"
 					) {
-						reason = "Authentication requires a database.";
+						addRule(
+							category,
+							techId,
+							"MongoDB requires the Prisma or Mongoose ORM.",
+						);
 					}
 
-					if (catKey === "addons") {
-						if (techId === "pwa" && !currentHasPWACompatibleFrontend) {
-							reason = "Requires TanStack Router or React Router frontend.";
+					if (
+						stack.dbSetup === "turso" &&
+						techId !== "drizzle" &&
+						techId !== "none"
+					) {
+						addRule(
+							category,
+							techId,
+							"Turso DB setup requires the Drizzle ORM.",
+						);
+					}
+
+					if (
+						stack.dbSetup === "prisma-postgres" &&
+						techId !== "prisma" &&
+						techId !== "none"
+					) {
+						addRule(
+							category,
+							techId,
+							"Prisma PostgreSQL setup requires Prisma ORM.",
+						);
+					}
+
+					if (
+						stack.dbSetup === "mongodb-atlas" &&
+						techId !== "prisma" &&
+						techId !== "mongoose" &&
+						techId !== "none"
+					) {
+						addRule(
+							category,
+							techId,
+							"MongoDB Atlas setup requires Prisma or Mongoose ORM.",
+						);
+					}
+
+					if (techId === "none") {
+						if (stack.database === "mongodb") {
+							addRule(
+								category,
+								techId,
+								"MongoDB requires Prisma or Mongoose ORM.",
+							);
 						}
-						if (techId === "tauri" && !currentHasTauriCompatibleFrontend) {
-							reason =
-								"Requires TanStack Router, React Router, Nuxt or Svelte frontend.";
+						if (stack.dbSetup === "turso") {
+							addRule(category, techId, "Turso DB setup requires Drizzle ORM.");
+						}
+						if (stack.dbSetup === "prisma-postgres") {
+							addRule(category, techId, "This DB setup requires Prisma ORM.");
 						}
 					}
 
-					if (catKey === "examples") {
-						const isNativeOnly =
-							currentHasNativeFrontend && !currentHasWebFrontend;
-						if (isNativeOnly) {
-							reason = "Examples are not supported with Native-only frontend.";
-						} else if (
-							(techId === "todo" || techId === "ai") &&
-							!currentHasWebFrontend
+					if (techId === "mongoose" && stack.database !== "mongodb") {
+						addRule(
+							category,
+							techId,
+							"Mongoose ORM is not compatible with relational databases.",
+						);
+					}
+				}
+
+				if (catKey === "dbSetup" && techId !== "none") {
+					if (stack.database === "none") {
+						addRule(
+							category,
+							techId,
+							"Select a database before choosing a cloud setup.",
+						);
+					}
+
+					if (techId === "turso") {
+						if (stack.database !== "sqlite" && stack.database !== "none") {
+							addRule(category, techId, "Turso requires SQLite database.");
+						}
+						if (stack.orm !== "drizzle" && stack.orm !== "none") {
+							addRule(category, techId, "Turso requires Drizzle ORM.");
+						}
+					} else if (techId === "prisma-postgres") {
+						if (stack.database !== "postgres" && stack.database !== "none") {
+							addRule(category, techId, "Requires PostgreSQL database.");
+						}
+						if (stack.orm !== "prisma" && stack.orm !== "none") {
+							addRule(category, techId, "Requires Prisma ORM.");
+						}
+					} else if (techId === "mongodb-atlas") {
+						if (stack.database !== "mongodb" && stack.database !== "none") {
+							addRule(category, techId, "Requires MongoDB database.");
+						}
+						if (
+							stack.orm !== "prisma" &&
+							stack.orm !== "mongoose" &&
+							stack.orm !== "none"
 						) {
-							reason =
-								"Requires a web frontend (TanStack Router, React Router, etc.).";
-						} else if (techId === "todo" && currentStack.database === "none") {
-							reason = "Todo example requires a database.";
-						} else if (techId === "ai" && currentStack.backend === "elysia") {
-							reason = "AI example is not compatible with Elysia backend.";
+							addRule(category, techId, "Requires Prisma or Mongoose ORM.");
+						}
+					} else if (techId === "neon") {
+						if (stack.database !== "postgres" && stack.database !== "none") {
+							addRule(category, techId, "Requires PostgreSQL database.");
 						}
 					}
 				}
 
-				if (reason) {
-					reasons.set(`${category}-${techId}`, reason);
+				if (
+					catKey === "auth" &&
+					techId === "true" &&
+					stack.database === "none"
+				) {
+					addRule(category, techId, "Authentication requires a database.");
+				}
+
+				if (catKey === "addons") {
+					if (techId === "pwa" && !rules.hasPWACompatible) {
+						addRule(
+							category,
+							techId,
+							"Requires TanStack Router or React Router frontend.",
+						);
+					}
+
+					if (techId === "tauri" && !rules.hasTauriCompatible) {
+						addRule(
+							category,
+							techId,
+							"Requires TanStack Router, React Router, Nuxt or Svelte frontend.",
+						);
+					}
+				}
+
+				if (catKey === "examples") {
+					if (rules.hasNativeOnly) {
+						addRule(
+							category,
+							techId,
+							"Examples are not supported with Native-only frontend.",
+						);
+					} else {
+						if (
+							(techId === "todo" || techId === "ai") &&
+							!rules.hasWebFrontend
+						) {
+							addRule(
+								category,
+								techId,
+								"Requires a web frontend (TanStack Router, React Router, etc.).",
+							);
+						}
+
+						if (techId === "todo" && stack.database === "none") {
+							addRule(category, techId, "Todo example requires a database.");
+						}
+
+						if (techId === "ai" && stack.backend === "elysia") {
+							addRule(
+								category,
+								techId,
+								"AI example is not compatible with Elysia backend.",
+							);
+						}
+					}
 				}
 			}
 		}
+
 		return reasons;
-	})();
+	}, [stack, rules]);
 
 	const selectedBadges = (() => {
 		const badges: React.ReactNode[] = [];
@@ -968,8 +1171,10 @@ const StackArchitect = () => {
 		}
 	}, []);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (compatibilityAnalysis.adjustedStack) {
+			setLastChanges(compatibilityAnalysis.changes);
 			setStack(compatibilityAnalysis.adjustedStack);
 		}
 	}, [compatibilityAnalysis.adjustedStack, setStack]);
@@ -1072,7 +1277,7 @@ const StackArchitect = () => {
 		});
 	};
 
-    const copyToClipboard = () => {
+	const copyToClipboard = () => {
 		navigator.clipboard.writeText(command);
 		setCopied(true);
 		setTimeout(() => setCopied(false), 2000);
@@ -1089,6 +1294,7 @@ const StackArchitect = () => {
 	const saveCurrentStack = () => {
 		localStorage.setItem("betterTStackPreference", JSON.stringify(stack));
 		setLastSavedStack(stack);
+		toast.success("Your stack configuration has been saved");
 	};
 
 	const loadSavedStack = () => {
@@ -1098,6 +1304,7 @@ const StackArchitect = () => {
 			setShowPresets(false);
 			setActiveCategory(CATEGORY_ORDER[0]);
 			contentRef.current?.scrollTo(0, 0);
+			toast.success("Saved configuration loaded");
 		}
 	};
 
@@ -1111,6 +1318,7 @@ const StackArchitect = () => {
 			setShowHelp(false);
 			setActiveCategory(CATEGORY_ORDER[0]);
 			contentRef.current?.scrollTo(0, 0);
+			toast.success(`Applied preset: ${preset.name}`);
 		}
 	};
 
@@ -1377,7 +1585,7 @@ const StackArchitect = () => {
 
 								const filteredOptions = categoryOptions.filter((tech) => {
 									if (
-										isConvexSelected &&
+										rules.isConvex &&
 										tech.id === "none" &&
 										["runtime", "database", "orm", "api", "dbSetup"].includes(
 											categoryKey,
@@ -1386,14 +1594,14 @@ const StackArchitect = () => {
 										return false;
 									}
 									if (
-										isConvexSelected &&
+										rules.isConvex &&
 										categoryKey === "auth" &&
 										tech.id === "false"
 									) {
 										return false;
 									}
 									if (
-										isConvexSelected &&
+										rules.isConvex &&
 										categoryKey === "examples" &&
 										tech.id !== "todo"
 									) {
