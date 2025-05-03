@@ -39,7 +39,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.amanvarshney01.mybettertapp"
+      "package": "com.amanvarshney01.mybettertapp",
+      "edgeToEdgeEnabled": true
     }
   }
 }
