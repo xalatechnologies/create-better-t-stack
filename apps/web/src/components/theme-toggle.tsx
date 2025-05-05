@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils"; // Make sure you have this utility
+import { cn } from "@/lib/utils";
 import * as SwitchPrimitives from "@radix-ui/react-switch";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";

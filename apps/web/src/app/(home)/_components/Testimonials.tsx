@@ -45,7 +45,7 @@ const MAX_VISIBLE_PAGES = 5;
 
 export default function Testimonials() {
 	const [startIndex, setStartIndex] = useState(0);
-	const [tweetsPerPage] = useState(6); // Show 6 tweets per page
+	const [tweetsPerPage] = useState(6);
 
 	const totalPages = useMemo(
 		() => Math.ceil(TWEET_IDS.length / tweetsPerPage),

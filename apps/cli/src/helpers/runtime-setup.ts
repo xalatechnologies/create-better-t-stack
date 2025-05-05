@@ -4,13 +4,12 @@ import type { ProjectBackend, ProjectConfig } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupRuntime(config: ProjectConfig): Promise<void> {
-	const { projectName, runtime, backend } = config;
+	const { projectName, runtime, backend, projectDir } = config;
 
 	if (backend === "convex" || backend === "next" || runtime === "none") {
 		return;
 	}
 
-	const projectDir = path.resolve(process.cwd(), projectName);
 	const serverDir = path.join(projectDir, "apps/server");
 
 	if (!(await fs.pathExists(serverDir))) {

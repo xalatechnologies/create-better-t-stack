@@ -198,8 +198,7 @@ DATABASE_AUTH_TOKEN=your_auth_token`);
 import type { ProjectConfig } from "../types";
 
 export async function setupTurso(config: ProjectConfig): Promise<void> {
-	const { projectName, orm } = config;
-	const projectDir = path.resolve(process.cwd(), projectName);
+	const { projectName, orm, projectDir } = config;
 	const isDrizzle = orm === "drizzle";
 	const setupSpinner = spinner();
 	setupSpinner.start("Setting up Turso database");

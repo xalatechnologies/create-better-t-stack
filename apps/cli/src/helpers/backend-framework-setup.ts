@@ -7,13 +7,12 @@ import type { ProjectConfig } from "../types";
 export async function setupBackendDependencies(
 	config: ProjectConfig,
 ): Promise<void> {
-	const { projectName, backend, runtime, api } = config;
+	const { projectName, backend, runtime, api, projectDir } = config;
 
 	if (backend === "convex") {
 		return;
 	}
 
-	const projectDir = path.resolve(process.cwd(), projectName);
 	const framework = backend;
 	const serverDir = path.join(projectDir, "apps/server");
 

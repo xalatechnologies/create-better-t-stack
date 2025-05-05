@@ -128,8 +128,7 @@ DATABASE_URL="your_connection_string"`);
 import type { ProjectConfig } from "../types";
 
 export async function setupNeonPostgres(config: ProjectConfig): Promise<void> {
-	const { projectName, packageManager } = config;
-	const projectDir = path.resolve(process.cwd(), projectName);
+	const { projectName, packageManager, projectDir } = config;
 	const setupSpinner = spinner();
 	setupSpinner.start("Setting up Neon PostgreSQL");
 

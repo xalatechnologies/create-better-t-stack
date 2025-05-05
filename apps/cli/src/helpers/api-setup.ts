@@ -5,8 +5,8 @@ import type { ProjectConfig, ProjectFrontend } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupApi(config: ProjectConfig): Promise<void> {
-	const { api, projectName, frontend, backend, packageManager } = config;
-	const projectDir = path.resolve(process.cwd(), projectName);
+	const { api, projectName, frontend, backend, packageManager, projectDir } =
+		config;
 	const isConvex = backend === "convex";
 	const webDir = path.join(projectDir, "apps/web");
 	const nativeDir = path.join(projectDir, "apps/native");

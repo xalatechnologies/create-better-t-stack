@@ -1,5 +1,13 @@
 import path from "node:path";
-import { cancel, intro, log, outro } from "@clack/prompts";
+import {
+	cancel,
+	confirm,
+	intro,
+	isCancel,
+	log,
+	outro,
+	spinner,
+} from "@clack/prompts";
 import { consola } from "consola";
 import fs from "fs-extra";
 import pc from "picocolors";
@@ -147,17 +155,96 @@ async function main() {
 			.parse();
 
 		const options = argv as YargsArgv;
-		const projectDirectory = options.projectDirectory;
+		const cliProjectNameArg = options.projectDirectory;
 
 		renderTitle();
-
-		const flagConfig = processAndValidateFlags(options, projectDirectory);
-
 		intro(pc.magenta("Creating a new Better-T-Stack project"));
 
-		if (!options.yes && Object.keys(flagConfig).length > 0) {
+		let currentPathInput: string;
+		let finalPathInput: string;
+		let finalResolvedPath: string;
+		let finalBaseName: string;
+		let shouldClearDirectory = false;
+
+		if (options.yes && cliProjectNameArg) {
+			currentPathInput = cliProjectNameArg;
+		} else if (options.yes) {
+			let defaultName = DEFAULT_CONFIG.relativePath;
+			let counter = 1;
+			while (
+				fs.pathExistsSync(path.resolve(process.cwd(), defaultName)) &&
+				fs.readdirSync(path.resolve(process.cwd(), defaultName)).length > 0
+			) {
+				defaultName = `${DEFAULT_CONFIG.projectName}-${counter}`;
+				counter++;
+			}
+			currentPathInput = defaultName;
+		} else {
+			currentPathInput = await getProjectName(cliProjectNameArg);
+		}
+
+		while (true) {
+			const resolvedPath = path.resolve(process.cwd(), currentPathInput);
+			const dirExists = fs.pathExistsSync(resolvedPath);
+			const dirIsNotEmpty =
+				dirExists && fs.readdirSync(resolvedPath).length > 0;
+
+			if (!dirIsNotEmpty) {
+				finalPathInput = currentPathInput;
+				shouldClearDirectory = false;
+				break;
+			}
+
+			const shouldOverwrite = await confirm({
+				message: `Directory "${pc.yellow(
+					currentPathInput,
+				)}" already exists and is not empty. Overwrite and replace all existing files?`,
+				initialValue: false,
+			});
+
+			if (isCancel(shouldOverwrite)) {
+				cancel(pc.red("Operation cancelled."));
+				process.exit(0);
+			}
+
+			if (shouldOverwrite) {
+				finalPathInput = currentPathInput;
+				shouldClearDirectory = true;
+				break;
+			}
+
+			log.info("Please choose a different project name or path.");
+			currentPathInput = await getProjectName(undefined);
+		}
+
+		if (finalPathInput === ".") {
+			finalResolvedPath = process.cwd();
+			finalBaseName = path.basename(finalResolvedPath);
+		} else {
+			finalResolvedPath = path.resolve(process.cwd(), finalPathInput);
+			finalBaseName = path.basename(finalResolvedPath);
+		}
+
+		if (shouldClearDirectory) {
+			const s = spinner();
+			s.start(`Clearing directory "${finalResolvedPath}"...`);
+			try {
+				await fs.emptyDir(finalResolvedPath);
+				s.stop(`Directory "${finalResolvedPath}" cleared.`);
+			} catch (error) {
+				s.stop(pc.red(`Failed to clear directory "${finalResolvedPath}".`));
+				consola.error(error);
+				process.exit(1);
+			}
+		}
+
+		const flagConfig = processAndValidateFlags(options, finalBaseName);
+
+		const { projectName: _projectNameFromFlags, ...otherFlags } = flagConfig;
+
+		if (!options.yes && Object.keys(otherFlags).length > 0) {
 			log.info(pc.yellow("Using these pre-selected options:"));
-			log.message(displayConfig(flagConfig));
+			log.message(displayConfig(otherFlags));
 			log.message("");
 		}
 
@@ -165,8 +252,10 @@ async function main() {
 		if (options.yes) {
 			config = {
 				...DEFAULT_CONFIG,
-				projectName: projectDirectory ?? DEFAULT_CONFIG.projectName,
 				...flagConfig,
+				projectName: finalBaseName,
+				projectDir: finalResolvedPath,
+				relativePath: finalPathInput,
 			};
 
 			if (config.backend === "convex") {
@@ -176,27 +265,25 @@ async function main() {
 				config.api = "none";
 				config.runtime = "none";
 				config.dbSetup = "none";
+				config.examples = ["todo"];
 			} else if (config.database === "none") {
 				config.orm = "none";
 				config.auth = false;
 				config.dbSetup = "none";
 			}
 
-			log.info(pc.yellow("Using these default/flag options:"));
+			log.info(
+				pc.yellow("Using default/flag options (config prompts skipped):"),
+			);
 			log.message(displayConfig(config));
 			log.message("");
 		} else {
-			config = await gatherConfig(flagConfig);
-		}
-
-		const projectDir = path.resolve(process.cwd(), config.projectName);
-
-		if (
-			fs.pathExistsSync(projectDir) &&
-			fs.readdirSync(projectDir).length > 0
-		) {
-			const newProjectName = await getProjectName();
-			config.projectName = newProjectName;
+			config = await gatherConfig(
+				flagConfig,
+				finalBaseName,
+				finalResolvedPath,
+				finalPathInput,
+			);
 		}
 
 		await createProject(config);
@@ -238,7 +325,7 @@ async function main() {
 
 function processAndValidateFlags(
 	options: YargsArgv,
-	projectDirectory?: string,
+	projectName?: string,
 ): Partial<ProjectConfig> {
 	const config: Partial<ProjectConfig> = {};
 	const providedFlags: Set<string> = new Set(
@@ -305,8 +392,13 @@ function processAndValidateFlags(
 	if (options.packageManager) {
 		config.packageManager = options.packageManager as ProjectPackageManager;
 	}
-	if (projectDirectory) {
-		config.projectName = projectDirectory;
+
+	if (projectName) {
+		config.projectName = projectName;
+	} else if (options.projectDirectory) {
+		config.projectName = path.basename(
+			path.resolve(process.cwd(), options.projectDirectory),
+		);
 	}
 
 	if (options.frontend && options.frontend.length > 0) {
@@ -363,7 +455,7 @@ function processAndValidateFlags(
 			config.examples = options.examples.filter(
 				(ex): ex is ProjectExamples => ex !== "none",
 			);
-			if (config.backend !== "convex" && options.examples.includes("none")) {
+			if (options.examples.includes("none") && config.backend !== "convex") {
 				config.examples = [];
 			}
 		}
@@ -384,15 +476,12 @@ function processAndValidateFlags(
 			incompatibleFlags.push(`--runtime ${options.runtime}`);
 		if (providedFlags.has("dbSetup") && options.dbSetup !== "none")
 			incompatibleFlags.push(`--db-setup ${options.dbSetup}`);
-		if (providedFlags.has("examples")) {
-			incompatibleFlags.push("--examples");
-		}
 
 		if (incompatibleFlags.length > 0) {
 			consola.fatal(
 				`The following flags are incompatible with '--backend convex': ${incompatibleFlags.join(
 					", ",
-				)}. Please remove them. The 'todo' example is included automatically with Convex.`,
+				)}. Please remove them.`,
 			);
 			process.exit(1);
 		}
@@ -463,6 +552,12 @@ function processAndValidateFlags(
 		}
 
 		if (config.orm === "mongoose" && !providedFlags.has("database")) {
+			if (effectiveDatabase && effectiveDatabase !== "mongodb") {
+				consola.fatal(
+					`Mongoose ORM requires MongoDB. Cannot use --orm mongoose with --database ${effectiveDatabase}.`,
+				);
+				process.exit(1);
+			}
 			config.database = "mongodb";
 		}
 
@@ -564,7 +659,7 @@ function processAndValidateFlags(
 		if (
 			(includesNuxt || includesSvelte || includesSolid) &&
 			effectiveApi !== "orpc" &&
-			(!options.api || (options.yes && options.api !== "trpc"))
+			(!options.api || (options.yes && options.api === "trpc"))
 		) {
 			if (config.api !== "none") {
 				config.api = "orpc";
@@ -576,32 +671,43 @@ function processAndValidateFlags(
 			const hasWebSpecificAddons = config.addons.some((addon) =>
 				webSpecificAddons.includes(addon),
 			);
-			const hasCompatibleWebFrontend = effectiveFrontend?.some(
-				(f) =>
+			const hasCompatibleWebFrontend = effectiveFrontend?.some((f) => {
+				const isPwaCompatible =
+					f === "tanstack-router" || f === "react-router" || f === "solid";
+				const isTauriCompatible =
 					f === "tanstack-router" ||
 					f === "react-router" ||
-					f === "solid" ||
-					(f === "nuxt" &&
-						config.addons?.includes("tauri") &&
-						!config.addons?.includes("pwa")) ||
-					(f === "svelte" &&
-						config.addons?.includes("tauri") &&
-						!config.addons?.includes("pwa")),
-			);
+					f === "nuxt" ||
+					f === "svelte" ||
+					f === "solid";
+
+				if (
+					config.addons?.includes("pwa") &&
+					config.addons?.includes("tauri")
+				) {
+					return isPwaCompatible && isTauriCompatible;
+				}
+				if (config.addons?.includes("pwa")) {
+					return isPwaCompatible;
+				}
+				if (config.addons?.includes("tauri")) {
+					return isTauriCompatible;
+				}
+				return true;
+			});
 
 			if (hasWebSpecificAddons && !hasCompatibleWebFrontend) {
-				let incompatibleAddon = "";
-				if (config.addons.includes("pwa") && includesNuxt) {
-					incompatibleAddon = "PWA addon is not compatible with Nuxt.";
-				} else if (
-					config.addons.includes("pwa") ||
-					config.addons.includes("tauri")
-				) {
-					incompatibleAddon =
-						"PWA requires tanstack-router/react-router/solid. Tauri requires tanstack-router/react-router/Nuxt/Svelte/Solid.";
+				let incompatibleReason = "Selected frontend is not compatible.";
+				if (config.addons.includes("pwa")) {
+					incompatibleReason =
+						"PWA requires tanstack-router, react-router, or solid.";
+				}
+				if (config.addons.includes("tauri")) {
+					incompatibleReason =
+						"Tauri requires tanstack-router, react-router, nuxt, svelte, or solid.";
 				}
 				consola.fatal(
-					`${incompatibleAddon} Cannot use these addons with your frontend selection.`,
+					`Incompatible addon/frontend combination: ${incompatibleReason}`,
 				);
 				process.exit(1);
 			}
@@ -671,7 +777,12 @@ main().catch((err) => {
 	if (err instanceof Error) {
 		if (
 			!err.message.includes("is only supported with") &&
-			!err.message.includes("incompatible with")
+			!err.message.includes("incompatible with") &&
+			!err.message.includes("requires") &&
+			!err.message.includes("Cannot use") &&
+			!err.message.includes("Cannot select multiple") &&
+			!err.message.includes("Cannot combine") &&
+			!err.message.includes("not supported")
 		) {
 			consola.error(err.message);
 			consola.error(err.stack);

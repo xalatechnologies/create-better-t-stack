@@ -154,8 +154,7 @@ export default prisma;
 import type { ProjectConfig } from "../types";
 
 export async function setupPrismaPostgres(config: ProjectConfig) {
-	const { projectName, packageManager } = config;
-	const projectDir = path.resolve(process.cwd(), projectName);
+	const { projectName, packageManager, projectDir } = config;
 	const serverDir = path.join(projectDir, "apps/server");
 	const s = spinner();
 	s.start("Setting up Prisma PostgreSQL");

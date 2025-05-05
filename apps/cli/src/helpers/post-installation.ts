@@ -16,6 +16,7 @@ export function displayPostInstallInstructions(
 	const {
 		database,
 		projectName,
+		relativePath,
 		packageManager,
 		depsInstalled,
 		orm,
@@ -27,7 +28,7 @@ export function displayPostInstallInstructions(
 
 	const isConvex = backend === "convex";
 	const runCmd = packageManager === "npm" ? "npm run" : packageManager;
-	const cdCmd = `cd ${projectName}`;
+	const cdCmd = `cd ${relativePath}`;
 	const hasHuskyOrBiome =
 		addons?.includes("husky") || addons?.includes("biome");
 
@@ -76,7 +77,7 @@ export function displayPostInstallInstructions(
 		!isConvex && database !== "none" && orm === "none" ? getNoOrmWarning() : "";
 
 	const hasReactRouter = frontend?.includes("react-router");
-	const hasSvelte = frontend?.includes("svelte"); // Keep separate for port logic
+	const hasSvelte = frontend?.includes("svelte");
 	const webPort = hasReactRouter || hasSvelte ? "5173" : "3001";
 
 	const tazeCommand = getPackageExecutionCommand(packageManager, "taze -r");

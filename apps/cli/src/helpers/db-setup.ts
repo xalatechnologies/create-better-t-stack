@@ -13,11 +13,10 @@ import { setupNeonPostgres } from "./neon-setup";
 import type { ProjectConfig } from "../types";
 
 export async function setupDatabase(config: ProjectConfig): Promise<void> {
-	const { projectName, database, orm, dbSetup, backend } = config;
+	const { projectName, database, orm, dbSetup, backend, projectDir } = config;
 
 	if (backend === "convex" || database === "none") {
 		if (backend !== "convex") {
-			const projectDir = path.resolve(process.cwd(), projectName);
 			const serverDir = path.join(projectDir, "apps/server");
 			const serverDbDir = path.join(serverDir, "src/db");
 			if (await fs.pathExists(serverDbDir)) {
@@ -27,7 +26,6 @@ export async function setupDatabase(config: ProjectConfig): Promise<void> {
 		return;
 	}
 
-	const projectDir = path.resolve(process.cwd(), projectName);
 	const s = spinner();
 	const serverDir = path.join(projectDir, "apps/server");
 

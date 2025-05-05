@@ -64,7 +64,7 @@ export function generateReproducibleCommand(config: ProjectConfig): string {
 		baseCommand = "bun create better-t-stack@latest";
 	}
 
-	const projectName = config.projectName ? ` ${config.projectName}` : "";
+	const projectPathArg = config.relativePath ? ` ${config.relativePath}` : "";
 
-	return `${baseCommand}${projectName} ${flags.join(" ")}`;
+	return `${baseCommand}${projectPathArg} ${flags.join(" ")}`;
 }

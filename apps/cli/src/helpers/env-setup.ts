@@ -65,8 +65,8 @@ export async function setupEnvironmentVariables(
 		auth,
 		examples,
 		dbSetup,
+		projectDir,
 	} = config;
-	const projectDir = path.resolve(process.cwd(), projectName);
 
 	const hasReactRouter = frontend.includes("react-router");
 	const hasTanStackRouter = frontend.includes("tanstack-router");

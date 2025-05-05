@@ -1,5 +1,4 @@
-import path from "node:path";
-import { cancel, log, spinner } from "@clack/prompts";
+import { cancel, log } from "@clack/prompts";
 import fs from "fs-extra";
 import pc from "picocolors";
 import type { ProjectConfig } from "../types";
@@ -27,7 +26,7 @@ import {
 } from "./template-manager";
 
 export async function createProject(options: ProjectConfig) {
-	const projectDir = path.resolve(process.cwd(), options.projectName);
+	const projectDir = options.projectDir;
 	const isConvex = options.backend === "convex";
 
 	try {

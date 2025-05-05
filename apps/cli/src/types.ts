@@ -37,6 +37,8 @@ export type ProjectApi = "trpc" | "orpc" | "none";
 
 export interface ProjectConfig {
 	projectName: string;
+	projectDir: string;
+	relativePath: string;
 	backend: ProjectBackend;
 	runtime: ProjectRuntime;
 	database: ProjectDatabase;

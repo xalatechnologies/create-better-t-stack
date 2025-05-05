@@ -10,8 +10,7 @@ import { getPackageExecutionCommand } from "../utils/get-package-execution-comma
 import type { ProjectConfig } from "../types";
 
 export async function setupTauri(config: ProjectConfig): Promise<void> {
-	const { projectName, packageManager, frontend } = config;
-	const projectDir = path.resolve(process.cwd(), projectName);
+	const { projectName, packageManager, frontend, projectDir } = config;
 	const s = spinner();
 	const clientPackageDir = path.join(projectDir, "apps/web");
 

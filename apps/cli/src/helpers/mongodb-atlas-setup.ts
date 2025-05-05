@@ -130,8 +130,7 @@ ${pc.green("MongoDB Atlas Manual Setup Instructions:")}
 }
 
 export async function setupMongoDBAtlas(config: ProjectConfig) {
-	const { projectName } = config;
-	const projectDir = path.resolve(process.cwd(), projectName);
+	const { projectName, projectDir } = config;
 	const mainSpinner = spinner();
 	mainSpinner.start("Setting up MongoDB Atlas");
 

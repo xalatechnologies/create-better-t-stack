@@ -25,11 +25,9 @@ import { getGitChoice } from "./git";
 import { getinstallChoice } from "./install";
 import { getORMChoice } from "./orm";
 import { getPackageManagerChoice } from "./package-manager";
-import { getProjectName } from "./project-name";
 import { getRuntimeChoice } from "./runtime";
 
 type PromptGroupResults = {
-	projectName: string;
 	frontend: ProjectFrontend[];
 	backend: ProjectBackend;
 	runtime: ProjectRuntime;
@@ -47,12 +45,12 @@ type PromptGroupResults = {
 
 export async function gatherConfig(
 	flags: Partial<ProjectConfig>,
+	projectName: string,
+	projectDir: string,
+	relativePath: string,
 ): Promise<ProjectConfig> {
 	const result = await group<PromptGroupResults>(
 		{
-			projectName: async () => {
-				return getProjectName(flags.projectName);
-			},
 			frontend: ({ results }) =>
 				getFrontendChoice(flags.frontend, flags.backend),
 			backend: ({ results }) =>
@@ -109,7 +107,9 @@ export async function gatherConfig(
 	}
 
 	return {
-		projectName: result.projectName,
+		projectName: projectName,
+		projectDir: projectDir,
+		relativePath: relativePath,
 		frontend: result.frontend,
 		backend: result.backend,
 		runtime: result.runtime,

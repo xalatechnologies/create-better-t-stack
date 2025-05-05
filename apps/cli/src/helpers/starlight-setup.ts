@@ -7,8 +7,7 @@ import type { ProjectConfig } from "../types";
 import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
 
 export async function setupStarlight(config: ProjectConfig): Promise<void> {
-	const { projectName, packageManager } = config;
-	const projectDir = path.resolve(process.cwd(), projectName);
+	const { projectName, packageManager, projectDir } = config;
 	const s = spinner();
 
 	try {

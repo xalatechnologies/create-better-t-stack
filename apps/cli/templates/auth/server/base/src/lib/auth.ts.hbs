@@ -94,7 +94,7 @@ export const auth = betterAuth({
   database: "", // Invalid configuration
   trustedOrigins: [
     process.env.CORS_ORIGIN || "",{{#if (includes frontend "native")}}
-    "my-better-t-app://", // Use hardcoded scheme{{/if}}
+    "my-better-t-app://",{{/if}}
   ],
   emailAndPassword: {
     enabled: true,

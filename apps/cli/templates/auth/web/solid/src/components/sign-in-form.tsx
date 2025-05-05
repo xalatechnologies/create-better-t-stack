@@ -68,8 +68,8 @@ export default function SignInForm({
                   type="email"
                   value={field().state.value}
                   onBlur={field().handleBlur}
-                  onInput={(e) => field().handleChange(e.currentTarget.value)} // Use onInput and currentTarget
-                  class="w-full rounded border p-2" // Example basic styling
+                  onInput={(e) => field().handleChange(e.currentTarget.value)}
+                  class="w-full rounded border p-2"
                 />
                 <For each={field().state.meta.errors}>
                   {(error) => (
@@ -122,7 +122,7 @@ export default function SignInForm({
         <button
           type="button"
           onClick={onSwitchToSignUp}
-          class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline" // Example basic styling
+          class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline"
         >
           Need an account? Sign Up
         </button>
