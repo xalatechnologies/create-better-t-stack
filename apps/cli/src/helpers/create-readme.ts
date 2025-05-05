@@ -3,6 +3,7 @@ import consola from "consola";
 import fs from "fs-extra";
 import type {
 	ProjectAddons,
+	ProjectApi,
 	ProjectConfig,
 	ProjectDatabase,
 	ProjectFrontend,
@@ -32,8 +33,10 @@ function generateReadmeContent(options: ProjectConfig): string {
 		runtime = "bun",
 		frontend = ["tanstack-router"],
 		backend = "hono",
+		api = "trpc",
 	} = options;
 
+	const isConvex = backend === "convex";
 	const hasReactRouter = frontend.includes("react-router");
 	const hasTanstackRouter = frontend.includes("tanstack-router");
 	const hasNative = frontend.includes("native");
@@ -53,15 +56,15 @@ function generateReadmeContent(options: ProjectConfig): string {
 
 	return `# ${projectName}
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, ${
+This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines ${
 		hasTanstackRouter
-			? "TanStack Router"
+			? "React, TanStack Router"
 			: hasReactRouter
-				? "React Router"
+				? "React, React Router"
 				: hasNext
 					? "Next.js"
 					: hasTanstackStart
-						? "TanStack Start"
+						? "React, TanStack Start"
 						: hasSvelte
 							? "SvelteKit"
 							: hasNuxt
@@ -69,11 +72,13 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 								: hasSolid
 									? "SolidJS"
 									: ""
-	}, ${backend[0].toUpperCase() + backend.slice(1)}, tRPC, and more.
+	}, ${backend[0].toUpperCase() + backend.slice(1)}${
+		isConvex ? "" : `, ${api.toUpperCase()}`
+	}, and more.
 
 ## Features
 
-${generateFeaturesList(database, auth, addons, orm, runtime, frontend, backend)}
+${generateFeaturesList(database, auth, addons, orm, runtime, frontend, backend, api)}
 
 ## Getting Started
 
@@ -82,8 +87,20 @@ First, install the dependencies:
 \`\`\`bash
 ${packageManager} install
 \`\`\`
+${
+	isConvex
+		? `
+## Convex Setup
 
-${generateDatabaseSetup(database, auth, packageManagerRunCmd, orm)}
+This project uses Convex as a backend. You'll need to set up Convex before running the app:
+
+\`\`\`bash
+${packageManagerRunCmd} dev:setup
+\`\`\`
+
+Follow the prompts to create a new Convex project and connect it to your application.`
+		: generateDatabaseSetup(database, auth, packageManagerRunCmd, orm)
+}
 
 Then, run the development server:
 
@@ -103,7 +120,11 @@ ${
 		: ""
 }
 ${hasNative ? "Use the Expo Go app to run the mobile application.\n" : ""}
-The API is running at [http://localhost:3000](http://localhost:3000).
+${
+	isConvex
+		? "Your app will connect to the Convex cloud backend automatically."
+		: "The API is running at [http://localhost:3000](http://localhost:3000)."
+}
 
 ${
 	addons.includes("pwa") && hasReactRouter
@@ -150,9 +171,13 @@ ${
 	addons.includes("starlight")
 		? "│   ├── docs/        # Documentation site (Astro Starlight)\n"
 		: ""
-}│   └── server/      # Backend API (${
-		backend[0].toUpperCase() + backend.slice(1)
-	}, tRPC)
+}${
+	isConvex
+		? "├── packages/\n│   └── backend/     # Convex backend functions and schema\n"
+		: `│   └── server/      # Backend API (${
+				backend[0].toUpperCase() + backend.slice(1)
+			}, ${api.toUpperCase()})`
+}
 \`\`\`
 
 ## Available Scripts
@@ -177,7 +202,9 @@ function generateFeaturesList(
 	runtime: ProjectRuntime,
 	frontend: ProjectFrontend[],
 	backend: string,
+	api: ProjectApi,
 ): string {
+	const isConvex = backend === "convex";
 	const hasTanstackRouter = frontend.includes("tanstack-router");
 	const hasReactRouter = frontend.includes("react-router");
 	const hasNative = frontend.includes("native");
@@ -221,25 +248,36 @@ function generateFeaturesList(
 		"- **shadcn/ui** - Reusable UI components",
 	);
 
-	if (backend === "hono") {
-		addonsList.push("- **Hono** - Lightweight, performant server framework");
-	} else if (backend === "express") {
-		addonsList.push("- **Express** - Fast, unopinionated web framework");
-	} else if (backend === "elysia") {
-		addonsList.push("- **Elysia** - Type-safe, high-performance framework");
-	} else if (backend === "next") {
-		addonsList.push("- **Next.js** - Full-stack React framework");
+	if (isConvex) {
+		addonsList.push("- **Convex** - Reactive backend-as-a-service platform");
+	} else {
+		if (backend === "hono") {
+			addonsList.push("- **Hono** - Lightweight, performant server framework");
+		} else if (backend === "express") {
+			addonsList.push("- **Express** - Fast, unopinionated web framework");
+		} else if (backend === "elysia") {
+			addonsList.push("- **Elysia** - Type-safe, high-performance framework");
+		} else if (backend === "next") {
+			addonsList.push("- **Next.js** - Full-stack React framework");
+		}
+
+		if (api === "trpc") {
+			addonsList.push("- **tRPC** - End-to-end type-safe APIs");
+		} else if (api === "orpc") {
+			addonsList.push(
+				"- **oRPC** - End-to-end type-safe APIs with OpenAPI integration",
+			);
+		}
+
+		addonsList.push(
+			`- **${runtime === "bun" ? "Bun" : "Node.js"}** - Runtime environment`,
+		);
 	}
 
-	addonsList.push(
-		"- **tRPC** - End-to-end type-safe APIs",
-		`- **${runtime === "bun" ? "Bun" : "Node.js"}** - Runtime environment`,
-	);
-
-	if (database !== "none") {
+	if (database !== "none" && !isConvex) {
 		addonsList.push(
 			`- **${
-				orm === "drizzle" ? "Drizzle" : "Prisma"
+				orm === "drizzle" ? "Drizzle" : orm === "prisma" ? "Prisma" : "Mongoose"
 			}** - TypeScript-first ORM`,
 			`- **${
 				database === "sqlite"
@@ -253,7 +291,7 @@ function generateFeaturesList(
 		);
 	}
 
-	if (auth) {
+	if (auth && !isConvex) {
 		addonsList.push(
 			"- **Authentication** - Email & password authentication with Better Auth",
 		);
@@ -270,6 +308,8 @@ function generateFeaturesList(
 			addonsList.push("- **Husky** - Git hooks for code quality");
 		} else if (addon === "starlight") {
 			addonsList.push("- **Starlight** - Documentation site with Astro");
+		} else if (addon === "turborepo") {
+			addonsList.push("- **Turborepo** - Optimized monorepo build system");
 		}
 	}
 
@@ -317,7 +357,9 @@ cd apps/server && ${packageManagerRunCmd} db:local
 2. Update your \`apps/server/.env\` file with your MySQL connection details.
 `;
 	} else if (database === "mongodb") {
-		setup += `This project uses MongoDB with Prisma ORM.
+		setup += `This project uses MongoDB ${
+			orm === "mongoose" ? "with Mongoose" : "with Prisma ORM"
+		}.
 
 1. Make sure you have MongoDB set up.
 2. Update your \`apps/server/.env\` file with your MongoDB connection URI.
@@ -331,7 +373,12 @@ ${auth ? "3" : "3"}. ${
 \`\`\`bash
 ${packageManagerRunCmd} db:push
 \`\`\``
-			: `Apply the schema to your database:
+			: orm === "drizzle"
+				? `Apply the schema to your database:
+\`\`\`bash
+${packageManagerRunCmd} db:push
+\`\`\``
+				: `Apply the schema to your database:
 \`\`\`bash
 ${packageManagerRunCmd} db:push
 \`\`\``
@@ -350,10 +397,21 @@ function generateScriptsList(
 	addons: ProjectAddons[],
 	backend: string,
 ): string {
+	const isConvex = backend === "convex";
+
 	let scripts = `- \`${packageManagerRunCmd} dev\`: Start all applications in development mode
 - \`${packageManagerRunCmd} build\`: Build all applications
-- \`${packageManagerRunCmd} dev:web\`: Start only the web application
-- \`${packageManagerRunCmd} dev:server\`: Start only the server
+- \`${packageManagerRunCmd} dev:web\`: Start only the web application`;
+
+	if (isConvex) {
+		scripts += `
+- \`${packageManagerRunCmd} dev:setup\`: Setup and configure your Convex project`;
+	} else {
+		scripts += `
+- \`${packageManagerRunCmd} dev:server\`: Start only the server`;
+	}
+
+	scripts += `
 - \`${packageManagerRunCmd} check-types\`: Check TypeScript types across all apps`;
 
 	if (hasNative) {
@@ -361,7 +419,7 @@ function generateScriptsList(
 - \`${packageManagerRunCmd} dev:native\`: Start the React Native/Expo development server`;
 	}
 
-	if (database !== "none") {
+	if (database !== "none" && !isConvex) {
 		scripts += `
 - \`${packageManagerRunCmd} db:push\`: Push schema changes to database
 - \`${packageManagerRunCmd} db:studio\`: Open database studio UI`;
