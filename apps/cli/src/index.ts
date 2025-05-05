@@ -1,11 +1,11 @@
 import path from "node:path";
 import {
 	cancel,
-	confirm,
 	intro,
 	isCancel,
 	log,
 	outro,
+	select,
 	spinner,
 } from "@clack/prompts";
 import { consola } from "consola";
@@ -195,26 +195,62 @@ async function main() {
 				break;
 			}
 
-			const shouldOverwrite = await confirm({
-				message: `Directory "${pc.yellow(
+			log.warn(
+				`Directory "${pc.yellow(
 					currentPathInput,
-				)}" already exists and is not empty. Overwrite and replace all existing files?`,
-				initialValue: false,
+				)}" already exists and is not empty.`,
+			);
+
+			const action = await select<"overwrite" | "merge" | "rename" | "cancel">({
+				message: "What would you like to do?",
+				options: [
+					{
+						value: "overwrite",
+						label: "Overwrite",
+						hint: "Empty the directory and create the project",
+					},
+					{
+						value: "merge",
+						label: "Merge",
+						hint: "Create project files inside, potentially overwriting conflicts",
+					},
+					{
+						value: "rename",
+						label: "Choose a different name/path",
+						hint: "Keep the existing directory and create a new one",
+					},
+					{ value: "cancel", label: "Cancel", hint: "Abort the process" },
+				],
+				initialValue: "rename",
 			});
 
-			if (isCancel(shouldOverwrite)) {
+			if (isCancel(action)) {
 				cancel(pc.red("Operation cancelled."));
 				process.exit(0);
 			}
 
-			if (shouldOverwrite) {
+			if (action === "overwrite") {
 				finalPathInput = currentPathInput;
 				shouldClearDirectory = true;
 				break;
 			}
-
-			log.info("Please choose a different project name or path.");
-			currentPathInput = await getProjectName(undefined);
+			if (action === "merge") {
+				finalPathInput = currentPathInput;
+				shouldClearDirectory = false;
+				log.info(
+					`Proceeding into existing directory "${pc.yellow(
+						currentPathInput,
+					)}". Files may be overwritten.`,
+				);
+				break;
+			}
+			if (action === "rename") {
+				log.info("Please choose a different project name or path.");
+				currentPathInput = await getProjectName(undefined);
+			} else if (action === "cancel") {
+				cancel(pc.red("Operation cancelled."));
+				process.exit(0);
+			}
 		}
 
 		if (finalPathInput === ".") {
@@ -236,10 +272,11 @@ async function main() {
 				consola.error(error);
 				process.exit(1);
 			}
+		} else {
+			await fs.ensureDir(finalResolvedPath);
 		}
 
 		const flagConfig = processAndValidateFlags(options, finalBaseName);
-
 		const { projectName: _projectNameFromFlags, ...otherFlags } = flagConfig;
 
 		if (!options.yes && Object.keys(otherFlags).length > 0) {
@@ -786,7 +823,6 @@ main().catch((err) => {
 		) {
 			consola.error(err.message);
 			consola.error(err.stack);
-		} else {
 		}
 	} else {
 		console.error(err);
