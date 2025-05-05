@@ -1,43 +1,62 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { ProjectBackend } from "../types";
+import type { ProjectBackend, ProjectFrontend } from "../types";
 
 export async function getBackendFrameworkChoice(
 	backendFramework?: ProjectBackend,
+	frontends?: ProjectFrontend[],
 ): Promise<ProjectBackend> {
 	if (backendFramework !== undefined) return backendFramework;
 
+	const hasIncompatibleFrontend = frontends?.some(
+		(f) => f === "nuxt" || f === "solid",
+	);
+
+	const backendOptions: Array<{
+		value: ProjectBackend;
+		label: string;
+		hint: string;
+	}> = [
+		{
+			value: "hono" as const,
+			label: "Hono",
+			hint: "Lightweight, ultrafast web framework",
+		},
+		{
+			value: "next" as const,
+			label: "Next.js",
+			hint: "Full-stack framework with API routes",
+		},
+		{
+			value: "express" as const,
+			label: "Express",
+			hint: "Fast, unopinionated, minimalist web framework for Node.js",
+		},
+		{
+			value: "elysia" as const,
+			label: "Elysia",
+			hint: "Ergonomic web framework for building backend servers",
+		},
+	];
+
+	if (!hasIncompatibleFrontend) {
+		backendOptions.push({
+			value: "convex" as const,
+			label: "Convex",
+			hint: "Reactive backend-as-a-service platform",
+		});
+	}
+
+	let initialValue = DEFAULT_CONFIG.backend;
+	if (hasIncompatibleFrontend && initialValue === "convex") {
+		initialValue = "hono";
+	}
+
 	const response = await select<ProjectBackend>({
 		message: "Select backend framework",
-		options: [
-			{
-				value: "hono",
-				label: "Hono",
-				hint: "Lightweight, ultrafast web framework",
-			},
-			{
-				value: "next",
-				label: "Next.js",
-				hint: "Full-stack framework with API routes",
-			},
-			{
-				value: "express",
-				label: "Express",
-				hint: "Fast, unopinionated, minimalist web framework for Node.js",
-			},
-			{
-				value: "elysia",
-				label: "Elysia",
-				hint: "Ergonomic web framework for building backend servers",
-			},
-			{
-				value: "convex",
-				label: "Convex",
-				hint: "Reactive backend-as-a-service platform",
-			},
-		],
-		initialValue: DEFAULT_CONFIG.backend,
+		options: backendOptions,
+		initialValue,
 	});
 
 	if (isCancel(response)) {

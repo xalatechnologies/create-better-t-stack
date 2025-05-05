@@ -53,8 +53,10 @@ export async function gatherConfig(
 			projectName: async () => {
 				return getProjectName(flags.projectName);
 			},
-			frontend: () => getFrontendChoice(flags.frontend),
-			backend: () => getBackendFrameworkChoice(flags.backend),
+			frontend: ({ results }) =>
+				getFrontendChoice(flags.frontend, flags.backend),
+			backend: ({ results }) =>
+				getBackendFrameworkChoice(flags.backend, results.frontend),
 			runtime: ({ results }) =>
 				getRuntimeChoice(flags.runtime, results.backend),
 			database: ({ results }) =>

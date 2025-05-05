@@ -18,6 +18,7 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 	);
 	const hasNuxtWeb = frontend.includes("nuxt");
 	const hasSvelteWeb = frontend.includes("svelte");
+	const hasSolidWeb = frontend.includes("solid");
 
 	if (!isConvex && api !== "none") {
 		const serverDir = path.join(projectDir, "apps/server");
@@ -85,6 +86,18 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 						projectDir: webDir,
 					});
 				}
+			} else if (hasSolidWeb) {
+				if (api === "orpc") {
+					await addPackageDependency({
+						dependencies: [
+							"@orpc/solid-query",
+							"@orpc/client",
+							"@orpc/server",
+							"@tanstack/solid-query",
+						],
+						projectDir: webDir,
+					});
+				}
 			}
 		}
 
@@ -114,6 +127,7 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 		"next",
 		"native",
 	];
+	const needsSolidQuery = frontend.includes("solid");
 	const needsReactQuery = frontend.some((f) => reactBasedFrontends.includes(f));
 
 	if (needsReactQuery && !isConvex) {
@@ -151,6 +165,26 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 					});
 				} catch (error) {}
 			} else {
+			}
+		}
+	}
+
+	if (needsSolidQuery && !isConvex) {
+		const solidQueryDeps: AvailableDependencies[] = ["@tanstack/solid-query"];
+		const solidQueryDevDeps: AvailableDependencies[] = [
+			"@tanstack/solid-query-devtools",
+		];
+
+		if (webDirExists) {
+			const webPkgJsonPath = path.join(webDir, "package.json");
+			if (await fs.pathExists(webPkgJsonPath)) {
+				try {
+					await addPackageDependency({
+						dependencies: solidQueryDeps,
+						devDependencies: solidQueryDevDeps,
+						projectDir: webDir,
+					});
+				} catch (error) {}
 			}
 		}
 	}

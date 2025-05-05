@@ -17,13 +17,15 @@ export async function getAddonsChoice(
 
 	const hasCompatiblePwaFrontend =
 		frontends?.includes("react-router") ||
-		frontends?.includes("tanstack-router");
+		frontends?.includes("tanstack-router") ||
+		frontends?.includes("solid");
 
 	const hasCompatibleTauriFrontend =
 		frontends?.includes("react-router") ||
 		frontends?.includes("tanstack-router") ||
 		frontends?.includes("nuxt") ||
-		frontends?.includes("svelte");
+		frontends?.includes("svelte") ||
+		frontends?.includes("solid");
 
 	const allPossibleOptions: AddonOption[] = [
 		{

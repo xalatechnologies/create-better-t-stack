@@ -37,6 +37,7 @@ export async function getExamplesChoice(
 				"next",
 				"nuxt",
 				"svelte",
+				"solid",
 			].includes(f),
 		) ?? false;
 	const noFrontendSelected = !frontends || frontends.length === 0;
@@ -52,7 +53,7 @@ export async function getExamplesChoice(
 		},
 	];
 
-	if (backend !== "elysia") {
+	if (backend !== "elysia" && !frontends?.includes("solid")) {
 		options.push({
 			value: "ai" as const,
 			label: "AI Chat",

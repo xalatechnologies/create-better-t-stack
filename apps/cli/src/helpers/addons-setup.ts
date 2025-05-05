@@ -14,6 +14,7 @@ export async function setupAddons(config: ProjectConfig) {
 		frontend.includes("react-router") || frontend.includes("tanstack-router");
 	const hasNuxtFrontend = frontend.includes("nuxt");
 	const hasSvelteFrontend = frontend.includes("svelte");
+	const hasSolidFrontend = frontend.includes("solid");
 
 	if (addons.includes("turborepo")) {
 		await addPackageDependency({
@@ -22,12 +23,15 @@ export async function setupAddons(config: ProjectConfig) {
 		});
 	}
 
-	if (addons.includes("pwa") && hasReactWebFrontend) {
+	if (addons.includes("pwa") && (hasReactWebFrontend || hasSolidFrontend)) {
 		await setupPwa(projectDir, frontend);
 	}
 	if (
 		addons.includes("tauri") &&
-		(hasReactWebFrontend || hasNuxtFrontend || hasSvelteFrontend)
+		(hasReactWebFrontend ||
+			hasNuxtFrontend ||
+			hasSvelteFrontend ||
+			hasSolidFrontend)
 	) {
 		await setupTauri(config);
 	}
@@ -48,7 +52,9 @@ function getWebAppDir(
 ): string {
 	if (
 		frontends.some((f) =>
-			["react-router", "tanstack-router", "nuxt", "svelte"].includes(f),
+			["react-router", "tanstack-router", "nuxt", "svelte", "solid"].includes(
+				f,
+			),
 		)
 	) {
 		return path.join(projectDir, "apps/web");
@@ -102,7 +108,7 @@ async function setupHusky(projectDir: string) {
 
 async function setupPwa(projectDir: string, frontends: ProjectFrontend[]) {
 	const isCompatibleFrontend = frontends.some((f) =>
-		["react-router", "tanstack-router"].includes(f),
+		["react-router", "tanstack-router", "solid"].includes(f),
 	);
 	if (!isCompatibleFrontend) return;
 

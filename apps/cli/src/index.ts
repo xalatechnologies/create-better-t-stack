@@ -78,6 +78,7 @@ async function main() {
 					"nuxt",
 					"native",
 					"svelte",
+					"solid",
 					"none",
 				],
 			})
@@ -326,11 +327,12 @@ function processAndValidateFlags(
 					f === "tanstack-start" ||
 					f === "next" ||
 					f === "nuxt" ||
-					f === "svelte",
+					f === "svelte" ||
+					f === "solid",
 			);
 			if (webFrontends.length > 1) {
 				consola.fatal(
-					"Cannot select multiple web frameworks. Choose only one of: tanstack-router, tanstack-start, react-router, next, nuxt, svelte",
+					"Cannot select multiple web frameworks. Choose only one of: tanstack-router, tanstack-start, react-router, next, nuxt, svelte, solid",
 				);
 				process.exit(1);
 			}
@@ -393,6 +395,20 @@ function processAndValidateFlags(
 				)}. Please remove them. The 'todo' example is included automatically with Convex.`,
 			);
 			process.exit(1);
+		}
+
+		if (providedFlags.has("frontend") && options.frontend) {
+			const incompatibleFrontends = options.frontend.filter(
+				(f) => f === "nuxt" || f === "solid",
+			);
+			if (incompatibleFrontends.length > 0) {
+				consola.fatal(
+					`The following frontends are not compatible with '--backend convex': ${incompatibleFrontends.join(
+						", ",
+					)}. Please choose a different frontend or backend.`,
+				);
+				process.exit(1);
+			}
 		}
 
 		config.auth = false;
@@ -529,19 +545,24 @@ function processAndValidateFlags(
 
 		const includesNuxt = effectiveFrontend?.includes("nuxt");
 		const includesSvelte = effectiveFrontend?.includes("svelte");
+		const includesSolid = effectiveFrontend?.includes("solid");
 
-		if ((includesNuxt || includesSvelte) && effectiveApi === "trpc") {
+		if (
+			(includesNuxt || includesSvelte || includesSolid) &&
+			effectiveApi === "trpc"
+		) {
 			consola.fatal(
 				`tRPC API is not supported with '${
-					includesNuxt ? "nuxt" : "svelte"
+					includesNuxt ? "nuxt" : includesSvelte ? "svelte" : "solid"
 				}' frontend. Please use --api orpc or remove '${
-					includesNuxt ? "nuxt" : "svelte"
+					includesNuxt ? "nuxt" : includesSvelte ? "svelte" : "solid"
 				}' from --frontend.`,
 			);
 			process.exit(1);
 		}
+
 		if (
-			(includesNuxt || includesSvelte) &&
+			(includesNuxt || includesSvelte || includesSolid) &&
 			effectiveApi !== "orpc" &&
 			(!options.api || (options.yes && options.api !== "trpc"))
 		) {
@@ -559,6 +580,7 @@ function processAndValidateFlags(
 				(f) =>
 					f === "tanstack-router" ||
 					f === "react-router" ||
+					f === "solid" ||
 					(f === "nuxt" &&
 						config.addons?.includes("tauri") &&
 						!config.addons?.includes("pwa")) ||
@@ -576,7 +598,7 @@ function processAndValidateFlags(
 					config.addons.includes("tauri")
 				) {
 					incompatibleAddon =
-						"PWA and Tauri addons require tanstack-router, react-router, or Nuxt/Svelte (Tauri only).";
+						"PWA requires tanstack-router/react-router/solid. Tauri requires tanstack-router/react-router/Nuxt/Svelte/Solid.";
 				}
 				consola.fatal(
 					`${incompatibleAddon} Cannot use these addons with your frontend selection.`,
@@ -632,18 +654,12 @@ function processAndValidateFlags(
 				process.exit(1);
 			}
 
-			const hasWebFrontendForExamples = effectiveFrontend?.some((f) =>
-				[
-					"tanstack-router",
-					"react-router",
-					"tanstack-start",
-					"next",
-					"nuxt",
-					"svelte",
-				].includes(f),
-			);
-			const noFrontendSelected =
-				!effectiveFrontend || effectiveFrontend.length === 0;
+			if (config.examples.includes("ai") && includesSolid) {
+				consola.fatal(
+					"The 'ai' example is not compatible with the Solid frontend.",
+				);
+				process.exit(1);
+			}
 		}
 	}
 

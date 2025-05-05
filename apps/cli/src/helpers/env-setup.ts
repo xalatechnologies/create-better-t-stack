@@ -74,12 +74,14 @@ export async function setupEnvironmentVariables(
 	const hasNextJs = frontend.includes("next");
 	const hasNuxt = frontend.includes("nuxt");
 	const hasSvelte = frontend.includes("svelte");
+	const hasSolid = frontend.includes("solid");
 	const hasWebFrontend =
 		hasReactRouter ||
 		hasTanStackRouter ||
 		hasTanStackStart ||
 		hasNextJs ||
 		hasNuxt ||
+		hasSolid ||
 		hasSvelte;
 
 	if (hasWebFrontend) {

@@ -63,6 +63,7 @@ export function displayPostInstallInstructions(
 			"tanstack-start",
 			"nuxt",
 			"svelte",
+			"solid",
 		].includes(f),
 	);
 	const hasNative = frontend?.includes("native");
@@ -75,7 +76,7 @@ export function displayPostInstallInstructions(
 		!isConvex && database !== "none" && orm === "none" ? getNoOrmWarning() : "";
 
 	const hasReactRouter = frontend?.includes("react-router");
-	const hasSvelte = frontend?.includes("svelte");
+	const hasSvelte = frontend?.includes("svelte"); // Keep separate for port logic
 	const webPort = hasReactRouter || hasSvelte ? "5173" : "3001";
 
 	const tazeCommand = getPackageExecutionCommand(packageManager, "taze -r");

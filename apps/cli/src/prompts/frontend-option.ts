@@ -1,10 +1,11 @@
 import { cancel, isCancel, multiselect, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { ProjectFrontend } from "../types";
+import type { ProjectBackend, ProjectFrontend } from "../types";
 
 export async function getFrontendChoice(
 	frontendOptions?: ProjectFrontend[],
+	backend?: ProjectBackend,
 ): Promise<ProjectFrontend[]> {
 	if (frontendOptions !== undefined) return frontendOptions;
 
@@ -23,17 +24,7 @@ export async function getFrontendChoice(
 			},
 		],
 		required: false,
-		initialValues: DEFAULT_CONFIG.frontend.some(
-			(f) =>
-				f === "tanstack-router" ||
-				f === "react-router" ||
-				f === "tanstack-start" ||
-				f === "next" ||
-				f === "nuxt" ||
-				f === "svelte",
-		)
-			? ["web"]
-			: [],
+		initialValues: ["web"],
 	});
 
 	if (isCancel(frontendTypes)) {
@@ -44,50 +35,55 @@ export async function getFrontendChoice(
 	const result: ProjectFrontend[] = [];
 
 	if (frontendTypes.includes("web")) {
+		const allWebOptions = [
+			{
+				value: "tanstack-router" as const,
+				label: "TanStack Router",
+				hint: "Modern and scalable routing for React Applications",
+			},
+			{
+				value: "react-router" as const,
+				label: "React Router",
+				hint: "A user‑obsessed, standards‑focused, multi‑strategy router",
+			},
+			{
+				value: "next" as const,
+				label: "Next.js",
+				hint: "The React Framework for the Web",
+			},
+			{
+				value: "nuxt" as const,
+				label: "Nuxt",
+				hint: "The Progressive Web Framework for Vue.js",
+			},
+			{
+				value: "svelte" as const,
+				label: "Svelte",
+				hint: "web development for the rest of us",
+			},
+			{
+				value: "solid" as const,
+				label: "Solid",
+				hint: "Simple and performant reactivity for building user interfaces",
+			},
+			{
+				value: "tanstack-start" as const,
+				label: "TanStack Start (beta)",
+				hint: "SSR, Server Functions, API Routes and more with TanStack Router",
+			},
+		];
+
+		const webOptions = allWebOptions.filter((option) => {
+			if (backend === "convex") {
+				return option.value !== "nuxt" && option.value !== "solid";
+			}
+			return true;
+		});
+
 		const webFramework = await select<ProjectFrontend>({
 			message: "Choose frontend framework",
-			options: [
-				{
-					value: "tanstack-router",
-					label: "TanStack Router",
-					hint: "Modern and scalable routing for React Applications",
-				},
-				{
-					value: "react-router",
-					label: "React Router",
-					hint: "A user‑obsessed, standards‑focused, multi‑strategy router",
-				},
-				{
-					value: "next",
-					label: "Next.js",
-					hint: "The React Framework for the Web",
-				},
-				{
-					value: "nuxt",
-					label: "Nuxt",
-					hint: "The Progressive Web Framework for Vue.js",
-				},
-				{
-					value: "svelte",
-					label: "Svelte",
-					hint: "web development for the rest of us",
-				},
-				{
-					value: "tanstack-start",
-					label: "TanStack Start (beta)",
-					hint: "SSR, Server Functions, API Routes and more with TanStack Router",
-				},
-			],
-			initialValue:
-				DEFAULT_CONFIG.frontend.find(
-					(f) =>
-						f === "tanstack-router" ||
-						f === "react-router" ||
-						f === "tanstack-start" ||
-						f === "next" ||
-						f === "nuxt" ||
-						f === "svelte",
-				) || "tanstack-router",
+			options: webOptions,
+			initialValue: DEFAULT_CONFIG.frontend[0],
 		});
 
 		if (isCancel(webFramework)) {

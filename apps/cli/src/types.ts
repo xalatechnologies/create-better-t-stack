@@ -25,6 +25,7 @@ export type ProjectFrontend =
 	| "nuxt"
 	| "native"
 	| "svelte"
+	| "solid"
 	| "none";
 export type ProjectDBSetup =
 	| "turso"

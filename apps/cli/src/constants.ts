@@ -84,6 +84,7 @@ export const dependencyVersionMap = {
 	"@orpc/server": "^1.1.1",
 	"@orpc/client": "^1.1.1",
 	"@orpc/react-query": "^1.1.1",
+	"@orpc/solid-query": "^1.1.1",
 	"@orpc/vue-query": "^1.1.1",
 	"@orpc/svelte-query": "^1.1.1",
 
@@ -98,6 +99,9 @@ export const dependencyVersionMap = {
 	"@tanstack/svelte-query": "^5.74.4",
 	"@tanstack/react-query-devtools": "^5.69.0",
 	"@tanstack/react-query": "^5.69.0",
+
+	"@tanstack/solid-query": "^5.75.0",
+	"@tanstack/solid-query-devtools": "^5.75.0",
 } as const;
 
 export type AvailableDependencies = keyof typeof dependencyVersionMap;
