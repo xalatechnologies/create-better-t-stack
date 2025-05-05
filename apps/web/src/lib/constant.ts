@@ -67,6 +67,14 @@ export const TECH_OPTIONS = {
 			default: false,
 		},
 		{
+			id: "solid",
+			name: "Solid",
+			description: "Simple and performant reactivity for building UIs",
+			icon: "/icon/solid.svg",
+			color: "from-blue-600 to-blue-800",
+			default: false,
+		},
+		{
 			id: "native",
 			name: "React Native",
 			description: "Expo with NativeWind",
@@ -417,7 +425,7 @@ export const PRESET_TEMPLATES = [
 		name: "Convex + React",
 		description: "Reactive full-stack app with Convex and TanStack Router",
 		stack: {
-			projectName: "my-convex-app",
+			projectName: "my-better-t-app",
 			frontend: ["tanstack-router"],
 			backend: "convex",
 			runtime: "none",
@@ -438,7 +446,7 @@ export const PRESET_TEMPLATES = [
 		name: "Mobile App",
 		description: "React Native with Expo and SQLite database",
 		stack: {
-			projectName: "my-native-app",
+			projectName: "my-better-t-app",
 			frontend: ["native"],
 			runtime: "bun",
 			backend: "hono",
@@ -459,7 +467,7 @@ export const PRESET_TEMPLATES = [
 		name: "API Only",
 		description: "Backend API with Hono and PostgreSQL",
 		stack: {
-			projectName: "my-api",
+			projectName: "my-better-t-app",
 			frontend: ["none"],
 			runtime: "bun",
 			backend: "hono",
@@ -480,7 +488,7 @@ export const PRESET_TEMPLATES = [
 		name: "Full Featured",
 		description: "Complete setup with web, native, Turso, and addons",
 		stack: {
-			projectName: "my-full-app",
+			projectName: "my-better-t-app",
 			frontend: ["tanstack-router", "native"],
 			runtime: "bun",
 			backend: "hono",
@@ -530,4 +538,38 @@ export const DEFAULT_STACK: StackState = {
 	git: "true",
 	install: "true",
 	api: "trpc",
+};
+
+export const isStackDefault = <K extends keyof StackState>(
+	stack: StackState,
+	key: K,
+	value: StackState[K],
+): boolean => {
+	const defaultValue = DEFAULT_STACK[key];
+
+	if (stack.backend === "convex") {
+		if (key === "runtime" && value === "none") return true;
+		if (key === "database" && value === "none") return true;
+		if (key === "orm" && value === "none") return true;
+		if (key === "api" && value === "none") return true;
+		if (key === "auth" && value === "false") return true;
+		if (key === "dbSetup" && value === "none") return true;
+		if (
+			key === "examples" &&
+			Array.isArray(value) &&
+			value.length === 1 &&
+			value[0] === "todo"
+		)
+			return true;
+	}
+
+	if (Array.isArray(defaultValue) && Array.isArray(value)) {
+		const sortedDefault = [...defaultValue].sort();
+		const sortedValue = [...value].sort();
+		return (
+			sortedDefault.length === sortedValue.length &&
+			sortedDefault.every((item, index) => item === sortedValue[index])
+		);
+	}
+	return defaultValue === value;
 };

@@ -13,6 +13,7 @@ import {
 	PRESET_TEMPLATES,
 	type StackState,
 	TECH_OPTIONS,
+	isStackDefault,
 } from "@/lib/constant";
 import { stackParsers, stackQueryStatesOptions } from "@/lib/stack-url-state";
 import { cn } from "@/lib/utils";
@@ -87,17 +88,20 @@ const hasWebFrontend = (frontend: string[]) =>
 			"next",
 			"nuxt",
 			"svelte",
+			"solid",
 		].includes(f),
 	);
 
 const hasNativeFrontend = (frontend: string[]) => frontend.includes("native");
 
 const hasPWACompatibleFrontend = (frontend: string[]) =>
-	frontend.some((f) => ["tanstack-router", "react-router"].includes(f));
+	frontend.some((f) =>
+		["tanstack-router", "react-router", "solid"].includes(f),
+	);
 
 const hasTauriCompatibleFrontend = (frontend: string[]) =>
 	frontend.some((f) =>
-		["tanstack-router", "react-router", "nuxt", "svelte"].includes(f),
+		["tanstack-router", "react-router", "nuxt", "svelte", "solid"].includes(f),
 	);
 
 const getBadgeColors = (category: string): string => {
@@ -215,6 +219,34 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 				});
 			}
 		}
+		const incompatibleConvexFrontends = ["nuxt", "solid"];
+		const originalFrontendLength = nextStack.frontend.length;
+		nextStack.frontend = nextStack.frontend.filter(
+			(f) => !incompatibleConvexFrontends.includes(f),
+		);
+		if (nextStack.frontend.length !== originalFrontendLength) {
+			changed = true;
+			notes.frontend.notes.push(
+				"Nuxt and Solid are not compatible with Convex backend and have been removed.",
+			);
+			notes.backend.notes.push(
+				"Convex backend is not compatible with Nuxt or Solid.",
+			);
+			notes.frontend.hasIssue = true;
+			notes.backend.hasIssue = true;
+			changes.push({
+				category: "convex",
+				message: "Removed incompatible frontends (Nuxt, Solid)",
+			});
+		}
+		if (nextStack.frontend.length === 0) {
+			nextStack.frontend = ["tanstack-router"];
+			changed = true;
+			changes.push({
+				category: "convex",
+				message: "Frontend defaulted to TanStack Router",
+			});
+		}
 	} else {
 		if (nextStack.runtime === "none") {
 			notes.runtime.notes.push(
@@ -310,18 +342,18 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 		} else {
 			if (nextStack.orm === "mongoose") {
 				notes.database.notes.push(
-					"Relational databases are not compatible with Mongoose ORM",
+					"Relational databases are not compatible with Mongoose ORM. Defaulting to Drizzle.",
 				);
 				notes.orm.notes.push(
-					"Relational databases are not compatible with Mongoose ORM",
+					"Mongoose ORM only works with MongoDB. Defaulting to Drizzle.",
 				);
 				notes.database.hasIssue = true;
 				notes.orm.hasIssue = true;
-				nextStack.orm = "prisma";
+				nextStack.orm = "drizzle";
 				changed = true;
 				changes.push({
 					category: "database",
-					message: "ORM set to 'Prisma' (Mongoose only works with MongoDB)",
+					message: "ORM set to 'Drizzle' (Mongoose only works with MongoDB)",
 				});
 			}
 			if (nextStack.dbSetup === "mongodb-atlas") {
@@ -457,8 +489,9 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 
 		const isNuxt = nextStack.frontend.includes("nuxt");
 		const isSvelte = nextStack.frontend.includes("svelte");
-		if ((isNuxt || isSvelte) && nextStack.api === "trpc") {
-			const frontendName = isNuxt ? "Nuxt" : "Svelte";
+		const isSolid = nextStack.frontend.includes("solid");
+		if ((isNuxt || isSvelte || isSolid) && nextStack.api === "trpc") {
+			const frontendName = isNuxt ? "Nuxt" : isSvelte ? "Svelte" : "Solid";
 			notes.api.notes.push(
 				`${frontendName} requires oRPC. It will be selected automatically.`,
 			);
@@ -482,25 +515,25 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 		if (!isPWACompat && nextStack.addons.includes("pwa")) {
 			incompatibleAddons.push("pwa");
 			notes.frontend.notes.push(
-				"PWA addon requires TanStack or React Router. Addon will be removed.",
+				"PWA addon requires TanStack/React Router or Solid. Addon will be removed.",
 			);
 			notes.addons.notes.push(
-				"PWA requires TanStack/React Router. It will be removed.",
+				"PWA requires TanStack/React Router/Solid. It will be removed.",
 			);
 			notes.frontend.hasIssue = true;
 			notes.addons.hasIssue = true;
 			changes.push({
 				category: "addons",
-				message: "PWA addon removed (requires TanStack or React Router)",
+				message: "PWA addon removed (requires compatible frontend)",
 			});
 		}
 		if (!isTauriCompat && nextStack.addons.includes("tauri")) {
 			incompatibleAddons.push("tauri");
 			notes.frontend.notes.push(
-				"Tauri addon requires TanStack Router, React Router, Nuxt or Svelte. Addon will be removed.",
+				"Tauri addon requires TanStack/React Router, Nuxt, Svelte or Solid. Addon will be removed.",
 			);
 			notes.addons.notes.push(
-				"Tauri requires TanStack/React Router/Nuxt/Svelte. It will be removed.",
+				"Tauri requires TanStack/React Router/Nuxt/Svelte/Solid. It will be removed.",
 			);
 			notes.frontend.hasIssue = true;
 			notes.addons.hasIssue = true;
@@ -529,8 +562,7 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 
 		const incompatibleExamples: string[] = [];
 		const isWeb = hasWebFrontend(nextStack.frontend);
-		const isNativeOnly =
-			hasNativeFrontend(nextStack.frontend) && !isWeb && !isConvex;
+		const isNativeOnly = hasNativeFrontend(nextStack.frontend) && !isWeb;
 
 		if (isNativeOnly) {
 			if (nextStack.examples.length > 0) {
@@ -538,7 +570,7 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 					"Examples are not supported with Native-only frontend. Examples will be removed.",
 				);
 				notes.examples.notes.push(
-					"Examples require a web frontend or Convex backend. They will be removed.",
+					"Examples require a web frontend. They will be removed.",
 				);
 				notes.frontend.hasIssue = true;
 				notes.examples.hasIssue = true;
@@ -582,23 +614,31 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 					message: "AI example removed (not compatible with Elysia)",
 				});
 			}
+			if (isSolid && nextStack.examples.includes("ai")) {
+				incompatibleExamples.push("ai");
+				changes.push({
+					category: "examples",
+					message: "AI example removed (not compatible with Solid)",
+				});
+			}
 		}
 
 		const uniqueIncompatibleExamples = [...new Set(incompatibleExamples)];
 		if (uniqueIncompatibleExamples.length > 0) {
-			if (
-				!isWeb &&
-				(uniqueIncompatibleExamples.includes("todo") ||
-					uniqueIncompatibleExamples.includes("ai"))
-			) {
-				notes.frontend.notes.push(
-					"Examples require a web frontend. Incompatible examples will be removed.",
-				);
-				notes.examples.notes.push(
-					"Requires a web frontend. Incompatible examples will be removed.",
-				);
-				notes.frontend.hasIssue = true;
-				notes.examples.hasIssue = true;
+			if (!isWeb && !isNativeOnly) {
+				if (
+					uniqueIncompatibleExamples.includes("todo") ||
+					uniqueIncompatibleExamples.includes("ai")
+				) {
+					notes.frontend.notes.push(
+						"Examples require a web frontend. Incompatible examples will be removed.",
+					);
+					notes.examples.notes.push(
+						"Requires a web frontend. Incompatible examples will be removed.",
+					);
+					notes.frontend.hasIssue = true;
+					notes.examples.hasIssue = true;
+				}
 			}
 			if (
 				nextStack.database === "none" &&
@@ -626,6 +666,16 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 				notes.backend.hasIssue = true;
 				notes.examples.hasIssue = true;
 			}
+			if (isSolid && uniqueIncompatibleExamples.includes("ai")) {
+				notes.frontend.notes.push(
+					"AI example is not compatible with Solid. It will be removed.",
+				);
+				notes.examples.notes.push(
+					"AI example is not compatible with Solid. It will be removed.",
+				);
+				notes.frontend.hasIssue = true;
+				notes.examples.hasIssue = true;
+			}
 
 			const originalExamplesLength = nextStack.examples.length;
 			nextStack.examples = nextStack.examples.filter(
@@ -647,6 +697,9 @@ const getCompatibilityRules = (stack: StackState) => {
 	const hasWebFrontendSelected = hasWebFrontend(stack.frontend);
 	const hasNativeOnly =
 		hasNativeFrontend(stack.frontend) && !hasWebFrontendSelected;
+	const hasSolid = stack.frontend.includes("solid");
+	const hasNuxt = stack.frontend.includes("nuxt");
+	const hasSvelte = stack.frontend.includes("svelte");
 
 	return {
 		isConvex,
@@ -655,8 +708,10 @@ const getCompatibilityRules = (stack: StackState) => {
 		hasNativeOnly,
 		hasPWACompatible: hasPWACompatibleFrontend(stack.frontend),
 		hasTauriCompatible: hasTauriCompatibleFrontend(stack.frontend),
-		hasNuxtOrSvelte:
-			stack.frontend.includes("nuxt") || stack.frontend.includes("svelte"),
+		hasNuxtOrSvelteOrSolid: hasNuxt || hasSvelte || hasSolid,
+		hasSolid,
+		hasNuxt,
+		hasSvelte,
 	};
 };
 
@@ -675,42 +730,14 @@ const generateCommand = (stackState: StackState): string => {
 	}
 
 	const projectName = stackState.projectName || "my-better-t-app";
-	const flags: string[] = ["--yes"];
+	const flags: string[] = [];
 
-	const isDefault = <K extends keyof StackState>(
+	const checkDefault = <K extends keyof StackState>(
 		key: K,
 		value: StackState[K],
-	) => {
-		const defaultValue = DEFAULT_STACK[key];
+	) => isStackDefault(stackState, key, value);
 
-		if (stackState.backend === "convex") {
-			if (key === "runtime" && value === "none") return true;
-			if (key === "database" && value === "none") return true;
-			if (key === "orm" && value === "none") return true;
-			if (key === "api" && value === "none") return true;
-			if (key === "auth" && value === "false") return true;
-			if (key === "dbSetup" && value === "none") return true;
-			if (
-				key === "examples" &&
-				Array.isArray(value) &&
-				value.length === 1 &&
-				value[0] === "todo"
-			)
-				return true;
-		}
-
-		if (Array.isArray(defaultValue) && Array.isArray(value)) {
-			const sortedDefault = [...defaultValue].sort();
-			const sortedValue = [...value].sort();
-			return (
-				sortedDefault.length === sortedValue.length &&
-				sortedDefault.every((item, index) => item === sortedValue[index])
-			);
-		}
-		return defaultValue === value;
-	};
-
-	if (!isDefault("frontend", stackState.frontend)) {
+	if (!checkDefault("frontend", stackState.frontend)) {
 		if (stackState.frontend.length === 0 || stackState.frontend[0] === "none") {
 			flags.push("--frontend none");
 		} else {
@@ -718,51 +745,51 @@ const generateCommand = (stackState: StackState): string => {
 		}
 	}
 
-	if (!isDefault("backend", stackState.backend)) {
+	if (!checkDefault("backend", stackState.backend)) {
 		flags.push(`--backend ${stackState.backend}`);
 	}
 
 	if (stackState.backend !== "convex") {
-		if (!isDefault("runtime", stackState.runtime)) {
+		if (!checkDefault("runtime", stackState.runtime)) {
 			flags.push(`--runtime ${stackState.runtime}`);
 		}
-		if (!isDefault("api", stackState.api)) {
+		if (!checkDefault("api", stackState.api)) {
 			flags.push(`--api ${stackState.api}`);
 		}
-		if (!isDefault("database", stackState.database)) {
+		if (!checkDefault("database", stackState.database)) {
 			flags.push(`--database ${stackState.database}`);
 		}
-		if (!isDefault("orm", stackState.orm)) {
+		if (!checkDefault("orm", stackState.orm)) {
 			flags.push(`--orm ${stackState.orm}`);
 		}
-		if (!isDefault("auth", stackState.auth)) {
+		if (!checkDefault("auth", stackState.auth)) {
 			if (stackState.auth === "false" && DEFAULT_STACK.auth === "true") {
 				flags.push("--no-auth");
 			}
 		}
-		if (!isDefault("dbSetup", stackState.dbSetup)) {
+		if (!checkDefault("dbSetup", stackState.dbSetup)) {
 			flags.push(`--db-setup ${stackState.dbSetup}`);
 		}
 	} else {
-		if (stackState.auth === "false" && DEFAULT_STACK.auth === "true") {
-			if (DEFAULT_STACK.auth === "true") {
-			}
-		}
 	}
 
-	if (!isDefault("packageManager", stackState.packageManager)) {
+	if (!checkDefault("packageManager", stackState.packageManager)) {
 		flags.push(`--package-manager ${stackState.packageManager}`);
 	}
 
-	if (!isDefault("git", stackState.git)) {
-		if (stackState.git === "false") flags.push("--no-git");
+	if (!checkDefault("git", stackState.git)) {
+		if (stackState.git === "false" && DEFAULT_STACK.git === "true") {
+			flags.push("--no-git");
+		}
 	}
 
-	if (!isDefault("install", stackState.install)) {
-		if (stackState.install === "false") flags.push("--no-install");
+	if (!checkDefault("install", stackState.install)) {
+		if (stackState.install === "false" && DEFAULT_STACK.install === "true") {
+			flags.push("--no-install");
+		}
 	}
 
-	if (!isDefault("addons", stackState.addons)) {
+	if (!checkDefault("addons", stackState.addons)) {
 		if (stackState.addons.length > 0) {
 			flags.push(`--addons ${stackState.addons.join(" ")}`);
 		} else {
@@ -772,7 +799,7 @@ const generateCommand = (stackState: StackState): string => {
 		}
 	}
 
-	if (!isDefault("examples", stackState.examples)) {
+	if (!checkDefault("examples", stackState.examples)) {
 		if (stackState.examples.length > 0) {
 			flags.push(`--examples ${stackState.examples.join(" ")}`);
 		} else {
@@ -780,10 +807,6 @@ const generateCommand = (stackState: StackState): string => {
 				flags.push("--examples none");
 			}
 		}
-	}
-
-	if (flags.length === 1 && flags[0] === "--yes") {
-		flags.pop();
 	}
 
 	return `${base} ${projectName}${
@@ -842,7 +865,7 @@ const StackArchitect = () => {
 							catKey,
 						)
 					) {
-						const convexDefaults: Record<string, string> = {
+						const convexDefaults: Record<string, string | string[]> = {
 							runtime: "none",
 							database: "none",
 							orm: "none",
@@ -860,12 +883,21 @@ const StackArchitect = () => {
 							);
 						}
 					}
-
 					if (catKey === "examples" && techId !== "todo") {
 						addRule(
 							category,
 							techId,
 							"Convex backend only supports the 'Todo' example.",
+						);
+					}
+					if (
+						catKey === "frontend" &&
+						(techId === "nuxt" || techId === "solid")
+					) {
+						addRule(
+							category,
+							techId,
+							`${tech.name} is not compatible with Convex backend.`,
 						);
 					}
 					continue;
@@ -887,11 +919,12 @@ const StackArchitect = () => {
 							"API 'None' is only available with the Convex backend.",
 						);
 					}
-
-					if (techId === "trpc" && rules.hasNuxtOrSvelte) {
-						const frontendName = stack.frontend.includes("nuxt")
+					if (techId === "trpc" && rules.hasNuxtOrSvelteOrSolid) {
+						const frontendName = rules.hasNuxt
 							? "Nuxt"
-							: "Svelte";
+							: rules.hasSvelte
+								? "Svelte"
+								: "Solid";
 						addRule(
 							category,
 							techId,
@@ -908,7 +941,6 @@ const StackArchitect = () => {
 							"Select a database to enable ORM options.",
 						);
 					}
-
 					if (
 						stack.database === "mongodb" &&
 						techId !== "prisma" &&
@@ -921,36 +953,31 @@ const StackArchitect = () => {
 							"MongoDB requires the Prisma or Mongoose ORM.",
 						);
 					}
-
 					if (
-						stack.dbSetup === "turso" &&
-						techId !== "drizzle" &&
-						techId !== "none"
+						stack.database !== "mongodb" &&
+						stack.database !== "none" &&
+						techId === "mongoose"
 					) {
 						addRule(
 							category,
 							techId,
-							"Turso DB setup requires the Drizzle ORM.",
+							"Mongoose ORM is only compatible with MongoDB.",
 						);
 					}
-
-					if (
-						stack.dbSetup === "prisma-postgres" &&
-						techId !== "prisma" &&
-						techId !== "none"
-					) {
+					if (stack.dbSetup === "turso" && techId !== "drizzle") {
+						addRule(category, techId, "Turso DB setup requires Drizzle ORM.");
+					}
+					if (stack.dbSetup === "prisma-postgres" && techId !== "prisma") {
 						addRule(
 							category,
 							techId,
 							"Prisma PostgreSQL setup requires Prisma ORM.",
 						);
 					}
-
 					if (
 						stack.dbSetup === "mongodb-atlas" &&
 						techId !== "prisma" &&
-						techId !== "mongoose" &&
-						techId !== "none"
+						techId !== "mongoose"
 					) {
 						addRule(
 							category,
@@ -958,7 +985,6 @@ const StackArchitect = () => {
 							"MongoDB Atlas setup requires Prisma or Mongoose ORM.",
 						);
 					}
-
 					if (techId === "none") {
 						if (stack.database === "mongodb") {
 							addRule(
@@ -973,14 +999,13 @@ const StackArchitect = () => {
 						if (stack.dbSetup === "prisma-postgres") {
 							addRule(category, techId, "This DB setup requires Prisma ORM.");
 						}
-					}
-
-					if (techId === "mongoose" && stack.database !== "mongodb") {
-						addRule(
-							category,
-							techId,
-							"Mongoose ORM is not compatible with relational databases.",
-						);
+						if (stack.dbSetup === "mongodb-atlas") {
+							addRule(
+								category,
+								techId,
+								"This DB setup requires Prisma or Mongoose ORM.",
+							);
+						}
 					}
 				}
 
@@ -991,36 +1016,32 @@ const StackArchitect = () => {
 							techId,
 							"Select a database before choosing a cloud setup.",
 						);
-					}
-
-					if (techId === "turso") {
-						if (stack.database !== "sqlite" && stack.database !== "none") {
-							addRule(category, techId, "Turso requires SQLite database.");
-						}
-						if (stack.orm !== "drizzle" && stack.orm !== "none") {
-							addRule(category, techId, "Turso requires Drizzle ORM.");
-						}
-					} else if (techId === "prisma-postgres") {
-						if (stack.database !== "postgres" && stack.database !== "none") {
-							addRule(category, techId, "Requires PostgreSQL database.");
-						}
-						if (stack.orm !== "prisma" && stack.orm !== "none") {
-							addRule(category, techId, "Requires Prisma ORM.");
-						}
-					} else if (techId === "mongodb-atlas") {
-						if (stack.database !== "mongodb" && stack.database !== "none") {
-							addRule(category, techId, "Requires MongoDB database.");
-						}
-						if (
-							stack.orm !== "prisma" &&
-							stack.orm !== "mongoose" &&
-							stack.orm !== "none"
-						) {
-							addRule(category, techId, "Requires Prisma or Mongoose ORM.");
-						}
-					} else if (techId === "neon") {
-						if (stack.database !== "postgres" && stack.database !== "none") {
-							addRule(category, techId, "Requires PostgreSQL database.");
+					} else {
+						if (techId === "turso") {
+							if (stack.database !== "sqlite") {
+								addRule(category, techId, "Turso requires SQLite database.");
+							}
+							if (stack.orm !== "drizzle") {
+								addRule(category, techId, "Turso requires Drizzle ORM.");
+							}
+						} else if (techId === "prisma-postgres") {
+							if (stack.database !== "postgres") {
+								addRule(category, techId, "Requires PostgreSQL database.");
+							}
+							if (stack.orm !== "prisma") {
+								addRule(category, techId, "Requires Prisma ORM.");
+							}
+						} else if (techId === "mongodb-atlas") {
+							if (stack.database !== "mongodb") {
+								addRule(category, techId, "Requires MongoDB database.");
+							}
+							if (stack.orm !== "prisma" && stack.orm !== "mongoose") {
+								addRule(category, techId, "Requires Prisma or Mongoose ORM.");
+							}
+						} else if (techId === "neon") {
+							if (stack.database !== "postgres") {
+								addRule(category, techId, "Requires PostgreSQL database.");
+							}
 						}
 					}
 				}
@@ -1038,15 +1059,14 @@ const StackArchitect = () => {
 						addRule(
 							category,
 							techId,
-							"Requires TanStack Router or React Router frontend.",
+							"Requires TanStack Router, React Router or Solid frontend.",
 						);
 					}
-
 					if (techId === "tauri" && !rules.hasTauriCompatible) {
 						addRule(
 							category,
 							techId,
-							"Requires TanStack Router, React Router, Nuxt or Svelte frontend.",
+							"Requires TanStack Router, React Router, Nuxt, Svelte or Solid frontend.",
 						);
 					}
 				}
@@ -1059,27 +1079,31 @@ const StackArchitect = () => {
 							"Examples are not supported with Native-only frontend.",
 						);
 					} else {
-						if (
-							(techId === "todo" || techId === "ai") &&
-							!rules.hasWebFrontend
-						) {
+						if (!rules.hasWebFrontend) {
 							addRule(
 								category,
 								techId,
 								"Requires a web frontend (TanStack Router, React Router, etc.).",
 							);
 						}
-
 						if (techId === "todo" && stack.database === "none") {
 							addRule(category, techId, "Todo example requires a database.");
 						}
-
-						if (techId === "ai" && stack.backend === "elysia") {
-							addRule(
-								category,
-								techId,
-								"AI example is not compatible with Elysia backend.",
-							);
+						if (techId === "ai") {
+							if (stack.backend === "elysia") {
+								addRule(
+									category,
+									techId,
+									"AI example is not compatible with Elysia backend.",
+								);
+							}
+							if (rules.hasSolid) {
+								addRule(
+									category,
+									techId,
+									"AI example is not compatible with Solid frontend.",
+								);
+							}
 						}
 					}
 				}
@@ -1174,6 +1198,8 @@ const StackArchitect = () => {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (compatibilityAnalysis.adjustedStack) {
+			if (compatibilityAnalysis.changes.length > 0) {
+			}
 			setLastChanges(compatibilityAnalysis.changes);
 			setStack(compatibilityAnalysis.adjustedStack);
 		}
@@ -1202,7 +1228,9 @@ const StackArchitect = () => {
 				catKey === "addons" ||
 				catKey === "examples"
 			) {
-				const currentArray = [...(currentValue as string[])];
+				const currentArray = Array.isArray(currentValue)
+					? [...currentValue]
+					: [];
 				let nextArray = [...currentArray];
 				const isSelected = currentArray.includes(techId);
 
@@ -1214,15 +1242,15 @@ const StackArchitect = () => {
 						"next",
 						"nuxt",
 						"svelte",
+						"solid",
 					];
 					if (techId === "none") {
 						nextArray = ["none"];
 					} else if (isSelected) {
-						if (currentArray.length > 1 || currentArray.includes("none")) {
+						if (currentArray.length > 1) {
 							nextArray = nextArray.filter((id) => id !== techId);
-							if (nextArray.length === 0 && !currentArray.includes("none")) {
-								nextArray = ["none"];
-							}
+						} else {
+							nextArray = ["none"];
 						}
 					} else {
 						nextArray = nextArray.filter((id) => id !== "none");
@@ -1583,30 +1611,7 @@ const StackArchitect = () => {
 									TECH_OPTIONS[categoryKey as keyof typeof TECH_OPTIONS] || [];
 								const categoryDisplayName = getCategoryDisplayName(categoryKey);
 
-								const filteredOptions = categoryOptions.filter((tech) => {
-									if (
-										rules.isConvex &&
-										tech.id === "none" &&
-										["runtime", "database", "orm", "api", "dbSetup"].includes(
-											categoryKey,
-										)
-									) {
-										return false;
-									}
-									if (
-										rules.isConvex &&
-										categoryKey === "auth" &&
-										tech.id === "false"
-									) {
-										return false;
-									}
-									if (
-										rules.isConvex &&
-										categoryKey === "examples" &&
-										tech.id !== "todo"
-									) {
-										return false;
-									}
+								const filteredOptions = categoryOptions.filter(() => {
 									return true;
 								});
 
@@ -1649,6 +1654,7 @@ const StackArchitect = () => {
 											{filteredOptions.map((tech) => {
 												let isSelected = false;
 												const category = categoryKey as keyof StackState;
+												const currentValue = stack[category];
 
 												if (
 													category === "addons" ||
@@ -1656,10 +1662,10 @@ const StackArchitect = () => {
 													category === "frontend"
 												) {
 													isSelected = (
-														(stack[category] as string[]) || []
+														(currentValue as string[]) || []
 													).includes(tech.id);
 												} else {
-													isSelected = stack[category] === tech.id;
+													isSelected = currentValue === tech.id;
 												}
 
 												const disabledReason = disabledReasons.get(
