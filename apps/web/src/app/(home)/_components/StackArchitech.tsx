@@ -730,7 +730,7 @@ const generateCommand = (stackState: StackState): string => {
 	}
 
 	const projectName = stackState.projectName || "my-better-t-app";
-	const flags: string[] = [];
+	const flags: string[] = ["--yes"];
 
 	const checkDefault = <K extends keyof StackState>(
 		key: K,
