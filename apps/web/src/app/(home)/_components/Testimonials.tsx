@@ -145,7 +145,7 @@ export default function Testimonials() {
 				{visibleTweetIndices.map((index) => (
 					<div
 						key={TWEET_IDS[index]}
-						className="overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-md"
+						className="overflow-hidden rounded-lg border border-border"
 					>
 						<Tweet id={TWEET_IDS[index]} />
 					</div>

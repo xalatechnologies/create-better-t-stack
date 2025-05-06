@@ -8,7 +8,7 @@ import CustomizableSection from "./_components/CustomizableSection";
 import Footer from "./_components/Footer";
 import Navbar from "./_components/Navbar";
 import NpmPackage from "./_components/NpmPackage";
-import SponsorsSection from "./_components/SponsorsSection";
+// import SponsorsSection from "./_components/SponsorsSection";
 import Testimonials from "./_components/Testimonials";
 
 export default function HomePage() {
@@ -161,7 +161,7 @@ export default function HomePage() {
 					<Testimonials />
 				</motion.div>
 
-				<motion.div
+				{/* <motion.div
 					className="w-full"
 					initial="hidden"
 					whileInView="visible"
@@ -169,7 +169,7 @@ export default function HomePage() {
 					variants={sectionVariants}
 				>
 					<SponsorsSection />
-				</motion.div>
+				</motion.div> */}
 			</main>
 			<Footer />
 		</>
