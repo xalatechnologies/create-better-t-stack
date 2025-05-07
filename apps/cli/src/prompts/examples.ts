@@ -1,4 +1,4 @@
-import { cancel, isCancel, log, multiselect } from "@clack/prompts";
+import { cancel, isCancel, multiselect } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
 import type {
@@ -18,6 +18,10 @@ export async function getExamplesChoice(
 
 	if (backend === "convex") {
 		return ["todo"];
+	}
+
+	if (backend === "none") {
+		return [];
 	}
 
 	if (database === "none") return [];

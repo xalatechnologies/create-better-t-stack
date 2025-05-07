@@ -132,7 +132,7 @@ async function main() {
 			.option("backend", {
 				type: "string",
 				describe: "Backend framework",
-				choices: ["hono", "express", "next", "elysia", "convex"],
+				choices: ["hono", "express", "next", "elysia", "convex", "none"],
 			})
 			.option("runtime", {
 				type: "string",
@@ -303,6 +303,14 @@ async function main() {
 				config.runtime = "none";
 				config.dbSetup = "none";
 				config.examples = ["todo"];
+			} else if (config.backend === "none") {
+				config.auth = false;
+				config.database = "none";
+				config.orm = "none";
+				config.api = "none";
+				config.runtime = "none";
+				config.dbSetup = "none";
+				config.examples = [];
 			} else if (config.database === "none") {
 				config.orm = "none";
 				config.auth = false;
@@ -389,17 +397,18 @@ function processAndValidateFlags(
 	if (
 		providedFlags.has("backend") &&
 		config.backend &&
-		config.backend !== "convex"
+		config.backend !== "convex" &&
+		config.backend !== "none"
 	) {
 		if (providedFlags.has("api") && options.api === "none") {
 			consola.fatal(
-				`'--api none' is only supported with '--backend convex'. Please choose 'trpc', 'orpc', or remove the --api flag.`,
+				`'--api none' is only supported with '--backend convex' or '--backend none'. Please choose 'trpc', 'orpc', or remove the --api flag.`,
 			);
 			process.exit(1);
 		}
 		if (providedFlags.has("runtime") && options.runtime === "none") {
 			consola.fatal(
-				`'--runtime none' is only supported with '--backend convex'. Please choose 'bun', 'node', or remove the --runtime flag.`,
+				`'--runtime none' is only supported with '--backend convex' or '--backend none'. Please choose 'bun', 'node', or remove the --runtime flag.`,
 			);
 			process.exit(1);
 		}
@@ -544,6 +553,48 @@ function processAndValidateFlags(
 		config.runtime = "none";
 		config.dbSetup = "none";
 		config.examples = ["todo"];
+	} else if (config.backend === "none") {
+		const incompatibleFlags: string[] = [];
+
+		if (providedFlags.has("auth") && options.auth === true)
+			incompatibleFlags.push("--auth");
+		if (providedFlags.has("database") && options.database !== "none")
+			incompatibleFlags.push(`--database ${options.database}`);
+		if (providedFlags.has("orm") && options.orm !== "none")
+			incompatibleFlags.push(`--orm ${options.orm}`);
+		if (providedFlags.has("api") && options.api !== "none")
+			incompatibleFlags.push(`--api ${options.api}`);
+		if (providedFlags.has("runtime") && options.runtime !== "none")
+			incompatibleFlags.push(`--runtime ${options.runtime}`);
+		if (providedFlags.has("dbSetup") && options.dbSetup !== "none")
+			incompatibleFlags.push(`--db-setup ${options.dbSetup}`);
+
+		if (incompatibleFlags.length > 0) {
+			consola.fatal(
+				`The following flags are incompatible with '--backend none': ${incompatibleFlags.join(
+					", ",
+				)}. Please remove them.`,
+			);
+			process.exit(1);
+		}
+
+		config.auth = false;
+		config.database = "none";
+		config.orm = "none";
+		config.api = "none";
+		config.runtime = "none";
+		config.dbSetup = "none";
+		if (
+			options.examples &&
+			!options.examples.includes("none") &&
+			options.examples.length > 0
+		) {
+			consola.fatal(
+				"Cannot select examples when backend is 'none'. Please remove the --examples flag or set --examples none.",
+			);
+			process.exit(1);
+		}
+		config.examples = [];
 	} else {
 		const effectiveDatabase =
 			config.database ?? (options.yes ? DEFAULT_CONFIG.database : undefined);
@@ -635,7 +686,9 @@ function processAndValidateFlags(
 				}
 				if (effectiveOrm !== "drizzle") {
 					consola.fatal(
-						`Turso setup requires Drizzle ORM. Cannot use --db-setup turso with --orm ${effectiveOrm ?? "none"}.`,
+						`Turso setup requires Drizzle ORM. Cannot use --db-setup turso with --orm ${
+							effectiveOrm ?? "none"
+						}.`,
 					);
 					process.exit(1);
 				}
@@ -782,10 +835,11 @@ function processAndValidateFlags(
 			if (
 				config.examples.includes("todo") &&
 				effectiveBackend !== "convex" &&
+				effectiveBackend !== "none" &&
 				effectiveDatabase === "none"
 			) {
 				consola.fatal(
-					"The 'todo' example requires a database (unless using Convex). Cannot use --examples todo when database is 'none'.",
+					"The 'todo' example requires a database if a backend (other than Convex) is present. Cannot use --examples todo when database is 'none' and a backend is selected.",
 				);
 				process.exit(1);
 			}

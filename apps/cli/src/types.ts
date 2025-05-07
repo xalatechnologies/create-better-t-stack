@@ -14,7 +14,13 @@ export type ProjectAddons =
 	| "starlight"
 	| "turborepo"
 	| "none";
-export type ProjectBackend = "hono" | "elysia" | "express" | "next" | "convex";
+export type ProjectBackend =
+	| "hono"
+	| "express"
+	| "next"
+	| "elysia"
+	| "convex"
+	| "none";
 export type ProjectRuntime = "node" | "bun" | "none";
 export type ProjectExamples = "todo" | "ai" | "none";
 export type ProjectFrontend =

@@ -48,6 +48,13 @@ export async function getBackendFrameworkChoice(
 		});
 	}
 
+	// Add "None" option
+	backendOptions.push({
+		value: "none" as const,
+		label: "None",
+		hint: "No backend server (e.g., for a static site or client-only app)",
+	});
+
 	let initialValue = DEFAULT_CONFIG.backend;
 	if (hasIncompatibleFrontend && initialValue === "convex") {
 		initialValue = "hono";

@@ -106,6 +106,16 @@ export async function gatherConfig(
 		result.dbSetup = "none";
 	}
 
+	if (result.backend === "none") {
+		result.runtime = "none";
+		result.database = "none";
+		result.orm = "none";
+		result.api = "none";
+		result.auth = false;
+		result.dbSetup = "none";
+		result.examples = [];
+	}
+
 	return {
 		projectName: projectName,
 		projectDir: projectDir,

@@ -1,4 +1,4 @@
-import { cancel, isCancel, log, select } from "@clack/prompts";
+import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
 import type { ProjectApi, ProjectBackend, ProjectFrontend } from "../types";
@@ -8,7 +8,7 @@ export async function getApiChoice(
 	frontend?: ProjectFrontend[],
 	backend?: ProjectBackend,
 ): Promise<ProjectApi> {
-	if (backend === "convex") {
+	if (backend === "convex" || backend === "none") {
 		return "none";
 	}
 

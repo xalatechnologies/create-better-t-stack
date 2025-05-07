@@ -213,15 +213,23 @@ export async function setupBackendFramework(
 	projectDir: string,
 	context: ProjectConfig,
 ): Promise<void> {
+	if (context.backend === "none") {
+		return;
+	}
+
+	const serverAppDir = path.join(projectDir, "apps/server");
+
 	if (context.backend === "convex") {
+		if (await fs.pathExists(serverAppDir)) {
+			await fs.remove(serverAppDir);
+		}
+
 		const convexBackendDestDir = path.join(projectDir, "packages/backend");
 		const convexSrcDir = path.join(
 			PKG_ROOT,
 			"templates/backend/convex/packages/backend",
 		);
-
 		await fs.ensureDir(convexBackendDestDir);
-
 		if (await fs.pathExists(convexSrcDir)) {
 			await processAndCopyFiles(
 				"**/*",
@@ -229,17 +237,10 @@ export async function setupBackendFramework(
 				convexBackendDestDir,
 				context,
 			);
-		} else {
-		}
-
-		const serverAppDir = path.join(projectDir, "apps/server");
-		if (await fs.pathExists(serverAppDir)) {
-			await fs.remove(serverAppDir);
 		}
 		return;
 	}
 
-	const serverAppDir = path.join(projectDir, "apps/server");
 	await fs.ensureDir(serverAppDir);
 
 	const serverBaseDir = path.join(
@@ -540,7 +541,11 @@ export async function setupExamplesTemplate(
 
 		const exampleBaseDir = path.join(PKG_ROOT, `templates/examples/${example}`);
 
-		if (serverAppDirExists && context.backend !== "convex") {
+		if (
+			serverAppDirExists &&
+			context.backend !== "convex" &&
+			context.backend !== "none"
+		) {
 			const exampleServerSrc = path.join(exampleBaseDir, "server");
 
 			if (example === "ai" && context.backend === "next") {

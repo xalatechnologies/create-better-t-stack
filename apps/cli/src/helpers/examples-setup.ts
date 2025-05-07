@@ -39,7 +39,7 @@ export async function setupExamples(config: ProjectConfig): Promise<void> {
 			});
 		}
 
-		if (serverDirExists) {
+		if (serverDirExists && backend !== "none") {
 			await addPackageDependency({
 				dependencies: ["ai", "@ai-sdk/google"],
 				projectDir: serverDir,
