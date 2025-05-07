@@ -92,7 +92,9 @@ const hasWebFrontend = (frontend: string[]) =>
 		].includes(f),
 	);
 
-const hasNativeFrontend = (frontend: string[]) => frontend.includes("native");
+const checkHasNativeFrontend = (frontend: string[]) =>
+	frontend.includes("native-nativewind") ||
+	frontend.includes("native-unistyles");
 
 const hasPWACompatibleFrontend = (frontend: string[]) =>
 	frontend.some((f) =>
@@ -183,6 +185,7 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 	}
 
 	const isConvex = nextStack.backend === "convex";
+	const isBackendNone = nextStack.backend === "none";
 
 	if (isConvex) {
 		const convexOverrides: Partial<StackState> = {
@@ -246,6 +249,40 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 				category: "convex",
 				message: "Frontend defaulted to TanStack Router",
 			});
+		}
+	} else if (isBackendNone) {
+		const noneOverrides: Partial<StackState> = {
+			auth: "false",
+			database: "none",
+			orm: "none",
+			api: "none",
+			runtime: "none",
+			dbSetup: "none",
+			examples: [],
+		};
+
+		for (const [key, value] of Object.entries(noneOverrides)) {
+			const catKey = key as keyof StackState;
+			if (JSON.stringify(nextStack[catKey]) !== JSON.stringify(value)) {
+				const displayName = getCategoryDisplayName(catKey);
+				const valueDisplay = Array.isArray(value) ? "none" : value;
+				const message = `${displayName} set to '${valueDisplay}'`;
+
+				notes[catKey].notes.push(
+					`No backend selected: ${displayName} will be set to '${valueDisplay}'.`,
+				);
+				notes.backend.notes.push(
+					`No backend requires ${displayName} to be '${valueDisplay}'.`,
+				);
+				notes[catKey].hasIssue = true;
+				notes.backend.hasIssue = true;
+				(nextStack[catKey] as string | string[]) = value;
+				changed = true;
+				changes.push({
+					category: "backend-none",
+					message,
+				});
+			}
 		}
 	} else {
 		if (nextStack.runtime === "none") {
@@ -562,7 +599,7 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 
 		const incompatibleExamples: string[] = [];
 		const isWeb = hasWebFrontend(nextStack.frontend);
-		const isNativeOnly = hasNativeFrontend(nextStack.frontend) && !isWeb;
+		const isNativeOnly = checkHasNativeFrontend(nextStack.frontend) && !isWeb;
 
 		if (isNativeOnly) {
 			if (nextStack.examples.length > 0) {
@@ -694,17 +731,19 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 
 const getCompatibilityRules = (stack: StackState) => {
 	const isConvex = stack.backend === "convex";
+	const isBackendNone = stack.backend === "none";
 	const hasWebFrontendSelected = hasWebFrontend(stack.frontend);
-	const hasNativeOnly =
-		hasNativeFrontend(stack.frontend) && !hasWebFrontendSelected;
+	const hasNativeFrontend = checkHasNativeFrontend(stack.frontend);
+	const hasNativeOnly = hasNativeFrontend && !hasWebFrontendSelected;
 	const hasSolid = stack.frontend.includes("solid");
 	const hasNuxt = stack.frontend.includes("nuxt");
 	const hasSvelte = stack.frontend.includes("svelte");
 
 	return {
 		isConvex,
+		isBackendNone,
 		hasWebFrontend: hasWebFrontendSelected,
-		hasNativeFrontend: hasNativeFrontend(stack.frontend),
+		hasNativeFrontend,
 		hasNativeOnly,
 		hasPWACompatible: hasPWACompatibleFrontend(stack.frontend),
 		hasTauriCompatible: hasTauriCompatibleFrontend(stack.frontend),
@@ -853,7 +892,7 @@ const StackArchitect = () => {
 		};
 
 		for (const category of CATEGORY_ORDER) {
-			const options = TECH_OPTIONS[category] || [];
+			const options = TECH_OPTIONS[category as keyof typeof TECH_OPTIONS] || [];
 			const catKey = category as keyof StackState;
 
 			for (const tech of options) {
@@ -879,7 +918,9 @@ const StackArchitect = () => {
 							addRule(
 								category,
 								techId,
-								`Convex backend requires ${getCategoryDisplayName(catKey)} to be '${requiredValue}'.`,
+								`Convex backend requires ${getCategoryDisplayName(
+									catKey,
+								)} to be '${requiredValue}'.`,
 							);
 						}
 					}
@@ -897,10 +938,41 @@ const StackArchitect = () => {
 						addRule(
 							category,
 							techId,
-							`${tech.name} is not compatible with Convex backend.`,
+							`Convex backend is not compatible with ${tech.name}.`,
 						);
 					}
 					continue;
+				}
+
+				if (rules.isBackendNone) {
+					if (
+						[
+							"auth",
+							"database",
+							"orm",
+							"api",
+							"runtime",
+							"dbSetup",
+							"examples",
+						].includes(catKey)
+					) {
+						if (
+							(catKey === "auth" && techId === "true") ||
+							((catKey === "database" ||
+								catKey === "orm" ||
+								catKey === "api" ||
+								catKey === "runtime" ||
+								catKey === "dbSetup") &&
+								techId !== "none") ||
+							(catKey === "examples" && techId !== "none")
+						) {
+							addRule(
+								category,
+								techId,
+								`Cannot be selected when 'No Backend' is chosen. Will be set to 'None' or disabled.`,
+							);
+						}
+					}
 				}
 
 				if (catKey === "runtime" && techId === "none") {
@@ -934,114 +1006,68 @@ const StackArchitect = () => {
 				}
 
 				if (catKey === "orm") {
-					if (stack.database === "none" && techId !== "none") {
-						addRule(
-							category,
-							techId,
-							"Select a database to enable ORM options.",
-						);
-					}
-					if (
-						stack.database === "mongodb" &&
-						techId !== "prisma" &&
-						techId !== "mongoose" &&
-						techId !== "none"
-					) {
-						addRule(
-							category,
-							techId,
-							"MongoDB requires the Prisma or Mongoose ORM.",
-						);
-					}
-					if (
-						stack.database !== "mongodb" &&
-						stack.database !== "none" &&
-						techId === "mongoose"
-					) {
-						addRule(
-							category,
-							techId,
-							"Mongoose ORM is only compatible with MongoDB.",
-						);
-					}
-					if (stack.dbSetup === "turso" && techId !== "drizzle") {
-						addRule(category, techId, "Turso DB setup requires Drizzle ORM.");
-					}
-					if (stack.dbSetup === "prisma-postgres" && techId !== "prisma") {
-						addRule(
-							category,
-							techId,
-							"Prisma PostgreSQL setup requires Prisma ORM.",
-						);
-					}
-					if (
-						stack.dbSetup === "mongodb-atlas" &&
-						techId !== "prisma" &&
-						techId !== "mongoose"
-					) {
-						addRule(
-							category,
-							techId,
-							"MongoDB Atlas setup requires Prisma or Mongoose ORM.",
-						);
-					}
 					if (techId === "none") {
-						if (stack.database === "mongodb") {
-							addRule(
-								category,
-								techId,
-								"MongoDB requires Prisma or Mongoose ORM.",
-							);
-						}
-						if (stack.dbSetup === "turso") {
-							addRule(category, techId, "Turso DB setup requires Drizzle ORM.");
-						}
-						if (stack.dbSetup === "prisma-postgres") {
-							addRule(category, techId, "This DB setup requires Prisma ORM.");
-						}
-						if (stack.dbSetup === "mongodb-atlas") {
-							addRule(
-								category,
-								techId,
-								"This DB setup requires Prisma or Mongoose ORM.",
-							);
-						}
+						addRule(
+							category,
+							techId,
+							"ORM 'None' is only available with the Convex backend.",
+						);
 					}
 				}
 
 				if (catKey === "dbSetup" && techId !== "none") {
-					if (stack.database === "none") {
-						addRule(
-							category,
-							techId,
-							"Select a database before choosing a cloud setup.",
-						);
-					} else {
-						if (techId === "turso") {
-							if (stack.database !== "sqlite") {
-								addRule(category, techId, "Turso requires SQLite database.");
-							}
-							if (stack.orm !== "drizzle") {
-								addRule(category, techId, "Turso requires Drizzle ORM.");
-							}
-						} else if (techId === "prisma-postgres") {
-							if (stack.database !== "postgres") {
-								addRule(category, techId, "Requires PostgreSQL database.");
-							}
-							if (stack.orm !== "prisma") {
-								addRule(category, techId, "Requires Prisma ORM.");
-							}
-						} else if (techId === "mongodb-atlas") {
-							if (stack.database !== "mongodb") {
-								addRule(category, techId, "Requires MongoDB database.");
-							}
-							if (stack.orm !== "prisma" && stack.orm !== "mongoose") {
-								addRule(category, techId, "Requires Prisma or Mongoose ORM.");
-							}
-						} else if (techId === "neon") {
-							if (stack.database !== "postgres") {
-								addRule(category, techId, "Requires PostgreSQL database.");
-							}
+					if (techId === "turso") {
+						if (stack.database !== "sqlite") {
+							addRule(
+								category,
+								techId,
+								"Turso requires SQLite. It will be selected.",
+							);
+						}
+						if (stack.orm !== "drizzle") {
+							addRule(
+								category,
+								techId,
+								"Turso requires Drizzle ORM. It will be selected.",
+							);
+						}
+					} else if (techId === "prisma-postgres") {
+						if (stack.database !== "postgres") {
+							addRule(
+								category,
+								techId,
+								"Prisma PostgreSQL setup requires PostgreSQL. It will be selected.",
+							);
+						}
+						if (stack.orm !== "prisma") {
+							addRule(
+								category,
+								techId,
+								"Prisma PostgreSQL setup requires Prisma ORM. It will be selected.",
+							);
+						}
+					} else if (techId === "mongodb-atlas") {
+						if (stack.database !== "mongodb") {
+							addRule(
+								category,
+								techId,
+								"MongoDB Atlas setup requires MongoDB. It will be selected.",
+							);
+						}
+						if (stack.orm !== "prisma" && stack.orm !== "mongoose") {
+							addRule(
+								category,
+								techId,
+								"MongoDB Atlas setup requires Prisma or Mongoose ORM. Prisma will be selected.",
+							);
+						}
+					} else if (techId === "neon") {
+						if (stack.database !== "postgres") {
+							addRule(
+								category,
+								techId,
+								"Neon requires PostgreSQL. It will be selected.",
+							);
 						}
 					}
 				}
@@ -1055,55 +1081,163 @@ const StackArchitect = () => {
 				}
 
 				if (catKey === "addons") {
-					if (techId === "pwa" && !rules.hasPWACompatible) {
+					const incompatibleAddons: string[] = [];
+					const isPWACompat = hasPWACompatibleFrontend(stack.frontend);
+					const isTauriCompat = hasTauriCompatibleFrontend(stack.frontend);
+
+					if (!isPWACompat && stack.addons.includes("pwa")) {
+						incompatibleAddons.push("pwa");
 						addRule(
 							category,
 							techId,
-							"Requires TanStack Router, React Router or Solid frontend.",
+							"PWA addon removed (requires compatible frontend)",
 						);
 					}
-					if (techId === "tauri" && !rules.hasTauriCompatible) {
+					if (!isTauriCompat && stack.addons.includes("tauri")) {
+						incompatibleAddons.push("tauri");
 						addRule(
 							category,
 							techId,
-							"Requires TanStack Router, React Router, Nuxt, Svelte or Solid frontend.",
+							"Tauri addon removed (requires compatible frontend)",
+						);
+					}
+
+					const originalAddonsLength = stack.addons.length;
+					if (incompatibleAddons.length > 0) {
+						stack.addons = stack.addons.filter(
+							(addon) => !incompatibleAddons.includes(addon),
+						);
+						if (stack.addons.length !== originalAddonsLength) {
+							addRule(
+								category,
+								techId,
+								"Addons filtered (requires compatible frontend)",
+							);
+						}
+					}
+
+					if (
+						stack.addons.includes("husky") &&
+						!stack.addons.includes("biome")
+					) {
+						addRule(
+							category,
+							techId,
+							"Husky addon is selected without Biome. Consider adding Biome for lint-staged integration.",
 						);
 					}
 				}
 
 				if (catKey === "examples") {
-					if (rules.hasNativeOnly) {
-						addRule(
-							category,
-							techId,
-							"Examples are not supported with Native-only frontend.",
-						);
-					} else {
-						if (!rules.hasWebFrontend) {
+					const incompatibleExamples: string[] = [];
+					const isWeb = hasWebFrontend(stack.frontend);
+					const isNativeOnly = checkHasNativeFrontend(stack.frontend) && !isWeb;
+
+					if (isNativeOnly) {
+						if (stack.examples.length > 0) {
 							addRule(
 								category,
 								techId,
-								"Requires a web frontend (TanStack Router, React Router, etc.).",
+								"Examples removed (not supported with Native-only frontend)",
 							);
 						}
-						if (techId === "todo" && stack.database === "none") {
-							addRule(category, techId, "Todo example requires a database.");
+					} else {
+						if (!isWeb) {
+							if (stack.examples.includes("todo")) {
+								incompatibleExamples.push("todo");
+								addRule(
+									category,
+									techId,
+									"Todo example removed (requires web frontend)",
+								);
+							}
+							if (stack.examples.includes("ai")) {
+								incompatibleExamples.push("ai");
+								addRule(
+									category,
+									techId,
+									"AI example removed (requires web frontend)",
+								);
+							}
 						}
-						if (techId === "ai") {
-							if (stack.backend === "elysia") {
+						if (stack.database === "none" && stack.examples.includes("todo")) {
+							incompatibleExamples.push("todo");
+							addRule(
+								category,
+								techId,
+								"Todo example removed (requires a database)",
+							);
+						}
+						if (stack.backend === "elysia" && stack.examples.includes("ai")) {
+							incompatibleExamples.push("ai");
+							addRule(
+								category,
+								techId,
+								"AI example removed (not compatible with Elysia)",
+							);
+						}
+						if (rules.hasSolid && stack.examples.includes("ai")) {
+							incompatibleExamples.push("ai");
+							addRule(
+								category,
+								techId,
+								"AI example removed (not compatible with Solid)",
+							);
+						}
+					}
+
+					const uniqueIncompatibleExamples = [...new Set(incompatibleExamples)];
+					if (uniqueIncompatibleExamples.length > 0) {
+						if (!isWeb && !isNativeOnly) {
+							if (
+								uniqueIncompatibleExamples.includes("todo") ||
+								uniqueIncompatibleExamples.includes("ai")
+							) {
 								addRule(
 									category,
 									techId,
-									"AI example is not compatible with Elysia backend.",
+									"Examples require a web frontend. Incompatible examples will be removed.",
 								);
 							}
-							if (rules.hasSolid) {
-								addRule(
-									category,
-									techId,
-									"AI example is not compatible with Solid frontend.",
-								);
-							}
+						}
+						if (
+							stack.database === "none" &&
+							uniqueIncompatibleExamples.includes("todo")
+						) {
+							addRule(
+								category,
+								techId,
+								"Todo example requires a database. It will be removed.",
+							);
+						}
+						if (
+							stack.backend === "elysia" &&
+							uniqueIncompatibleExamples.includes("ai")
+						) {
+							addRule(
+								category,
+								techId,
+								"AI example is not compatible with Elysia. It will be removed.",
+							);
+						}
+						if (rules.hasSolid && uniqueIncompatibleExamples.includes("ai")) {
+							addRule(
+								category,
+								techId,
+								"AI example is not compatible with Solid. It will be removed.",
+							);
+						}
+
+						const originalExamplesLength = stack.examples.length;
+						stack.examples = stack.examples.filter(
+							(ex) => !uniqueIncompatibleExamples.includes(ex),
+						);
+						if (stack.examples.length !== originalExamplesLength) {
+							addRule(
+								category,
+								techId,
+								"Examples filtered (incompatible examples removed)",
+							);
 						}
 					}
 				}
@@ -1256,6 +1390,8 @@ const StackArchitect = () => {
 						nextArray = nextArray.filter((id) => id !== "none");
 						if (webTypes.includes(techId)) {
 							nextArray = nextArray.filter((id) => !webTypes.includes(id));
+						} else if (techId.startsWith("native-")) {
+							nextArray = nextArray.filter((id) => !id.startsWith("native-"));
 						}
 						nextArray.push(techId);
 					}

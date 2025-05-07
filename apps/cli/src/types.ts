@@ -29,7 +29,8 @@ export type ProjectFrontend =
 	| "tanstack-start"
 	| "next"
 	| "nuxt"
-	| "native"
+	| "native-nativewind"
+	| "native-unistyles"
 	| "svelte"
 	| "solid"
 	| "none";

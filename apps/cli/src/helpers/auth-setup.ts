@@ -45,7 +45,11 @@ export async function setupAuth(config: ProjectConfig): Promise<void> {
 			});
 		}
 
-		if (frontend.includes("native") && nativeDirExists) {
+		if (
+			(frontend.includes("native-nativewind") ||
+				frontend.includes("native-unistyles")) &&
+			nativeDirExists
+		) {
 			await addPackageDependency({
 				dependencies: ["better-auth", "@better-auth/expo"],
 				projectDir: nativeDir,

@@ -1,0 +1,115 @@
+import { ScrollView, Text, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+import { Container } from "@/components/container";
+
+{{#if (eq api "orpc")}}
+import { useQuery } from "@tanstack/react-query";
+import { orpc } from "@/utils/orpc";
+{{/if}}
+{{#if (eq api "trpc")}}
+import { useQuery } from "@tanstack/react-query";
+import { trpc } from "@/utils/trpc";
+{{/if}}
+{{#if (eq backend "convex")}}
+import { useQuery } from "convex/react";
+import { api } from "@{{ projectName }}/backend/convex/_generated/api.js";
+{{/if}}
+
+export default function Home() {
+  {{#if (eq api "orpc")}}
+  const healthCheck = useQuery(orpc.healthCheck.queryOptions());
+  {{/if}}
+  {{#if (eq api "trpc")}}
+  const healthCheck = useQuery(trpc.healthCheck.queryOptions());
+  {{/if}}
+  {{#if (eq backend "convex")}}
+  const healthCheck = useQuery(api.healthCheck.get);
+  {{/if}}
+
+  return (
+    <Container>
+      <ScrollView contentContainerStyle={styles.pageContainer}>
+        <Text style={styles.headerTitle}>BETTER T STACK</Text>
+
+        <View style={styles.apiStatusCard}>
+          <Text style={styles.cardTitle}>API Status</Text>
+          <View style={styles.apiStatusRow}>
+            <View
+              style={[
+                styles.statusIndicatorDot,
+                {{#if (or (eq api "orpc") (eq api "trpc"))}}
+                healthCheck.data
+                  ? styles.statusIndicatorGreen
+                  : styles.statusIndicatorRed,
+                {{else}}
+                healthCheck === "OK"
+                  ? styles.statusIndicatorGreen
+                  : styles.statusIndicatorRed,
+                {{/if}}
+              ]}
+            />
+            <Text style={styles.statusText}>
+              {{#if (or (eq api "orpc") (eq api "trpc"))}}
+              {healthCheck.isLoading
+                ? "Checking..."
+                : healthCheck.data
+                  ? "Connected"
+                  : "Disconnected"}
+              {{/if}}
+              {{#if (eq backend "convex")}}
+              {healthCheck === undefined
+                ? "Checking..."
+                : healthCheck === "OK"
+                  ? "Connected"
+                  : "Error"}
+              {{/if}}
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+    </Container>
+  );
+}
+
+const styles = StyleSheet.create((theme) => ({
+  pageContainer: {
+    paddingHorizontal: 8,
+  },
+  headerTitle: {
+    color: theme?.colors?.typography,
+    fontSize: 30,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  apiStatusCard: {
+    marginBottom: 24,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme?.colors?.border,
+    padding: 16,
+  },
+  cardTitle: {
+    marginBottom: 12,
+    fontWeight: "500",
+    color: theme?.colors?.typography,
+  },
+  apiStatusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  statusIndicatorDot: {
+    height: 12,
+    width: 12,
+    borderRadius: 9999,
+  },
+  statusIndicatorGreen: {
+    backgroundColor: theme.colors.success,
+  },
+  statusIndicatorRed: {
+    backgroundColor: theme.colors.destructive,
+  },
+  statusText: {
+    color: theme?.colors?.typography,
+  },
+}));

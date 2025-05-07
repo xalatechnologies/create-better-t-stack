@@ -48,7 +48,6 @@ export async function getBackendFrameworkChoice(
 		});
 	}
 
-	// Add "None" option
 	backendOptions.push({
 		value: "none" as const,
 		label: "None",

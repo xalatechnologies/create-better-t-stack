@@ -41,10 +41,10 @@ export default function Header() {
             );
             {{else if (includes frontend "react-router")}}
             return (
-              <NavLink 
-                key={to} 
-                to={to} 
-                className={({ isActive }) => isActive ? "font-bold" : ""} 
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) => isActive ? "font-bold" : ""}
                 end
               >
                 {label}
@@ -60,7 +60,6 @@ export default function Header() {
               </Link>
             );
             {{else}}
-            // Fallback case (shouldn't happen with valid frontend selection)
             return null;
             {{/if}}
           })}

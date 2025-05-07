@@ -23,21 +23,21 @@ Follow the prompts to configure your project or use the `--yes` flag for default
 
 ## Features
 
-| Category | Options |
-|----------|---------|
-| **TypeScript** | End-to-end type safety across all parts of your application |
-| **Frontend** | • React with TanStack Router<br>• React with React Router<br>• React with TanStack Start (SSR)<br>• Next.js<br>• SvelteKit<br>• Nuxt (Vue)<br>• SolidJS<br>• React Native with Expo<br>• None |
-| **Backend** | • Hono<br>• Express<br>• Elysia<br>• Next.js API routes<br>• Convex |
-| **API Layer** | • tRPC (type-safe APIs)<br>• oRPC (OpenAPI-compatible type-safe APIs) |
-| **Runtime** | • Bun<br>• Node.js |
-| **Database** | • SQLite<br>• PostgreSQL<br>• MySQL<br>• MongoDB<br>• None |
-| **ORM** | • Drizzle (TypeScript-first)<br>• Prisma (feature-rich)<br>• Mongoose (for MongoDB)<br>• None |
-| **Database Setup** | • Turso (SQLite)<br>• Neon (PostgreSQL)<br>• Prisma Postgres (via Prisma Accelerate)<br>• MongoDB Atlas<br>• None (manual setup) |
-| **Authentication** | Better-Auth (email/password, with more options coming soon) |
-| **Styling** | Tailwind CSS with shadcn/ui components |
-| **Addons** | • PWA support<br>• Tauri (desktop applications)<br>• Starlight (documentation site)<br>• Biome (linting and formatting)<br>• Husky (Git hooks)<br>• Turborepo (optimized builds) |
-| **Examples** | • Todo app<br>• AI Chat interface (using Vercel AI SDK) |
-| **Developer Experience** | • Automatic Git initialization<br>• Package manager choice (npm, pnpm, bun)<br>• Automatic dependency installation |
+| Category                 | Options                                                                                                                                                                                                                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **TypeScript**           | End-to-end type safety across all parts of your application                                                                                                                                                                                                |
+| **Frontend**             | • React with TanStack Router<br>• React with React Router<br>• React with TanStack Start (SSR)<br>• Next.js<br>• SvelteKit<br>• Nuxt (Vue)<br>• SolidJS<br>• React Native with NativeWind (via Expo)<br>• React Native with Unistyles (via Expo)<br>• None |
+| **Backend**              | • Hono<br>• Express<br>• Elysia<br>• Next.js API routes<br>• Convex<br>• None                                                                                                                                                                              |
+| **API Layer**            | • tRPC (type-safe APIs)<br>• oRPC (OpenAPI-compatible type-safe APIs)<br>• None                                                                                                                                                                            |
+| **Runtime**              | • Bun<br>• Node.js                                                                                                                                                                                                                                         |
+| **Database**             | • SQLite<br>• PostgreSQL<br>• MySQL<br>• MongoDB<br>• None                                                                                                                                                                                                 |
+| **ORM**                  | • Drizzle (TypeScript-first)<br>• Prisma (feature-rich)<br>• Mongoose (for MongoDB)<br>• None                                                                                                                                                              |
+| **Database Setup**       | • Turso (SQLite)<br>• Neon (PostgreSQL)<br>• Prisma Postgres (via Prisma Accelerate)<br>• MongoDB Atlas<br>• None (manual setup)                                                                                                                           |
+| **Authentication**       | Better-Auth (email/password, with more options coming soon)                                                                                                                                                                                                |
+| **Styling**              | Tailwind CSS with shadcn/ui components                                                                                                                                                                                                                     |
+| **Addons**               | • PWA support<br>• Tauri (desktop applications)<br>• Starlight (documentation site)<br>• Biome (linting and formatting)<br>• Husky (Git hooks)<br>• Turborepo (optimized builds)                                                                           |
+| **Examples**             | • Todo app<br>• AI Chat interface (using Vercel AI SDK)                                                                                                                                                                                                    |
+| **Developer Experience** | • Automatic Git initialization<br>• Package manager choice (npm, pnpm, bun)<br>• Automatic dependency installation                                                                                                                                         |
 
 ## Usage
 
@@ -51,7 +51,7 @@ Options:
   --orm <type>                    ORM type (none, drizzle, prisma, mongoose)
   --auth                          Include authentication
   --no-auth                       Exclude authentication
-  --frontend <types...>           Frontend types (tanstack-router, react-router, tanstack-start, next, nuxt, svelte, solid, native, none)
+  --frontend <types...>           Frontend types (tanstack-router, react-router, tanstack-start, next, nuxt, svelte, solid, native-nativewind, native-unistyles, none)
   --addons <types...>             Additional addons (pwa, tauri, starlight, biome, husky, turborepo, none)
   --examples <types...>           Examples to include (todo, ai, none)
   --git                           Initialize git repository
@@ -119,6 +119,7 @@ npx create-better-t-stack my-app --addons starlight
 ## Compatibility Notes
 
 - **Convex backend**: Automatically disables authentication, database, ORM, and API options
+- **Backend 'none'**: If selected, this option will force related options like API, ORM, database, authentication, and runtime to 'none'. Examples will also be disabled (set to none/empty).
 - **SvelteKit, Nuxt, and SolidJS** frontends are only compatible with oRPC API layer
 - **PWA support** requires React with TanStack Router, React Router, or SolidJS
 - **Tauri desktop app** requires React (TanStack Router/React Router), Nuxt, SvelteKit, or SolidJS

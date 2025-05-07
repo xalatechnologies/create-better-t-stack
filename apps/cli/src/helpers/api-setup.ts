@@ -125,7 +125,8 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 		"tanstack-router",
 		"tanstack-start",
 		"next",
-		"native",
+		"native-nativewind",
+		"native-unistyles",
 	];
 	const needsSolidQuery = frontend.includes("solid");
 	const needsReactQuery = frontend.some((f) => reactBasedFrontends.includes(f));
@@ -137,9 +138,14 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 		];
 
 		const hasReactWeb = frontend.some(
-			(f) => f !== "native" && reactBasedFrontends.includes(f),
+			(f) =>
+				f !== "native-nativewind" &&
+				f !== "native-unistyles" &&
+				reactBasedFrontends.includes(f),
 		);
-		const hasNative = frontend.includes("native");
+		const hasNative =
+			frontend.includes("native-nativewind") ||
+			frontend.includes("native-unistyles");
 
 		if (hasReactWeb && webDirExists) {
 			const webPkgJsonPath = path.join(webDir, "package.json");

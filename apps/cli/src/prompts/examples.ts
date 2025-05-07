@@ -27,7 +27,10 @@ export async function getExamplesChoice(
 	if (database === "none") return [];
 
 	const onlyNative =
-		frontends && frontends.length === 1 && frontends[0] === "native";
+		frontends &&
+		frontends.length === 1 &&
+		(frontends[0] === "native-nativewind" ||
+			frontends[0] === "native-unistyles");
 	if (onlyNative) {
 		return [];
 	}

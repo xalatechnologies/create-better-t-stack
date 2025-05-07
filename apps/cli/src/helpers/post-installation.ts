@@ -1,11 +1,6 @@
 import { consola } from "consola";
 import pc from "picocolors";
-import type {
-	ProjectBackend,
-	ProjectDatabase,
-	ProjectOrm,
-	ProjectRuntime,
-} from "../types";
+import type { ProjectDatabase, ProjectOrm, ProjectRuntime } from "../types";
 import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
 
 import type { ProjectConfig } from "../types";
@@ -43,9 +38,11 @@ export function displayPostInstallInstructions(
 	const lintingInstructions = hasHuskyOrBiome
 		? getLintingInstructions(runCmd)
 		: "";
-	const nativeInstructions = frontend?.includes("native")
-		? getNativeInstructions(isConvex)
-		: "";
+	const nativeInstructions =
+		frontend?.includes("native-nativewind") ||
+		frontend?.includes("native-unistyles")
+			? getNativeInstructions(isConvex)
+			: "";
 	const pwaInstructions =
 		addons?.includes("pwa") &&
 		(frontend?.includes("react-router") ||
@@ -67,7 +64,9 @@ export function displayPostInstallInstructions(
 			"solid",
 		].includes(f),
 	);
-	const hasNative = frontend?.includes("native");
+	const hasNative =
+		frontend?.includes("native-nativewind") ||
+		frontend?.includes("native-unistyles");
 
 	const bunWebNativeWarning =
 		packageManager === "bun" && hasNative && hasWeb
@@ -90,7 +89,9 @@ export function displayPostInstallInstructions(
 	}
 
 	if (isConvex) {
-		output += `${pc.cyan(`${stepCounter++}.`)} ${runCmd} dev:setup ${pc.dim("(this will guide you through Convex project setup)")}\n`;
+		output += `${pc.cyan(`${stepCounter++}.`)} ${runCmd} dev:setup ${pc.dim(
+			"(this will guide you through Convex project setup)",
+		)}\n`;
 		output += `${pc.cyan(`${stepCounter++}.`)} ${runCmd} dev\n\n`;
 	} else {
 		output += `${pc.cyan(`${stepCounter++}.`)} ${runCmd} dev\n\n`;
@@ -101,7 +102,9 @@ export function displayPostInstallInstructions(
 	if (hasWeb) {
 		output += `${pc.cyan("•")} Frontend: http://localhost:${webPort}\n`;
 	} else if (!hasNative && !addons?.includes("starlight")) {
-		output += `${pc.yellow("NOTE:")} You are creating a backend-only app (no frontend selected)\n`;
+		output += `${pc.yellow(
+			"NOTE:",
+		)} You are creating a backend-only app (no frontend selected)\n`;
 	}
 
 	if (!isConvex) {
@@ -122,8 +125,12 @@ export function displayPostInstallInstructions(
 	if (noOrmWarning) output += `\n${noOrmWarning.trim()}\n`;
 	if (bunWebNativeWarning) output += `\n${bunWebNativeWarning.trim()}\n`;
 
-	output += `\n${pc.bold("Update all dependencies:\n")}${pc.cyan(tazeCommand)}\n\n`;
-	output += `${pc.bold("Like Better-T Stack?")} Please consider giving us a star on GitHub:\n`;
+	output += `\n${pc.bold("Update all dependencies:\n")}${pc.cyan(
+		tazeCommand,
+	)}\n\n`;
+	output += `${pc.bold(
+		"Like Better-T Stack?",
+	)} Please consider giving us a star on GitHub:\n`;
 	output += pc.cyan("https://github.com/AmanVarshney01/create-better-t-stack");
 
 	consola.box(output);
@@ -183,7 +190,9 @@ function getDatabaseInstructions(
 		instructions.push(`${pc.cyan("•")} Database UI: ${`${runCmd} db:studio`}`);
 		if (database === "sqlite") {
 			instructions.push(
-				`${pc.cyan("•")} Start local DB (if needed): ${`cd apps/server && ${runCmd} db:local`}`,
+				`${pc.cyan(
+					"•",
+				)} Start local DB (if needed): ${`cd apps/server && ${runCmd} db:local`}`,
 			);
 		}
 	} else if (orm === "none") {

@@ -84,7 +84,8 @@ async function main() {
 					"tanstack-start",
 					"next",
 					"nuxt",
-					"native",
+					"native-nativewind",
+					"native-unistyles",
 					"svelte",
 					"solid",
 					"none",
@@ -303,6 +304,9 @@ async function main() {
 				config.runtime = "none";
 				config.dbSetup = "none";
 				config.examples = ["todo"];
+				log.info(
+					"Due to '--backend convex' flag, the following options have been automatically set: auth=false, database=none, orm=none, api=none, runtime=none, dbSetup=none, examples=todo",
+				);
 			} else if (config.backend === "none") {
 				config.auth = false;
 				config.database = "none";
@@ -311,10 +315,24 @@ async function main() {
 				config.runtime = "none";
 				config.dbSetup = "none";
 				config.examples = [];
+				log.info(
+					"Due to '--backend none', the following options have been automatically set: --auth=false, --database=none, --orm=none, --api=none, --runtime=none, --db-setup=none, --examples=none",
+				);
 			} else if (config.database === "none") {
 				config.orm = "none";
+				log.info(
+					"Due to '--database none', '--orm' has been automatically set to 'none'.",
+				);
+
 				config.auth = false;
+				log.info(
+					"Due to '--database none', '--auth' has been automatically set to 'false'.",
+				);
+
 				config.dbSetup = "none";
+				log.info(
+					"Due to '--database none', '--db-setup' has been automatically set to 'none'.",
+				);
 			}
 
 			log.info(
@@ -380,13 +398,16 @@ function processAndValidateFlags(
 	if (options.api) {
 		config.api = options.api as ProjectApi;
 		if (options.api === "none") {
-			if (options.backend && options.backend !== "convex") {
+			if (
+				options.backend &&
+				options.backend !== "convex" &&
+				options.backend !== "none"
+			) {
 				consola.fatal(
-					`'--api none' is only supported with '--backend convex'. Please choose a different API setting or use '--backend convex'.`,
+					`'--api none' is only supported with '--backend convex' or '--backend none'. Please choose a different API setting or use '--backend convex' or '--backend none'.`,
 				);
 				process.exit(1);
 			}
-			config.backend = "convex";
 		}
 	}
 
@@ -468,9 +489,19 @@ function processAndValidateFlags(
 					f === "svelte" ||
 					f === "solid",
 			);
+			const nativeFrontends = validOptions.filter(
+				(f) => f === "native-nativewind" || f === "native-unistyles",
+			);
+
 			if (webFrontends.length > 1) {
 				consola.fatal(
 					"Cannot select multiple web frameworks. Choose only one of: tanstack-router, tanstack-start, react-router, next, nuxt, svelte, solid",
+				);
+				process.exit(1);
+			}
+			if (nativeFrontends.length > 1) {
+				consola.fatal(
+					"Cannot select multiple native frameworks. Choose only one of: native-nativewind, native-unistyles",
 				);
 				process.exit(1);
 			}
@@ -595,6 +626,9 @@ function processAndValidateFlags(
 			process.exit(1);
 		}
 		config.examples = [];
+		log.info(
+			"Due to '--backend none', the following options have been automatically set: --auth=false, --database=none, --orm=none, --api=none, --runtime=none, --db-setup=none, --examples=none",
+		);
 	} else {
 		const effectiveDatabase =
 			config.database ?? (options.yes ? DEFAULT_CONFIG.database : undefined);
@@ -621,6 +655,9 @@ function processAndValidateFlags(
 				process.exit(1);
 			}
 			config.orm = "none";
+			log.info(
+				"Due to '--database none', '--orm' has been automatically set to 'none'.",
+			);
 
 			if (providedFlags.has("auth") && options.auth === true) {
 				consola.fatal(
@@ -629,6 +666,9 @@ function processAndValidateFlags(
 				process.exit(1);
 			}
 			config.auth = false;
+			log.info(
+				"Due to '--database none', '--auth' has been automatically set to 'false'.",
+			);
 
 			if (providedFlags.has("dbSetup") && options.dbSetup !== "none") {
 				consola.fatal(
@@ -637,6 +677,9 @@ function processAndValidateFlags(
 				process.exit(1);
 			}
 			config.dbSetup = "none";
+			log.info(
+				"Due to '--database none', '--db-setup' has been automatically set to 'none'.",
+			);
 		}
 
 		if (config.orm === "mongoose" && !providedFlags.has("database")) {
@@ -753,6 +796,9 @@ function processAndValidateFlags(
 		) {
 			if (config.api !== "none") {
 				config.api = "orpc";
+				log.info(
+					`Due to frontend selection, API has been set to 'orpc'. tRPC is not compatible with Nuxt, Svelte, or Solid Framework`,
+				);
 			}
 		}
 
@@ -813,7 +859,8 @@ function processAndValidateFlags(
 		const onlyNativeFrontend =
 			effectiveFrontend &&
 			effectiveFrontend.length === 1 &&
-			effectiveFrontend[0] === "native";
+			(effectiveFrontend[0] === "native-nativewind" ||
+				effectiveFrontend[0] === "native-unistyles");
 
 		if (
 			onlyNativeFrontend &&
@@ -822,7 +869,7 @@ function processAndValidateFlags(
 			!config.examples.includes("none")
 		) {
 			consola.fatal(
-				"Examples are not supported when only the 'native' frontend is selected.",
+				"Examples are not supported when only a native frontend (NativeWind or Unistyles) is selected.",
 			);
 			process.exit(1);
 		}

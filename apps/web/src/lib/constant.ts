@@ -75,11 +75,19 @@ export const TECH_OPTIONS = {
 			default: false,
 		},
 		{
-			id: "native",
-			name: "React Native",
-			description: "Expo with NativeWind",
+			id: "native-nativewind",
+			name: "React Native + NativeWind",
+			description: "Expo with NativeWind (Tailwind)",
 			icon: "/icon/expo.svg",
 			color: "from-purple-400 to-purple-600",
+			default: false,
+		},
+		{
+			id: "native-unistyles",
+			name: "React Native + Unistyles",
+			description: "Expo with Unistyles",
+			icon: "/icon/expo.svg",
+			color: "from-pink-400 to-pink-600",
 			default: false,
 		},
 		{
@@ -144,6 +152,13 @@ export const TECH_OPTIONS = {
 			description: "Reactive backend-as-a-service",
 			icon: "/icon/convex.svg",
 			color: "from-pink-500 to-pink-700",
+		},
+		{
+			id: "none",
+			name: "No Backend",
+			description: "Skip backend integration (frontend only)",
+			icon: "⚙️",
+			color: "from-gray-400 to-gray-600",
 		},
 	],
 	database: [
@@ -447,7 +462,7 @@ export const PRESET_TEMPLATES = [
 		description: "React Native with Expo and SQLite database",
 		stack: {
 			projectName: "my-better-t-app",
-			frontend: ["native"],
+			frontend: ["native-nativewind"],
 			runtime: "bun",
 			backend: "hono",
 			database: "sqlite",
@@ -489,7 +504,7 @@ export const PRESET_TEMPLATES = [
 		description: "Complete setup with web, native, Turso, and addons",
 		stack: {
 			projectName: "my-better-t-app",
-			frontend: ["tanstack-router", "native"],
+			frontend: ["tanstack-router", "native-nativewind"],
 			runtime: "bun",
 			backend: "hono",
 			database: "sqlite",

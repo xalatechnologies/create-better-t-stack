@@ -95,7 +95,28 @@ export async function getFrontendChoice(
 	}
 
 	if (frontendTypes.includes("native")) {
-		result.push("native");
+		const nativeFramework = await select<ProjectFrontend>({
+			message: "Choose native framework",
+			options: [
+				{
+					value: "native-nativewind" as const,
+					label: "NativeWind",
+					hint: "Use Tailwind CSS for React Native",
+				},
+				{
+					value: "native-unistyles" as const,
+					label: "Unistyles",
+					hint: "Consistent styling for React Native",
+				},
+			],
+			initialValue: "native-nativewind",
+		});
+
+		if (isCancel(nativeFramework)) {
+			cancel(pc.red("Operation cancelled"));
+			process.exit(0);
+		}
+		result.push(nativeFramework);
 	}
 
 	return result;

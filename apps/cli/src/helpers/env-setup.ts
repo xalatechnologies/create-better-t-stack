@@ -118,7 +118,10 @@ export async function setupEnvironmentVariables(
 		}
 	}
 
-	if (frontend.includes("native")) {
+	if (
+		frontend.includes("native-nativewind") ||
+		frontend.includes("native-unistyles")
+	) {
 		const nativeDir = path.join(projectDir, "apps/native");
 		if (await fs.pathExists(nativeDir)) {
 			let envVarName = "EXPO_PUBLIC_SERVER_URL";

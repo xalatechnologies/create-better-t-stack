@@ -39,7 +39,9 @@ function generateReadmeContent(options: ProjectConfig): string {
 	const isConvex = backend === "convex";
 	const hasReactRouter = frontend.includes("react-router");
 	const hasTanstackRouter = frontend.includes("tanstack-router");
-	const hasNative = frontend.includes("native");
+	const hasNative =
+		frontend.includes("native-nativewind") ||
+		frontend.includes("native-unistyles");
 	const hasNext = frontend.includes("next");
 	const hasTanstackStart = frontend.includes("tanstack-start");
 	const hasSvelte = frontend.includes("svelte");
@@ -78,7 +80,16 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 
 ## Features
 
-${generateFeaturesList(database, auth, addons, orm, runtime, frontend, backend, api)}
+${generateFeaturesList(
+	database,
+	auth,
+	addons,
+	orm,
+	runtime,
+	frontend,
+	backend,
+	api,
+)}
 
 ## Getting Started
 
@@ -207,7 +218,9 @@ function generateFeaturesList(
 	const isConvex = backend === "convex";
 	const hasTanstackRouter = frontend.includes("tanstack-router");
 	const hasReactRouter = frontend.includes("react-router");
-	const hasNative = frontend.includes("native");
+	const hasNative =
+		frontend.includes("native-nativewind") ||
+		frontend.includes("native-unistyles");
 	const hasNext = frontend.includes("next");
 	const hasTanstackStart = frontend.includes("tanstack-start");
 	const hasSvelte = frontend.includes("svelte");

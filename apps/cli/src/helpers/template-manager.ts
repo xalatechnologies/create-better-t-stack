@@ -70,7 +70,9 @@ export async function setupFrontendTemplates(
 	const hasNuxtWeb = context.frontend.includes("nuxt");
 	const hasSvelteWeb = context.frontend.includes("svelte");
 	const hasSolidWeb = context.frontend.includes("solid");
-	const hasNative = context.frontend.includes("native");
+	const hasNativeWind = context.frontend.includes("native-nativewind");
+	const hasUnistyles = context.frontend.includes("native-unistyles");
+	const hasNative = hasNativeWind || hasUnistyles;
 	const isConvex = context.backend === "convex";
 
 	if (hasReactWeb || hasNuxtWeb || hasSvelteWeb || hasSolidWeb) {
@@ -181,14 +183,43 @@ export async function setupFrontendTemplates(
 		}
 	}
 
-	if (hasNative) {
+	if (hasNativeWind || hasUnistyles) {
 		const nativeAppDir = path.join(projectDir, "apps/native");
 		await fs.ensureDir(nativeAppDir);
 
-		const nativeBaseDir = path.join(PKG_ROOT, "templates/frontend/native");
-		if (await fs.pathExists(nativeBaseDir)) {
-			await processAndCopyFiles("**/*", nativeBaseDir, nativeAppDir, context);
+		const nativeBaseCommonDir = path.join(
+			PKG_ROOT,
+			"templates/frontend/native/native-base",
+		);
+		if (await fs.pathExists(nativeBaseCommonDir)) {
+			await processAndCopyFiles(
+				"**/*",
+				nativeBaseCommonDir,
+				nativeAppDir,
+				context,
+			);
 		} else {
+		}
+
+		let nativeFrameworkPath = "";
+		if (hasNativeWind) {
+			nativeFrameworkPath = "nativewind";
+		} else if (hasUnistyles) {
+			nativeFrameworkPath = "unistyles";
+		}
+
+		const nativeSpecificDir = path.join(
+			PKG_ROOT,
+			`templates/frontend/native/${nativeFrameworkPath}`,
+		);
+		if (await fs.pathExists(nativeSpecificDir)) {
+			await processAndCopyFiles(
+				"**/*",
+				nativeSpecificDir,
+				nativeAppDir,
+				context,
+				true,
+			);
 		}
 
 		if (!isConvex && (context.api === "trpc" || context.api === "orpc")) {
@@ -203,7 +234,6 @@ export async function setupFrontendTemplates(
 					nativeAppDir,
 					context,
 				);
-			} else {
 			}
 		}
 	}
@@ -345,7 +375,9 @@ export async function setupAuthTemplate(
 	const hasNuxtWeb = context.frontend.includes("nuxt");
 	const hasSvelteWeb = context.frontend.includes("svelte");
 	const hasSolidWeb = context.frontend.includes("solid");
-	const hasNative = context.frontend.includes("native");
+	const hasNativeWind = context.frontend.includes("native-nativewind");
+	const hasUnistyles = context.frontend.includes("native-unistyles");
+	const hasNative = hasNativeWind || hasUnistyles;
 
 	if (serverAppDirExists) {
 		const authServerBaseSrc = path.join(PKG_ROOT, "templates/auth/server/base");
@@ -475,10 +507,39 @@ export async function setupAuthTemplate(
 	}
 
 	if (hasNative && nativeAppDirExists) {
-		const authNativeSrc = path.join(PKG_ROOT, "templates/auth/native");
-		if (await fs.pathExists(authNativeSrc)) {
-			await processAndCopyFiles("**/*", authNativeSrc, nativeAppDir, context);
-		} else {
+		const authNativeBaseSrc = path.join(
+			PKG_ROOT,
+			"templates/auth/native/native-base",
+		);
+		if (await fs.pathExists(authNativeBaseSrc)) {
+			await processAndCopyFiles(
+				"**/*",
+				authNativeBaseSrc,
+				nativeAppDir,
+				context,
+			);
+		}
+
+		let nativeFrameworkAuthPath = "";
+		if (hasNativeWind) {
+			nativeFrameworkAuthPath = "nativewind";
+		} else if (hasUnistyles) {
+			nativeFrameworkAuthPath = "unistyles";
+		}
+
+		if (nativeFrameworkAuthPath) {
+			const authNativeFrameworkSrc = path.join(
+				PKG_ROOT,
+				`templates/auth/native/${nativeFrameworkAuthPath}`,
+			);
+			if (await fs.pathExists(authNativeFrameworkSrc)) {
+				await processAndCopyFiles(
+					"**/*",
+					authNativeFrameworkSrc,
+					nativeAppDir,
+					context,
+				);
+			}
 		}
 	}
 }
@@ -695,6 +756,9 @@ export async function handleExtras(
 	context: ProjectConfig,
 ): Promise<void> {
 	const extrasDir = path.join(PKG_ROOT, "templates/extras");
+	const hasNativeWind = context.frontend.includes("native-nativewind");
+	const hasUnistyles = context.frontend.includes("native-unistyles");
+	const hasNative = hasNativeWind || hasUnistyles;
 
 	if (context.packageManager === "pnpm") {
 		const pnpmWorkspaceSrc = path.join(extrasDir, "pnpm-workspace.yaml");
@@ -706,7 +770,7 @@ export async function handleExtras(
 
 	if (
 		context.packageManager === "pnpm" &&
-		(context.frontend.includes("native") || context.frontend.includes("nuxt"))
+		(hasNative || context.frontend.includes("nuxt"))
 	) {
 		const npmrcTemplateSrc = path.join(extrasDir, "_npmrc.hbs");
 		const npmrcDest = path.join(projectDir, ".npmrc");
