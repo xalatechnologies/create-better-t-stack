@@ -27,6 +27,8 @@ import {
 	InfoIcon,
 	RefreshCw,
 	Settings,
+	Share2,
+	Shuffle,
 	Star,
 	Terminal,
 } from "lucide-react";
@@ -275,7 +277,7 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 					`No backend requires ${displayName} to be '${valueDisplay}'.`,
 				);
 				notes[catKey].hasIssue = true;
-				notes.backend.hasIssue = true;
+				notes[catKey].hasIssue = true;
 				(nextStack[catKey] as string | string[]) = value;
 				changed = true;
 				changes.push({
@@ -883,6 +885,70 @@ const StackArchitect = () => {
 	);
 
 	const rules = useMemo(() => getCompatibilityRules(stack), [stack]);
+
+	const getRandomStack = () => {
+		const randomStack: Partial<StackState> = {
+			projectName: `my-random-stack-${Math.random()
+				.toString(36)
+				.substring(2, 7)}`,
+		};
+
+		for (const category of CATEGORY_ORDER) {
+			const options = TECH_OPTIONS[category as keyof typeof TECH_OPTIONS] || [];
+			if (options.length === 0) continue;
+
+			const catKey = category as keyof StackState;
+
+			if (["frontend", "addons", "examples"].includes(catKey)) {
+				const currentValues: string[] = [];
+				randomStack[catKey as "frontend" | "addons" | "examples"] =
+					currentValues;
+
+				if (catKey === "frontend") {
+					const randomIndex = Math.floor(Math.random() * options.length);
+					const selectedOption = options[randomIndex].id;
+					currentValues.push(selectedOption);
+					if (selectedOption === "none" && currentValues.length > 1) {
+						randomStack[catKey] = ["none"];
+					} else if (selectedOption !== "none") {
+						randomStack[catKey] = currentValues.filter((id) => id !== "none");
+					}
+				} else {
+					const numToPick = Math.floor(
+						Math.random() * Math.min(options.length + 1, 4),
+					);
+					const shuffledOptions = [...options].sort(() => 0.5 - Math.random());
+					for (let i = 0; i < numToPick; i++) {
+						currentValues.push(shuffledOptions[i].id);
+					}
+				}
+			} else {
+				const randomIndex = Math.floor(Math.random() * options.length);
+				(randomStack[catKey] as string) = options[randomIndex].id;
+			}
+		}
+		setStack(randomStack as StackState);
+		setShowHelp(false);
+		setShowPresets(false);
+		setActiveCategory(CATEGORY_ORDER[0]);
+		contentRef.current?.scrollTo(0, 0);
+		toast.success("Random stack generated!");
+	};
+
+	const shareToTwitter = () => {
+		const text = encodeURIComponent(
+			"Check out this cool tech stack I configured with Create Better T-Stack!\n\n",
+		);
+		if (typeof window !== "undefined") {
+			const url = encodeURIComponent(window.location.href);
+			window.open(
+				`https://twitter.com/intent/tweet?text=${text}&url=${url}`,
+				"_blank",
+			);
+		} else {
+			toast.error("Could not generate share link.");
+		}
+	};
 
 	const disabledReasons = useMemo(() => {
 		const reasons = new Map<string, string>();
@@ -1652,6 +1718,15 @@ const StackArchitect = () => {
 								<RefreshCw className="h-3 w-3" />
 								Reset
 							</button>
+							<button
+								type="button"
+								onClick={getRandomStack}
+								className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+								title="Generate a random stack"
+							>
+								<Shuffle className="h-3 w-3" />
+								Random
+							</button>
 							{lastSavedStack && (
 								<button
 									type="button"
@@ -1667,11 +1742,20 @@ const StackArchitect = () => {
 								id="save-stack-button"
 								type="button"
 								onClick={saveCurrentStack}
-								className="flex items-center gap-1 rounded border border-chart-4 bg-chart-4/10 px-2 py-1 text-chart-4 text-xs transition-colors hover:bg-chart-4/20"
+								className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
 								title="Save current preferences"
 							>
 								<Star className="h-3 w-3" />
 								<span>Save</span>
+							</button>
+							<button
+								type="button"
+								onClick={shareToTwitter}
+								className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+								title="Share to Twitter"
+							>
+								<Share2 className="h-3 w-3" />
+								Share
 							</button>
 						</div>
 					</div>
