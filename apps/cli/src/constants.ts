@@ -15,7 +15,7 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 	database: "sqlite",
 	orm: "drizzle",
 	auth: true,
-	addons: [],
+	addons: ["turborepo"],
 	examples: [],
 	git: true,
 	packageManager: getUserPkgManager(),

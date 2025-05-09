@@ -356,7 +356,7 @@ export const TECH_OPTIONS = {
 			description: "Monorepo build system",
 			icon: "/icon/turborepo.svg",
 			color: "from-gray-400 to-gray-700",
-			default: false,
+			default: true,
 		},
 	],
 	examples: [
@@ -548,7 +548,7 @@ export const DEFAULT_STACK: StackState = {
 	dbSetup: "none",
 	auth: "true",
 	packageManager: "bun",
-	addons: [],
+	addons: ["turborepo"],
 	examples: [],
 	git: "true",
 	install: "true",
