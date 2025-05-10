@@ -1,6 +1,5 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
-import { DEFAULT_CONFIG } from "../constants";
 import type { ProjectApi, ProjectBackend, ProjectFrontend } from "../types";
 
 export async function getApiChoice(
@@ -29,6 +28,11 @@ export async function getApiChoice(
 			label: "oRPC",
 			hint: "End-to-end type-safe APIs that adhere to OpenAPI standards",
 		},
+		{
+			value: "none" as const,
+			label: "None",
+			hint: "No API layer (e.g. for full-stack frameworks like Next.js with Route Handlers)",
+		},
 	];
 
 	if (includesNuxt || includesSvelte || includesSolid) {
@@ -36,9 +40,14 @@ export async function getApiChoice(
 			{
 				value: "orpc" as const,
 				label: "oRPC",
-				hint: `End-to-end type-safe APIs (Required for ${
+				hint: `End-to-end type-safe APIs (Recommended for ${
 					includesNuxt ? "Nuxt" : includesSvelte ? "Svelte" : "Solid"
 				} frontend)`,
+			},
+			{
+				value: "none" as const,
+				label: "None",
+				hint: "No API layer",
 			},
 		];
 	}
@@ -46,19 +55,12 @@ export async function getApiChoice(
 	const apiType = await select<ProjectApi>({
 		message: "Select API type",
 		options: apiOptions,
-		initialValue:
-			includesNuxt || includesSvelte || includesSolid
-				? "orpc"
-				: DEFAULT_CONFIG.api,
+		initialValue: apiOptions[0].value,
 	});
 
 	if (isCancel(apiType)) {
 		cancel(pc.red("Operation cancelled"));
 		process.exit(0);
-	}
-
-	if ((includesNuxt || includesSvelte || includesSolid) && apiType !== "orpc") {
-		return "orpc";
 	}
 
 	return apiType;
