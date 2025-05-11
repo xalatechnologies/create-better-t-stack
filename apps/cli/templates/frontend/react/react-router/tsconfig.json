@@ -23,5 +23,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true
-  }
+  },
+  "references": [{
+    "path": "../server"
+  }]
 }
