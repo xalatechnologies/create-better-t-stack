@@ -60,7 +60,9 @@ export async function setupTauri(config: ProjectConfig): Promise<void> {
 				? "../build"
 				: hasNext
 					? "../.next"
-					: "../dist";
+					: hasReactRouter
+						? "../build/client"
+						: "../dist";
 
 		const tauriArgs = [
 			"init",
