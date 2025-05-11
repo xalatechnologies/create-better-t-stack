@@ -105,7 +105,14 @@ const hasPWACompatibleFrontend = (frontend: string[]) =>
 
 const hasTauriCompatibleFrontend = (frontend: string[]) =>
 	frontend.some((f) =>
-		["tanstack-router", "react-router", "nuxt", "svelte", "solid"].includes(f),
+		[
+			"tanstack-router",
+			"react-router",
+			"nuxt",
+			"svelte",
+			"solid",
+			"next",
+		].includes(f),
 	);
 
 const getBadgeColors = (category: string): string => {
@@ -545,10 +552,10 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 			if (!isTauriCompat && nextStack.addons.includes("tauri")) {
 				incompatibleAddons.push("tauri");
 				notes.frontend.notes.push(
-					"Tauri addon requires TanStack/React Router, Nuxt, Svelte or Solid. Addon will be removed.",
+					"Tauri addon requires TanStack/React Router, Nuxt, Svelte, Solid, or Next.js. Addon will be removed.",
 				);
 				notes.addons.notes.push(
-					"Tauri requires TanStack/React Router/Nuxt/Svelte/Solid. It will be removed.",
+					"Tauri requires TanStack/React Router/Nuxt/Svelte/Solid/Next.js. It will be removed.",
 				);
 				notes.frontend.hasIssue = true;
 				notes.addons.hasIssue = true;
@@ -1213,7 +1220,7 @@ const StackArchitect = () => {
 						addRule(
 							category,
 							techId,
-							"Disabled: Tauri addon requires a compatible frontend (e.g., TanStack Router, Nuxt, Svelte, Solid).",
+							"Disabled: Tauri addon requires a compatible frontend (e.g., TanStack Router, Nuxt, Svelte, Solid, Next.js).",
 						);
 					}
 				}

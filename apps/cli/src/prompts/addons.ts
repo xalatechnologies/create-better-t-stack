@@ -25,7 +25,8 @@ export async function getAddonsChoice(
 		frontends?.includes("tanstack-router") ||
 		frontends?.includes("nuxt") ||
 		frontends?.includes("svelte") ||
-		frontends?.includes("solid");
+		frontends?.includes("solid") ||
+		frontends?.includes("next");
 
 	const allPossibleOptions: AddonOption[] = [
 		{

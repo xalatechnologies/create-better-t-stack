@@ -795,7 +795,8 @@ function processAndValidateFlags(
 					f === "react-router" ||
 					f === "nuxt" ||
 					f === "svelte" ||
-					f === "solid";
+					f === "solid" ||
+					f === "next";
 
 				if (
 					config.addons?.includes("pwa") &&
@@ -820,7 +821,7 @@ function processAndValidateFlags(
 				}
 				if (config.addons.includes("tauri")) {
 					incompatibleReason =
-						"Tauri requires tanstack-router, react-router, nuxt, svelte, or solid.";
+						"Tauri requires tanstack-router, react-router, nuxt, svelte, solid, or next.";
 				}
 				consola.fatal(
 					`Incompatible addon/frontend combination: ${incompatibleReason}`,

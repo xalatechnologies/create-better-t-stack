@@ -14,6 +14,7 @@ export async function setupAddons(config: ProjectConfig) {
 	const hasNuxtFrontend = frontend.includes("nuxt");
 	const hasSvelteFrontend = frontend.includes("svelte");
 	const hasSolidFrontend = frontend.includes("solid");
+	const hasNextFrontend = frontend.includes("next");
 
 	if (addons.includes("turborepo")) {
 		await addPackageDependency({
@@ -30,7 +31,8 @@ export async function setupAddons(config: ProjectConfig) {
 		(hasReactWebFrontend ||
 			hasNuxtFrontend ||
 			hasSvelteFrontend ||
-			hasSolidFrontend)
+			hasSolidFrontend ||
+			hasNextFrontend)
 	) {
 		await setupTauri(config);
 	}
