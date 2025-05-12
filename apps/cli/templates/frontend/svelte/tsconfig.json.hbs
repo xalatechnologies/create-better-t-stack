@@ -11,9 +11,11 @@
 		"strict": true,
 		"moduleResolution": "bundler"
 	},
- "references": [{
+      {{#unless (or (eq backend "convex") (eq backend "none"))}}
+  "references": [{
     "path": "../server"
   }]
+  {{/unless}}
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
 	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
 	//
