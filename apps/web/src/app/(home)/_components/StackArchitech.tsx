@@ -858,9 +858,9 @@ const StackArchitect = () => {
 	const [showPresets, setShowPresets] = useState(false);
 	const [showHelp, setShowHelp] = useState(false);
 	const [lastSavedStack, setLastSavedStack] = useState<StackState | null>(null);
-	const [activeCategory, setActiveCategory] = useState<string | null>(
-		CATEGORY_ORDER[0],
-	);
+	// const [activeCategory, setActiveCategory] = useState<string | null>(
+	// 	CATEGORY_ORDER[0],
+	// );
 	const [, setLastChanges] = useState<
 		Array<{ category: string; message: string }>
 	>([]);
@@ -915,7 +915,6 @@ const StackArchitect = () => {
 		setStack(randomStack as StackState);
 		setShowHelp(false);
 		setShowPresets(false);
-		setActiveCategory(CATEGORY_ORDER[0]);
 		contentRef.current?.scrollTo(0, 0);
 		toast.success("Random stack generated!");
 	};
@@ -1480,7 +1479,6 @@ const StackArchitect = () => {
 		setStack(DEFAULT_STACK);
 		setShowHelp(false);
 		setShowPresets(false);
-		setActiveCategory(CATEGORY_ORDER[0]);
 		contentRef.current?.scrollTo(0, 0);
 	};
 
@@ -1495,7 +1493,6 @@ const StackArchitect = () => {
 			setStack(lastSavedStack);
 			setShowHelp(false);
 			setShowPresets(false);
-			setActiveCategory(CATEGORY_ORDER[0]);
 			contentRef.current?.scrollTo(0, 0);
 			toast.success("Saved configuration loaded");
 		}
@@ -1509,20 +1506,8 @@ const StackArchitect = () => {
 			setStack(preset.stack);
 			setShowPresets(false);
 			setShowHelp(false);
-			setActiveCategory(CATEGORY_ORDER[0]);
 			contentRef.current?.scrollTo(0, 0);
 			toast.success(`Applied preset: ${preset.name}`);
-		}
-	};
-
-	const handleSidebarClick = (category: string) => {
-		setActiveCategory(category);
-		const element = sectionRefs.current[category];
-		if (element) {
-			element.scrollIntoView({
-				behavior: "smooth",
-				block: "start",
-			});
 		}
 	};
 
@@ -1530,7 +1515,7 @@ const StackArchitect = () => {
 		<TooltipProvider>
 			<div
 				className={cn(
-					"flex h-screen flex-col overflow-hidden border-border bg-background text-foreground",
+					"flex h-svh flex-col overflow-hidden border-border bg-background text-foreground",
 				)}
 			>
 				<div
@@ -1644,151 +1629,153 @@ const StackArchitect = () => {
 					</div>
 				)}
 
-				<div className="flex-shrink-0 bg-background p-3 pb-0 font-mono sm:p-4 sm:pb-0">
-					<div className="mb-3 flex flex-col justify-between gap-y-3 sm:flex-row sm:items-start">
-						<label className="flex flex-col">
-							<span className="mb-1 text-muted-foreground text-xs">
-								Project Name:
-							</span>
-							<input
-								type="text"
-								value={stack.projectName || ""}
-								onChange={(e) => {
-									const newValue = e.target.value;
-									setStack({ projectName: newValue });
-								}}
-								className={cn(
-									"w-full rounded border bg-background px-2 py-1 font-mono text-sm focus:outline-none sm:w-auto",
-									projectNameError
-										? "border-destructive bg-destructive/10 text-destructive-foreground"
-										: "border-border focus:border-primary",
+				<div className="grid grid-cols-1 overflow-hidden sm:grid-cols-[auto_1fr]">
+					<div className="flex h-full max-w-full flex-col justify-between border-border border-r p-4 sm:max-w-3xs md:max-w-xs lg:max-w-sm">
+						<div className="flex flex-col space-y-4">
+							<label className="flex flex-col">
+								<span className="mb-1 text-muted-foreground text-xs">
+									Project Name:
+								</span>
+								<input
+									type="text"
+									value={stack.projectName || ""}
+									onChange={(e) => {
+										const newValue = e.target.value;
+										setStack({ projectName: newValue });
+									}}
+									className={cn(
+										"w-full rounded border bg-background px-2 py-1 font-mono text-sm focus:outline-none",
+										projectNameError
+											? "border-destructive bg-destructive/10 text-destructive-foreground"
+											: "border-border focus:border-primary",
+									)}
+									placeholder="my-better-t-app"
+								/>
+								{projectNameError && (
+									<p className="mt-1 text-destructive text-xs">
+										{projectNameError}
+									</p>
 								)}
-								placeholder="my-better-t-app"
-							/>
-							{projectNameError && (
-								<p className="mt-1 text-destructive text-xs">
-									{projectNameError}
-								</p>
-							)}
-						</label>
-						<div className="flex flex-wrap gap-2">
-							<button
-								type="button"
-								onClick={resetStack}
-								className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
-								title="Reset to defaults"
-							>
-								<RefreshCw className="h-3 w-3" />
-								Reset
-							</button>
-							<button
-								type="button"
-								onClick={getRandomStack}
-								className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
-								title="Generate a random stack"
-							>
-								<Shuffle className="h-3 w-3" />
-								Random
-							</button>
-							{lastSavedStack && (
+							</label>
+							<div className="flex flex-wrap gap-2">
 								<button
 									type="button"
-									onClick={loadSavedStack}
+									onClick={resetStack}
 									className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
-									title="Load saved preferences"
+									title="Reset to defaults"
 								>
-									<Settings className="h-3 w-3" />
-									Load Saved
+									<RefreshCw className="h-3 w-3" />
+									Reset
 								</button>
-							)}
-							<button
-								id="save-stack-button"
-								type="button"
-								onClick={saveCurrentStack}
-								className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
-								title="Save current preferences"
-							>
-								<Star className="h-3 w-3" />
-								<span>Save</span>
-							</button>
-							<button
-								type="button"
-								onClick={shareToTwitter}
-								className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
-								title="Share to Twitter"
-							>
-								<Share2 className="h-3 w-3" />
-								Share
-							</button>
-						</div>
-					</div>
-
-					<div className="relative mb-4 overflow-hidden rounded border border-border bg-background p-2 pr-16 sm:pr-20">
-						<div className="flex overflow-x-auto">
-							<span className="mr-2 select-none text-chart-4">$</span>
-							<code className="no-scrollbar inline-flex items-center overflow-x-auto whitespace-pre break-words text-muted-foreground text-xs sm:text-sm">
-								{command}
-							</code>
-						</div>
-						<button
-							type="button"
-							onClick={copyToClipboard}
-							className={cn(
-								"-translate-y-1/2 absolute top-1/2 right-1 flex items-center gap-1 rounded px-2 py-1 text-xs transition-colors",
-								copied
-									? "bg-muted text-chart-4"
-									: "text-muted-foreground hover:bg-muted hover:text-foreground",
-							)}
-							title={copied ? "Copied!" : "Copy command"}
-						>
-							{copied ? (
-								<>
-									<Check className="h-3 w-3 flex-shrink-0" />
-									<span>Copied</span>
-								</>
-							) : (
-								<>
-									<ClipboardCopy className="h-3 w-3 flex-shrink-0" />
-									<span>Copy</span>
-								</>
-							)}
-						</button>
-					</div>
-
-					<div className="mb-4">
-						<div className="flex flex-wrap gap-1.5">{selectedBadges}</div>
-					</div>
-				</div>
-
-				<div className="flex flex-grow overflow-hidden">
-					<nav className="hidden w-48 flex-shrink-0 overflow-y-auto border-border border-r p-2 md:flex">
-						<ul className="space-y-1">
-							{CATEGORY_ORDER.map((category) => (
-								<li key={category}>
+								<button
+									type="button"
+									onClick={getRandomStack}
+									className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+									title="Generate a random stack"
+								>
+									<Shuffle className="h-3 w-3" />
+									Random
+								</button>
+								{lastSavedStack && (
 									<button
 										type="button"
-										onClick={() => handleSidebarClick(category)}
-										className={cn(
-											"flex w-full items-center justify-between rounded px-2 py-1.5 text-left font-mono text-xs transition-colors",
-											activeCategory === category
-												? "bg-primary/10 text-primary"
-												: "text-muted-foreground hover:bg-muted/50",
-										)}
+										onClick={loadSavedStack}
+										className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+										title="Load saved preferences"
 									>
-										<span>{getCategoryDisplayName(category)}</span>
-										{compatibilityAnalysis.notes[category]?.hasIssue && (
-											<span title="Compatibility issue affects this section">
-												<InfoIcon className="h-3 w-3 flex-shrink-0 text-chart-5" />{" "}
-											</span>
+										<Settings className="h-3 w-3" />
+										Load Saved
+									</button>
+								)}
+								<button
+									id="save-stack-button"
+									type="button"
+									onClick={saveCurrentStack}
+									className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+									title="Save current preferences"
+								>
+									<Star className="h-3 w-3" />
+									<span>Save</span>
+								</button>
+								<button
+									type="button"
+									onClick={shareToTwitter}
+									className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+									title="Share to Twitter"
+								>
+									<Share2 className="h-3 w-3" />
+									Share
+								</button>
+							</div>
+							<div className="relative rounded border border-border bg-background p-2">
+								<div className="flex">
+									<span className="mr-2 select-none text-chart-4">$</span>
+									<code className="block break-all text-muted-foreground text-xs sm:text-sm">
+										{command}
+									</code>
+								</div>
+								<div className="mt-2 flex justify-end">
+									<button
+										type="button"
+										onClick={copyToClipboard}
+										className={cn(
+											"flex items-center gap-1 rounded px-2 py-1 text-xs transition-colors",
+											copied
+												? "bg-muted text-chart-4"
+												: "text-muted-foreground hover:bg-muted hover:text-foreground",
+										)}
+										title={copied ? "Copied!" : "Copy command"}
+									>
+										{copied ? (
+											<>
+												<Check className="h-3 w-3 flex-shrink-0" />
+												<span>Copied</span>
+											</>
+										) : (
+											<>
+												<ClipboardCopy className="h-3 w-3 flex-shrink-0" />
+												<span>Copy</span>
+											</>
 										)}
 									</button>
-								</li>
-							))}
-						</ul>
-					</nav>
-
-					<ScrollArea ref={contentRef} className="flex-1 scroll-smooth">
-						<main className="flex-grow p-4">
+								</div>
+							</div>
+							<div>
+								<h3 className="mb-2 font-medium text-foreground text-sm">
+									Selected Stack
+								</h3>
+								<div className="flex flex-wrap gap-1.5">{selectedBadges}</div>
+							</div>
+						</div>
+						<div className="mt-auto border-border border-t pt-4">
+							<h3 className="mb-2 font-medium text-foreground text-sm">
+								Quick Presets
+							</h3>
+							<div className="grid grid-cols-2 gap-2">
+								{PRESET_TEMPLATES.map((preset) => (
+									<button
+										type="button"
+										key={preset.id}
+										onClick={() => applyPreset(preset.id)}
+										className="rounded border border-border bg-background p-2 text-left transition-colors hover:bg-muted"
+										title={preset.description}
+									>
+										<div className="font-medium text-foreground text-sm">
+											{preset.name}
+										</div>
+										<div className="text-muted-foreground text-xs">
+											{preset.description}
+										</div>
+									</button>
+								))}
+							</div>
+						</div>
+					</div>
+					<ScrollArea
+						ref={contentRef}
+						className="overflow-hidden scroll-smooth"
+					>
+						<main className="p-4">
 							{CATEGORY_ORDER.map((categoryKey) => {
 								const categoryOptions =
 									TECH_OPTIONS[categoryKey as keyof typeof TECH_OPTIONS] || [];
@@ -1814,8 +1801,7 @@ const StackArchitect = () => {
 											<h2 className="font-semibold text-base text-foreground">
 												{categoryDisplayName}
 											</h2>
-											{compatibilityAnalysis.notes[categoryKey]?.notes.length >
-												0 && (
+											{compatibilityAnalysis.notes[categoryKey]?.hasIssue && (
 												<Tooltip delayDuration={100}>
 													<TooltipTrigger asChild>
 														<InfoIcon className="ml-2 h-4 w-4 flex-shrink-0 cursor-help text-muted-foreground" />
@@ -1833,7 +1819,7 @@ const StackArchitect = () => {
 											)}
 										</div>
 
-										<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+										<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
 											{filteredOptions.map((tech) => {
 												let isSelected = false;
 												const category = categoryKey as keyof StackState;
