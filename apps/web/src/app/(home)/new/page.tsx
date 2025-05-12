@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "motion/react";
-import StackArchitect from "../_components/StackArchitech";
+import StackBuilder from "../_components/stack-builder";
 
-export default function FullScreenStackArchitect() {
+export default function FullScreenStackBuilder() {
 	return (
 		<div className="flex h-svh flex-col bg-background">
 			<motion.div
@@ -12,7 +12,7 @@ export default function FullScreenStackArchitect() {
 				transition={{ duration: 0.3 }}
 				className="w-full flex-1"
 			>
-				<StackArchitect />
+				<StackBuilder />
 			</motion.div>
 		</div>
 	);

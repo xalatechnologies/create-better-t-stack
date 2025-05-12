@@ -844,7 +844,7 @@ const generateCommand = (stackState: StackState): string => {
 	}`;
 };
 
-const StackArchitect = () => {
+const StackBuilder = () => {
 	const [stack, setStack] = useQueryStates(
 		stackParsers,
 		stackQueryStatesOptions,
@@ -1937,4 +1937,4 @@ const StackArchitect = () => {
 	);
 };
 
-export default StackArchitect;
+export default StackBuilder;

@@ -5,7 +5,7 @@ import { Github, Maximize2, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import PackageIcon from "./Icons";
+import PackageIcon from "./icons";
 
 export default function Navbar() {
 	const [scrolled, setScrolled] = useState(false);

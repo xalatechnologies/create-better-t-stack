@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Check, ClipboardCopy } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
-import PackageIcon from "./Icons";
+import PackageIcon from "./icons";
 
 const CodeContainer = () => {
 	const [selectedPM, setSelectedPM] = useState<"npm" | "pnpm" | "bun">("bun");

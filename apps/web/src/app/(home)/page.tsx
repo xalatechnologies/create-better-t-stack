@@ -1,15 +1,15 @@
 "use client";
-import ShinyText from "@/app/(home)/_components/ShinyText";
+import ShinyText from "@/app/(home)/_components/shiny-text";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import React from "react";
-import CodeContainer from "./_components/CodeContainer";
-import CustomizableSection from "./_components/CustomizableSection";
-import Footer from "./_components/Footer";
-import Navbar from "./_components/Navbar";
-import NpmPackage from "./_components/NpmPackage";
+import CodeContainer from "./_components/code-container";
+import CustomizableSection from "./_components/customizable-section";
+import Footer from "./_components/footer";
+import Navbar from "./_components/navbar";
+import NpmPackage from "./_components/npm-package";
 // import SponsorsSection from "./_components/SponsorsSection";
-import Testimonials from "./_components/Testimonials";
+import Testimonials from "./_components/testimonials";
 
 export default function HomePage() {
 	const containerVariants = {

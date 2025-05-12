@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import StackArchitect from "./StackArchitech";
+import StackBuilder from "./stack-builder";
 
 export default function CustomizableSection() {
 	return (
@@ -39,7 +39,7 @@ export default function CustomizableSection() {
 				transition={{ duration: 0.6, delay: 0.2 }}
 				className="relative border"
 			>
-				<StackArchitect />
+				<StackBuilder />
 			</motion.div>
 		</section>
 	);
