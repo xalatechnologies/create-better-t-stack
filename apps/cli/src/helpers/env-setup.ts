@@ -163,7 +163,8 @@ export async function setupEnvironmentVariables(
 		dbSetup === "turso" ||
 		dbSetup === "prisma-postgres" ||
 		dbSetup === "mongodb-atlas" ||
-		dbSetup === "neon";
+		dbSetup === "neon" ||
+		dbSetup === "supabase";
 
 	if (database !== "none" && !specializedSetup) {
 		switch (database) {

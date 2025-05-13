@@ -15,6 +15,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { DEFAULT_CONFIG } from "./constants";
 import { createProject } from "./helpers/create-project";
+import { setupDatabase } from "./helpers/db-setup";
 import { gatherConfig } from "./prompts/config-prompts";
 import { getProjectName } from "./prompts/project-name";
 import type {
@@ -128,7 +129,14 @@ async function main() {
 			.option("db-setup", {
 				type: "string",
 				describe: "Database setup",
-				choices: ["turso", "neon", "prisma-postgres", "mongodb-atlas", "none"],
+				choices: [
+					"turso",
+					"neon",
+					"prisma-postgres",
+					"mongodb-atlas",
+					"supabase",
+					"none",
+				],
 			})
 			.option("backend", {
 				type: "string",

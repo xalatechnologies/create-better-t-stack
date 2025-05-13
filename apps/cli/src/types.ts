@@ -39,6 +39,7 @@ export type ProjectDBSetup =
 	| "prisma-postgres"
 	| "mongodb-atlas"
 	| "neon"
+	| "supabase"
 	| "none";
 export type ProjectApi = "trpc" | "orpc" | "none";
 

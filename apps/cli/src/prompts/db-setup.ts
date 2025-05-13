@@ -1,4 +1,4 @@
-import { cancel, isCancel, log, select } from "@clack/prompts";
+import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
 import type { ProjectBackend, ProjectDBSetup, ProjectOrm } from "../types";
 
@@ -40,6 +40,11 @@ export async function getDBSetupChoice(
 				value: "neon" as const,
 				label: "Neon Postgres",
 				hint: "Serverless Postgres with branching capability",
+			},
+			{
+				value: "supabase" as const,
+				label: "Supabase",
+				hint: "Local Supabase stack (requires Docker)",
 			},
 			...(orm === "prisma"
 				? [

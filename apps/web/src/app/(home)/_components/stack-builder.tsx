@@ -289,7 +289,6 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 					`No backend requires ${displayName} to be '${valueDisplay}'.`,
 				);
 				notes[catKey].hasIssue = true;
-				notes[catKey].hasIssue = true;
 				(nextStack[catKey] as string | string[]) = value;
 				changed = true;
 				changes.push({
@@ -510,6 +509,24 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 					changes.push({
 						category: "dbSetup",
 						message: "Database set to 'PostgreSQL' (required by Neon)",
+					});
+				}
+			} else if (nextStack.dbSetup === "supabase") {
+				if (nextStack.database !== "postgres") {
+					notes.dbSetup.notes.push(
+						"Supabase (local) requires PostgreSQL. It will be selected.",
+					);
+					notes.database.notes.push(
+						"Supabase (local) DB setup requires PostgreSQL. It will be selected.",
+					);
+					notes.dbSetup.hasIssue = true;
+					notes.database.hasIssue = true;
+					nextStack.database = "postgres";
+					changed = true;
+					changes.push({
+						category: "dbSetup",
+						message:
+							"Database set to 'PostgreSQL' (required by Supabase setup)",
 					});
 				}
 			}
@@ -961,7 +978,6 @@ const StackBuilder = () => {
 
 	const disabledReasons = useMemo(() => {
 		const reasons = new Map<string, string>();
-
 		const addRule = (category: string, techId: string, reason: string) => {
 			reasons.set(`${category}-${techId}`, reason);
 		};
@@ -1217,6 +1233,14 @@ const StackBuilder = () => {
 								category,
 								techId,
 								"Disabled: Neon requires PostgreSQL. (Will auto-select if chosen)",
+							);
+						}
+					} else if (techId === "supabase") {
+						if (stack.database !== "postgres" && stack.database !== "none") {
+							addRule(
+								category,
+								techId,
+								"Disabled: Supabase (local) requires PostgreSQL. (Will auto-select if chosen)",
 							);
 						}
 					}

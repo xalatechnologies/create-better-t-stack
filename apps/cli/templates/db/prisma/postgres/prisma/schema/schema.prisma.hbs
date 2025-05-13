@@ -7,4 +7,7 @@ generator client {
 datasource db {
   provider = "postgres"
   url      = env("DATABASE_URL")
+  {{#if (eq dbSetup "supabase")}}
+  directUrl = env("DIRECT_URL")
+  {{/if}}
 }

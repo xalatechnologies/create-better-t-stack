@@ -6,6 +6,7 @@ import pc from "picocolors";
 import { addPackageDependency } from "../utils/add-package-deps";
 import { setupMongoDBAtlas } from "./mongodb-atlas-setup";
 import { setupPrismaPostgres } from "./prisma-postgres-setup";
+import { setupSupabase } from "./supabase-setup";
 import { setupTurso } from "./turso-setup";
 
 import { setupNeonPostgres } from "./neon-setup";
@@ -13,7 +14,7 @@ import { setupNeonPostgres } from "./neon-setup";
 import type { ProjectConfig } from "../types";
 
 export async function setupDatabase(config: ProjectConfig): Promise<void> {
-	const { projectName, database, orm, dbSetup, backend, projectDir } = config;
+	const { database, orm, dbSetup, backend, projectDir } = config;
 
 	if (backend === "convex" || database === "none") {
 		if (backend !== "convex") {
@@ -75,6 +76,8 @@ export async function setupDatabase(config: ProjectConfig): Promise<void> {
 				await setupPrismaPostgres(config);
 			} else if (dbSetup === "neon") {
 				await setupNeonPostgres(config);
+			} else if (dbSetup === "supabase") {
+				await setupSupabase(config);
 			}
 		} else if (database === "mongodb" && dbSetup === "mongodb-atlas") {
 			await setupMongoDBAtlas(config);

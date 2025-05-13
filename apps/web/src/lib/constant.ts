@@ -277,6 +277,13 @@ export const TECH_OPTIONS = {
 			color: "from-green-400 to-green-600",
 		},
 		{
+			id: "supabase",
+			name: "Supabase",
+			description: "Local Supabase stack (requires Docker)",
+			icon: "/icon/supabase.svg",
+			color: "from-emerald-400 to-emerald-600",
+		},
+		{
 			id: "none",
 			name: "Basic Setup",
 			description: "No cloud DB integration",
