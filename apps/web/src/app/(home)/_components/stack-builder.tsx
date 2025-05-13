@@ -1429,15 +1429,6 @@ const StackBuilder = () => {
 				const isSelected = currentArray.includes(techId);
 
 				if (catKey === "webFrontend") {
-					const webTypes = [
-						"tanstack-router",
-						"react-router",
-						"tanstack-start",
-						"next",
-						"nuxt",
-						"svelte",
-						"solid",
-					];
 					if (techId === "none") {
 						nextArray = ["none"];
 					} else if (isSelected) {

@@ -603,13 +603,6 @@ export const isStackDefault = <K extends keyof StackState>(
 	}
 
 	if (key === "webFrontend" && stack.webFrontend) {
-		const currentWeb = (stack.webFrontend as string[]).filter(
-			(f) => !f.startsWith("native-") && f !== "none",
-		);
-		const currentNative = (stack.webFrontend as string[]).filter((f) =>
-			f.startsWith("native-"),
-		);
-
 		if (key === "webFrontend") {
 			const defaultWeb = (DEFAULT_STACK.webFrontend as string[]).sort();
 			const valueWeb = (value as string[]).sort();
