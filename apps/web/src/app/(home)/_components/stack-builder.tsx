@@ -63,7 +63,8 @@ const validateProjectName = (name: string): string | undefined => {
 };
 
 const CATEGORY_ORDER: Array<keyof typeof TECH_OPTIONS> = [
-	"frontend",
+	"webFrontend",
+	"nativeFrontend",
 	"backend",
 	"runtime",
 	"api",
@@ -78,8 +79,8 @@ const CATEGORY_ORDER: Array<keyof typeof TECH_OPTIONS> = [
 	"install",
 ];
 
-const hasWebFrontend = (frontend: string[]) =>
-	frontend.some((f) =>
+const hasWebFrontend = (webFrontend: string[]) =>
+	webFrontend.some((f) =>
 		[
 			"tanstack-router",
 			"react-router",
@@ -91,17 +92,17 @@ const hasWebFrontend = (frontend: string[]) =>
 		].includes(f),
 	);
 
-const checkHasNativeFrontend = (frontend: string[]) =>
-	frontend.includes("native-nativewind") ||
-	frontend.includes("native-unistyles");
+const checkHasNativeFrontend = (nativeFrontend: string[]) =>
+	nativeFrontend.includes("native-nativewind") ||
+	nativeFrontend.includes("native-unistyles");
 
-const hasPWACompatibleFrontend = (frontend: string[]) =>
-	frontend.some((f) =>
+const hasPWACompatibleFrontend = (webFrontend: string[]) =>
+	webFrontend.some((f) =>
 		["tanstack-router", "react-router", "solid"].includes(f),
 	);
 
-const hasTauriCompatibleFrontend = (frontend: string[]) =>
-	frontend.some((f) =>
+const hasTauriCompatibleFrontend = (webFrontend: string[]) =>
+	webFrontend.some((f) =>
 		[
 			"tanstack-router",
 			"react-router",
@@ -114,7 +115,8 @@ const hasTauriCompatibleFrontend = (frontend: string[]) =>
 
 const getBadgeColors = (category: string): string => {
 	switch (category) {
-		case "frontend":
+		case "webFrontend":
+		case "nativeFrontend":
 			return "border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-700/30 dark:bg-blue-900/30 dark:text-blue-300";
 		case "runtime":
 			return "border-amber-300 bg-amber-100 text-amber-800 dark:border-amber-700/30 dark:bg-amber-900/30 dark:text-amber-300";
@@ -229,32 +231,38 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 			}
 		}
 		const incompatibleConvexFrontends = ["nuxt", "solid"];
-		const originalFrontendLength = nextStack.frontend.length;
-		nextStack.frontend = nextStack.frontend.filter(
+		const originalWebFrontendLength = nextStack.webFrontend.length;
+		nextStack.webFrontend = nextStack.webFrontend.filter(
 			(f) => !incompatibleConvexFrontends.includes(f),
 		);
-		if (nextStack.frontend.length !== originalFrontendLength) {
+		if (nextStack.webFrontend.length !== originalWebFrontendLength) {
 			changed = true;
-			notes.frontend.notes.push(
+			notes.webFrontend.notes.push(
 				"Nuxt and Solid are not compatible with Convex backend and have been removed.",
 			);
 			notes.backend.notes.push(
 				"Convex backend is not compatible with Nuxt or Solid.",
 			);
-			notes.frontend.hasIssue = true;
+			notes.webFrontend.hasIssue = true;
 			notes.backend.hasIssue = true;
 			changes.push({
 				category: "convex",
-				message: "Removed incompatible frontends (Nuxt, Solid)",
+				message: "Removed incompatible web frontends (Nuxt, Solid)",
 			});
 		}
-		if (nextStack.frontend.length === 0) {
-			nextStack.frontend = ["tanstack-router"];
+		if (
+			nextStack.webFrontend.length === 0 ||
+			nextStack.webFrontend[0] === "none"
+		) {
+			nextStack.webFrontend = ["tanstack-router"];
 			changed = true;
 			changes.push({
 				category: "convex",
-				message: "Frontend defaulted to TanStack Router",
+				message: "Web Frontend defaulted to TanStack Router",
 			});
+		}
+		if (nextStack.nativeFrontend[0] === "none") {
+		} else {
 		}
 	} else if (isBackendNone) {
 		const noneOverrides: Partial<StackState> = {
@@ -506,19 +514,19 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 				}
 			}
 
-			const isNuxt = nextStack.frontend.includes("nuxt");
-			const isSvelte = nextStack.frontend.includes("svelte");
-			const isSolid = nextStack.frontend.includes("solid");
+			const isNuxt = nextStack.webFrontend.includes("nuxt");
+			const isSvelte = nextStack.webFrontend.includes("svelte");
+			const isSolid = nextStack.webFrontend.includes("solid");
 			if ((isNuxt || isSvelte || isSolid) && nextStack.api === "trpc") {
 				const frontendName = isNuxt ? "Nuxt" : isSvelte ? "Svelte" : "Solid";
 				notes.api.notes.push(
 					`${frontendName} requires oRPC. It will be selected automatically.`,
 				);
-				notes.frontend.notes.push(
+				notes.webFrontend.notes.push(
 					`Selected ${frontendName}: API will be set to oRPC.`,
 				);
 				notes.api.hasIssue = true;
-				notes.frontend.hasIssue = true;
+				notes.webFrontend.hasIssue = true;
 				nextStack.api = "orpc";
 				changed = true;
 				changes.push({
@@ -528,37 +536,37 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 			}
 
 			const incompatibleAddons: string[] = [];
-			const isPWACompat = hasPWACompatibleFrontend(nextStack.frontend);
-			const isTauriCompat = hasTauriCompatibleFrontend(nextStack.frontend);
+			const isPWACompat = hasPWACompatibleFrontend(nextStack.webFrontend);
+			const isTauriCompat = hasTauriCompatibleFrontend(nextStack.webFrontend);
 
 			if (!isPWACompat && nextStack.addons.includes("pwa")) {
 				incompatibleAddons.push("pwa");
-				notes.frontend.notes.push(
+				notes.webFrontend.notes.push(
 					"PWA addon requires TanStack/React Router or Solid. Addon will be removed.",
 				);
 				notes.addons.notes.push(
 					"PWA requires TanStack/React Router/Solid. It will be removed.",
 				);
-				notes.frontend.hasIssue = true;
+				notes.webFrontend.hasIssue = true;
 				notes.addons.hasIssue = true;
 				changes.push({
 					category: "addons",
-					message: "PWA addon removed (requires compatible frontend)",
+					message: "PWA addon removed (requires compatible web frontend)",
 				});
 			}
 			if (!isTauriCompat && nextStack.addons.includes("tauri")) {
 				incompatibleAddons.push("tauri");
-				notes.frontend.notes.push(
+				notes.webFrontend.notes.push(
 					"Tauri addon requires TanStack/React Router, Nuxt, Svelte, Solid, or Next.js. Addon will be removed.",
 				);
 				notes.addons.notes.push(
 					"Tauri requires TanStack/React Router/Nuxt/Svelte/Solid/Next.js. It will be removed.",
 				);
-				notes.frontend.hasIssue = true;
+				notes.webFrontend.hasIssue = true;
 				notes.addons.hasIssue = true;
 				changes.push({
 					category: "addons",
-					message: "Tauri addon removed (requires compatible frontend)",
+					message: "Tauri addon removed (requires compatible web frontend)",
 				});
 			}
 
@@ -580,18 +588,19 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 			}
 
 			const incompatibleExamples: string[] = [];
-			const isWeb = hasWebFrontend(nextStack.frontend);
-			const isNativeOnly = checkHasNativeFrontend(nextStack.frontend) && !isWeb;
+			const isWeb = hasWebFrontend(nextStack.webFrontend);
+			const hasNative = checkHasNativeFrontend(nextStack.nativeFrontend);
+			const isNativeOnly = hasNative && !isWeb;
 
 			if (isNativeOnly) {
 				if (nextStack.examples.length > 0) {
-					notes.frontend.notes.push(
+					notes.webFrontend.notes.push(
 						"Examples are not supported with Native-only frontend. Examples will be removed.",
 					);
 					notes.examples.notes.push(
 						"Examples require a web frontend. They will be removed.",
 					);
-					notes.frontend.hasIssue = true;
+					notes.webFrontend.hasIssue = true;
 					notes.examples.hasIssue = true;
 					incompatibleExamples.push(...nextStack.examples);
 					changes.push({
@@ -653,13 +662,13 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 						uniqueIncompatibleExamples.includes("todo") ||
 						uniqueIncompatibleExamples.includes("ai")
 					) {
-						notes.frontend.notes.push(
+						notes.webFrontend.notes.push(
 							"Examples require a web frontend. Incompatible examples will be removed.",
 						);
 						notes.examples.notes.push(
 							"Requires a web frontend. Incompatible examples will be removed.",
 						);
-						notes.frontend.hasIssue = true;
+						notes.webFrontend.hasIssue = true;
 						notes.examples.hasIssue = true;
 					}
 				}
@@ -690,13 +699,13 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 					notes.examples.hasIssue = true;
 				}
 				if (isSolid && uniqueIncompatibleExamples.includes("ai")) {
-					notes.frontend.notes.push(
+					notes.webFrontend.notes.push(
 						"AI example is not compatible with Solid. It will be removed.",
 					);
 					notes.examples.notes.push(
 						"AI example is not compatible with Solid. It will be removed.",
 					);
-					notes.frontend.hasIssue = true;
+					notes.webFrontend.hasIssue = true;
 					notes.examples.hasIssue = true;
 				}
 
@@ -720,12 +729,12 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 const getCompatibilityRules = (stack: StackState) => {
 	const isConvex = stack.backend === "convex";
 	const isBackendNone = stack.backend === "none";
-	const hasWebFrontendSelected = hasWebFrontend(stack.frontend);
-	const hasNativeFrontend = checkHasNativeFrontend(stack.frontend);
+	const hasWebFrontendSelected = hasWebFrontend(stack.webFrontend);
+	const hasNativeFrontend = checkHasNativeFrontend(stack.nativeFrontend);
 	const hasNativeOnly = hasNativeFrontend && !hasWebFrontendSelected;
-	const hasSolid = stack.frontend.includes("solid");
-	const hasNuxt = stack.frontend.includes("nuxt");
-	const hasSvelte = stack.frontend.includes("svelte");
+	const hasSolid = stack.webFrontend.includes("solid");
+	const hasNuxt = stack.webFrontend.includes("nuxt");
+	const hasSvelte = stack.webFrontend.includes("svelte");
 
 	return {
 		isConvex,
@@ -733,8 +742,8 @@ const getCompatibilityRules = (stack: StackState) => {
 		hasWebFrontend: hasWebFrontendSelected,
 		hasNativeFrontend,
 		hasNativeOnly,
-		hasPWACompatible: hasPWACompatibleFrontend(stack.frontend),
-		hasTauriCompatible: hasTauriCompatibleFrontend(stack.frontend),
+		hasPWACompatible: hasPWACompatibleFrontend(stack.webFrontend),
+		hasTauriCompatible: hasTauriCompatibleFrontend(stack.webFrontend),
 		hasNuxtOrSvelteOrSolid: hasNuxt || hasSvelte || hasSolid,
 		hasSolid,
 		hasNuxt,
@@ -764,11 +773,34 @@ const generateCommand = (stackState: StackState): string => {
 		value: StackState[K],
 	) => isStackDefault(stackState, key, value);
 
-	if (!checkDefault("frontend", stackState.frontend)) {
-		if (stackState.frontend.length === 0 || stackState.frontend[0] === "none") {
+	if (!checkDefault("webFrontend", stackState.webFrontend)) {
+		if (
+			stackState.webFrontend.length === 0 ||
+			stackState.webFrontend[0] === "none"
+		) {
 			flags.push("--frontend none");
 		} else {
-			flags.push(`--frontend ${stackState.frontend.join(" ")}`);
+			flags.push(`--frontend ${stackState.webFrontend.join(" ")}`);
+		}
+	}
+
+	if (!checkDefault("nativeFrontend", stackState.nativeFrontend)) {
+		if (
+			stackState.nativeFrontend.length > 0 &&
+			stackState.nativeFrontend[0] !== "none"
+		) {
+			if (checkDefault("webFrontend", stackState.webFrontend)) {
+				flags.push(`--frontend ${stackState.nativeFrontend.join(" ")}`);
+			} else {
+				const existingFrontendIndex = flags.findIndex((f) =>
+					f.startsWith("--frontend "),
+				);
+				if (existingFrontendIndex !== -1) {
+					flags[existingFrontendIndex] += ` ${stackState.nativeFrontend.join(
+						" ",
+					)}`;
+				}
+			}
 		}
 	}
 
@@ -876,12 +908,15 @@ const StackBuilder = () => {
 
 			const catKey = category as keyof StackState;
 
-			if (["frontend", "addons", "examples"].includes(catKey)) {
+			if (
+				["webFrontend", "nativeFrontend", "addons", "examples"].includes(catKey)
+			) {
 				const currentValues: string[] = [];
-				randomStack[catKey as "frontend" | "addons" | "examples"] =
-					currentValues;
+				randomStack[
+					catKey as "webFrontend" | "nativeFrontend" | "addons" | "examples"
+				] = currentValues;
 
-				if (catKey === "frontend") {
+				if (catKey === "webFrontend" || catKey === "nativeFrontend") {
 					const randomIndex = Math.floor(Math.random() * options.length);
 					const selectedOption = options[randomIndex].id;
 					currentValues.push(selectedOption);
@@ -986,7 +1021,7 @@ const StackBuilder = () => {
 							);
 						}
 					} else if (
-						catKey === "frontend" &&
+						catKey === "webFrontend" &&
 						(techId === "nuxt" || techId === "solid")
 					) {
 						addRule(
@@ -1274,9 +1309,15 @@ const StackBuilder = () => {
 			if (!options) continue;
 
 			if (Array.isArray(selectedValue)) {
-				if (selectedValue.length === 0 || selectedValue[0] === "none") continue;
+				if (
+					selectedValue.length === 0 ||
+					(selectedValue.length === 1 && selectedValue[0] === "none")
+				) {
+					continue;
+				}
 
 				for (const id of selectedValue) {
+					if (id === "none") continue;
 					const tech = options.find((opt) => opt.id === id);
 					if (tech) {
 						badges.push(
@@ -1376,7 +1417,8 @@ const StackBuilder = () => {
 			const currentValue = currentStack[catKey];
 
 			if (
-				catKey === "frontend" ||
+				catKey === "webFrontend" ||
+				catKey === "nativeFrontend" ||
 				catKey === "addons" ||
 				catKey === "examples"
 			) {
@@ -1386,7 +1428,7 @@ const StackBuilder = () => {
 				let nextArray = [...currentArray];
 				const isSelected = currentArray.includes(techId);
 
-				if (catKey === "frontend") {
+				if (catKey === "webFrontend") {
 					const webTypes = [
 						"tanstack-router",
 						"react-router",
@@ -1405,25 +1447,31 @@ const StackBuilder = () => {
 							nextArray = ["none"];
 						}
 					} else {
-						nextArray = nextArray.filter((id) => id !== "none");
-						if (webTypes.includes(techId)) {
-							nextArray = nextArray.filter((id) => !webTypes.includes(id));
-						} else if (techId.startsWith("native-")) {
-							nextArray = nextArray.filter((id) => !id.startsWith("native-"));
-						}
-						nextArray.push(techId);
+						nextArray = [techId];
 					}
-					if (nextArray.length > 1) {
-						nextArray = nextArray.filter((id) => id !== "none");
-					}
-					if (nextArray.length === 0) {
+				} else if (catKey === "nativeFrontend") {
+					if (techId === "none") {
 						nextArray = ["none"];
+					} else if (isSelected) {
+						nextArray = ["none"];
+					} else {
+						nextArray = [techId];
 					}
 				} else {
 					if (isSelected) {
 						nextArray = nextArray.filter((id) => id !== techId);
 					} else {
 						nextArray.push(techId);
+					}
+					if (nextArray.length > 1) {
+						nextArray = nextArray.filter((id) => id !== "none");
+					}
+					if (
+						nextArray.length === 0 &&
+						(catKey === "addons" || catKey === "examples")
+					) {
+					} else if (nextArray.length === 0) {
+						nextArray = ["none"];
 					}
 				}
 
@@ -1730,7 +1778,8 @@ const StackBuilder = () => {
 												if (
 													category === "addons" ||
 													category === "examples" ||
-													category === "frontend"
+													category === "webFrontend" ||
+													category === "nativeFrontend"
 												) {
 													isSelected = (
 														(currentValue as string[]) || []

@@ -23,7 +23,7 @@ export const TECH_OPTIONS = {
 			color: "from-gray-400 to-gray-600",
 		},
 	],
-	frontend: [
+	webFrontend: [
 		{
 			id: "tanstack-router",
 			name: "TanStack Router",
@@ -82,6 +82,16 @@ export const TECH_OPTIONS = {
 			default: false,
 		},
 		{
+			id: "none",
+			name: "No Web Frontend",
+			description: "No web-based frontend",
+			icon: "⚙️",
+			color: "from-gray-400 to-gray-600",
+			default: false,
+		},
+	],
+	nativeFrontend: [
+		{
 			id: "native-nativewind",
 			name: "React Native + NativeWind",
 			description: "Expo with NativeWind (Tailwind)",
@@ -99,9 +109,9 @@ export const TECH_OPTIONS = {
 		},
 		{
 			id: "none",
-			name: "No Frontend",
-			description: "API-only backend",
-			icon: "⚙️",
+			name: "No Native Frontend",
+			description: "No native mobile frontend",
+			icon: "📱",
 			color: "from-gray-400 to-gray-600",
 			default: false,
 		},
@@ -427,7 +437,8 @@ export const PRESET_TEMPLATES = [
 		description: "Standard web app with TanStack Router, Bun, Hono and SQLite",
 		stack: {
 			projectName: "my-better-t-app",
-			frontend: ["tanstack-router"],
+			webFrontend: ["tanstack-router"],
+			nativeFrontend: ["none"],
 			runtime: "bun",
 			backend: "hono",
 			database: "sqlite",
@@ -448,7 +459,8 @@ export const PRESET_TEMPLATES = [
 		description: "Reactive full-stack app with Convex and TanStack Router",
 		stack: {
 			projectName: "my-better-t-app",
-			frontend: ["tanstack-router"],
+			webFrontend: ["tanstack-router"],
+			nativeFrontend: ["none"],
 			backend: "convex",
 			runtime: "none",
 			database: "none",
@@ -469,7 +481,8 @@ export const PRESET_TEMPLATES = [
 		description: "React Native with Expo and SQLite database",
 		stack: {
 			projectName: "my-better-t-app",
-			frontend: ["native-nativewind"],
+			webFrontend: ["none"],
+			nativeFrontend: ["native-nativewind"],
 			runtime: "bun",
 			backend: "hono",
 			database: "sqlite",
@@ -490,7 +503,8 @@ export const PRESET_TEMPLATES = [
 		description: "Backend API with Hono and PostgreSQL",
 		stack: {
 			projectName: "my-better-t-app",
-			frontend: ["none"],
+			webFrontend: ["none"],
+			nativeFrontend: ["none"],
 			runtime: "bun",
 			backend: "hono",
 			database: "postgres",
@@ -511,7 +525,8 @@ export const PRESET_TEMPLATES = [
 		description: "Complete setup with web, native, Turso, and addons",
 		stack: {
 			projectName: "my-better-t-app",
-			frontend: ["tanstack-router", "native-nativewind"],
+			webFrontend: ["tanstack-router"],
+			nativeFrontend: ["native-nativewind"],
 			runtime: "bun",
 			backend: "hono",
 			database: "sqlite",
@@ -530,7 +545,8 @@ export const PRESET_TEMPLATES = [
 
 export type StackState = {
 	projectName: string;
-	frontend: string[];
+	webFrontend: string[];
+	nativeFrontend: string[];
 	runtime: string;
 	backend: string;
 	database: string;
@@ -547,7 +563,8 @@ export type StackState = {
 
 export const DEFAULT_STACK: StackState = {
 	projectName: "my-better-t-app",
-	frontend: ["tanstack-router"],
+	webFrontend: ["tanstack-router"],
+	nativeFrontend: ["none"],
 	runtime: "bun",
 	backend: "hono",
 	database: "sqlite",
@@ -583,6 +600,24 @@ export const isStackDefault = <K extends keyof StackState>(
 			value[0] === "todo"
 		)
 			return true;
+	}
+
+	if (key === "webFrontend" && stack.webFrontend) {
+		const currentWeb = (stack.webFrontend as string[]).filter(
+			(f) => !f.startsWith("native-") && f !== "none",
+		);
+		const currentNative = (stack.webFrontend as string[]).filter((f) =>
+			f.startsWith("native-"),
+		);
+
+		if (key === "webFrontend") {
+			const defaultWeb = (DEFAULT_STACK.webFrontend as string[]).sort();
+			const valueWeb = (value as string[]).sort();
+			return (
+				defaultWeb.length === valueWeb.length &&
+				defaultWeb.every((item, index) => item === valueWeb[index])
+			);
+		}
 	}
 
 	if (Array.isArray(defaultValue) && Array.isArray(value)) {

@@ -12,7 +12,12 @@ const getValidIds = (category: keyof typeof TECH_OPTIONS): string[] => {
 
 export const stackParsers = {
 	projectName: parseAsString.withDefault(DEFAULT_STACK.projectName),
-	frontend: parseAsArrayOf(parseAsString).withDefault(DEFAULT_STACK.frontend),
+	webFrontend: parseAsArrayOf(parseAsString).withDefault(
+		DEFAULT_STACK.webFrontend,
+	),
+	nativeFrontend: parseAsArrayOf(parseAsString).withDefault(
+		DEFAULT_STACK.nativeFrontend,
+	),
 	runtime: parseAsStringEnum<StackState["runtime"]>(
 		getValidIds("runtime"),
 	).withDefault(DEFAULT_STACK.runtime),
@@ -50,7 +55,8 @@ export const stackParsers = {
 
 export const stackUrlKeys: UrlKeys<typeof stackParsers> = {
 	projectName: "name",
-	frontend: "fe",
+	webFrontend: "fe-w",
+	nativeFrontend: "fe-n",
 	runtime: "rt",
 	backend: "be",
 	api: "api",
