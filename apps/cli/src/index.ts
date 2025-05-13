@@ -736,6 +736,13 @@ function processAndValidateFlags(
 					);
 					process.exit(1);
 				}
+			} else if (dbSetup === "supabase") {
+				if (effectiveDatabase !== "postgres") {
+					consola.fatal(
+						`Supabase setup requires PostgreSQL. Cannot use --db-setup supabase with --database ${effectiveDatabase}.`,
+					);
+					process.exit(1);
+				}
 			} else if (dbSetup === "prisma-postgres") {
 				if (effectiveDatabase !== "postgres") {
 					consola.fatal(
