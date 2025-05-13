@@ -19,11 +19,8 @@ import { stackParsers, stackQueryStatesOptions } from "@/lib/stack-url-state";
 import { cn } from "@/lib/utils";
 import {
 	Check,
-	Circle,
-	CircleCheck,
 	ClipboardCopy,
 	Github,
-	HelpCircle,
 	InfoIcon,
 	RefreshCw,
 	Settings,
@@ -855,12 +852,7 @@ const StackBuilder = () => {
 	const [projectNameError, setProjectNameError] = useState<string | undefined>(
 		undefined,
 	);
-	const [showPresets, setShowPresets] = useState(false);
-	const [showHelp, setShowHelp] = useState(false);
 	const [lastSavedStack, setLastSavedStack] = useState<StackState | null>(null);
-	// const [activeCategory, setActiveCategory] = useState<string | null>(
-	// 	CATEGORY_ORDER[0],
-	// );
 	const [, setLastChanges] = useState<
 		Array<{ category: string; message: string }>
 	>([]);
@@ -913,8 +905,6 @@ const StackBuilder = () => {
 			}
 		}
 		setStack(randomStack as StackState);
-		setShowHelp(false);
-		setShowPresets(false);
 		contentRef.current?.scrollTo(0, 0);
 		toast.success("Random stack generated!");
 	};
@@ -1477,8 +1467,6 @@ const StackBuilder = () => {
 
 	const resetStack = () => {
 		setStack(DEFAULT_STACK);
-		setShowHelp(false);
-		setShowPresets(false);
 		contentRef.current?.scrollTo(0, 0);
 	};
 
@@ -1491,8 +1479,6 @@ const StackBuilder = () => {
 	const loadSavedStack = () => {
 		if (lastSavedStack) {
 			setStack(lastSavedStack);
-			setShowHelp(false);
-			setShowPresets(false);
 			contentRef.current?.scrollTo(0, 0);
 			toast.success("Saved configuration loaded");
 		}
@@ -1504,8 +1490,6 @@ const StackBuilder = () => {
 		);
 		if (preset) {
 			setStack(preset.stack);
-			setShowPresets(false);
-			setShowHelp(false);
 			contentRef.current?.scrollTo(0, 0);
 			toast.success(`Applied preset: ${preset.name}`);
 		}
@@ -1532,26 +1516,6 @@ const StackBuilder = () => {
 						Create Better T Stack
 					</div>
 					<div className="ml-auto flex space-x-2">
-						<button
-							type="button"
-							onClick={() => setShowHelp((prev) => !prev)}
-							className={cn(
-								"text-muted-foreground transition-colors hover:text-foreground",
-							)}
-							title="Help"
-						>
-							<HelpCircle className="h-4 w-4" />
-						</button>
-						<button
-							type="button"
-							onClick={() => setShowPresets((prev) => !prev)}
-							className={cn(
-								"text-muted-foreground transition-colors hover:text-foreground",
-							)}
-							title="Presets"
-						>
-							<Star className="h-4 w-4" />
-						</button>
 						<Link
 							href={"https://github.com/AmanVarshney01/create-better-t-stack"}
 							target="_blank"
@@ -1566,68 +1530,6 @@ const StackBuilder = () => {
 						<ThemeToggle />
 					</div>
 				</div>
-
-				{showHelp && (
-					<div className="flex-shrink-0 border-border border-b bg-background p-3 text-foreground sm:p-4">
-						<h3 className="mb-2 font-medium text-sm">
-							How to Use Stack Architect
-						</h3>
-						<ul className="list-disc space-y-1 pl-5 text-xs">
-							<li>
-								Use the sidebar to navigate between configuration sections.
-							</li>
-							<li>Select your preferred technologies in the main area.</li>
-							<li>
-								Some selections may disable or automatically change other
-								options based on compatibility (check notes{" "}
-								<InfoIcon className="inline h-3 w-3" /> within each section!).
-							</li>
-							<li>
-								The command below updates automatically based on your
-								selections.
-							</li>
-							<li>
-								Click the copy button (
-								<ClipboardCopy className="inline h-3 w-3" />) next to the
-								command to copy it.
-							</li>
-							<li>
-								Use presets (<Star className="inline h-3 w-3" />) for quick
-								setup or reset (<RefreshCw className="inline h-3 w-3" />) to
-								defaults.
-							</li>
-							<li>
-								Save (<Star className="inline h-3 w-3" />) your preferences to
-								load (<Settings className="inline h-3 w-3" />) them later.
-							</li>
-						</ul>
-					</div>
-				)}
-
-				{showPresets && (
-					<div className="flex-shrink-0 border-border border-b bg-background p-3 sm:p-4">
-						<h3 className="mb-2 font-medium text-foreground text-sm">
-							Quick Start Presets
-						</h3>
-						<div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-							{PRESET_TEMPLATES.map((preset) => (
-								<button
-									type="button"
-									key={preset.id}
-									onClick={() => applyPreset(preset.id)}
-									className="rounded border border-border bg-background p-2 text-left transition-colors hover:bg-muted"
-								>
-									<div className="font-medium text-foreground text-sm">
-										{preset.name}
-									</div>
-									<div className="text-muted-foreground text-xs">
-										{preset.description}
-									</div>
-								</button>
-							))}
-						</div>
-					</div>
-				)}
 
 				<div className="grid grid-cols-1 overflow-hidden sm:grid-cols-[auto_1fr]">
 					<div className="flex h-full max-w-full flex-col justify-between border-border border-r p-4 sm:max-w-3xs md:max-w-xs lg:max-w-sm">
@@ -1747,7 +1649,7 @@ const StackBuilder = () => {
 								<div className="flex flex-wrap gap-1.5">{selectedBadges}</div>
 							</div>
 						</div>
-						<div className="mt-auto border-border border-t pt-4">
+						<div className="mt-auto hidden border-border border-t pt-4 md:flex md:flex-col">
 							<h3 className="mb-2 font-medium text-foreground text-sm">
 								Quick Presets
 							</h3>
@@ -1847,7 +1749,7 @@ const StackBuilder = () => {
 														<TooltipTrigger asChild>
 															<motion.div
 																className={cn(
-																	"relative rounded border p-3 transition-all",
+																	"relative rounded border p-2 transition-all",
 																	isDisabled && !isSelected
 																		? "cursor-not-allowed opacity-60"
 																		: "cursor-pointer",
@@ -1874,20 +1776,13 @@ const StackBuilder = () => {
 																}
 															>
 																<div className="flex items-start">
-																	<div className="mt-1 mr-3 flex-shrink-0">
-																		{isSelected ? (
-																			<CircleCheck className="h-5 w-5 text-primary" />
-																		) : (
-																			<Circle className="h-5 w-5 text-muted-foreground" />
-																		)}
-																	</div>
 																	<div className="flex-grow">
 																		<div className="flex items-center justify-between">
 																			<div className="flex items-center">
 																				<TechIcon
 																					icon={tech.icon}
 																					name={tech.name}
-																					className="mr-2 h-5 w-5"
+																					className="mr-1.5 h-4 w-4"
 																				/>
 																				<span
 																					className={cn(
@@ -1904,7 +1799,7 @@ const StackBuilder = () => {
 																				<InfoIcon className="ml-2 h-4 w-4 flex-shrink-0 text-muted-foreground" />
 																			)}
 																		</div>
-																		<p className="mt-1 text-muted-foreground text-xs">
+																		<p className="mt-0.5 text-muted-foreground text-xs">
 																			{tech.description}
 																		</p>
 																	</div>
