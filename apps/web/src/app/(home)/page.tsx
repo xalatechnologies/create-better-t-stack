@@ -2,13 +2,12 @@
 import ShinyText from "@/app/(home)/_components/shiny-text";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
-import React from "react";
 import CodeContainer from "./_components/code-container";
 import CustomizableSection from "./_components/customizable-section";
 import Footer from "./_components/footer";
 import Navbar from "./_components/navbar";
 import NpmPackage from "./_components/npm-package";
-// import SponsorsSection from "./_components/SponsorsSection";
+import SponsorsSection from "./_components/sponsors-section";
 import Testimonials from "./_components/testimonials";
 
 export default function HomePage() {
@@ -161,7 +160,7 @@ export default function HomePage() {
 					<Testimonials />
 				</motion.div>
 
-				{/* <motion.div
+				<motion.div
 					className="w-full"
 					initial="hidden"
 					whileInView="visible"
@@ -169,7 +168,7 @@ export default function HomePage() {
 					variants={sectionVariants}
 				>
 					<SponsorsSection />
-				</motion.div> */}
+				</motion.div>
 			</main>
 			<Footer />
 		</>

@@ -30,3 +30,20 @@ export interface TechEdge {
 	type?: string;
 	animated?: boolean;
 }
+
+export interface Sponsor {
+	sponsor: {
+		login: string;
+		name: string;
+		avatarUrl: string;
+		websiteUrl?: string;
+		linkUrl: string;
+		type: string;
+	};
+	isOneTime: boolean;
+	monthlyDollars: number;
+	privacyLevel: string;
+	tierName: string;
+	createdAt: string;
+	provider: string;
+}

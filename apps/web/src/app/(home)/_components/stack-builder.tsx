@@ -16,6 +16,7 @@ import {
 	isStackDefault,
 } from "@/lib/constant";
 import { stackParsers, stackQueryStatesOptions } from "@/lib/stack-url-state";
+import type { Sponsor } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
 	Check,
@@ -890,6 +891,9 @@ const StackBuilder = () => {
 	const [, setLastChanges] = useState<
 		Array<{ category: string; message: string }>
 	>([]);
+	const [sponsors, setSponsors] = useState<Sponsor[]>([]);
+	const [loadingSponsors, setLoadingSponsors] = useState(true);
+	const [sponsorError, setSponsorError] = useState<string | null>(null);
 
 	const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 	const contentRef = useRef<HTMLDivElement>(null);
@@ -1416,6 +1420,24 @@ const StackBuilder = () => {
 		setProjectNameError(validateProjectName(stack.projectName || ""));
 	}, [stack.projectName]);
 
+	useEffect(() => {
+		fetch(
+			"https://cdn.jsdelivr.net/gh/amanvarshney01/sponsors/sponsorkit/sponsors.json",
+		)
+			.then((res) => {
+				if (!res.ok) throw new Error("Failed to fetch sponsors");
+				return res.json();
+			})
+			.then((data) => {
+				setSponsors(Array.isArray(data) ? data : []);
+				setLoadingSponsors(false);
+			})
+			.catch(() => {
+				setSponsorError("Could not load sponsors");
+				setLoadingSponsors(false);
+			});
+	}, []);
+
 	const handleTechSelect = (
 		category: keyof typeof TECH_OPTIONS,
 		techId: string,
@@ -1873,6 +1895,75 @@ const StackBuilder = () => {
 								);
 							})}
 							<div className="h-10" />
+							{/* Sponsors Section */}
+							<section className="mt-12 mb-8">
+								<div className="mb-6 text-center">
+									<h2 className="font-bold font-mono text-2xl text-foreground tracking-tight">
+										<span className="text-primary">Sponsors</span>
+									</h2>
+								</div>
+								{loadingSponsors ? (
+									<div className="flex items-center justify-center py-8 text-muted-foreground text-sm">
+										Loading sponsors...
+									</div>
+								) : sponsorError ? (
+									<div className="flex items-center justify-center py-8 text-destructive text-sm">
+										{sponsorError}
+									</div>
+								) : sponsors.length === 0 ? (
+									<div className="flex items-center justify-center py-8 text-muted-foreground text-sm">
+										No sponsors yet.{" "}
+										<a
+											href="https://github.com/sponsors/AmanVarshney01"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="ml-2 text-primary underline"
+										>
+											Become a Sponsor
+										</a>
+									</div>
+								) : (
+									<div className="flex flex-wrap justify-center gap-6">
+										{sponsors.map((entry) => (
+											<a
+												key={entry.sponsor.login}
+												href={entry.sponsor.websiteUrl || entry.sponsor.linkUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="flex flex-col items-center gap-2 rounded-lg border border-border bg-muted/30 px-4 py-3 shadow-sm transition-transform hover:scale-105 hover:border-primary"
+												title={entry.sponsor.name}
+											>
+												<Image
+													src={entry.sponsor.avatarUrl}
+													alt={entry.sponsor.name}
+													width={56}
+													height={56}
+													className="rounded-full border border-border bg-background"
+													unoptimized
+												/>
+												<span className="font-mono text-foreground text-xs">
+													{entry.sponsor.name || entry.sponsor.login}
+												</span>
+												{entry.tierName && (
+													<span className="text-[10px] text-muted-foreground">
+														{entry.tierName}
+													</span>
+												)}
+											</a>
+										))}
+									</div>
+								)}
+								<div className="mt-8 text-center">
+									<a
+										href="https://github.com/sponsors/AmanVarshney01"
+										target="_blank"
+										rel="noopener noreferrer"
+										className="inline-flex items-center gap-2 rounded-md border border-primary/50 bg-primary/10 px-4 py-2 font-mono text-primary text-sm transition-colors hover:bg-primary/20"
+									>
+										Become a Sponsor
+									</a>
+								</div>
+							</section>
 						</main>
 					</ScrollArea>
 				</div>
