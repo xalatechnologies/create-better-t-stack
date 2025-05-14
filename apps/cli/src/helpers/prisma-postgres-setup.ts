@@ -154,7 +154,7 @@ export default prisma;
 import type { ProjectConfig } from "../types";
 
 export async function setupPrismaPostgres(config: ProjectConfig) {
-	const { projectName, packageManager, projectDir } = config;
+	const { packageManager, projectDir } = config;
 	const serverDir = path.join(projectDir, "apps/server");
 	const s = spinner();
 	s.start("Setting up Prisma PostgreSQL");
@@ -171,6 +171,11 @@ export async function setupPrismaPostgres(config: ProjectConfig) {
 			await addPrismaAccelerateExtension(serverDir);
 			log.success(
 				pc.green("Prisma PostgreSQL database configured successfully!"),
+			);
+			log.info(
+				pc.cyan(
+					'NOTE: Make sure to uncomment `import "dotenv/config";` in `apps/server/src/prisma.config.ts` to load environment variables.',
+				),
 			);
 		} else {
 			const fallbackSpinner = spinner();
