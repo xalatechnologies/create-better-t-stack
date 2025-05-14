@@ -2,7 +2,7 @@
 
 A modern CLI tool for scaffolding end-to-end type-safe TypeScript projects with best practices and customizable configurations
 
-![demo](https://cdn.jsdelivr.net/gh/amanvarshney01/create-better-t-stack@master/demo.gif)
+![demo](https://cdn.jsdelivr.net/gh/amanvarshney01/create-better-t-stack/demo.gif)
 
 ## Quick Start
 
@@ -64,7 +64,7 @@ Just fork the repository and submit a pull request!
 ## Sponsors
 
 <p align="center">
-<img src="https://cdn.jsdelivr.net/gh/amanvarshney01/sponsors@master/sponsorkit/sponsors.svg" alt="Sponsors" width="300">
+<img src="https://cdn.jsdelivr.net/gh/amanvarshney01/sponsors/sponsorkit/sponsors.svg" alt="Sponsors" width="300">
 </p>
 
 ## Star History

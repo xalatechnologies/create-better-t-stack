@@ -145,5 +145,5 @@ After project creation, you'll receive detailed instructions for next steps and 
 ## Sponsors
 
 <p align="center">
-<img src="https://cdn.jsdelivr.net/gh/amanvarshney01/sponsors@master/sponsorkit/sponsors.svg" alt="Sponsors" width="300">
+<img src="https://cdn.jsdelivr.net/gh/amanvarshney01/sponsors/sponsorkit/sponsors.svg" alt="Sponsors" width="300">
 </p>

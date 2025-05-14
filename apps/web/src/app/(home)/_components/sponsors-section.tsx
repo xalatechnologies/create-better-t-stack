@@ -35,7 +35,7 @@ export default function SponsorsSection() {
 				transition={{ duration: 0.5, delay: 0.2 }}
 			>
 				<Image
-					src="https://cdn.jsdelivr.net/gh/amanvarshney01/sponsors@master/sponsorkit/sponsors.svg"
+					src="https://cdn.jsdelivr.net/gh/amanvarshney01/sponsors/sponsorkit/sponsors.svg"
 					alt="Sponsors"
 					width={1000}
 					height={500}
