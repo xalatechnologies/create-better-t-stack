@@ -1421,9 +1421,7 @@ const StackBuilder = () => {
 	}, [stack.projectName]);
 
 	useEffect(() => {
-		fetch(
-			"https://cdn.jsdelivr.net/gh/amanvarshney01/sponsors/sponsorkit/sponsors.json",
-		)
+		fetch("https://sponsors.amanv.dev/sponsors.json")
 			.then((res) => {
 				if (!res.ok) throw new Error("Failed to fetch sponsors");
 				return res.json();
