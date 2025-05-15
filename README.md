@@ -64,7 +64,7 @@ Just fork the repository and submit a pull request!
 ## Sponsors
 
 <p align="center">
-<img src="https://sponsors.amanv.dev/sponsors.svg" alt="Sponsors" width="300">
+<img src="https://sponsors.amanv.dev/sponsors.png" alt="Sponsors" width="300">
 </p>
 
 ## Star History

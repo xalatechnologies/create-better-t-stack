@@ -145,5 +145,5 @@ After project creation, you'll receive detailed instructions for next steps and 
 ## Sponsors
 
 <p align="center">
-<img src="https://sponsors.amanv.dev/sponsors.svg" alt="Sponsors" width="300">
+<img src="https://sponsors.amanv.dev/sponsors.png" alt="Sponsors" width="300">
 </p>
