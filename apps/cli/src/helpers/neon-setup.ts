@@ -1,5 +1,5 @@
 import path from "node:path";
-import { cancel, isCancel, log, spinner, text } from "@clack/prompts";
+import { cancel, isCancel, log, select, spinner, text } from "@clack/prompts";
 import { consola } from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
@@ -13,6 +13,21 @@ type NeonConfig = {
 	dbName: string;
 	roleName: string;
 };
+
+type NeonRegion = {
+	label: string;
+	value: string;
+};
+
+const NEON_REGIONS: NeonRegion[] = [
+	{ label: "AWS US East (N. Virginia)", value: "aws-us-east-1" },
+	{ label: "AWS US East (Ohio)", value: "aws-us-east-2" },
+	{ label: "AWS US West (Oregon)", value: "aws-us-west-2" },
+	{ label: "AWS Europe (Frankfurt)", value: "aws-eu-central-1" },
+	{ label: "AWS Asia Pacific (Singapore)", value: "aws-ap-southeast-1" },
+	{ label: "AWS Asia Pacific (Sydney)", value: "aws-ap-southeast-2" },
+	{ label: "Azure East US 2 region (Virginia)", value: "azure-eastus2" },
+];
 
 async function executeNeonCommand(
 	packageManager: ProjectPackageManager,
@@ -65,10 +80,11 @@ async function authenticateWithNeon(packageManager: ProjectPackageManager) {
 
 async function createNeonProject(
 	projectName: string,
+	regionId: string,
 	packageManager: ProjectPackageManager,
 ) {
 	try {
-		const commandArgsString = `neonctl projects create --name "${projectName}" --output json`;
+		const commandArgsString = `neonctl projects create --name ${projectName} --region-id ${regionId} --output json`;
 		const { stdout } = await executeNeonCommand(
 			packageManager,
 			commandArgsString,
@@ -149,13 +165,20 @@ export async function setupNeonPostgres(config: ProjectConfig): Promise<void> {
 			initialValue: suggestedProjectName,
 		});
 
-		if (isCancel(projectName)) {
+		const regionId = await select({
+			message: "Select a region for your Neon project:",
+			options: NEON_REGIONS,
+			initialValue: NEON_REGIONS[0].value,
+		});
+
+		if (isCancel(projectName) || isCancel(regionId)) {
 			cancel(pc.red("Operation cancelled"));
 			process.exit(0);
 		}
 
 		const config = await createNeonProject(
 			projectName as string,
+			regionId,
 			packageManager,
 		);
 
