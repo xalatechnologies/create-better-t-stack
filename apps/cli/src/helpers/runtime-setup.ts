@@ -4,7 +4,7 @@ import type { ProjectBackend, ProjectConfig } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupRuntime(config: ProjectConfig): Promise<void> {
-	const { projectName, runtime, backend, projectDir } = config;
+	const { runtime, backend, projectDir } = config;
 
 	if (backend === "convex" || backend === "next" || runtime === "none") {
 		return;
@@ -25,7 +25,7 @@ export async function setupRuntime(config: ProjectConfig): Promise<void> {
 
 async function setupBunRuntime(
 	serverDir: string,
-	backend: ProjectBackend,
+	_backend: ProjectBackend,
 ): Promise<void> {
 	const packageJsonPath = path.join(serverDir, "package.json");
 	if (!(await fs.pathExists(packageJsonPath))) return;

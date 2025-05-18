@@ -10,7 +10,6 @@ export function displayPostInstallInstructions(
 ) {
 	const {
 		database,
-		projectName,
 		relativePath,
 		packageManager,
 		depsInstalled,

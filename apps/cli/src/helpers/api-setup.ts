@@ -156,7 +156,7 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 						devDependencies: reactQueryDevDeps,
 						projectDir: webDir,
 					});
-				} catch (error) {}
+				} catch (_error) {}
 			} else {
 			}
 		}
@@ -169,7 +169,7 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 						dependencies: reactQueryDeps,
 						projectDir: nativeDir,
 					});
-				} catch (error) {}
+				} catch (_error) {}
 			} else {
 			}
 		}
@@ -190,7 +190,7 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 						devDependencies: solidQueryDevDeps,
 						projectDir: webDir,
 					});
-				} catch (error) {}
+				} catch (_error) {}
 			}
 		}
 	}
@@ -212,7 +212,7 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 						dependencies: webDepsToAdd,
 						projectDir: webDir,
 					});
-				} catch (error) {}
+				} catch (_error) {}
 			} else {
 			}
 		}
@@ -225,7 +225,7 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 						dependencies: ["convex"],
 						projectDir: nativeDir,
 					});
-				} catch (error) {}
+				} catch (_error) {}
 			} else {
 			}
 		}
@@ -248,7 +248,7 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 					await fs.writeJson(pkgJsonPath, pkgJson, { spaces: 2 });
 				} else {
 				}
-			} catch (error) {}
+			} catch (_error) {}
 		};
 
 		if (webDirExists) {

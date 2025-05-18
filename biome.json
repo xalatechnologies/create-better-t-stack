@@ -38,6 +38,11 @@
 						"functions": ["clsx", "cva", "cn"]
 					}
 				}
+			},
+			"correctness": {
+				"noUnusedImports": "error",
+				"noUnusedLabels": "error",
+				"noUnusedVariables": "error"
 			}
 		},
 		"ignore": ["template"]

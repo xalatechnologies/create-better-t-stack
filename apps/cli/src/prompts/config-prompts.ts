@@ -51,8 +51,7 @@ export async function gatherConfig(
 ): Promise<ProjectConfig> {
 	const result = await group<PromptGroupResults>(
 		{
-			frontend: ({ results }) =>
-				getFrontendChoice(flags.frontend, flags.backend),
+			frontend: () => getFrontendChoice(flags.frontend, flags.backend),
 			backend: ({ results }) =>
 				getBackendFrameworkChoice(flags.backend, results.frontend),
 			runtime: ({ results }) =>

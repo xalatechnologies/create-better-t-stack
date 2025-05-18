@@ -15,7 +15,6 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { DEFAULT_CONFIG } from "./constants";
 import { createProject } from "./helpers/create-project";
-import { setupDatabase } from "./helpers/db-setup";
 import { gatherConfig } from "./prompts/config-prompts";
 import { getProjectName } from "./prompts/project-name";
 import type {
@@ -632,11 +631,11 @@ function processAndValidateFlags(
 			config.database ?? (options.yes ? DEFAULT_CONFIG.database : undefined);
 		const effectiveOrm =
 			config.orm ?? (options.yes ? DEFAULT_CONFIG.orm : undefined);
-		const effectiveAuth =
+		const _effectiveAuth =
 			config.auth ?? (options.yes ? DEFAULT_CONFIG.auth : undefined);
-		const effectiveDbSetup =
+		const _effectiveDbSetup =
 			config.dbSetup ?? (options.yes ? DEFAULT_CONFIG.dbSetup : undefined);
-		const effectiveExamples =
+		const _effectiveExamples =
 			config.examples ?? (options.yes ? DEFAULT_CONFIG.examples : undefined);
 		const effectiveFrontend =
 			config.frontend ?? (options.yes ? DEFAULT_CONFIG.frontend : undefined);

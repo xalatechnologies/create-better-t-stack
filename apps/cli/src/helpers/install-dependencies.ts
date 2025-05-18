@@ -51,7 +51,7 @@ async function runBiomeCheck(
 		})`${packageManager} biome check --write .`;
 
 		s.stop("Biome check completed successfully");
-	} catch (error) {
+	} catch (_error) {
 		s.stop(pc.yellow("Biome check encountered issues"));
 		log.warn(pc.yellow("Some files may need manual formatting"));
 	}

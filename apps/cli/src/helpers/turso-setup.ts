@@ -47,7 +47,7 @@ async function loginToTurso() {
 		await $`turso auth login`;
 		s.stop("Logged in to Turso successfully!");
 		return true;
-	} catch (error) {
+	} catch (_error) {
 		s.stop(pc.red("Failed to log in to Turso"));
 	}
 }
@@ -166,7 +166,7 @@ async function createTursoDatabase(dbName: string, groupName: string | null) {
 			dbUrl: dbUrl.trim(),
 			authToken: authToken.trim(),
 		};
-	} catch (error) {
+	} catch (_error) {
 		s.stop(pc.red("Failed to retrieve database connection details"));
 	}
 }
@@ -198,15 +198,15 @@ DATABASE_AUTH_TOKEN=your_auth_token`);
 import type { ProjectConfig } from "../types";
 
 export async function setupTurso(config: ProjectConfig): Promise<void> {
-	const { projectName, orm, projectDir } = config;
-	const isDrizzle = orm === "drizzle";
+	const { orm, projectDir } = config;
+	const _isDrizzle = orm === "drizzle";
 	const setupSpinner = spinner();
 	setupSpinner.start("Setting up Turso database");
 
 	try {
 		const platform = os.platform();
 		const isMac = platform === "darwin";
-		const isLinux = platform === "linux";
+		const _isLinux = platform === "linux";
 		const isWindows = platform === "win32";
 
 		if (isWindows) {

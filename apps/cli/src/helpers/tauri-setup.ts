@@ -10,7 +10,7 @@ import { getPackageExecutionCommand } from "../utils/get-package-execution-comma
 import type { ProjectConfig } from "../types";
 
 export async function setupTauri(config: ProjectConfig): Promise<void> {
-	const { projectName, packageManager, frontend, projectDir } = config;
+	const { packageManager, frontend, projectDir } = config;
 	const s = spinner();
 	const clientPackageDir = path.join(projectDir, "apps/web");
 
@@ -40,11 +40,11 @@ export async function setupTauri(config: ProjectConfig): Promise<void> {
 			await fs.writeJson(clientPackageJsonPath, packageJson, { spaces: 2 });
 		}
 
-		const hasTanstackRouter = frontend.includes("tanstack-router");
+		const _hasTanstackRouter = frontend.includes("tanstack-router");
 		const hasReactRouter = frontend.includes("react-router");
 		const hasNuxt = frontend.includes("nuxt");
 		const hasSvelte = frontend.includes("svelte");
-		const hasSolid = frontend.includes("solid");
+		const _hasSolid = frontend.includes("solid");
 		const hasNext = frontend.includes("next");
 
 		const devUrl =

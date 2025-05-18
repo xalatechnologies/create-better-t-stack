@@ -7,7 +7,7 @@ import type { ProjectConfig } from "../types";
 export async function setupBackendDependencies(
 	config: ProjectConfig,
 ): Promise<void> {
-	const { projectName, backend, runtime, api, projectDir } = config;
+	const { backend, runtime, api, projectDir } = config;
 
 	if (backend === "convex") {
 		return;

@@ -73,7 +73,7 @@ async function authenticateWithNeon(packageManager: ProjectPackageManager) {
 		);
 		log.success("Authenticated with Neon successfully!");
 		return true;
-	} catch (error) {
+	} catch (_error) {
 		consola.error(pc.red("Failed to authenticate with Neon"));
 	}
 }
@@ -113,7 +113,7 @@ async function createNeonProject(
 			pc.red("Failed to extract connection information from response"),
 		);
 		return null;
-	} catch (error) {
+	} catch (_error) {
 		consola.error(pc.red("Failed to create Neon project"));
 	}
 }
@@ -144,7 +144,7 @@ DATABASE_URL="your_connection_string"`);
 import type { ProjectConfig } from "../types";
 
 export async function setupNeonPostgres(config: ProjectConfig): Promise<void> {
-	const { projectName, packageManager, projectDir } = config;
+	const { packageManager, projectDir } = config;
 	const setupSpinner = spinner();
 	setupSpinner.start("Setting up Neon PostgreSQL");
 

@@ -93,7 +93,7 @@ async function writeEnvFile(projectDir: string, config?: PrismaConfig) {
 		}
 
 		await fs.writeFile(envPath, envContent.trim());
-	} catch (error) {
+	} catch (_error) {
 		consola.error("Failed to update environment configuration");
 	}
 }
@@ -143,7 +143,7 @@ export default prisma;
 			}
 		}
 		return true;
-	} catch (error) {
+	} catch (_error) {
 		log.warn(
 			pc.yellow("Could not add Prisma Accelerate extension automatically"),
 		);

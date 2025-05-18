@@ -405,7 +405,7 @@ function generateScriptsList(
 	packageManagerRunCmd: string,
 	database: ProjectDatabase,
 	orm: ProjectOrm,
-	auth: boolean,
+	_auth: boolean,
 	hasNative: boolean,
 	addons: ProjectAddons[],
 	backend: string,

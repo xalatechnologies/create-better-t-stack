@@ -176,7 +176,7 @@ async function updateRootPackageJson(
 			cwd: projectDir,
 		});
 		packageJson.packageManager = `${options.packageManager}@${stdout.trim()}`;
-	} catch (e) {
+	} catch (_e) {
 		log.warn(`Could not determine ${options.packageManager} version.`);
 	}
 

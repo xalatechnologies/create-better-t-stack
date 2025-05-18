@@ -23,7 +23,7 @@ async function checkAtlasCLI(): Promise<boolean> {
 				: pc.yellow("MongoDB Atlas CLI not found"),
 		);
 		return exists;
-	} catch (error) {
+	} catch (_error) {
 		s.stop(pc.red("Error checking for MongoDB Atlas CLI"));
 		return false;
 	}
@@ -106,7 +106,7 @@ async function writeEnvFile(projectDir: string, config?: MongoDBConfig) {
 		}
 
 		await fs.writeFile(envPath, envContent.trim());
-	} catch (error) {
+	} catch (_error) {
 		consola.error("Failed to update environment configuration");
 	}
 }
@@ -130,7 +130,7 @@ ${pc.green("MongoDB Atlas Manual Setup Instructions:")}
 }
 
 export async function setupMongoDBAtlas(config: ProjectConfig) {
-	const { projectName, projectDir } = config;
+	const { projectDir } = config;
 	const mainSpinner = spinner();
 	mainSpinner.start("Setting up MongoDB Atlas");
 

@@ -47,7 +47,7 @@ async function processAndCopyFiles(
 			} else {
 				await fs.copy(srcPath, destPath, { overwrite: true });
 			}
-		} catch (error) {}
+		} catch (_error) {}
 	}
 }
 
@@ -72,7 +72,7 @@ export async function setupFrontendTemplates(
 	const hasSolidWeb = context.frontend.includes("solid");
 	const hasNativeWind = context.frontend.includes("native-nativewind");
 	const hasUnistyles = context.frontend.includes("native-unistyles");
-	const hasNative = hasNativeWind || hasUnistyles;
+	const _hasNative = hasNativeWind || hasUnistyles;
 	const isConvex = context.backend === "convex";
 
 	if (hasReactWeb || hasNuxtWeb || hasSvelteWeb || hasSolidWeb) {
@@ -677,7 +677,7 @@ export async function setupExamplesTemplate(
 							await fs.copy(srcPath, destPath, { overwrite: false });
 						}
 					}
-				} catch (error) {}
+				} catch (_error) {}
 			}
 		}
 

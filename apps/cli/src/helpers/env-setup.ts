@@ -56,17 +56,8 @@ async function addEnvVariablesToFile(
 export async function setupEnvironmentVariables(
 	config: ProjectConfig,
 ): Promise<void> {
-	const {
-		projectName,
-		backend,
-		frontend,
-		database,
-		orm,
-		auth,
-		examples,
-		dbSetup,
-		projectDir,
-	} = config;
+	const { backend, frontend, database, auth, examples, dbSetup, projectDir } =
+		config;
 
 	const hasReactRouter = frontend.includes("react-router");
 	const hasTanStackRouter = frontend.includes("tanstack-router");

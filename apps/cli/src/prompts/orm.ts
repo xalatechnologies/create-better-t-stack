@@ -1,4 +1,4 @@
-import { cancel, isCancel, log, select } from "@clack/prompts";
+import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
 import type { ProjectBackend, ProjectDatabase, ProjectOrm } from "../types";

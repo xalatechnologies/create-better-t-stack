@@ -5,7 +5,7 @@ import type { ProjectConfig } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 
 export async function setupExamples(config: ProjectConfig): Promise<void> {
-	const { projectName, examples, frontend, backend, projectDir } = config;
+	const { examples, frontend, backend, projectDir } = config;
 
 	if (
 		backend === "convex" ||

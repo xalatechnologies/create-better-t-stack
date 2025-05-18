@@ -49,7 +49,7 @@ export default function SponsorsSection() {
 						href="https://github.com/sponsors/AmanVarshney01"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="mt-4 inline-flex items-center gap-2 rounded-lg border border-primary bg-transparent px-4 py-2 font-mono text-base text-primary shadow-md transition-all hover:bg-primary hover:text-primary-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+						className="mt-4 inline-flex items-center gap-2 rounded-lg border border-primary bg-transparent px-4 py-2 font-mono text-base text-primary shadow-md transition-all hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
 					>
 						<svg
 							className="h-4 w-4"
@@ -116,7 +116,7 @@ export default function SponsorsSection() {
 						href="https://github.com/sponsors/AmanVarshney01"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="inline-flex items-center gap-3 rounded-xl border border-primary bg-transparent px-6 py-3 font-mono font-semibold text-lg text-primary shadow-md transition-all duration-300 ease-in-out hover:bg-primary hover:text-primary-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+						className="inline-flex items-center gap-3 rounded-xl border border-primary bg-transparent px-6 py-3 font-mono font-semibold text-lg text-primary shadow-md transition-all duration-300 ease-in-out hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
 					>
 						<svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
 							<title>Heart Icon</title>
