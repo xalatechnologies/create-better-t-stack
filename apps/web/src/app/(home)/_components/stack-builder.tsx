@@ -1963,7 +1963,9 @@ const StackBuilder = () => {
 												year: "numeric",
 												month: "short",
 											});
-											const title = `@${entry.sponsor.login} - ${entry.sponsor.type}${
+											const title = `@${entry.sponsor.login} - ${
+												entry.sponsor.type
+											}${
 												entry.isOneTime ? " (One-time)" : " (Monthly)"
 											}\nTier: ${entry.tierName || "N/A"}\nSince: ${since}`;
 											return (
@@ -2006,13 +2008,12 @@ const StackBuilder = () => {
 											href="https://github.com/sponsors/AmanVarshney01"
 											target="_blank"
 											rel="noopener noreferrer"
-											className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-primary to-accent px-8 py-4 font-mono font-semibold text-primary-foreground text-xl shadow-xl transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+											className="inline-flex items-center gap-3 rounded-xl border border-primary bg-transparent px-6 py-3 font-mono font-semibold text-lg text-primary shadow-md transition-all duration-300 ease-in-out hover:bg-primary hover:text-primary-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
 										>
 											<svg
-												className="h-7 w-7 animate-pulse"
+												className="h-5 w-5"
 												fill="currentColor"
 												viewBox="0 0 20 20"
-												xmlns="http://www.w3.org/2000/svg"
 											>
 												<title>Heart Icon</title>
 												<path
