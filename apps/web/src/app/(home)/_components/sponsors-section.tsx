@@ -1,5 +1,3 @@
-"use client";
-
 import type { Sponsor } from "@/lib/types";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -27,111 +25,116 @@ export default function SponsorsSection() {
 
 	return (
 		<section className="relative z-10 mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-			<div className="mb-10 text-center">
-				<h2 className="font-bold font-mono text-3xl text-foreground tracking-tight sm:text-4xl lg:text-5xl">
-					<span className="text-primary">Sponsors</span>
+			<div className="mb-12 text-center">
+				<h2 className="font-bold font-mono text-4xl text-foreground tracking-tight sm:text-5xl lg:text-6xl">
+					<span className="text-primary">Our Sponsors</span>
 				</h2>
-				<p className="mx-auto mt-2 max-w-xl text-base text-muted-foreground">
-					Thank you to our sponsors for supporting this project!
+				<p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
+					This project is proudly supported by these amazing organizations and
+					individuals.
 				</p>
 			</div>
 			{loadingSponsors ? (
-				<div className="flex animate-pulse items-center justify-center py-8 text-muted-foreground text-sm">
+				<div className="flex animate-pulse items-center justify-center py-12 text-base text-muted-foreground">
 					Loading sponsors...
 				</div>
 			) : sponsorError ? (
-				<div className="flex items-center justify-center py-8 text-destructive text-sm">
+				<div className="flex items-center justify-center py-12 text-base text-destructive">
 					{sponsorError}
 				</div>
 			) : sponsors.length === 0 ? (
-				<div className="flex items-center justify-center py-8 text-muted-foreground text-sm">
-					No sponsors yet.{" "}
+				<div className="flex flex-col items-center justify-center py-12 text-base text-muted-foreground">
+					No sponsors yet.
 					<a
 						href="https://github.com/sponsors/AmanVarshney01"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="ml-2 text-primary underline"
+						className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-mono text-lg text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
 					>
+						<svg
+							className="h-6 w-6"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							viewBox="0 0 24 24"
+						>
+							<title>Heart Icon</title>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+							/>
+						</svg>
 						Become a Sponsor
 					</a>
 				</div>
 			) : (
-				<div className="fade-in-sponsors flex flex-wrap justify-center gap-8">
+				<div className="fade-in-sponsors grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-8 xl:grid-cols-5">
 					{sponsors.map((entry) => {
-						const since = new Date(entry.createdAt).toLocaleDateString();
-						const title = `@${entry.sponsor.login}\n${entry.sponsor.type}${
+						const since = new Date(entry.createdAt).toLocaleDateString(
+							undefined,
+							{ year: "numeric", month: "short" },
+						);
+						const title = `@${entry.sponsor.login} - ${entry.sponsor.type}${
 							entry.isOneTime ? " (One-time)" : " (Monthly)"
-						}\n${entry.tierName ? `${entry.tierName}\n` : ""}Since: ${since}`;
+						}\nTier: ${entry.tierName || "N/A"}\nSince: ${since}`;
 						return (
 							<a
 								key={entry.sponsor.login}
 								href={entry.sponsor.websiteUrl || entry.sponsor.linkUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className={
-									"group relative flex flex-col items-center gap-2 rounded-xl border border-border bg-background/80 px-6 py-5 shadow-sm transition-all duration-200 hover:scale-105 hover:border-primary hover:shadow-lg"
-								}
+								className="group hover:-translate-y-1 relative flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-6 shadow-md transition-all duration-300 ease-in-out hover:border-primary hover:shadow-xl"
 								title={title}
-								style={{ minWidth: 140, maxWidth: 180 }}
 							>
-								<div className="relative">
+								<div className="relative mb-2">
 									<Image
 										src={entry.sponsor.avatarUrl}
 										alt={entry.sponsor.name || entry.sponsor.login}
-										width={64}
-										height={64}
-										className="rounded-full border-2 border-border bg-background transition-colors group-hover:border-primary"
+										width={80}
+										height={80}
+										className="rounded-full border-2 border-border bg-background transition-colors duration-300 group-hover:border-primary"
 										unoptimized
 									/>
 								</div>
-								<span className="break-all text-center font-mono text-foreground text-xs">
+								<span className="break-words text-center font-mono font-semibold text-foreground text-sm">
 									{entry.sponsor.name || entry.sponsor.login}
 								</span>
 								{entry.tierName && (
-									<span className="text-center text-[11px] text-muted-foreground">
+									<span className="rounded-full bg-primary/10 px-3 py-1 text-center font-medium text-primary text-xs">
 										{entry.tierName}
 									</span>
 								)}
-								<span className="text-center text-[11px] text-muted-foreground">
-									{entry.monthlyDollars > 0
-										? `$${entry.monthlyDollars} / mo`
-										: entry.isOneTime && entry.monthlyDollars > 0
-											? `$${entry.monthlyDollars} one-time`
-											: "Supporter"}
-								</span>
-								<span className="text-center text-[10px] text-muted-foreground">
-									{entry.isOneTime ? "One-time" : "Monthly"}
-								</span>
 							</a>
 						);
 					})}
 				</div>
 			)}
-			<div className="mt-12 text-center">
-				<a
-					href="https://github.com/sponsors/AmanVarshney01"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="inline-flex items-center gap-2 rounded-lg border-2 border-primary bg-primary/10 px-8 py-3 font-mono text-lg text-primary shadow-md transition-all hover:scale-105 hover:bg-primary/20 hover:shadow-lg"
-				>
-					<svg
-						className="mr-2 h-5 w-5"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2"
-						viewBox="0 0 24 24"
+			{sponsors.length > 0 && (
+				<div className="mt-16 text-center">
+					<a
+						href="https://github.com/sponsors/AmanVarshney01"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-primary to-accent px-8 py-4 font-mono font-semibold text-primary-foreground text-xl shadow-xl transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
 					>
-						<title>Heart in Circle</title>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							d="M12 8c-1.657 0-3 1.343-3 3 0 2.25 3 5 3 5s3-2.75 3-5c0-1.657-1.343-3-3-3z"
-						/>
-						<circle cx="12" cy="11" r="9" />
-					</svg>
-					Become a Sponsor
-				</a>
-			</div>
+						<svg
+							className="h-7 w-7 animate-pulse"
+							fill="currentColor"
+							viewBox="0 0 20 20"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<title>Heart Icon</title>
+							<path
+								fillRule="evenodd"
+								d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+								clipRule="evenodd"
+							/>
+						</svg>
+						Support Our Project!
+					</a>
+				</div>
+			)}
 		</section>
 	);
 }
