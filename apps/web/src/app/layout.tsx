@@ -1,3 +1,4 @@
+export const dynamic = "force-static";
 import { RootProvider } from "fumadocs-ui/provider";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
