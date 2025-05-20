@@ -966,7 +966,7 @@ const StackBuilder = () => {
 
 	const shareToTwitter = () => {
 		const text = encodeURIComponent(
-			"Check out this cool tech stack I configured with Create Better T-Stack!\n\n",
+			"Check out this cool tech stack I configured with Create Better T Stack!\n\n",
 		);
 		if (typeof window !== "undefined") {
 			const url = encodeURIComponent(window.location.href);
@@ -1355,15 +1355,17 @@ const StackBuilder = () => {
 									getBadgeColors(category),
 								)}
 							>
-								<TechIcon
-									icon={tech.icon}
-									name={tech.name}
-									className={
-										tech.icon.startsWith("/icon/")
-											? "h-3 w-3"
-											: "h-3 w-3 text-xs"
-									}
-								/>
+								{tech.icon !== "" && (
+									<TechIcon
+										icon={tech.icon}
+										name={tech.name}
+										className={
+											tech.icon.startsWith("/icon/")
+												? "h-3 w-3"
+												: "h-3 w-3 text-xs"
+										}
+									/>
+								)}
 								{tech.name}
 							</span>,
 						);
@@ -1390,7 +1392,9 @@ const StackBuilder = () => {
 							getBadgeColors(category),
 						)}
 					>
-						<TechIcon icon={tech.icon} name={tech.name} className="h-3 w-3" />
+						{tech.icon !== "" && (
+							<TechIcon icon={tech.icon} name={tech.name} className="h-3 w-3" />
+						)}
 						{tech.name}
 					</span>,
 				);
@@ -1846,11 +1850,13 @@ const StackBuilder = () => {
 																	<div className="flex-grow">
 																		<div className="flex items-center justify-between">
 																			<div className="flex items-center">
-																				<TechIcon
-																					icon={tech.icon}
-																					name={tech.name}
-																					className="mr-1.5 h-4 w-4"
-																				/>
+																				{tech.icon !== "" && (
+																					<TechIcon
+																						icon={tech.icon}
+																						name={tech.name}
+																						className="mr-1.5 h-4 w-4"
+																					/>
+																				)}
 																				<span
 																					className={cn(
 																						"font-medium text-sm",

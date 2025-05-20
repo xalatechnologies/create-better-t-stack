@@ -45,9 +45,17 @@ export default function HomePage() {
 		},
 	};
 
-	const frontendOptions = TECH_OPTIONS.webFrontend.filter(
+	const webFrontendOptions = TECH_OPTIONS.webFrontend.filter(
 		(option) => option.id !== "none",
 	);
+	const nativeFrontendOptions = TECH_OPTIONS.nativeFrontend.filter(
+		(option) => option.id !== "none",
+	);
+	const combinedFrontendOptions = [
+		...webFrontendOptions,
+		...nativeFrontendOptions,
+	];
+
 	const backendOptions = TECH_OPTIONS.backend.filter(
 		(option) => option.id !== "none",
 	);
@@ -128,7 +136,10 @@ export default function HomePage() {
 						<motion.div className="mx-auto w-full" variants={itemVariants}>
 							<CodeContainer />
 							<div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
-								<FeatureCard title="Frontend" options={frontendOptions} />
+								<FeatureCard
+									title="Frontend"
+									options={combinedFrontendOptions}
+								/>
 								<FeatureCard title="Backend" options={backendOptions} />
 								<FeatureCard title="Runtime" options={runtimeOptions} />
 								<FeatureCard title="API Layer" options={apiLayerOptions} />
