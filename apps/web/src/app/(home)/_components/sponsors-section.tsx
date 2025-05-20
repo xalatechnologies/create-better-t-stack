@@ -26,12 +26,11 @@ export default function SponsorsSection() {
 	return (
 		<section className="relative z-10 mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
 			<div className="mb-12 text-center">
-				<h2 className="font-bold font-mono text-4xl text-foreground tracking-tight sm:text-5xl lg:text-6xl">
+				<h2 className="font-bold font-mono text-3xl text-foreground tracking-tight sm:text-4xl lg:text-5xl">
 					<span className="text-primary">Our Sponsors</span>
 				</h2>
 				<p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-					This project is proudly supported by these amazing organizations and
-					individuals.
+					Supported by amazing organizations and individuals.
 				</p>
 			</div>
 			{loadingSponsors ? (
@@ -49,7 +48,7 @@ export default function SponsorsSection() {
 						href="https://github.com/sponsors/AmanVarshney01"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="mt-4 inline-flex items-center gap-2 rounded-lg border border-primary bg-transparent px-4 py-2 font-mono text-base text-primary shadow-md transition-all hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+						className="mt-4 inline-flex items-center gap-2 rounded-lg border border-primary bg-transparent px-4 py-2 font-mono text-primary text-sm shadow-sm transition-all hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
 					>
 						<svg
 							className="h-4 w-4"
@@ -69,7 +68,7 @@ export default function SponsorsSection() {
 					</a>
 				</div>
 			) : (
-				<div className="fade-in-sponsors grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-8 xl:grid-cols-5">
+				<div className="grid grid-cols-2 items-center justify-center gap-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-12">
 					{sponsors.map((entry) => {
 						const since = new Date(entry.createdAt).toLocaleDateString(
 							undefined,
@@ -84,24 +83,22 @@ export default function SponsorsSection() {
 								href={entry.sponsor.websiteUrl || entry.sponsor.linkUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="group hover:-translate-y-1 relative flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-6 shadow-md transition-all duration-300 ease-in-out hover:border-primary hover:shadow-xl"
+								className="group flex flex-col items-center gap-2 text-center transition-opacity hover:opacity-80"
 								title={title}
 							>
-								<div className="relative mb-2">
-									<Image
-										src={entry.sponsor.avatarUrl}
-										alt={entry.sponsor.name || entry.sponsor.login}
-										width={80}
-										height={80}
-										className="rounded-full border-2 border-border bg-background transition-colors duration-300 group-hover:border-primary"
-										unoptimized
-									/>
-								</div>
-								<span className="break-words text-center font-mono font-semibold text-foreground text-sm">
+								<Image
+									src={entry.sponsor.avatarUrl}
+									alt={entry.sponsor.name || entry.sponsor.login}
+									width={170}
+									height={170}
+									className="rounded-full border-2 border-border bg-background transition-colors duration-300 group-hover:border-primary"
+									unoptimized
+								/>
+								<span className="truncate font-medium font-mono text-foreground text-sm group-hover:text-primary">
 									{entry.sponsor.name || entry.sponsor.login}
 								</span>
 								{entry.tierName && (
-									<span className="rounded-full bg-primary/10 px-3 py-1 text-center font-medium text-primary text-xs">
+									<span className="text-muted-foreground text-xs group-hover:text-primary/80">
 										{entry.tierName}
 									</span>
 								)}
@@ -116,7 +113,7 @@ export default function SponsorsSection() {
 						href="https://github.com/sponsors/AmanVarshney01"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="inline-flex items-center gap-3 rounded-xl border border-primary bg-transparent px-6 py-3 font-mono font-semibold text-lg text-primary shadow-md transition-all duration-300 ease-in-out hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+						className="inline-flex items-center gap-2 rounded-lg border border-primary bg-transparent px-5 py-2.5 font-mono font-semibold text-base text-primary shadow-sm transition-all duration-300 ease-in-out hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
 					>
 						<svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
 							<title>Heart Icon</title>
