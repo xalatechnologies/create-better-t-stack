@@ -1,8 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { TECH_OPTIONS } from "@/lib/constant";
+import { Github, Star } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import FeatureCard from "./_components/FeatureCard";
 import CodeContainer from "./_components/code-container";
 import Footer from "./_components/footer";
@@ -11,6 +13,30 @@ import SponsorsSection from "./_components/sponsors-section";
 import Testimonials from "./_components/testimonials";
 
 export default function HomePage() {
+	const [stars, setStars] = useState<number | null>(null);
+	const [isLoadingStars, setIsLoadingStars] = useState(true);
+
+	useEffect(() => {
+		async function fetchStars() {
+			try {
+				const response = await fetch(
+					"https://api.github.com/repos/amanvarshney01/create-better-t-stack",
+				);
+				if (response.ok) {
+					const data = await response.json();
+					setStars(data.stargazers_count);
+				} else {
+					console.error("Failed to fetch GitHub stars");
+				}
+			} catch (error) {
+				console.error("Error fetching GitHub stars:", error);
+			} finally {
+				setIsLoadingStars(false);
+			}
+		}
+		fetchStars();
+	}, []);
+
 	const containerVariants = {
 		hidden: { opacity: 0 },
 		visible: {
@@ -123,6 +149,30 @@ export default function HomePage() {
 										className="w-full font-mono sm:w-auto"
 									>
 										Go to Stack Builder
+									</Button>
+								</Link>
+								<Link
+									href="https://github.com/amanvarshney01/create-better-t-stack"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<Button
+										size="lg"
+										variant="outline"
+										className="w-full font-mono hover:bg-background hover:text-primary sm:w-auto"
+										disabled={isLoadingStars}
+									>
+										<Github className="mr-2 h-4 w-4" />
+										Star on GitHub
+										{stars !== null && !isLoadingStars && (
+											<span className="ml-2 flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-xs">
+												<Star className="h-3 w-3 text-yellow-400" />
+												{stars}
+											</span>
+										)}
+										{isLoadingStars && (
+											<span className="ml-2 h-4 w-10 animate-pulse rounded-sm" />
+										)}
 									</Button>
 								</Link>
 								{/* <ShinyText
