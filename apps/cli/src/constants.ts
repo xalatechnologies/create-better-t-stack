@@ -76,10 +76,11 @@ export const dependencyVersionMap = {
 
 	turbo: "^2.4.2",
 
-	ai: "^4.2.8",
+	ai: "^4.3.16",
 	"@ai-sdk/google": "^1.2.3",
 	"@ai-sdk/vue": "^1.2.8",
 	"@ai-sdk/svelte": "^2.1.9",
+	"@ai-sdk/react": "^1.2.12",
 
 	"@prisma/extension-accelerate": "^1.3.0",
 

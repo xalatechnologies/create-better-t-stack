@@ -24,6 +24,11 @@ export async function setupExamples(config: ProjectConfig): Promise<void> {
 
 		const hasNuxt = frontend.includes("nuxt");
 		const hasSvelte = frontend.includes("svelte");
+		const hasReact =
+			frontend.includes("react-router") ||
+			frontend.includes("tanstack-router") ||
+			frontend.includes("next") ||
+			frontend.includes("tanstack-start");
 
 		if (clientDirExists) {
 			const dependencies: AvailableDependencies[] = ["ai"];
@@ -31,7 +36,8 @@ export async function setupExamples(config: ProjectConfig): Promise<void> {
 				dependencies.push("@ai-sdk/vue");
 			} else if (hasSvelte) {
 				dependencies.push("@ai-sdk/svelte");
-			} else {
+			} else if (hasReact) {
+				dependencies.push("@ai-sdk/react");
 			}
 			await addPackageDependency({
 				dependencies,
