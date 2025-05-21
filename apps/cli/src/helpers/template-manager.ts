@@ -557,10 +557,20 @@ export async function setupAddonsTemplate(
 		let addonDestDir = projectDir;
 
 		if (addon === "pwa") {
-			addonSrcDir = path.join(PKG_ROOT, "templates/addons/pwa/apps/web");
-			addonDestDir = path.join(projectDir, "apps/web");
-
-			if (!(await fs.pathExists(addonDestDir))) {
+			const webAppDir = path.join(projectDir, "apps/web");
+			if (!(await fs.pathExists(webAppDir))) {
+				continue;
+			}
+			addonDestDir = webAppDir;
+			if (context.frontend.includes("next")) {
+				addonSrcDir = path.join(PKG_ROOT, "templates/addons/pwa/apps/web/next");
+			} else if (
+				context.frontend.some((f) =>
+					["tanstack-router", "react-router", "solid"].includes(f),
+				)
+			) {
+				addonSrcDir = path.join(PKG_ROOT, "templates/addons/pwa/apps/web/vite");
+			} else {
 				continue;
 			}
 		}

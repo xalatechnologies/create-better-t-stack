@@ -800,7 +800,10 @@ function processAndValidateFlags(
 			);
 			const hasCompatibleWebFrontend = effectiveFrontend?.some((f) => {
 				const isPwaCompatible =
-					f === "tanstack-router" || f === "react-router" || f === "solid";
+					f === "tanstack-router" ||
+					f === "react-router" ||
+					f === "solid" ||
+					f === "next";
 				const isTauriCompatible =
 					f === "tanstack-router" ||
 					f === "react-router" ||
@@ -828,7 +831,7 @@ function processAndValidateFlags(
 				let incompatibleReason = "Selected frontend is not compatible.";
 				if (config.addons.includes("pwa")) {
 					incompatibleReason =
-						"PWA requires tanstack-router, react-router, or solid.";
+						"PWA requires tanstack-router, react-router, next, or solid.";
 				}
 				if (config.addons.includes("tauri")) {
 					incompatibleReason =

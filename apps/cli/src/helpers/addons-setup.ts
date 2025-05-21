@@ -10,7 +10,9 @@ import type { ProjectConfig } from "../types";
 export async function setupAddons(config: ProjectConfig) {
 	const { addons, frontend, projectDir } = config;
 	const hasReactWebFrontend =
-		frontend.includes("react-router") || frontend.includes("tanstack-router");
+		frontend.includes("react-router") ||
+		frontend.includes("tanstack-router") ||
+		frontend.includes("next");
 	const hasNuxtFrontend = frontend.includes("nuxt");
 	const hasSvelteFrontend = frontend.includes("svelte");
 	const hasSolidFrontend = frontend.includes("solid");

@@ -18,7 +18,8 @@ export async function getAddonsChoice(
 	const hasCompatiblePwaFrontend =
 		frontends?.includes("react-router") ||
 		frontends?.includes("tanstack-router") ||
-		frontends?.includes("solid");
+		frontends?.includes("solid") ||
+		frontends?.includes("next");
 
 	const hasCompatibleTauriFrontend =
 		frontends?.includes("react-router") ||
