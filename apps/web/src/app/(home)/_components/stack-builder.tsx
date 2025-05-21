@@ -100,7 +100,7 @@ const checkHasNativeFrontend = (nativeFrontend: string[]) =>
 
 const hasPWACompatibleFrontend = (webFrontend: string[]) =>
 	webFrontend.some((f) =>
-		["tanstack-router", "react-router", "solid"].includes(f),
+		["tanstack-router", "react-router", "solid", "next"].includes(f),
 	);
 
 const hasTauriCompatibleFrontend = (webFrontend: string[]) =>
