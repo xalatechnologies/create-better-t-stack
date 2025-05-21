@@ -3,26 +3,78 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
-interface TechOption {
+type TechOption = {
 	id: string;
 	name: string;
 	icon: string;
-}
+};
 
-interface FeatureCardProps {
+type FeatureCardProps = {
 	title: string;
 	description?: string;
 	options: TechOption[];
 	className?: string;
+};
+
+function TechIcon({
+	icon,
+	name,
+	className,
+}: {
+	icon: string;
+	name: string;
+	className?: string;
+}) {
+	const [mounted, setMounted] = useState(false);
+	const { theme } = useTheme();
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (mounted && icon.startsWith("/icon/")) {
+		if (
+			theme === "light" &&
+			(icon.includes("drizzle") ||
+				icon.includes("prisma") ||
+				icon.includes("express"))
+		) {
+			icon = icon.replace(".svg", "-light.svg");
+		}
+
+		return (
+			<Image
+				src={icon}
+				alt={`${name} icon`}
+				width={24}
+				height={24}
+				className={cn("h-6 w-6 object-contain", className)}
+				unoptimized
+			/>
+		);
+	}
+
+	return (
+		<span
+			className={cn(
+				"flex h-6 w-6 items-center justify-center text-2xl",
+				className,
+			)}
+		>
+			{icon}
+		</span>
+	);
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({
+export default function FeatureCard({
 	title,
 	options,
 	className,
-}) => {
+}: FeatureCardProps) {
 	return (
 		<motion.div
 			className={cn(
@@ -45,7 +97,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 								title={option.name}
 								className="flex items-center justify-center"
 							>
-								{option.icon.startsWith("/") ? (
+								{/* {option.icon.startsWith("/") ? (
 									<Image
 										src={option.icon}
 										alt={option.name}
@@ -57,7 +109,12 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 									<span className="flex h-6 w-6 items-center justify-center text-2xl">
 										{option.icon}
 									</span>
-								)}
+								)} */}
+								<TechIcon
+									icon={option.icon}
+									name={option.name}
+									className="h-6 w-6 object-contain"
+								/>
 							</li>
 						))}
 					</ul>
@@ -65,6 +122,4 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 			</div>
 		</motion.div>
 	);
-};
-
-export default FeatureCard;
+}

@@ -29,7 +29,7 @@ const CodeContainer = () => {
 			<div className="overflow-hidden rounded-lg border border-border bg-muted/30 shadow-sm">
 				<div className="flex items-center justify-between border-border border-b bg-muted/50 px-4 py-2">
 					<span className="text-muted-foreground text-xs">
-						Choose your package manager:
+						Package manager:
 					</span>
 					<div className="flex items-center rounded-md border border-border bg-background p-0.5">
 						{packageManagers.map((pm) => (
