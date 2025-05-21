@@ -110,7 +110,7 @@ export default function HomePage() {
 			<Navbar />
 			<main className="flex min-h-svh flex-col items-center justify-center overflow-x-hidden bg-background px-4 pt-24 pb-10 sm:px-6 md:px-8 md:pt-28 lg:pt-32">
 				<motion.div
-					className="mx-auto mb-12 w-full max-w-6xl sm:mb-16"
+					className="mx-auto min-h-svh w-full max-w-6xl"
 					initial="hidden"
 					animate="visible"
 					variants={containerVariants}
