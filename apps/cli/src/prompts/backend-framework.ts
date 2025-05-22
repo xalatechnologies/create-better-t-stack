@@ -34,6 +34,11 @@ export async function getBackendFrameworkChoice(
 			hint: "Fast, unopinionated, minimalist web framework for Node.js",
 		},
 		{
+			value: "fastify" as const,
+			label: "Fastify",
+			hint: "Fast, low-overhead web framework for Node.js",
+		},
+		{
 			value: "elysia" as const,
 			label: "Elysia",
 			hint: "Ergonomic web framework for building backend servers",

@@ -17,6 +17,7 @@ export type ProjectAddons =
 export type ProjectBackend =
 	| "hono"
 	| "express"
+	| "fastify"
 	| "next"
 	| "elysia"
 	| "convex"

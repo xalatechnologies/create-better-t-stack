@@ -12,7 +12,7 @@ export default function Features() {
 			<Card
 				icon={<Server />}
 				title="Flexible Backend"
-				description="Choose between Hono, Elysia, Next.js and Express"
+				description="Choose between Hono, Elysia, Next.js, Express, and Fastify"
 			/>
 			<Card
 				icon={<Cable />}

@@ -45,6 +45,12 @@ export async function setupBackendDependencies(
 		if (runtime === "node") {
 			devDependencies.push("tsx", "@types/node");
 		}
+	} else if (framework === "fastify") {
+		dependencies.push("fastify", "@fastify/cors");
+
+		if (runtime === "node") {
+			devDependencies.push("tsx", "@types/node");
+		}
 	}
 
 	if (runtime === "bun") {

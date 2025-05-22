@@ -140,7 +140,15 @@ async function main() {
 			.option("backend", {
 				type: "string",
 				describe: "Backend framework",
-				choices: ["hono", "express", "next", "elysia", "convex", "none"],
+				choices: [
+					"hono",
+					"express",
+					"fastify",
+					"next",
+					"elysia",
+					"convex",
+					"none",
+				],
 			})
 			.option("runtime", {
 				type: "string",

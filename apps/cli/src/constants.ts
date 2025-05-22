@@ -74,6 +74,9 @@ export const dependencyVersionMap = {
 	"@types/express": "^5.0.1",
 	"@types/cors": "^2.8.17",
 
+	fastify: "^5.3.3",
+	"@fastify/cors": "^11.0.1",
+
 	turbo: "^2.4.2",
 
 	ai: "^4.3.16",

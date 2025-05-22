@@ -268,6 +268,8 @@ function generateFeaturesList(
 			addonsList.push("- **Hono** - Lightweight, performant server framework");
 		} else if (backend === "express") {
 			addonsList.push("- **Express** - Fast, unopinionated web framework");
+		} else if (backend === "fastify") {
+			addonsList.push("- **Fastify** - Fast, low-overhead web framework");
 		} else if (backend === "elysia") {
 			addonsList.push("- **Elysia** - Type-safe, high-performance framework");
 		} else if (backend === "next") {
