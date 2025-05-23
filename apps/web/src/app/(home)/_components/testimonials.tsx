@@ -104,15 +104,6 @@ export default function Testimonials() {
 		return pages;
 	}, [totalPages, currentPage]);
 
-	const sectionVariants = {
-		hidden: { opacity: 0, y: 30 },
-		visible: {
-			opacity: 1,
-			y: 0,
-			transition: { duration: 0.6, ease: "easeOut" },
-		},
-	};
-
 	const gridVariants = {
 		hidden: { opacity: 0 },
 		visible: {
@@ -122,13 +113,7 @@ export default function Testimonials() {
 	};
 
 	return (
-		<motion.section
-			className="relative z-10 mx-auto w-full max-w-7xl space-y-12 px-4 py-16 sm:px-6 sm:py-24 lg:space-y-16 lg:px-8"
-			initial="hidden"
-			whileInView="visible"
-			viewport={{ once: true, amount: 0.2 }}
-			variants={sectionVariants}
-		>
+		<motion.section className="relative z-10 mx-auto w-full max-w-7xl space-y-12 px-4 py-16 sm:px-6 sm:py-24 lg:space-y-16 lg:px-8">
 			<div className="text-center">
 				<h2 className="font-bold font-mono text-3xl text-foreground tracking-tight sm:text-4xl lg:text-5xl">
 					Loved by <span className="text-primary">Developers</span>

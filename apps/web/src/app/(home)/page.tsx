@@ -124,7 +124,7 @@ export default function HomePage() {
 								</div>
 							</div>
 
-							<h1 className="font-bold text-4xl tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
+							<h1 className="font-bold text-5xl tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
 								<span className="text-foreground">Roll Your Own</span>
 								<br />
 								<span className="text-primary">Stack</span>
