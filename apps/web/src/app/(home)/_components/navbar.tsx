@@ -47,6 +47,7 @@ export default function Navbar() {
 			label: "Demo",
 			target: "_blank",
 		},
+		{ href: "/showcase", label: "Showcase" },
 		{ href: "/docs", label: "Docs" },
 		{
 			href: "https://www.npmjs.com/package/create-better-t-stack",
@@ -67,6 +68,7 @@ export default function Navbar() {
 			label: "Demo",
 			target: "_blank",
 		},
+		{ href: "/showcase", label: "Showcase" },
 		{ href: "/docs", label: "Docs" },
 		{
 			href: "https://www.npmjs.com/package/create-better-t-stack",

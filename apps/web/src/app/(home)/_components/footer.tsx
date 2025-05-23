@@ -7,7 +7,7 @@ const Footer = () => {
 			<div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
 				<div className="mb-12 grid gap-8 md:grid-cols-3">
 					<div>
-						<h3 className="mb-4 flex items-center gap-2 font-bold text-foreground text-lg">
+						<h3 className="mb-4 flex items-center gap-2 font-semibold text-base text-foreground">
 							<span>Better-T Stack</span>
 						</h3>
 						<p className="text-muted-foreground leading-relaxed">
@@ -44,7 +44,7 @@ const Footer = () => {
 					</div>
 
 					<div>
-						<h3 className="mb-4 font-bold text-foreground text-lg">
+						<h3 className="mb-4 font-semibold text-base text-foreground">
 							Resources
 						</h3>
 						<ul className="space-y-2.5 text-muted-foreground">
@@ -90,7 +90,9 @@ const Footer = () => {
 					</div>
 
 					<div>
-						<h3 className="mb-4 font-bold text-foreground text-lg">Contact</h3>
+						<h3 className="mb-4 font-semibold text-base text-foreground">
+							Contact
+						</h3>
 						<div className="space-y-2.5 text-muted-foreground">
 							<p className="flex items-center">
 								<span className="mr-2 rounded bg-muted px-2 py-1 font-mono text-sm">
