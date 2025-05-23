@@ -62,27 +62,27 @@ export default function HomePage() {
 
 	const techStackCategories = [
 		{
-			category: "Frontend Frameworks",
+			category: "Frontend",
 			options: frontendOptions,
 		},
 		{
-			category: "Backend Frameworks",
+			category: "Backend",
 			options: backendOptions,
 		},
 		{
-			category: "Database Systems",
+			category: "Database",
 			options: databaseOptions,
 		},
 		{
-			category: "Runtime Environments",
+			category: "Runtime",
 			options: runtimeOptions,
 		},
 		{
-			category: "API Layers",
+			category: "API",
 			options: apiOptions,
 		},
 		{
-			category: "ORM Solutions",
+			category: "ORM",
 			options: ormOptions,
 		},
 		{
@@ -95,15 +95,14 @@ export default function HomePage() {
 		},
 		{
 			category: "Package Managers",
-			description: "Dependency management tools",
 			options: packageManagerOptions,
 		},
 		{
-			category: "Development Tools",
+			category: "Addons",
 			options: addonsOptions,
 		},
 		{
-			category: "Example Projects",
+			category: "Examples",
 			options: examplesOptions,
 		},
 	];
