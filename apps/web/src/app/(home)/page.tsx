@@ -1,7 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { TECH_OPTIONS } from "@/lib/constant";
+import discordLogo from "@/public/icon/discord.svg";
 import { Github, Star, Terminal } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import CodeContainer from "./_components/code-container";
@@ -165,6 +167,24 @@ export default function HomePage() {
 											)}
 										</Button>
 									</Link>
+									<Link
+										href="https://discord.com/invite/tMunxM5R"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<Button
+											size="lg"
+											variant="outline"
+											className="w-full hover:text-primary sm:w-auto"
+										>
+											<Image
+												src={discordLogo}
+												alt="discord"
+												className="size-4"
+											/>
+											Join Discord
+										</Button>
+									</Link>
 								</div>
 								<CodeContainer />
 							</div>
@@ -208,10 +228,13 @@ export default function HomePage() {
 															key={option.id}
 															className="flex items-center gap-2 rounded border bg-background px-2 py-1"
 														>
-															{option.icon && (
-																<img
+															{option.icon !== "" && (
+																<Image
 																	src={option.icon}
 																	alt={option.name}
+																	height={50}
+																	width={50}
+																	unoptimized
 																	className="h-4 w-4"
 																/>
 															)}

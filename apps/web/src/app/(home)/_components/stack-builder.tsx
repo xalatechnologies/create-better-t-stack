@@ -17,6 +17,7 @@ import {
 } from "@/lib/constant";
 import { stackParsers, stackQueryStatesOptions } from "@/lib/stack-url-state";
 import { cn } from "@/lib/utils";
+import discordLogo from "@/public/icon/discord.svg";
 import {
 	Check,
 	ClipboardCopy,
@@ -1596,6 +1597,17 @@ const StackBuilder = () => {
 							title="GitHub Repository"
 						>
 							<Github className="h-4 w-4" />
+						</Link>
+						<Link
+							href={"https://discord.com/invite/tMunxM5R"}
+							target="_blank"
+							rel="noopener noreferrer"
+							className={cn(
+								"text-muted-foreground transition-colors hover:text-foreground",
+							)}
+							title="Join Discord"
+						>
+							<Image src={discordLogo} alt="discord" className="size-4" />{" "}
 						</Link>
 						<ThemeToggle />
 					</div>
