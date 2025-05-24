@@ -113,7 +113,7 @@ export default function HomePage() {
 		<>
 			<Navbar />
 			<main className="min-h-svh bg-background">
-				<div className="relative h-svh overflow-hidden">
+				<div className="min-h-svh">
 					<div className="relative px-4 pt-32 pb-16 sm:px-6 md:px-8">
 						<div className="mx-auto max-w-4xl text-center">
 							<div>
