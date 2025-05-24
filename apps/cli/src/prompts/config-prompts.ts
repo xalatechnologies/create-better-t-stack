@@ -104,6 +104,7 @@ export async function gatherConfig(
 		result.api = "none";
 		result.auth = false;
 		result.dbSetup = "none";
+		result.examples = ["todo"];
 	}
 
 	if (result.backend === "none") {
