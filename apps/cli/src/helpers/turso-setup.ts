@@ -11,9 +11,9 @@ import {
 } from "@clack/prompts";
 import consola from "consola";
 import { $ } from "execa";
-import fs from "fs-extra";
 import pc from "picocolors";
 import { commandExists } from "../utils/command-exists";
+import { type EnvVariable, addEnvVariablesToFile } from "./env-setup";
 
 type TursoConfig = {
 	dbUrl: string;
@@ -138,7 +138,9 @@ async function createTursoDatabase(dbName: string, groupName: string | null) {
 
 	try {
 		s.start(
-			`Creating Turso database "${dbName}"${groupName ? ` in group "${groupName}"` : ""}...`,
+			`Creating Turso database "${dbName}"${
+				groupName ? ` in group "${groupName}"` : ""
+			}...`,
 		);
 
 		if (groupName) {
@@ -173,14 +175,19 @@ async function createTursoDatabase(dbName: string, groupName: string | null) {
 
 async function writeEnvFile(projectDir: string, config?: TursoConfig) {
 	const envPath = path.join(projectDir, "apps/server", ".env");
-	const envContent = config
-		? `DATABASE_URL="${config.dbUrl}"
-DATABASE_AUTH_TOKEN="${config.authToken}"`
-		: `DATABASE_URL=
-DATABASE_AUTH_TOKEN=`;
-
-	await fs.ensureDir(path.dirname(envPath));
-	await fs.writeFile(envPath, envContent);
+	const variables: EnvVariable[] = [
+		{
+			key: "DATABASE_URL",
+			value: config?.dbUrl ?? "",
+			condition: true,
+		},
+		{
+			key: "DATABASE_AUTH_TOKEN",
+			value: config?.authToken ?? "",
+			condition: true,
+		},
+	];
+	await addEnvVariablesToFile(envPath, variables);
 }
 
 function displayManualSetupInstructions() {
@@ -288,7 +295,9 @@ export async function setupTurso(config: ProjectConfig): Promise<void> {
 		setupSpinner.stop(pc.red("Failed to set up Turso database"));
 		consola.error(
 			pc.red(
-				`Error during Turso setup: ${error instanceof Error ? error.message : String(error)}`,
+				`Error during Turso setup: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
 			),
 		);
 		await writeEnvFile(projectDir);

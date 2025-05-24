@@ -6,6 +6,7 @@ import fs from "fs-extra";
 import pc from "picocolors";
 import type { ProjectConfig } from "../types";
 import { commandExists } from "../utils/command-exists";
+import { type EnvVariable, addEnvVariablesToFile } from "./env-setup";
 
 type MongoDBConfig = {
 	connectionString: string;
@@ -85,27 +86,14 @@ async function initMongoDBAtlas(
 async function writeEnvFile(projectDir: string, config?: MongoDBConfig) {
 	try {
 		const envPath = path.join(projectDir, "apps/server", ".env");
-		await fs.ensureDir(path.dirname(envPath));
-
-		let envContent = "";
-		if (await fs.pathExists(envPath)) {
-			envContent = await fs.readFile(envPath, "utf8");
-		}
-
-		const mongoUrlLine = config
-			? `DATABASE_URL="${config.connectionString}"`
-			: `DATABASE_URL="mongodb://localhost:27017/mydb"`;
-
-		if (!envContent.includes("DATABASE_URL=")) {
-			envContent += `\n${mongoUrlLine}`;
-		} else {
-			envContent = envContent.replace(
-				/DATABASE_URL=.*(\r?\n|$)/,
-				`${mongoUrlLine}$1`,
-			);
-		}
-
-		await fs.writeFile(envPath, envContent.trim());
+		const variables: EnvVariable[] = [
+			{
+				key: "DATABASE_URL",
+				value: config?.connectionString ?? "mongodb://localhost:27017/mydb",
+				condition: true,
+			},
+		];
+		await addEnvVariablesToFile(envPath, variables);
 	} catch (_error) {
 		consola.error("Failed to update environment configuration");
 	}
@@ -116,13 +104,17 @@ function displayManualSetupInstructions() {
 ${pc.green("MongoDB Atlas Manual Setup Instructions:")}
 
 1. Install Atlas CLI:
-   ${pc.blue("https://www.mongodb.com/docs/atlas/cli/stable/install-atlas-cli/")}
+   ${pc.blue(
+			"https://www.mongodb.com/docs/atlas/cli/stable/install-atlas-cli/",
+		)}
 
 2. Run the following command and follow the prompts:
    ${pc.blue("atlas deployments setup")}
 
 3. Get your connection string from the Atlas dashboard:
-   Format: ${pc.dim("mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/DATABASE_NAME")}
+   Format: ${pc.dim(
+			"mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/DATABASE_NAME",
+		)}
 
 4. Add the connection string to your .env file:
    ${pc.dim('DATABASE_URL="your_connection_string"')}
@@ -158,7 +150,9 @@ export async function setupMongoDBAtlas(config: ProjectConfig) {
 		mainSpinner.stop(pc.red("MongoDB Atlas setup failed"));
 		consola.error(
 			pc.red(
-				`Error during MongoDB Atlas setup: ${error instanceof Error ? error.message : String(error)}`,
+				`Error during MongoDB Atlas setup: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
 			),
 		);
 

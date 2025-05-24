@@ -6,6 +6,7 @@ import fs from "fs-extra";
 import pc from "picocolors";
 import type { ProjectPackageManager } from "../types";
 import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
+import { type EnvVariable, addEnvVariablesToFile } from "./env-setup";
 
 type NeonConfig = {
 	connectionString: string;
@@ -120,12 +121,16 @@ async function createNeonProject(
 
 async function writeEnvFile(projectDir: string, config?: NeonConfig) {
 	const envPath = path.join(projectDir, "apps/server", ".env");
-	const envContent = config
-		? `DATABASE_URL="${config.connectionString}"`
-		: `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"`;
-
-	await fs.ensureDir(path.dirname(envPath));
-	await fs.writeFile(envPath, envContent);
+	const variables: EnvVariable[] = [
+		{
+			key: "DATABASE_URL",
+			value:
+				config?.connectionString ??
+				"postgresql://postgres:postgres@localhost:5432/mydb?schema=public",
+			condition: true,
+		},
+	];
+	await addEnvVariablesToFile(envPath, variables);
 
 	return true;
 }

@@ -6,6 +6,7 @@ import fs from "fs-extra";
 import pc from "picocolors";
 import type { ProjectConfig, ProjectPackageManager } from "../types";
 import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
+import { type EnvVariable, addEnvVariablesToFile } from "./env-setup";
 
 async function writeSupabaseEnvFile(
 	projectDir: string,
@@ -13,38 +14,21 @@ async function writeSupabaseEnvFile(
 ): Promise<boolean> {
 	try {
 		const envPath = path.join(projectDir, "apps/server", ".env");
-		await fs.ensureDir(path.dirname(envPath));
-
-		let envContent = "";
-		if (await fs.pathExists(envPath)) {
-			envContent = await fs.readFile(envPath, "utf8");
-		}
-
 		const dbUrlToUse =
 			databaseUrl || "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
-
-		const databaseUrlLine = `DATABASE_URL="${dbUrlToUse}"`;
-		const directUrlLine = `DIRECT_URL="${dbUrlToUse}"`;
-
-		if (!envContent.includes("DATABASE_URL=")) {
-			envContent += `\n${databaseUrlLine}`;
-		} else {
-			envContent = envContent.replace(
-				/DATABASE_URL=.*(\r?\n|$)/,
-				`${databaseUrlLine}$1`,
-			);
-		}
-
-		if (!envContent.includes("DIRECT_URL=")) {
-			envContent += `\n${directUrlLine}`;
-		} else {
-			envContent = envContent.replace(
-				/DIRECT_URL=.*(\r?\n|$)/,
-				`${directUrlLine}$1`,
-			);
-		}
-
-		await fs.writeFile(envPath, envContent.trim());
+		const variables: EnvVariable[] = [
+			{
+				key: "DATABASE_URL",
+				value: dbUrlToUse,
+				condition: true,
+			},
+			{
+				key: "DIRECT_URL",
+				value: dbUrlToUse,
+				condition: true,
+			},
+		];
+		await addEnvVariablesToFile(envPath, variables);
 		return true;
 	} catch (error) {
 		consola.error(pc.red("Failed to update .env file for Supabase."));

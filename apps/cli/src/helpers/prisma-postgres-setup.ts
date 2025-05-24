@@ -7,6 +7,7 @@ import pc from "picocolors";
 import type { ProjectPackageManager } from "../types";
 import { addPackageDependency } from "../utils/add-package-deps";
 import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
+import { type EnvVariable, addEnvVariablesToFile } from "./env-setup";
 
 type PrismaConfig = {
 	databaseUrl: string;
@@ -72,27 +73,16 @@ async function initPrismaDatabase(
 async function writeEnvFile(projectDir: string, config?: PrismaConfig) {
 	try {
 		const envPath = path.join(projectDir, "apps/server", ".env");
-		await fs.ensureDir(path.dirname(envPath));
-
-		let envContent = "";
-		if (await fs.pathExists(envPath)) {
-			envContent = await fs.readFile(envPath, "utf8");
-		}
-
-		const databaseUrlLine = config
-			? `DATABASE_URL="${config.databaseUrl}"`
-			: `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"`;
-
-		if (!envContent.includes("DATABASE_URL=")) {
-			envContent += `\n${databaseUrlLine}`;
-		} else {
-			envContent = envContent.replace(
-				/DATABASE_URL=.*(\r?\n|$)/,
-				`${databaseUrlLine}$1`,
-			);
-		}
-
-		await fs.writeFile(envPath, envContent.trim());
+		const variables: EnvVariable[] = [
+			{
+				key: "DATABASE_URL",
+				value:
+					config?.databaseUrl ??
+					"postgresql://postgres:postgres@localhost:5432/mydb?schema=public",
+				condition: true,
+			},
+		];
+		await addEnvVariablesToFile(envPath, variables);
 	} catch (_error) {
 		consola.error("Failed to update environment configuration");
 	}

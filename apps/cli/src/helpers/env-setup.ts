@@ -3,13 +3,13 @@ import fs from "fs-extra";
 import type { ProjectConfig } from "../types";
 import { generateAuthSecret } from "./auth-setup";
 
-interface EnvVariable {
+export interface EnvVariable {
 	key: string;
 	value: string | null | undefined;
 	condition: boolean;
 }
 
-async function addEnvVariablesToFile(
+export async function addEnvVariablesToFile(
 	filePath: string,
 	variables: EnvVariable[],
 ): Promise<void> {
@@ -22,11 +22,13 @@ async function addEnvVariablesToFile(
 
 	let modified = false;
 	let contentToAdd = "";
+	const exampleVariables: string[] = [];
 
 	for (const { key, value, condition } of variables) {
 		if (condition) {
 			const regex = new RegExp(`^${key}=.*$`, "m");
 			const valueToWrite = value ?? "";
+			exampleVariables.push(`${key}=`);
 
 			if (regex.test(envContent)) {
 				const existingMatch = envContent.match(regex);
@@ -50,6 +52,35 @@ async function addEnvVariablesToFile(
 
 	if (modified) {
 		await fs.writeFile(filePath, envContent.trimEnd());
+	}
+
+	const exampleFilePath = filePath.replace(/\.env$/, ".env.example");
+	let exampleEnvContent = "";
+	if (await fs.pathExists(exampleFilePath)) {
+		exampleEnvContent = await fs.readFile(exampleFilePath, "utf8");
+	}
+
+	let exampleModified = false;
+	let exampleContentToAdd = "";
+
+	for (const exampleVar of exampleVariables) {
+		const key = exampleVar.split("=")[0];
+		const regex = new RegExp(`^${key}=.*$`, "m");
+		if (!regex.test(exampleEnvContent)) {
+			exampleContentToAdd += `${exampleVar}\n`;
+			exampleModified = true;
+		}
+	}
+
+	if (exampleContentToAdd) {
+		if (exampleEnvContent.length > 0 && !exampleEnvContent.endsWith("\n")) {
+			exampleEnvContent += "\n";
+		}
+		exampleEnvContent += exampleContentToAdd;
+	}
+
+	if (exampleModified || !(await fs.pathExists(exampleFilePath))) {
+		await fs.writeFile(exampleFilePath, exampleEnvContent.trimEnd());
 	}
 }
 
@@ -160,8 +191,7 @@ export async function setupEnvironmentVariables(
 	if (database !== "none" && !specializedSetup) {
 		switch (database) {
 			case "postgres":
-				databaseUrl =
-					"postgresql://postgres:postgres@localhost:5432/mydb?schema=public";
+				databaseUrl = "postgresql://postgres:password@localhost:5432/postgres";
 				break;
 			case "mysql":
 				databaseUrl = "mysql://root:password@localhost:3306/mydb";
