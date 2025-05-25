@@ -2,7 +2,7 @@ import { log, spinner } from "@clack/prompts";
 import consola from "consola";
 import { $ } from "execa";
 import pc from "picocolors";
-import type { ProjectAddons, ProjectPackageManager } from "../types";
+import type { Addons, PackageManager } from "../../types";
 
 export async function installDependencies({
 	projectDir,
@@ -10,8 +10,8 @@ export async function installDependencies({
 	addons = [],
 }: {
 	projectDir: string;
-	packageManager: ProjectPackageManager;
-	addons?: ProjectAddons[];
+	packageManager: PackageManager;
+	addons?: Addons[];
 }) {
 	const s = spinner();
 
@@ -38,7 +38,7 @@ export async function installDependencies({
 
 async function runBiomeCheck(
 	projectDir: string,
-	packageManager: ProjectPackageManager,
+	packageManager: PackageManager,
 ) {
 	const s = spinner();
 

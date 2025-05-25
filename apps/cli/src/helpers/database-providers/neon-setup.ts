@@ -4,9 +4,12 @@ import { consola } from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type { ProjectPackageManager } from "../types";
-import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
-import { type EnvVariable, addEnvVariablesToFile } from "./env-setup";
+import type { PackageManager } from "../../types";
+import { getPackageExecutionCommand } from "../../utils/get-package-execution-command";
+import {
+	type EnvVariable,
+	addEnvVariablesToFile,
+} from "../project-generation/env-setup";
 
 type NeonConfig = {
 	connectionString: string;
@@ -31,7 +34,7 @@ const NEON_REGIONS: NeonRegion[] = [
 ];
 
 async function executeNeonCommand(
-	packageManager: ProjectPackageManager,
+	packageManager: PackageManager,
 	commandArgsString: string,
 	spinnerText?: string,
 ) {
@@ -52,7 +55,7 @@ async function executeNeonCommand(
 	}
 }
 
-async function isNeonAuthenticated(packageManager: ProjectPackageManager) {
+async function isNeonAuthenticated(packageManager: PackageManager) {
 	try {
 		const commandArgsString = "neonctl projects list";
 		const result = await executeNeonCommand(packageManager, commandArgsString);
@@ -65,7 +68,7 @@ async function isNeonAuthenticated(packageManager: ProjectPackageManager) {
 	}
 }
 
-async function authenticateWithNeon(packageManager: ProjectPackageManager) {
+async function authenticateWithNeon(packageManager: PackageManager) {
 	try {
 		await executeNeonCommand(
 			packageManager,
@@ -82,7 +85,7 @@ async function authenticateWithNeon(packageManager: ProjectPackageManager) {
 async function createNeonProject(
 	projectName: string,
 	regionId: string,
-	packageManager: ProjectPackageManager,
+	packageManager: PackageManager,
 ) {
 	try {
 		const commandArgsString = `neonctl projects create --name ${projectName} --region-id ${regionId} --output json`;
@@ -146,7 +149,7 @@ function displayManualSetupInstructions() {
 DATABASE_URL="your_connection_string"`);
 }
 
-import type { ProjectConfig } from "../types";
+import type { ProjectConfig } from "../../types";
 
 export async function setupNeonPostgres(config: ProjectConfig): Promise<void> {
 	const { packageManager, projectDir } = config;

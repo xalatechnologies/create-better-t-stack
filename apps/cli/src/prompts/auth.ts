@@ -1,12 +1,12 @@
 import { cancel, confirm, isCancel } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { ProjectBackend } from "../types";
+import type { Backend } from "../types";
 
 export async function getAuthChoice(
 	auth: boolean | undefined,
 	hasDatabase: boolean,
-	backend?: ProjectBackend,
+	backend?: Backend,
 ): Promise<boolean> {
 	if (backend === "convex") {
 		return false;

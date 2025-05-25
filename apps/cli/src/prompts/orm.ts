@@ -1,7 +1,7 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { ProjectBackend, ProjectDatabase, ProjectOrm } from "../types";
+import type { Backend, Database, ORM } from "../types";
 
 const ormOptions = {
 	prisma: {
@@ -22,11 +22,11 @@ const ormOptions = {
 };
 
 export async function getORMChoice(
-	orm: ProjectOrm | undefined,
+	orm: ORM | undefined,
 	hasDatabase: boolean,
-	database?: ProjectDatabase,
-	backend?: ProjectBackend,
-): Promise<ProjectOrm> {
+	database?: Database,
+	backend?: Backend,
+): Promise<ORM> {
 	if (backend === "convex") {
 		return "none";
 	}
@@ -40,7 +40,7 @@ export async function getORMChoice(
 			: [ormOptions.drizzle, ormOptions.prisma]),
 	];
 
-	const response = await select<ProjectOrm>({
+	const response = await select<ORM>({
 		message: "Select ORM",
 		options,
 		initialValue: database === "mongodb" ? "prisma" : DEFAULT_CONFIG.orm,

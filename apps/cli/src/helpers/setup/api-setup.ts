@@ -1,8 +1,8 @@
 import path from "node:path";
 import fs from "fs-extra";
-import type { AvailableDependencies } from "../constants";
-import type { ProjectConfig, ProjectFrontend } from "../types";
-import { addPackageDependency } from "../utils/add-package-deps";
+import type { AvailableDependencies } from "../../constants";
+import type { Frontend, ProjectConfig } from "../../types";
+import { addPackageDependency } from "../../utils/add-package-deps";
 
 export async function setupApi(config: ProjectConfig): Promise<void> {
 	const { api, projectName, frontend, backend, packageManager, projectDir } =
@@ -120,7 +120,7 @@ export async function setupApi(config: ProjectConfig): Promise<void> {
 		}
 	}
 
-	const reactBasedFrontends: ProjectFrontend[] = [
+	const reactBasedFrontends: Frontend[] = [
 		"react-router",
 		"tanstack-router",
 		"tanstack-start",

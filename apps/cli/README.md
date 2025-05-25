@@ -27,7 +27,7 @@ Follow the prompts to configure your project or use the `--yes` flag for default
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **TypeScript**           | End-to-end type safety across all parts of your application                                                                                                                                                                                                |
 | **Frontend**             | • React with TanStack Router<br>• React with React Router<br>• React with TanStack Start (SSR)<br>• Next.js<br>• SvelteKit<br>• Nuxt (Vue)<br>• SolidJS<br>• React Native with NativeWind (via Expo)<br>• React Native with Unistyles (via Expo)<br>• None |
-| **Backend**              | • Hono<br>• Express<br>• Elysia<br>• Next.js API routes<br>• Convex<br>• None                                                                                                                                                                              |
+| **Backend**              | • Hono<br>• Express<br>• Elysia<br>• Next.js API routes<br>• Convex<br>• Fastify<br>• None                                                                                                                                                                              |
 | **API Layer**            | • tRPC (type-safe APIs)<br>• oRPC (OpenAPI-compatible type-safe APIs)<br>• None                                                                                                                                                                            |
 | **Runtime**              | • Bun<br>• Node.js                                                                                                                                                                                                                                         |
 | **Database**             | • SQLite<br>• PostgreSQL<br>• MySQL<br>• MongoDB<br>• None                                                                                                                                                                                                 |
@@ -60,7 +60,7 @@ Options:
   --install                       Install dependencies
   --no-install                    Skip installing dependencies
   --db-setup <setup>              Database setup (turso, neon, prisma-postgres, mongodb-atlas, none)
-  --backend <framework>           Backend framework (hono, express, elysia, next, convex)
+  --backend <framework>           Backend framework (hono, express, elysia, next, convex, fastify, none)
   --runtime <runtime>             Runtime (bun, node, none)
   --api <type>                    API type (trpc, orpc, none)
   -h, --help                      Display help

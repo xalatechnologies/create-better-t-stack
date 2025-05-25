@@ -2,14 +2,14 @@ import path from "node:path";
 import consola from "consola";
 import fs from "fs-extra";
 import type {
-	ProjectAddons,
-	ProjectApi,
+	API,
+	Addons,
+	Database,
+	Frontend,
+	ORM,
 	ProjectConfig,
-	ProjectDatabase,
-	ProjectFrontend,
-	ProjectOrm,
-	ProjectRuntime,
-} from "../types";
+	Runtime,
+} from "../../types";
 
 export async function createReadme(projectDir: string, options: ProjectConfig) {
 	const readmePath = path.join(projectDir, "README.md");
@@ -206,14 +206,14 @@ ${generateScriptsList(
 }
 
 function generateFeaturesList(
-	database: ProjectDatabase,
+	database: Database,
 	auth: boolean,
-	addons: ProjectAddons[],
-	orm: ProjectOrm,
-	runtime: ProjectRuntime,
-	frontend: ProjectFrontend[],
+	addons: Addons[],
+	orm: ORM,
+	runtime: Runtime,
+	frontend: Frontend[],
 	backend: string,
-	api: ProjectApi,
+	api: API,
 ): string {
 	const isConvex = backend === "convex";
 	const hasTanstackRouter = frontend.includes("tanstack-router");
@@ -332,10 +332,10 @@ function generateFeaturesList(
 }
 
 function generateDatabaseSetup(
-	database: ProjectDatabase,
+	database: Database,
 	auth: boolean,
 	packageManagerRunCmd: string,
-	orm: ProjectOrm,
+	orm: ORM,
 ): string {
 	if (database === "none") {
 		return "";
@@ -405,11 +405,11 @@ ${packageManagerRunCmd} db:push
 
 function generateScriptsList(
 	packageManagerRunCmd: string,
-	database: ProjectDatabase,
-	orm: ProjectOrm,
+	database: Database,
+	orm: ORM,
 	_auth: boolean,
 	hasNative: boolean,
-	addons: ProjectAddons[],
+	addons: Addons[],
 	backend: string,
 ): string {
 	const isConvex = backend === "convex";

@@ -4,10 +4,13 @@ import { consola } from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type { ProjectPackageManager } from "../types";
-import { addPackageDependency } from "../utils/add-package-deps";
-import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
-import { type EnvVariable, addEnvVariablesToFile } from "./env-setup";
+import type { PackageManager } from "../../types";
+import { addPackageDependency } from "../../utils/add-package-deps";
+import { getPackageExecutionCommand } from "../../utils/get-package-execution-command";
+import {
+	type EnvVariable,
+	addEnvVariablesToFile,
+} from "../project-generation/env-setup";
 
 type PrismaConfig = {
 	databaseUrl: string;
@@ -15,7 +18,7 @@ type PrismaConfig = {
 
 async function initPrismaDatabase(
 	serverDir: string,
-	packageManager: ProjectPackageManager,
+	packageManager: PackageManager,
 ): Promise<PrismaConfig | null> {
 	const s = spinner();
 	try {
@@ -141,7 +144,7 @@ export default prisma;
 	}
 }
 
-import type { ProjectConfig } from "../types";
+import type { ProjectConfig } from "../../types";
 
 export async function setupPrismaPostgres(config: ProjectConfig) {
 	const { packageManager, projectDir } = config;

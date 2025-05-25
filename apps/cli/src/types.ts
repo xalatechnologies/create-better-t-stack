@@ -1,12 +1,7 @@
-export type ProjectDatabase =
-	| "sqlite"
-	| "postgres"
-	| "mongodb"
-	| "mysql"
-	| "none";
-export type ProjectOrm = "drizzle" | "prisma" | "mongoose" | "none";
-export type ProjectPackageManager = "npm" | "pnpm" | "bun";
-export type ProjectAddons =
+export type Database = "sqlite" | "postgres" | "mongodb" | "mysql" | "none";
+export type ORM = "drizzle" | "prisma" | "mongoose" | "none";
+export type PackageManager = "npm" | "pnpm" | "bun";
+export type Addons =
 	| "pwa"
 	| "biome"
 	| "tauri"
@@ -14,7 +9,7 @@ export type ProjectAddons =
 	| "starlight"
 	| "turborepo"
 	| "none";
-export type ProjectBackend =
+export type Backend =
 	| "hono"
 	| "express"
 	| "fastify"
@@ -22,9 +17,9 @@ export type ProjectBackend =
 	| "elysia"
 	| "convex"
 	| "none";
-export type ProjectRuntime = "node" | "bun" | "none";
-export type ProjectExamples = "todo" | "ai" | "none";
-export type ProjectFrontend =
+export type Runtime = "node" | "bun" | "none";
+export type Examples = "todo" | "ai" | "none";
+export type Frontend =
 	| "react-router"
 	| "tanstack-router"
 	| "tanstack-start"
@@ -35,51 +30,51 @@ export type ProjectFrontend =
 	| "svelte"
 	| "solid"
 	| "none";
-export type ProjectDBSetup =
+export type DatabaseSetup =
 	| "turso"
 	| "prisma-postgres"
 	| "mongodb-atlas"
 	| "neon"
 	| "supabase"
 	| "none";
-export type ProjectApi = "trpc" | "orpc" | "none";
+export type API = "trpc" | "orpc" | "none";
 
 export interface ProjectConfig {
 	projectName: string;
 	projectDir: string;
 	relativePath: string;
-	backend: ProjectBackend;
-	runtime: ProjectRuntime;
-	database: ProjectDatabase;
-	orm: ProjectOrm;
+	backend: Backend;
+	runtime: Runtime;
+	database: Database;
+	orm: ORM;
 	auth: boolean;
-	addons: ProjectAddons[];
-	examples: ProjectExamples[];
+	addons: Addons[];
+	examples: Examples[];
 	git: boolean;
-	packageManager: ProjectPackageManager;
+	packageManager: PackageManager;
 	install: boolean;
-	dbSetup: ProjectDBSetup;
-	frontend: ProjectFrontend[];
-	api: ProjectApi;
+	dbSetup: DatabaseSetup;
+	frontend: Frontend[];
+	api: API;
 }
 
 export type YargsArgv = {
 	projectDirectory?: string;
 
 	yes?: boolean;
-	database?: ProjectDatabase;
-	orm?: ProjectOrm;
+	database?: Database;
+	orm?: ORM;
 	auth?: boolean;
-	frontend?: ProjectFrontend[];
-	addons?: ProjectAddons[];
-	examples?: ProjectExamples[];
+	frontend?: Frontend[];
+	addons?: Addons[];
+	examples?: Examples[];
 	git?: boolean;
-	packageManager?: ProjectPackageManager;
+	packageManager?: PackageManager;
 	install?: boolean;
-	dbSetup?: ProjectDBSetup;
-	backend?: ProjectBackend;
-	runtime?: ProjectRuntime;
-	api?: ProjectApi;
+	dbSetup?: DatabaseSetup;
+	backend?: Backend;
+	runtime?: Runtime;
+	api?: API;
 
 	_: (string | number)[];
 	$0: string;

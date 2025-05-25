@@ -1,18 +1,18 @@
 import { cancel, isCancel, multiselect } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { ProjectAddons, ProjectFrontend } from "../types";
+import type { Addons, Frontend } from "../types";
 
 type AddonOption = {
-	value: ProjectAddons;
+	value: Addons;
 	label: string;
 	hint: string;
 };
 
 export async function getAddonsChoice(
-	addons?: ProjectAddons[],
-	frontends?: ProjectFrontend[],
-): Promise<ProjectAddons[]> {
+	addons?: Addons[],
+	frontends?: Frontend[],
+): Promise<Addons[]> {
 	if (addons !== undefined) return addons;
 
 	const hasCompatiblePwaFrontend =

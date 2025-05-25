@@ -1,19 +1,19 @@
 import { cancel, log } from "@clack/prompts";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type { ProjectConfig } from "../types";
-import { setupAddons } from "./addons-setup";
-import { setupApi } from "./api-setup";
-import { setupAuth } from "./auth-setup";
-import { setupBackendDependencies } from "./backend-framework-setup";
+import type { ProjectConfig } from "../../types";
+import { setupAddons } from "../setup/addons-setup";
+import { setupApi } from "../setup/api-setup";
+import { setupAuth } from "../setup/auth-setup";
+import { setupBackendDependencies } from "../setup/backend-setup";
+import { setupDatabase } from "../setup/db-setup";
+import { setupExamples } from "../setup/examples-setup";
+import { setupRuntime } from "../setup/runtime-setup";
 import { createReadme } from "./create-readme";
-import { setupDatabase } from "./db-setup";
 import { setupEnvironmentVariables } from "./env-setup";
-import { setupExamples } from "./examples-setup";
 import { installDependencies } from "./install-dependencies";
 import { displayPostInstallInstructions } from "./post-installation";
 import { initializeGit, updatePackageConfigurations } from "./project-config";
-import { setupRuntime } from "./runtime-setup";
 import {
 	copyBaseTemplate,
 	handleExtras,

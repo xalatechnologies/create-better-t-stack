@@ -3,15 +3,15 @@ import { spinner } from "@clack/prompts";
 import consola from "consola";
 import fs from "fs-extra";
 import pc from "picocolors";
-import { addPackageDependency } from "../utils/add-package-deps";
-import { setupMongoDBAtlas } from "./mongodb-atlas-setup";
-import { setupPrismaPostgres } from "./prisma-postgres-setup";
-import { setupSupabase } from "./supabase-setup";
-import { setupTurso } from "./turso-setup";
+import { addPackageDependency } from "../../utils/add-package-deps";
+import { setupMongoDBAtlas } from "../database-providers/mongodb-atlas-setup";
+import { setupPrismaPostgres } from "../database-providers/prisma-postgres-setup";
+import { setupSupabase } from "../database-providers/supabase-setup";
+import { setupTurso } from "../database-providers/turso-setup";
 
-import { setupNeonPostgres } from "./neon-setup";
+import { setupNeonPostgres } from "../database-providers/neon-setup";
 
-import type { ProjectConfig } from "../types";
+import type { ProjectConfig } from "../../types";
 
 export async function setupDatabase(config: ProjectConfig): Promise<void> {
 	const { database, orm, dbSetup, backend, projectDir } = config;

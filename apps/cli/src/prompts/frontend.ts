@@ -1,12 +1,12 @@
 import { cancel, isCancel, multiselect, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { ProjectBackend, ProjectFrontend } from "../types";
+import type { Backend, Frontend } from "../types";
 
 export async function getFrontendChoice(
-	frontendOptions?: ProjectFrontend[],
-	backend?: ProjectBackend,
-): Promise<ProjectFrontend[]> {
+	frontendOptions?: Frontend[],
+	backend?: Backend,
+): Promise<Frontend[]> {
 	if (frontendOptions !== undefined) return frontendOptions;
 
 	const frontendTypes = await multiselect({
@@ -32,7 +32,7 @@ export async function getFrontendChoice(
 		process.exit(0);
 	}
 
-	const result: ProjectFrontend[] = [];
+	const result: Frontend[] = [];
 
 	if (frontendTypes.includes("web")) {
 		const allWebOptions = [
@@ -80,8 +80,8 @@ export async function getFrontendChoice(
 			return true;
 		});
 
-		const webFramework = await select<ProjectFrontend>({
-			message: "Choose frontend framework",
+		const webFramework = await select<Frontend>({
+			message: "Choose frontend",
 			options: webOptions,
 			initialValue: DEFAULT_CONFIG.frontend[0],
 		});
@@ -95,7 +95,7 @@ export async function getFrontendChoice(
 	}
 
 	if (frontendTypes.includes("native")) {
-		const nativeFramework = await select<ProjectFrontend>({
+		const nativeFramework = await select<Frontend>({
 			message: "Choose native framework",
 			options: [
 				{

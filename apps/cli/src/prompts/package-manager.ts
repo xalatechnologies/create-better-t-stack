@@ -1,16 +1,16 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
-import type { ProjectPackageManager } from "../types";
+import type { PackageManager } from "../types";
 import { getUserPkgManager } from "../utils/get-package-manager";
 
 export async function getPackageManagerChoice(
-	packageManager?: ProjectPackageManager,
-): Promise<ProjectPackageManager> {
+	packageManager?: PackageManager,
+): Promise<PackageManager> {
 	if (packageManager !== undefined) return packageManager;
 
 	const detectedPackageManager = getUserPkgManager();
 
-	const response = await select<ProjectPackageManager>({
+	const response = await select<PackageManager>({
 		message: "Choose package manager",
 		options: [
 			{ value: "npm", label: "npm", hint: "Node Package Manager" },

@@ -4,9 +4,12 @@ import { consola } from "consola";
 import { type ExecaError, execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type { ProjectConfig, ProjectPackageManager } from "../types";
-import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
-import { type EnvVariable, addEnvVariablesToFile } from "./env-setup";
+import type { PackageManager, ProjectConfig } from "../../types";
+import { getPackageExecutionCommand } from "../../utils/get-package-execution-command";
+import {
+	type EnvVariable,
+	addEnvVariablesToFile,
+} from "../project-generation/env-setup";
 
 async function writeSupabaseEnvFile(
 	projectDir: string,
@@ -50,7 +53,7 @@ function extractDbUrl(output: string): string | null {
 
 async function initializeSupabase(
 	serverDir: string,
-	packageManager: ProjectPackageManager,
+	packageManager: PackageManager,
 ): Promise<boolean> {
 	log.info("Initializing Supabase project...");
 	try {
@@ -86,7 +89,7 @@ async function initializeSupabase(
 
 async function startSupabase(
 	serverDir: string,
-	packageManager: ProjectPackageManager,
+	packageManager: PackageManager,
 ): Promise<string | null> {
 	log.info("Starting Supabase services (this may take a moment)...");
 	const supabaseStartCommand = getPackageExecutionCommand(

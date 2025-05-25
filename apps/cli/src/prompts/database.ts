@@ -1,19 +1,19 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { ProjectBackend, ProjectDatabase } from "../types";
+import type { Backend, Database } from "../types";
 
 export async function getDatabaseChoice(
-	database?: ProjectDatabase,
-	backend?: ProjectBackend,
-): Promise<ProjectDatabase> {
+	database?: Database,
+	backend?: Backend,
+): Promise<Database> {
 	if (backend === "convex" || backend === "none") {
 		return "none";
 	}
 
 	if (database !== undefined) return database;
 
-	const response = await select<ProjectDatabase>({
+	const response = await select<Database>({
 		message: "Select database",
 		options: [
 			{

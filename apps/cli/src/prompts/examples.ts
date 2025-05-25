@@ -1,21 +1,15 @@
 import { cancel, isCancel, multiselect } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type {
-	ProjectApi,
-	ProjectBackend,
-	ProjectDatabase,
-	ProjectExamples,
-	ProjectFrontend,
-} from "../types";
+import type { API, Backend, Database, Examples, Frontend } from "../types";
 
 export async function getExamplesChoice(
-	examples?: ProjectExamples[],
-	database?: ProjectDatabase,
-	frontends?: ProjectFrontend[],
-	backend?: ProjectBackend,
-	api?: ProjectApi,
-): Promise<ProjectExamples[]> {
+	examples?: Examples[],
+	database?: Database,
+	frontends?: Frontend[],
+	backend?: Backend,
+	api?: API,
+): Promise<Examples[]> {
 	if (api === "none") {
 		return [];
 	}
@@ -56,8 +50,8 @@ export async function getExamplesChoice(
 
 	if (!hasWebFrontend && !noFrontendSelected) return [];
 
-	let response: ProjectExamples[] | symbol = [];
-	const options: { value: ProjectExamples; label: string; hint: string }[] = [
+	let response: Examples[] | symbol = [];
+	const options: { value: Examples; label: string; hint: string }[] = [
 		{
 			value: "todo" as const,
 			label: "Todo App",
@@ -73,7 +67,7 @@ export async function getExamplesChoice(
 		});
 	}
 
-	response = await multiselect<ProjectExamples>({
+	response = await multiselect<Examples>({
 		message: "Include examples",
 		options: options,
 		required: false,

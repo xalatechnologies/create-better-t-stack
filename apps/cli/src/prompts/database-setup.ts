@@ -1,18 +1,18 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
-import type { ProjectBackend, ProjectDBSetup, ProjectOrm } from "../types";
+import type { Backend, DatabaseSetup, ORM } from "../types";
 
 export async function getDBSetupChoice(
 	databaseType: string,
-	dbSetup: ProjectDBSetup | undefined,
-	orm?: ProjectOrm,
-	backend?: ProjectBackend,
-): Promise<ProjectDBSetup> {
+	dbSetup: DatabaseSetup | undefined,
+	orm?: ORM,
+	backend?: Backend,
+): Promise<DatabaseSetup> {
 	if (backend === "convex") {
 		return "none";
 	}
 
-	if (dbSetup !== undefined) return dbSetup as ProjectDBSetup;
+	if (dbSetup !== undefined) return dbSetup as DatabaseSetup;
 
 	if (databaseType === "none") {
 		return "none";
@@ -22,7 +22,7 @@ export async function getDBSetupChoice(
 		return "none";
 	}
 
-	let options: Array<{ value: ProjectDBSetup; label: string; hint: string }> =
+	let options: Array<{ value: DatabaseSetup; label: string; hint: string }> =
 		[];
 
 	if (databaseType === "sqlite") {
@@ -70,7 +70,7 @@ export async function getDBSetupChoice(
 		return "none";
 	}
 
-	const response = await select<ProjectDBSetup>({
+	const response = await select<DatabaseSetup>({
 		message: `Select ${databaseType} setup option`,
 		options,
 		initialValue: "none",

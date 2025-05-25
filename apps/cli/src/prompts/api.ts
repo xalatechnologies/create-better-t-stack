@@ -1,12 +1,12 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
-import type { ProjectApi, ProjectBackend, ProjectFrontend } from "../types";
+import type { API, Backend, Frontend } from "../types";
 
 export async function getApiChoice(
-	Api?: ProjectApi | undefined,
-	frontend?: ProjectFrontend[],
-	backend?: ProjectBackend,
-): Promise<ProjectApi> {
+	Api?: API | undefined,
+	frontend?: Frontend[],
+	backend?: Backend,
+): Promise<API> {
 	if (backend === "convex" || backend === "none") {
 		return "none";
 	}
@@ -52,7 +52,7 @@ export async function getApiChoice(
 		];
 	}
 
-	const apiType = await select<ProjectApi>({
+	const apiType = await select<API>({
 		message: "Select API type",
 		options: apiOptions,
 		initialValue: apiOptions[0].value,

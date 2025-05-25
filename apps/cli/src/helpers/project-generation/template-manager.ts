@@ -1,9 +1,9 @@
 import path from "node:path";
 import fs from "fs-extra";
 import { globby } from "globby";
-import { PKG_ROOT } from "../constants";
-import type { ProjectConfig } from "../types";
-import { processTemplate } from "../utils/template-processor";
+import { PKG_ROOT } from "../../constants";
+import type { ProjectConfig } from "../../types";
+import { processTemplate } from "../../utils/template-processor";
 
 async function processAndCopyFiles(
 	sourcePattern: string | string[],

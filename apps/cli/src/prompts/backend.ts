@@ -1,12 +1,12 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
 import { DEFAULT_CONFIG } from "../constants";
-import type { ProjectBackend, ProjectFrontend } from "../types";
+import type { Backend, Frontend } from "../types";
 
 export async function getBackendFrameworkChoice(
-	backendFramework?: ProjectBackend,
-	frontends?: ProjectFrontend[],
-): Promise<ProjectBackend> {
+	backendFramework?: Backend,
+	frontends?: Frontend[],
+): Promise<Backend> {
 	if (backendFramework !== undefined) return backendFramework;
 
 	const hasIncompatibleFrontend = frontends?.some(
@@ -14,7 +14,7 @@ export async function getBackendFrameworkChoice(
 	);
 
 	const backendOptions: Array<{
-		value: ProjectBackend;
+		value: Backend;
 		label: string;
 		hint: string;
 	}> = [
@@ -26,7 +26,7 @@ export async function getBackendFrameworkChoice(
 		{
 			value: "next" as const,
 			label: "Next.js",
-			hint: "Full-stack framework with API routes",
+			hint: "Nextjs API routes",
 		},
 		{
 			value: "express" as const,
@@ -56,7 +56,7 @@ export async function getBackendFrameworkChoice(
 	backendOptions.push({
 		value: "none" as const,
 		label: "None",
-		hint: "No backend server (e.g., for a static site or client-only app)",
+		hint: "No backend server",
 	});
 
 	let initialValue = DEFAULT_CONFIG.backend;
@@ -64,8 +64,8 @@ export async function getBackendFrameworkChoice(
 		initialValue = "hono";
 	}
 
-	const response = await select<ProjectBackend>({
-		message: "Select backend framework",
+	const response = await select<Backend>({
+		message: "Select backend",
 		options: backendOptions,
 		initialValue,
 	});

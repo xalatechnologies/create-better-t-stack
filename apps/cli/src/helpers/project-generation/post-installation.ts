@@ -1,9 +1,9 @@
 import { consola } from "consola";
 import pc from "picocolors";
-import type { ProjectDatabase, ProjectOrm, ProjectRuntime } from "../types";
-import { getPackageExecutionCommand } from "../utils/get-package-execution-command";
+import type { Database, ORM, Runtime } from "../../types";
+import { getPackageExecutionCommand } from "../../utils/get-package-execution-command";
 
-import type { ProjectConfig } from "../types";
+import type { ProjectConfig } from "../../types";
 
 export function displayPostInstallInstructions(
 	config: ProjectConfig & { depsInstalled: boolean },
@@ -157,10 +157,10 @@ function getLintingInstructions(runCmd?: string): string {
 }
 
 function getDatabaseInstructions(
-	database: ProjectDatabase,
-	orm?: ProjectOrm,
+	database: Database,
+	orm?: ORM,
 	runCmd?: string,
-	runtime?: ProjectRuntime,
+	runtime?: Runtime,
 ): string {
 	const instructions = [];
 

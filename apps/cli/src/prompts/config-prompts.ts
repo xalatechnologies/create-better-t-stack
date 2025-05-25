@@ -1,26 +1,26 @@
 import { cancel, group } from "@clack/prompts";
 import pc from "picocolors";
 import type {
-	ProjectAddons,
-	ProjectApi,
-	ProjectBackend,
+	API,
+	Addons,
+	Backend,
+	Database,
+	DatabaseSetup,
+	Examples,
+	Frontend,
+	ORM,
+	PackageManager,
 	ProjectConfig,
-	ProjectDBSetup,
-	ProjectDatabase,
-	ProjectExamples,
-	ProjectFrontend,
-	ProjectOrm,
-	ProjectPackageManager,
-	ProjectRuntime,
+	Runtime,
 } from "../types";
 import { getAddonsChoice } from "./addons";
 import { getApiChoice } from "./api";
 import { getAuthChoice } from "./auth";
-import { getBackendFrameworkChoice } from "./backend-framework";
+import { getBackendFrameworkChoice } from "./backend";
 import { getDatabaseChoice } from "./database";
-import { getDBSetupChoice } from "./db-setup";
+import { getDBSetupChoice } from "./database-setup";
 import { getExamplesChoice } from "./examples";
-import { getFrontendChoice } from "./frontend-option";
+import { getFrontendChoice } from "./frontend";
 import { getGitChoice } from "./git";
 import { getinstallChoice } from "./install";
 import { getORMChoice } from "./orm";
@@ -28,18 +28,18 @@ import { getPackageManagerChoice } from "./package-manager";
 import { getRuntimeChoice } from "./runtime";
 
 type PromptGroupResults = {
-	frontend: ProjectFrontend[];
-	backend: ProjectBackend;
-	runtime: ProjectRuntime;
-	database: ProjectDatabase;
-	orm: ProjectOrm;
-	api: ProjectApi;
+	frontend: Frontend[];
+	backend: Backend;
+	runtime: Runtime;
+	database: Database;
+	orm: ORM;
+	api: API;
 	auth: boolean;
-	addons: ProjectAddons[];
-	examples: ProjectExamples[];
-	dbSetup: ProjectDBSetup;
+	addons: Addons[];
+	examples: Examples[];
+	dbSetup: DatabaseSetup;
 	git: boolean;
-	packageManager: ProjectPackageManager;
+	packageManager: PackageManager;
 	install: boolean;
 };
 

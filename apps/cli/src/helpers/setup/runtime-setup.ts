@@ -1,7 +1,7 @@
 import path from "node:path";
 import fs from "fs-extra";
-import type { ProjectBackend, ProjectConfig } from "../types";
-import { addPackageDependency } from "../utils/add-package-deps";
+import type { Backend, ProjectConfig } from "../../types";
+import { addPackageDependency } from "../../utils/add-package-deps";
 
 export async function setupRuntime(config: ProjectConfig): Promise<void> {
 	const { runtime, backend, projectDir } = config;
@@ -25,7 +25,7 @@ export async function setupRuntime(config: ProjectConfig): Promise<void> {
 
 async function setupBunRuntime(
 	serverDir: string,
-	_backend: ProjectBackend,
+	_backend: Backend,
 ): Promise<void> {
 	const packageJsonPath = path.join(serverDir, "package.json");
 	if (!(await fs.pathExists(packageJsonPath))) return;
@@ -48,7 +48,7 @@ async function setupBunRuntime(
 
 async function setupNodeRuntime(
 	serverDir: string,
-	backend: ProjectBackend,
+	backend: Backend,
 ): Promise<void> {
 	const packageJsonPath = path.join(serverDir, "package.json");
 	if (!(await fs.pathExists(packageJsonPath))) return;

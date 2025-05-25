@@ -4,9 +4,12 @@ import consola from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type { ProjectConfig } from "../types";
-import { commandExists } from "../utils/command-exists";
-import { type EnvVariable, addEnvVariablesToFile } from "./env-setup";
+import type { ProjectConfig } from "../../types";
+import { commandExists } from "../../utils/command-exists";
+import {
+	type EnvVariable,
+	addEnvVariablesToFile,
+} from "../project-generation/env-setup";
 
 type MongoDBConfig = {
 	connectionString: string;

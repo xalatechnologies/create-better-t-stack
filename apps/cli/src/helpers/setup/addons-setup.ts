@@ -1,11 +1,11 @@
 import path from "node:path";
 import fs from "fs-extra";
-import type { ProjectFrontend } from "../types";
-import { addPackageDependency } from "../utils/add-package-deps";
+import type { Frontend } from "../../types";
+import { addPackageDependency } from "../../utils/add-package-deps";
 import { setupStarlight } from "./starlight-setup";
 import { setupTauri } from "./tauri-setup";
 
-import type { ProjectConfig } from "../types";
+import type { ProjectConfig } from "../../types";
 
 export async function setupAddons(config: ProjectConfig) {
 	const { addons, frontend, projectDir } = config;
@@ -49,10 +49,7 @@ export async function setupAddons(config: ProjectConfig) {
 	}
 }
 
-function getWebAppDir(
-	projectDir: string,
-	frontends: ProjectFrontend[],
-): string {
+function getWebAppDir(projectDir: string, frontends: Frontend[]): string {
 	if (
 		frontends.some((f) =>
 			["react-router", "tanstack-router", "nuxt", "svelte", "solid"].includes(
@@ -109,7 +106,7 @@ async function setupHusky(projectDir: string) {
 	}
 }
 
-async function setupPwa(projectDir: string, frontends: ProjectFrontend[]) {
+async function setupPwa(projectDir: string, frontends: Frontend[]) {
 	const isCompatibleFrontend = frontends.some((f) =>
 		["react-router", "tanstack-router", "solid"].includes(f),
 	);

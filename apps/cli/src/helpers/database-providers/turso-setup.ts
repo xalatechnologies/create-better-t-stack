@@ -12,8 +12,12 @@ import {
 import consola from "consola";
 import { $ } from "execa";
 import pc from "picocolors";
-import { commandExists } from "../utils/command-exists";
-import { type EnvVariable, addEnvVariablesToFile } from "./env-setup";
+import type { ProjectConfig } from "../../types";
+import { commandExists } from "../../utils/command-exists";
+import {
+	type EnvVariable,
+	addEnvVariablesToFile,
+} from "../project-generation/env-setup";
 
 type TursoConfig = {
 	dbUrl: string;
@@ -201,8 +205,6 @@ function displayManualSetupInstructions() {
 DATABASE_URL=your_database_url
 DATABASE_AUTH_TOKEN=your_auth_token`);
 }
-
-import type { ProjectConfig } from "../types";
 
 export async function setupTurso(config: ProjectConfig): Promise<void> {
 	const { orm, projectDir } = config;
