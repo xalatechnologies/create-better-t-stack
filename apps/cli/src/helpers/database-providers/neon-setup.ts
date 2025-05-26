@@ -4,7 +4,7 @@ import { consola } from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
-import type { PackageManager } from "../../types";
+import type { PackageManager, ProjectConfig } from "../../types";
 import { getPackageExecutionCommand } from "../../utils/get-package-execution-command";
 import {
 	type EnvVariable,
@@ -47,10 +47,13 @@ async function executeNeonCommand(
 
 		if (spinnerText) s.start(spinnerText);
 		const result = await execa(fullCommand, { shell: true });
-		if (spinnerText) s.stop(pc.green("Completed"));
+		if (spinnerText)
+			s.stop(
+				pc.green(spinnerText.replace("...", "").replace("ing ", "ed ").trim()),
+			);
 		return result;
 	} catch (error) {
-		if (s) s.stop(pc.red(`Failed: ${spinnerText}`));
+		if (s) s.stop(pc.red(`Failed: ${spinnerText || "Command execution"}`));
 		throw error;
 	}
 }
@@ -75,7 +78,6 @@ async function authenticateWithNeon(packageManager: PackageManager) {
 			"neonctl auth",
 			"Authenticating with Neon...",
 		);
-		log.success("Authenticated with Neon successfully!");
 		return true;
 	} catch (_error) {
 		consola.error(pc.red("Failed to authenticate with Neon"));
@@ -149,17 +151,15 @@ function displayManualSetupInstructions() {
 DATABASE_URL="your_connection_string"`);
 }
 
-import type { ProjectConfig } from "../../types";
-
 export async function setupNeonPostgres(config: ProjectConfig): Promise<void> {
 	const { packageManager, projectDir } = config;
 	const setupSpinner = spinner();
-	setupSpinner.start("Setting up Neon PostgreSQL");
+	setupSpinner.start("Checking Neon authentication...");
 
 	try {
 		const isAuthenticated = await isNeonAuthenticated(packageManager);
 
-		setupSpinner.stop("Setting up Neon PostgreSQL");
+		setupSpinner.stop("Neon authentication checked");
 
 		if (!isAuthenticated) {
 			log.info("Please authenticate with Neon to continue:");
@@ -202,9 +202,9 @@ export async function setupNeonPostgres(config: ProjectConfig): Promise<void> {
 		await fs.ensureDir(path.join(projectDir, "apps/server"));
 		await writeEnvFile(projectDir, config);
 
-		finalSpinner.stop("Neon database configured successfully!");
+		finalSpinner.stop("Neon database configured!");
 	} catch (error) {
-		setupSpinner.stop(pc.red("Neon PostgreSQL setup failed"));
+		setupSpinner.stop(pc.red("Neon authentication check failed"));
 
 		if (error instanceof Error) {
 			consola.error(pc.red(error.message));

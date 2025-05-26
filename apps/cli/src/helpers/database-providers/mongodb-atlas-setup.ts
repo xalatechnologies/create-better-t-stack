@@ -17,7 +17,7 @@ type MongoDBConfig = {
 
 async function checkAtlasCLI(): Promise<boolean> {
 	const s = spinner();
-	s.start("Checking for MongoDB Atlas CLI");
+	s.start("Checking for MongoDB Atlas CLI...");
 
 	try {
 		const exists = await commandExists("atlas");
@@ -28,7 +28,7 @@ async function checkAtlasCLI(): Promise<boolean> {
 		);
 		return exists;
 	} catch (_error) {
-		s.stop(pc.red("Error checking for MongoDB Atlas CLI"));
+		s.stop(pc.red("Error checking MongoDB Atlas CLI"));
 		return false;
 	}
 }
@@ -56,7 +56,7 @@ async function initMongoDBAtlas(
 			stdio: "inherit",
 		});
 
-		log.info(pc.green("Atlas setup complete!"));
+		log.info(pc.green("MongoDB Atlas deployment ready"));
 
 		const connectionString = await text({
 			message: "Enter your MongoDB connection string:",
@@ -127,13 +127,13 @@ ${pc.green("MongoDB Atlas Manual Setup Instructions:")}
 export async function setupMongoDBAtlas(config: ProjectConfig) {
 	const { projectDir } = config;
 	const mainSpinner = spinner();
-	mainSpinner.start("Setting up MongoDB Atlas");
+	mainSpinner.start("Setting up MongoDB Atlas...");
 
 	const serverDir = path.join(projectDir, "apps/server");
 	try {
 		await fs.ensureDir(serverDir);
 
-		mainSpinner.stop("Starting MongoDB Atlas setup");
+		mainSpinner.stop("MongoDB Atlas setup ready");
 
 		const config = await initMongoDBAtlas(serverDir);
 

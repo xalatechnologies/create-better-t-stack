@@ -22,12 +22,12 @@ async function initPrismaDatabase(
 ): Promise<PrismaConfig | null> {
 	const s = spinner();
 	try {
-		s.start("Initializing Prisma PostgreSQL");
+		s.start("Initializing Prisma PostgreSQL...");
 
 		const prismaDir = path.join(serverDir, "prisma");
 		await fs.ensureDir(prismaDir);
 
-		s.stop("Initializing Prisma. Follow the prompts below:");
+		s.stop("Prisma PostgreSQL initialized. Follow the prompts below:");
 
 		const prismaInitCommand = getPackageExecutionCommand(
 			packageManager,
@@ -65,7 +65,7 @@ async function initPrismaDatabase(
 			databaseUrl: databaseUrl as string,
 		};
 	} catch (error) {
-		s.stop(pc.red("Failed to initialize Prisma PostgreSQL"));
+		s.stop(pc.red("Prisma PostgreSQL initialization failed"));
 		if (error instanceof Error) {
 			consola.error(error.message);
 		}
@@ -150,12 +150,12 @@ export async function setupPrismaPostgres(config: ProjectConfig) {
 	const { packageManager, projectDir } = config;
 	const serverDir = path.join(projectDir, "apps/server");
 	const s = spinner();
-	s.start("Setting up Prisma PostgreSQL");
+	s.start("Setting up Prisma PostgreSQL...");
 
 	try {
 		await fs.ensureDir(serverDir);
 
-		s.stop("Starting Prisma setup");
+		s.stop("Prisma PostgreSQL setup ready");
 
 		const config = await initPrismaDatabase(serverDir, packageManager);
 
@@ -172,9 +172,9 @@ export async function setupPrismaPostgres(config: ProjectConfig) {
 			);
 		} else {
 			const fallbackSpinner = spinner();
-			fallbackSpinner.start("Setting up fallback configuration");
+			fallbackSpinner.start("Setting up fallback configuration...");
 			await writeEnvFile(projectDir);
-			fallbackSpinner.stop("Manual setup required");
+			fallbackSpinner.stop("Fallback configuration ready");
 			displayManualSetupInstructions();
 		}
 	} catch (error) {

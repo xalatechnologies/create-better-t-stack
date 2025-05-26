@@ -49,7 +49,7 @@ async function loginToTurso() {
 	try {
 		s.start("Logging in to Turso...");
 		await $`turso auth login`;
-		s.stop("Logged in to Turso successfully!");
+		s.stop("Logged into Turso");
 		return true;
 	} catch (_error) {
 		s.stop(pc.red("Failed to log in to Turso"));
@@ -69,7 +69,7 @@ async function installTursoCLI(isMac: boolean) {
 			await $`bash -c '${installScript}'`;
 		}
 
-		s.stop("Turso CLI installed successfully!");
+		s.stop("Turso CLI installed");
 		return true;
 	} catch (error) {
 		if (error instanceof Error && error.message.includes("User force closed")) {
@@ -153,7 +153,7 @@ async function createTursoDatabase(dbName: string, groupName: string | null) {
 			await $`turso db create ${dbName}`;
 		}
 
-		s.stop(`Created database "${dbName}"`);
+		s.stop(`Turso database "${dbName}" created`);
 	} catch (error) {
 		s.stop(pc.red(`Failed to create database "${dbName}"`));
 		if (error instanceof Error && error.message.includes("already exists")) {
@@ -166,7 +166,7 @@ async function createTursoDatabase(dbName: string, groupName: string | null) {
 		const { stdout: dbUrl } = await $`turso db show ${dbName} --url`;
 		const { stdout: authToken } = await $`turso db tokens create ${dbName}`;
 
-		s.stop("Retrieved database connection details");
+		s.stop("Database connection details retrieved");
 
 		return {
 			dbUrl: dbUrl.trim(),
@@ -210,7 +210,7 @@ export async function setupTurso(config: ProjectConfig): Promise<void> {
 	const { orm, projectDir } = config;
 	const _isDrizzle = orm === "drizzle";
 	const setupSpinner = spinner();
-	setupSpinner.start("Setting up Turso database");
+	setupSpinner.start("Checking Turso CLI availability...");
 
 	try {
 		const platform = os.platform();
@@ -226,7 +226,7 @@ export async function setupTurso(config: ProjectConfig): Promise<void> {
 			return;
 		}
 
-		setupSpinner.stop("Checking Turso CLI");
+		setupSpinner.stop("Turso CLI availability checked");
 
 		const isCliInstalled = await isTursoInstalled();
 
@@ -278,23 +278,21 @@ export async function setupTurso(config: ProjectConfig): Promise<void> {
 
 			try {
 				const config = await createTursoDatabase(dbName, selectedGroup);
-
-				const finalSpinner = spinner();
-				finalSpinner.start("Writing configuration to .env file");
 				await writeEnvFile(projectDir, config);
-				finalSpinner.stop("Turso database configured successfully!");
-
 				success = true;
 			} catch (error) {
 				if (error instanceof Error && error.message === "DATABASE_EXISTS") {
 					log.warn(pc.yellow(`Database "${pc.red(dbName)}" already exists`));
 					suggestedName = `${dbName}-${Math.floor(Math.random() * 1000)}`;
 				} else {
+					throw error;
 				}
 			}
 		}
+
+		log.success("Turso database setup completed successfully!");
 	} catch (error) {
-		setupSpinner.stop(pc.red("Failed to set up Turso database"));
+		setupSpinner.stop(pc.red("Turso CLI availability check failed"));
 		consola.error(
 			pc.red(
 				`Error during Turso setup: ${

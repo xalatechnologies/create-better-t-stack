@@ -66,7 +66,7 @@ async function initializeSupabase(
 			stdio: "inherit",
 			shell: true,
 		});
-		log.success("Supabase project initialized successfully.");
+		log.success("Supabase project initialized");
 		return true;
 	} catch (error) {
 		consola.error(pc.red("Failed to initialize Supabase project."));
@@ -183,7 +183,7 @@ export async function setupSupabase(config: ProjectConfig) {
 			const envUpdated = await writeSupabaseEnvFile(projectDir, dbUrl);
 
 			if (envUpdated) {
-				log.success(pc.green("Supabase local development setup complete!"));
+				log.success(pc.green("Supabase local development setup ready!"));
 			} else {
 				log.error(
 					pc.red(
