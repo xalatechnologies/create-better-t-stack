@@ -38,7 +38,6 @@ import { useQueryStates } from "nuqs";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import SponsorsSection from "./sponsors-section";
 
 const validateProjectName = (name: string): string | undefined => {
 	const INVALID_CHARS = ["<", ">", ":", '"', "|", "?", "*"];
@@ -1837,7 +1836,7 @@ const StackBuilder = () => {
 																		? "cursor-not-allowed opacity-60"
 																		: "cursor-pointer",
 																	isSelected
-																		? "border-primary bg-primary/10 ring-1 ring-primary"
+																		? "border-primary bg-primary/10"
 																		: `border-border ${
 																				!isDisabled
 																					? "hover:border-muted hover:bg-muted"
@@ -1909,7 +1908,6 @@ const StackBuilder = () => {
 								);
 							})}
 							<div className="h-10" />
-							<SponsorsSection />
 						</main>
 					</ScrollArea>
 				</div>

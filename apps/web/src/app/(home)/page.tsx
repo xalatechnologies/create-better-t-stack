@@ -154,13 +154,13 @@ export default function HomePage() {
 										<Button
 											size="lg"
 											variant="outline"
-											className="w-full hover:text-primary sm:w-auto"
+											className="w-full hover:bg-muted/50 hover:text-foreground sm:w-auto dark:hover:text-foreground"
 											disabled={isLoadingStars}
 										>
 											<Github className="mr-2 h-4 w-4" />
 											Star on GitHub
 											{stars !== null && !isLoadingStars && (
-												<span className="ml-2 flex items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-xs">
+												<span className="ml-2 flex items-center gap-1 rounded bg-muted/30 px-1.5 py-0.5 text-xs">
 													<Star className="h-3 w-3 text-yellow-400" />
 													{stars}
 												</span>
@@ -175,7 +175,7 @@ export default function HomePage() {
 										<Button
 											size="lg"
 											variant="outline"
-											className="w-full hover:text-primary sm:w-auto"
+											className="w-full hover:bg-muted/50 hover:text-foreground sm:w-auto dark:hover:text-foreground"
 										>
 											<Image
 												src={discordLogo}
