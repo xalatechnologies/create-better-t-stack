@@ -133,7 +133,7 @@ export default function HomePage() {
 	return (
 		<div className="terminal-scanlines min-h-screen bg-background font-mono">
 			<Navbar />
-			<main className="terminal-matrix-bg p-6 pt-28">
+			<main className="terminal-matrix-bg mx-auto max-w-7xl p-6 pt-28">
 				<div className="mb-8 flex items-center justify-center">
 					<div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-6">
 						<pre className="ascii-art terminal-glow text-primary text-xs leading-tight sm:text-sm">
