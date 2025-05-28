@@ -117,9 +117,6 @@ export default function SponsorsSection() {
 									<div className="border-border border-b bg-muted/20 px-3 py-2">
 										<div className="flex items-center gap-2">
 											<span className="text-primary text-xs">▶</span>
-											<span className="truncate font-mono font-semibold text-xs">
-												[SPONSOR_{String(index + 1).padStart(3, "0")}]
-											</span>
 											<div className="ml-auto flex items-center gap-2 text-muted-foreground text-xs">
 												<span>{entry.isOneTime ? "ONE-TIME" : "MONTHLY"}</span>
 												<span>•</span>

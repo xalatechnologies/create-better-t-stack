@@ -178,7 +178,7 @@ export default function Testimonials() {
 							onClick={handlePrev}
 							disabled={currentPage === 1}
 							className={cn(
-								"terminal-block-hover flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 font-mono text-xs transition-colors",
+								"terminal-block-hover hidden items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 font-mono text-xs transition-colors sm:flex",
 								currentPage === 1
 									? "cursor-not-allowed opacity-50"
 									: "hover:bg-muted/50",
@@ -225,7 +225,7 @@ export default function Testimonials() {
 							onClick={handleNext}
 							disabled={currentPage === totalPages}
 							className={cn(
-								"terminal-block-hover flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 font-mono text-xs transition-colors",
+								"terminal-block-hover hidden items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 font-mono text-xs transition-colors sm:flex",
 								currentPage === totalPages
 									? "cursor-not-allowed opacity-50"
 									: "hover:bg-muted/50",

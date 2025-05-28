@@ -361,7 +361,7 @@ export default function HomePage() {
 													/>
 												)}
 												<span className="flex-1 truncate font-mono text-xs">
-													{option.name.toLowerCase().replace(/\s+/g, "-")}.pkg
+													{option.name.toLowerCase().replace(/\s+/g, "-")}
 												</span>
 												<span className="font-mono text-muted-foreground text-xs opacity-0 transition-opacity group-hover:opacity-100">
 													-rw-r--r--

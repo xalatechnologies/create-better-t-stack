@@ -319,6 +319,20 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 		}
 		if (nextStack.api === "none" && (isConvex || isBackendNone)) {
 		} else if (nextStack.api === "none" && !(isConvex || isBackendNone)) {
+			if (nextStack.examples.length > 0) {
+				notes.api.notes.push("API 'None' selected: Examples will be removed.");
+				notes.examples.notes.push(
+					"Examples require an API. They will be removed when API is 'None'.",
+				);
+				notes.api.hasIssue = true;
+				notes.examples.hasIssue = true;
+				nextStack.examples = [];
+				changed = true;
+				changes.push({
+					category: "api",
+					message: "Examples removed (API 'None' does not support examples)",
+				});
+			}
 		}
 
 		if (nextStack.database === "none") {
@@ -1281,6 +1295,17 @@ const StackBuilder = () => {
 								category,
 								techId,
 								"Disabled: This example requires a web frontend.",
+							);
+						}
+						if (
+							stack.api === "none" &&
+							!rules.isConvex &&
+							!rules.isBackendNone
+						) {
+							addRule(
+								category,
+								techId,
+								"Disabled: Examples require an API. Cannot be selected when API is 'None'.",
 							);
 						}
 						if (
