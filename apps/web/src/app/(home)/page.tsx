@@ -179,7 +179,7 @@ export default function HomePage() {
 				</div>
 
 				<div className="mb-6 text-center">
-					<p className="mx-auto max-w-2xl font-mono text-lg text-muted-foreground">
+					<p className="mx-auto font-mono text-lg text-muted-foreground">
 						# Modern CLI for scaffolding end-to-end type-safe TypeScript
 						projects
 					</p>
