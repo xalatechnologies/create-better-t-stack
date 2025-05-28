@@ -1,11 +1,11 @@
 export const dynamic = "force-static";
+import { Toaster } from "@/components/ui/sonner";
 import { RootProvider } from "fumadocs-ui/provider";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
 import "./global.css";
-import { Toaster } from "@/components/ui/sonner";
 
 const poppins = Poppins({
 	subsets: ["latin"],
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
 		siteName: "Better-T Stack",
 		images: [
 			{
-				url: "/image.png",
+				url: "/image.jpg",
 				width: 1200,
 				height: 630,
 				alt: "Better-T Stack",
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
 		title: "Better-T Stack",
 		description:
 			"A modern CLI tool for scaffolding end-to-end type-safe TypeScript projects with best practices and customizable configurations",
-		images: ["/image.png"],
+		images: ["/image.jpg"],
 	},
 	robots: {
 		index: true,
