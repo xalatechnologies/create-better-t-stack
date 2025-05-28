@@ -18,6 +18,9 @@
         "name": "next"
       }
     ],
+    {#unless (or (eq backend "convex") (eq backend "none"))}}
+	  "composite": true,
+		{{/unless}}
     "paths": {
       "@/*": ["./src/*"]
     }

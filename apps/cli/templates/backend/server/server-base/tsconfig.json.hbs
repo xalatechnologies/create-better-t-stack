@@ -20,6 +20,9 @@
         "node", "bun"
       {{/if}}
     ],
+  	{{#unless (or (eq backend "convex") (eq backend "none"))}}
+	  "composite": true,
+		{{/unless}}
 		"jsx": "react-jsx"{{#if (eq backend 'hono')}},
 		"jsxImportSource": "hono/jsx"{{/if}}
 	},
