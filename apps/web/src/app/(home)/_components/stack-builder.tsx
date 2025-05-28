@@ -268,17 +268,6 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 				message: "Removed incompatible web frontends (Nuxt, Solid)",
 			});
 		}
-		if (
-			nextStack.webFrontend.length === 0 ||
-			nextStack.webFrontend[0] === "none"
-		) {
-			nextStack.webFrontend = ["tanstack-router"];
-			changed = true;
-			changes.push({
-				category: "convex",
-				message: "Web Frontend defaulted to TanStack Router",
-			});
-		}
 		if (nextStack.nativeFrontend[0] === "none") {
 		} else {
 		}
