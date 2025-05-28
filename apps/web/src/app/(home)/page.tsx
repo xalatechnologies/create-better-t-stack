@@ -27,9 +27,9 @@ export default function HomePage() {
 	const [selectedPM, setSelectedPM] = useState<"npm" | "pnpm" | "bun">("bun");
 
 	const commands = {
-		npm: "npx create-better-t-stack@latest my-app",
-		pnpm: "pnpm create better-t-stack@latest my-app",
-		bun: "bun create better-t-stack@latest my-app",
+		npm: "npx create-better-t-stack@latest",
+		pnpm: "pnpm create better-t-stack@latest",
+		bun: "bun create better-t-stack@latest",
 	};
 
 	useEffect(() => {

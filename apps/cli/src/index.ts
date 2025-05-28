@@ -17,6 +17,7 @@ import { createProject } from "./helpers/project-generation/create-project";
 import { gatherConfig } from "./prompts/config-prompts";
 import { getProjectName } from "./prompts/project-name";
 import type { ProjectConfig } from "./types";
+import { trackProjectCreation } from "./utils/analytics";
 import { displayConfig } from "./utils/display-config";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
 import { renderTitle } from "./utils/render-title";
@@ -197,11 +198,13 @@ async function main() {
 
 		await createProject(config);
 
+		await trackProjectCreation(config);
+
+		const reproducibleCommand = generateReproducibleCommand(config);
+
 		log.success(
 			pc.blue(
-				`You can reproduce this setup with the following command:\n${generateReproducibleCommand(
-					config,
-				)}`,
+				`You can reproduce this setup with the following command:\n${reproducibleCommand}`,
 			),
 		);
 
