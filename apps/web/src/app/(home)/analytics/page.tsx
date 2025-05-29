@@ -398,16 +398,31 @@ export default function AnalyticsPage() {
 
 	const fetchLastUpdated = useCallback(async () => {
 		try {
-			const response = await fetch(
-				"https://api.github.com/repos/amanvarshney01/create-better-t-stack/commits?path=apps/web/public/export.csv&per_page=1",
-			);
+			const response = await fetch("/export.csv");
+			const csvText = await response.text();
+			const lines = csvText.split("\n");
+			const timestampColumn = lines[0]
+				.split(",")
+				.findIndex((header) => header.includes("timestamp"));
 
-			if (response.ok) {
-				const commits = await response.json();
-				if (commits.length > 0) {
-					const lastCommitDate = new Date(commits[0].commit.committer.date);
+			if (timestampColumn !== -1) {
+				const timestamps = lines
+					.slice(1)
+					.filter((line) => line.trim())
+					.map((line) => {
+						const columns = line.split(",");
+						return columns[timestampColumn]?.replace(/"/g, "");
+					})
+					.filter(Boolean)
+					.map((timestamp) => new Date(timestamp))
+					.filter((date) => !Number.isNaN(date.getTime()));
+
+				if (timestamps.length > 0) {
+					const mostRecentDate = new Date(
+						Math.max(...timestamps.map((d) => d.getTime())),
+					);
 					setLastUpdated(
-						lastCommitDate.toLocaleDateString("en-US", {
+						mostRecentDate.toLocaleDateString("en-US", {
 							year: "numeric",
 							month: "short",
 							day: "numeric",
@@ -416,12 +431,15 @@ export default function AnalyticsPage() {
 							timeZone: "UTC",
 						}),
 					);
+				} else {
+					setLastUpdated("NO_DATA_FOUND");
 				}
 			} else {
-				console.warn("Could not fetch last updated date from GitHub");
+				setLastUpdated("TIMESTAMP_COLUMN_NOT_FOUND");
 			}
 		} catch (error) {
 			console.error("Error fetching last updated date:", error);
+			setLastUpdated("ERROR_PARSING_CSV");
 		} finally {
 			setLoadingLastUpdated(false);
 		}
