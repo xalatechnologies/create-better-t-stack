@@ -1,4 +1,3 @@
-import consola from "consola";
 import { PostHog } from "posthog-node";
 import type { ProjectConfig } from "../types";
 import { getLatestCLIVersion } from "./get-latest-cli-version";
@@ -18,9 +17,7 @@ export async function trackProjectCreation(
 	});
 
 	try {
-		const sessionId = `cli_${Date.now()}_${crypto
-			.randomUUID()
-			.replace(/-/g, "")}`;
+		const sessionId = `cli_${crypto.randomUUID().replace(/-/g, "")}`;
 
 		const { projectName, projectDir, relativePath, ...safeConfig } = config;
 
@@ -35,8 +32,8 @@ export async function trackProjectCreation(
 				$ip: null,
 			},
 		});
-	} catch (error) {
-		consola.debug("Analytics tracking failed:", error);
+	} catch (_error) {
+		// consola.debug("Analytics tracking failed:", error);
 	} finally {
 		await posthog.shutdown();
 	}

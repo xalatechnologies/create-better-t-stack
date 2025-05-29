@@ -26,7 +26,7 @@ export async function getBackendFrameworkChoice(
 		{
 			value: "next" as const,
 			label: "Next.js",
-			hint: "Nextjs API routes",
+			hint: "separate api routes only backend",
 		},
 		{
 			value: "express" as const,
