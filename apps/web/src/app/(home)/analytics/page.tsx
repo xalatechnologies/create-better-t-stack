@@ -823,7 +823,11 @@ export default function AnalyticsPage() {
 							<span className="text-primary">$</span>
 							<span className="font-mono text-muted-foreground">
 								# Last updated:{" "}
-								{loadingLastUpdated ? "CHECKING..." : lastUpdated || "UNKNOWN"}
+								{loadingLastUpdated
+									? "CHECKING..."
+									: lastUpdated
+										? `${lastUpdated} UTC`
+										: "UNKNOWN"}
 							</span>
 						</div>
 					</div>
