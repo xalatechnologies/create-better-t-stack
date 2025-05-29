@@ -67,8 +67,8 @@ export default function ShowcasePage() {
 				>
 					<motion.div className="mb-8" variants={itemVariants}>
 						<div className="mb-6 flex items-center gap-2">
-							<Terminal className="terminal-glow h-4 w-4 text-primary" />
-							<span className="terminal-glow font-bold font-mono text-lg">
+							<Terminal className="h-4 w-4 text-primary" />
+							<span className="font-bold font-mono text-lg">
 								PROJECT_SHOWCASE.EXE
 							</span>
 							<div className="h-px flex-1 bg-border" />
@@ -79,19 +79,19 @@ export default function ShowcasePage() {
 
 						<div className="terminal-block-hover mb-8 rounded border border-border bg-muted/20 p-4">
 							<div className="flex items-center gap-2 text-sm">
-								<span className="terminal-glow text-primary">$</span>
+								<span className="text-primary">$</span>
 								<span className="font-mono text-foreground">
 									user@dev-machine:~/showcase$ ls -la
 								</span>
 							</div>
 							<div className="mt-2 flex items-center gap-2 text-sm">
-								<span className="terminal-glow text-primary">$</span>
+								<span className="text-primary">$</span>
 								<span className="font-mono text-muted-foreground">
 									# Discover amazing projects built with Better-T-Stack
 								</span>
 							</div>
 							<div className="mt-2 flex items-center gap-2 text-sm">
-								<span className="terminal-glow text-primary">$</span>
+								<span className="text-primary">$</span>
 								<span className="font-mono text-muted-foreground">
 									# Real-world implementations showcasing stack capabilities
 								</span>
@@ -121,13 +121,13 @@ export default function ShowcasePage() {
 					<motion.div className="mt-8" variants={itemVariants}>
 						<div className="terminal-block-hover rounded border border-border bg-muted/20 p-4">
 							<div className="flex items-center gap-2 text-sm">
-								<span className="terminal-glow text-primary">$</span>
+								<span className="text-primary">$</span>
 								<span className="font-mono text-muted-foreground">
 									# Want to showcase your project? Submit via GitHub issues
 								</span>
 							</div>
 							<div className="mt-2 flex items-center gap-2 text-sm">
-								<span className="terminal-glow text-primary">$</span>
+								<span className="text-primary">$</span>
 								<span className="font-mono text-foreground">
 									echo &quot;Built something amazing? We&apos;d love to feature
 									it!&quot;

@@ -27,8 +27,8 @@ export default function SponsorsSection() {
 	return (
 		<div className="mb-12">
 			<div className="mb-6 flex items-center gap-2">
-				<Terminal className="terminal-glow h-4 w-4 text-primary" />
-				<span className="terminal-glow font-bold font-mono text-lg">
+				<Terminal className="h-4 w-4 text-primary" />
+				<span className="font-bold font-mono text-lg">
 					SPONSORS_DATABASE.JSON
 				</span>
 				<div className="h-px flex-1 bg-border" />
@@ -39,13 +39,13 @@ export default function SponsorsSection() {
 
 			<div className="terminal-block-hover mb-8 rounded border border-border bg-muted/20 p-4">
 				<div className="flex items-center gap-2 text-sm">
-					<span className="terminal-glow text-primary">$</span>
+					<span className="text-primary">$</span>
 					<span className="font-mono text-foreground">
 						# Amazing organizations and individuals supporting this project
 					</span>
 				</div>
 				<div className="mt-2 flex items-center gap-2 text-sm">
-					<span className="terminal-glow text-primary">$</span>
+					<span className="text-primary">$</span>
 					<span className="font-mono text-muted-foreground">
 						# Your support helps maintain and improve Better-T-Stack
 					</span>
@@ -81,7 +81,7 @@ export default function SponsorsSection() {
 								</span>
 							</div>
 							<div className="flex items-center justify-center gap-2 text-sm">
-								<span className="terminal-glow text-primary">$</span>
+								<span className="text-primary">$</span>
 								<span className="font-mono text-muted-foreground">
 									# Be the first to support this project!
 								</span>

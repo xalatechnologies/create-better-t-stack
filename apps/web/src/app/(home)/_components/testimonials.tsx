@@ -115,8 +115,8 @@ export default function Testimonials() {
 	return (
 		<div className="mb-12">
 			<div className="mb-6 flex items-center gap-2">
-				<Terminal className="terminal-glow h-4 w-4 text-primary" />
-				<span className="terminal-glow font-bold font-mono text-lg">
+				<Terminal className="h-4 w-4 text-primary" />
+				<span className="font-bold font-mono text-lg">
 					DEVELOPER_TESTIMONIALS.LOG
 				</span>
 				<div className="h-px flex-1 bg-border" />
@@ -127,13 +127,13 @@ export default function Testimonials() {
 
 			<div className="terminal-block-hover mb-8 rounded border border-border bg-muted/20 p-4">
 				<div className="flex items-center gap-2 text-sm">
-					<span className="terminal-glow text-primary">$</span>
+					<span className="text-primary">$</span>
 					<span className="font-mono text-foreground">
 						# Community feedback from X (Twitter)
 					</span>
 				</div>
 				<div className="mt-2 flex items-center gap-2 text-sm">
-					<span className="terminal-glow text-primary">$</span>
+					<span className="text-primary">$</span>
 					<span className="font-mono text-muted-foreground">
 						# Real developers sharing their experience
 					</span>
@@ -201,7 +201,7 @@ export default function Testimonials() {
 										className={cn(
 											"terminal-block-hover flex h-6 w-6 items-center justify-center rounded border border-border font-mono text-xs transition-colors",
 											currentPage === page
-												? "terminal-glow bg-primary/20 text-primary"
+												? "bg-primary/20 text-primary"
 												: "bg-background text-muted-foreground hover:text-foreground",
 										)}
 									>

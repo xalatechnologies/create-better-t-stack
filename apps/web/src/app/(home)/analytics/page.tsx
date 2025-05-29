@@ -772,8 +772,8 @@ export default function AnalyticsPage() {
 			<div className="terminal-matrix-bg container mx-auto max-w-7xl space-y-8 px-4 py-8 pt-28">
 				<div className="mb-8">
 					<div className="mb-6 flex items-center gap-2">
-						<Terminal className="terminal-glow h-5 w-5 text-primary" />
-						<span className="terminal-glow font-bold font-mono text-xl">
+						<Terminal className="h-5 w-5 text-primary" />
+						<span className="font-bold font-mono text-xl">
 							ANALYTICS_DASHBOARD.EXE
 						</span>
 						<div className="h-px flex-1 bg-border" />
@@ -784,20 +784,20 @@ export default function AnalyticsPage() {
 
 					<div className="terminal-block-hover rounded border border-border bg-muted/20 p-4">
 						<div className="flex items-center gap-2 text-sm">
-							<span className="terminal-glow text-primary">$</span>
+							<span className="text-primary">$</span>
 							<span className="font-mono text-foreground">
 								# Analytics from Better-T-Stack CLI usage data
 							</span>
 						</div>
 						<div className="mt-2 flex items-center gap-2 text-sm">
-							<span className="terminal-glow text-primary">$</span>
+							<span className="text-primary">$</span>
 							<span className="font-mono text-muted-foreground">
 								# Uses PostHog - no personal info tracked, runs on each project
 								creation
 							</span>
 						</div>
 						<div className="mt-2 flex items-center gap-2 text-sm">
-							<span className="terminal-glow text-primary">$</span>
+							<span className="text-primary">$</span>
 							<span className="font-mono text-muted-foreground">
 								# Source:{" "}
 								<Link
@@ -820,7 +820,7 @@ export default function AnalyticsPage() {
 							</span>
 						</div>
 						<div className="mt-2 flex items-center gap-2 text-sm">
-							<span className="terminal-glow text-primary">$</span>
+							<span className="text-primary">$</span>
 							<span className="font-mono text-muted-foreground">
 								# Last updated:{" "}
 								{loadingLastUpdated ? "CHECKING..." : lastUpdated || "UNKNOWN"}
@@ -847,7 +847,7 @@ export default function AnalyticsPage() {
 								</div>
 							</div>
 							<div className="flex items-center gap-1 rounded border border-border bg-primary/10 px-2 py-1">
-								<span className="terminal-glow text-primary text-xs">▶</span>
+								<span className="text-primary text-xs">▶</span>
 								<span className="font-mono font-semibold text-primary text-xs">
 									JOIN
 								</span>
@@ -858,7 +858,7 @@ export default function AnalyticsPage() {
 
 				<div className="space-y-4">
 					<div className="mb-4 flex items-center gap-2">
-						<span className="terminal-glow font-bold font-mono text-lg">
+						<span className="font-bold font-mono text-lg">
 							SYSTEM_METRICS.LOG
 						</span>
 						<div className="h-px flex-1 bg-border" />
@@ -871,11 +871,11 @@ export default function AnalyticsPage() {
 									<span className="font-mono font-semibold text-sm">
 										TOTAL_PROJECTS
 									</span>
-									<Terminal className="terminal-glow h-4 w-4 text-primary" />
+									<Terminal className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="terminal-glow font-bold font-mono text-2xl text-primary">
+								<div className="font-bold font-mono text-2xl text-primary">
 									{totalProjects.toLocaleString()}
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
@@ -890,11 +890,11 @@ export default function AnalyticsPage() {
 									<span className="font-mono font-semibold text-sm">
 										TOP_FRONTEND
 									</span>
-									<Cpu className="terminal-glow h-4 w-4 text-primary" />
+									<Cpu className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="terminal-glow truncate font-bold font-mono text-accent text-lg">
+								<div className="truncate font-bold font-mono text-accent text-lg">
 									{mostPopularFrontend}
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
@@ -909,11 +909,11 @@ export default function AnalyticsPage() {
 									<span className="font-mono font-semibold text-sm">
 										TOP_BACKEND
 									</span>
-									<Terminal className="terminal-glow h-4 w-4 text-primary" />
+									<Terminal className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="terminal-glow truncate font-bold font-mono text-accent text-lg">
+								<div className="truncate font-bold font-mono text-accent text-lg">
 									{mostPopularBackend}
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
@@ -928,11 +928,11 @@ export default function AnalyticsPage() {
 									<span className="font-mono font-semibold text-sm">
 										TOP_DATABASE
 									</span>
-									<Download className="terminal-glow h-4 w-4 text-primary" />
+									<Download className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="terminal-glow truncate font-bold font-mono text-accent text-lg">
+								<div className="truncate font-bold font-mono text-accent text-lg">
 									{getDatabaseData().length > 0
 										? getDatabaseData()[0].name
 										: "None"}
@@ -949,11 +949,11 @@ export default function AnalyticsPage() {
 									<span className="font-mono font-semibold text-sm">
 										TOP_API
 									</span>
-									<TrendingUp className="terminal-glow h-4 w-4 text-primary" />
+									<TrendingUp className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="terminal-glow truncate font-bold font-mono text-accent text-lg">
+								<div className="truncate font-bold font-mono text-accent text-lg">
 									{getAPIData().length > 0 ? getAPIData()[0].name : "None"}
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
@@ -968,11 +968,11 @@ export default function AnalyticsPage() {
 									<span className="font-mono font-semibold text-sm">
 										AUTH_ADOPTION
 									</span>
-									<Users className="terminal-glow h-4 w-4 text-primary" />
+									<Users className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="terminal-glow font-bold font-mono text-2xl text-primary">
+								<div className="font-bold font-mono text-2xl text-primary">
 									{authEnabledPercent}%
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
@@ -987,11 +987,11 @@ export default function AnalyticsPage() {
 									<span className="font-mono font-semibold text-sm">
 										TOP_PKG_MGR
 									</span>
-									<Terminal className="terminal-glow h-4 w-4 text-primary" />
+									<Terminal className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="terminal-glow truncate font-bold font-mono text-accent text-lg">
+								<div className="truncate font-bold font-mono text-accent text-lg">
 									{getPackageManagerData().length > 0
 										? getPackageManagerData()[0].name
 										: "npm"}
@@ -1008,11 +1008,11 @@ export default function AnalyticsPage() {
 									<span className="font-mono font-semibold text-sm">
 										AVG_DAILY
 									</span>
-									<TrendingUp className="terminal-glow h-4 w-4 text-primary" />
+									<TrendingUp className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="terminal-glow font-bold font-mono text-2xl text-primary">
+								<div className="font-bold font-mono text-2xl text-primary">
 									{avgProjectsPerDay.toFixed(1)}
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
@@ -1025,7 +1025,7 @@ export default function AnalyticsPage() {
 
 				<div className="space-y-6">
 					<div className="mb-4 flex items-center gap-2">
-						<span className="terminal-glow font-bold font-mono text-lg">
+						<span className="font-bold font-mono text-lg">
 							TIMELINE_ANALYSIS.CHARTS
 						</span>
 						<div className="h-px flex-1 bg-border" />
@@ -1124,7 +1124,7 @@ export default function AnalyticsPage() {
 
 				<div className="space-y-6">
 					<div className="mb-4 flex items-center gap-2">
-						<span className="terminal-glow font-bold font-mono text-lg">
+						<span className="font-bold font-mono text-lg">
 							STACK_CONFIGURATION.DB
 						</span>
 						<div className="h-px flex-1 bg-border" />
@@ -1425,7 +1425,7 @@ export default function AnalyticsPage() {
 
 				<div className="space-y-6">
 					<div className="mb-4 flex items-center gap-2">
-						<span className="terminal-glow font-bold font-mono text-lg">
+						<span className="font-bold font-mono text-lg">
 							DEV_ENVIRONMENT.CONFIG
 						</span>
 						<div className="h-px flex-1 bg-border" />

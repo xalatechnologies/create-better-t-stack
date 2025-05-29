@@ -125,7 +125,7 @@ export default function ShowcaseItem({
 
 					<div className="border-border border-t pt-2">
 						<div className="flex items-center gap-2 text-xs">
-							<span className="terminal-glow text-primary">$</span>
+							<span className="text-primary">$</span>
 							<span className="font-mono text-muted-foreground">
 								echo &quot;Status: READY&quot;
 							</span>

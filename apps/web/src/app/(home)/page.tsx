@@ -136,7 +136,7 @@ export default function HomePage() {
 			<main className="terminal-matrix-bg mx-auto max-w-7xl p-6 pt-28">
 				<div className="mb-8 flex items-center justify-center">
 					<div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-6">
-						<pre className="ascii-art terminal-glow text-primary text-xs leading-tight sm:text-sm">
+						<pre className="ascii-art text-primary text-xs leading-tight sm:text-sm">
 							{`
 ██████╗  ██████╗ ██╗     ██╗
 ██╔══██╗██╔═══██╗██║     ██║
@@ -146,7 +146,7 @@ export default function HomePage() {
 ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝`}
 						</pre>
 
-						<pre className="ascii-art terminal-glow text-primary text-xs leading-tight sm:text-sm">
+						<pre className="ascii-art text-primary text-xs leading-tight sm:text-sm">
 							{`
 ██╗   ██╗ ██████╗ ██╗   ██╗██████╗
 ╚██╗ ██╔╝██╔═══██╗██║   ██║██╔══██╗
@@ -156,7 +156,7 @@ export default function HomePage() {
    ╚═╝    ╚═════╝  ╚═════╝ ╚═╝  ╚═╝`}
 						</pre>
 
-						<pre className="ascii-art terminal-glow text-primary text-xs leading-tight sm:text-sm">
+						<pre className="ascii-art text-primary text-xs leading-tight sm:text-sm">
 							{`
  ██████╗ ██╗    ██╗███╗   ██╗
 ██╔═══██╗██║    ██║████╗  ██║
@@ -166,7 +166,7 @@ export default function HomePage() {
  ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═══╝`}
 						</pre>
 
-						<pre className="ascii-art terminal-glow text-primary text-xs leading-tight sm:text-sm">
+						<pre className="ascii-art text-primary text-xs leading-tight sm:text-sm">
 							{`
 ███████╗████████╗ █████╗  ██████╗██╗  ██╗
 ██╔════╝╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝
@@ -192,10 +192,8 @@ export default function HomePage() {
 				<div className="terminal-block-hover mb-8 rounded border border-border bg-muted/20 p-4">
 					<div className="mb-4 flex items-center justify-between">
 						<div className="flex items-center gap-2">
-							<Terminal className="terminal-glow h-4 w-4 text-primary" />
-							<span className="terminal-glow font-semibold text-sm">
-								QUICK_START
-							</span>
+							<Terminal className="h-4 w-4 text-primary" />
+							<span className="font-semibold text-sm">QUICK_START</span>
 						</div>
 						<div className="flex items-center rounded border border-border bg-background p-0.5">
 							{(["bun", "pnpm", "npm"] as const).map((pm) => (
@@ -206,7 +204,7 @@ export default function HomePage() {
 									className={cn(
 										"flex items-center gap-1.5 rounded px-2 py-1 font-mono text-xs transition-colors duration-150",
 										selectedPM === pm
-											? "terminal-glow bg-primary/20 text-primary"
+											? "bg-primary/20 text-primary"
 											: "text-muted-foreground hover:text-foreground",
 									)}
 								>
@@ -220,7 +218,7 @@ export default function HomePage() {
 					<div className="space-y-3">
 						<div className="flex items-center justify-between rounded border border-border bg-background p-3">
 							<div className="flex items-center gap-2 text-sm">
-								<span className="terminal-glow text-primary">$</span>
+								<span className="text-primary">$</span>
 								<span className="font-mono text-foreground">
 									{commands[selectedPM]}
 								</span>
@@ -245,7 +243,7 @@ export default function HomePage() {
 					<Link href="/new">
 						<div className="group terminal-block-hover cursor-pointer rounded border border-border bg-background p-4">
 							<div className="flex items-center gap-2">
-								<ChevronRight className="terminal-glow h-4 w-4 text-primary" />
+								<ChevronRight className="h-4 w-4 text-primary" />
 								<span className="font-mono font-semibold">
 									STACK_BUILDER.EXE
 								</span>
@@ -264,7 +262,7 @@ export default function HomePage() {
 						<div className="group terminal-block-hover cursor-pointer rounded border border-border bg-background p-4">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
-									<Github className="terminal-glow h-4 w-4 text-primary" />
+									<Github className="h-4 w-4 text-primary" />
 									<span className="font-mono font-semibold">
 										GITHUB_REPO.GIT
 									</span>
@@ -303,7 +301,7 @@ export default function HomePage() {
 
 				<div className="mb-12">
 					<div className="mb-6 flex items-center gap-2">
-						<span className="terminal-glow font-bold font-mono text-lg">
+						<span className="font-bold font-mono text-lg">
 							TECH_STACK_MATRIX.DB
 						</span>
 						<div className="h-px flex-1 bg-border" />
@@ -320,7 +318,7 @@ export default function HomePage() {
 					<div className="terminal-block-hover rounded border border-border bg-background">
 						<div className="border-border border-b bg-muted/20 px-4 py-3">
 							<div className="flex items-center gap-2">
-								<Terminal className="terminal-glow h-4 w-4 text-primary" />
+								<Terminal className="h-4 w-4 text-primary" />
 								<span className="font-mono font-semibold text-sm">
 									/tech-stack/packages/
 								</span>
@@ -392,7 +390,7 @@ export default function HomePage() {
 				</div>
 
 				<div className="terminal-block-hover mb-8 rounded border border-border bg-muted/20 p-4">
-					<div className="terminal-glow mb-2 font-mono font-semibold text-sm">
+					<div className="mb-2 font-mono font-semibold text-sm">
 						SYSTEM_INFO.LOG
 					</div>
 					<div className="grid grid-cols-1 gap-2 font-mono text-xs md:grid-cols-3">
@@ -404,7 +402,7 @@ export default function HomePage() {
 						</div>
 						<div>
 							<span className="text-primary">STATUS:</span>{" "}
-							<span className="terminal-glow text-accent">READY</span>
+							<span className="text-accent">READY</span>
 						</div>
 					</div>
 				</div>
