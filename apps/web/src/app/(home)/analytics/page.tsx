@@ -372,7 +372,7 @@ export default function AnalyticsPage() {
 
 	const loadCSVData = useCallback(async () => {
 		try {
-			const response = await fetch("/export.csv");
+			const response = await fetch("https://r2.amanv.dev/export.csv");
 			const csvText = await response.text();
 
 			Papa.parse(csvText, {
@@ -448,7 +448,7 @@ export default function AnalyticsPage() {
 
 	const fetchLastUpdated = useCallback(async () => {
 		try {
-			const response = await fetch("/export.csv");
+			const response = await fetch("https://r2.amanv.dev/export.csv");
 			const csvText = await response.text();
 			const lines = csvText.split("\n");
 			const timestampColumn = lines[0]
@@ -896,7 +896,7 @@ export default function AnalyticsPage() {
 								</Link>
 								{" | "}
 								<Link
-									href="https://github.com/amanvarshney01/create-better-t-stack/blob/main/apps/web/public/export.csv"
+									href="https://r2.amanv.dev/export.csv"
 									target="_blank"
 									rel="noopener noreferrer"
 									className="text-accent underline hover:text-primary"
@@ -909,7 +909,11 @@ export default function AnalyticsPage() {
 							<span className="text-primary">$</span>
 							<span className="font-mono text-muted-foreground">
 								# Last updated:{" "}
-								{loadingLastUpdated ? "CHECKING..." : lastUpdated || "UNKNOWN"}
+								{loadingLastUpdated
+									? "CHECKING..."
+									: lastUpdated
+										? `${lastUpdated} UTC`
+										: "UNKNOWN"}
 							</span>
 						</div>
 					</div>
