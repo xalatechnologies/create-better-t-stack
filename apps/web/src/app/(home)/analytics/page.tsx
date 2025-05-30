@@ -1035,7 +1035,7 @@ export default function AnalyticsPage() {
 						<div className="h-px flex-1 bg-border" />
 					</div>
 
-					<div className="grid gap-6 md:grid-cols-2">
+					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 						<div className="terminal-block-hover rounded border border-border bg-background">
 							<div className="border-border border-b bg-muted/20 px-4 py-3">
 								<div className="flex items-center gap-2">
@@ -1178,7 +1178,7 @@ export default function AnalyticsPage() {
 						</div>
 					</div>
 
-					<div className="grid gap-6 md:grid-cols-2">
+					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 						<div className="terminal-block-hover rounded border border-border bg-background">
 							<div className="border-border border-b bg-muted/20 px-4 py-3">
 								<div className="flex items-center gap-2">
@@ -1438,7 +1438,7 @@ export default function AnalyticsPage() {
 						</span>
 					</div>
 
-					<div className="grid gap-6 md:grid-cols-2">
+					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 						<div className="terminal-block-hover rounded border border-border bg-background">
 							<div className="border-border border-b bg-muted/20 px-4 py-3">
 								<div className="flex items-center gap-2">
