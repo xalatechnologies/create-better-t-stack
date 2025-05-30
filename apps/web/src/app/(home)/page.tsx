@@ -281,7 +281,7 @@ export default function HomePage() {
 					</Link>
 
 					<Link
-						href="https://discord.com/invite/tMunxM5R"
+						href="https://discord.gg/ZYsbjpDaM5"
 						target="_blank"
 						rel="noopener noreferrer"
 					>

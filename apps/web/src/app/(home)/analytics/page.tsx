@@ -921,7 +921,7 @@ export default function AnalyticsPage() {
 					</div>
 
 					<Link
-						href="https://discord.com/invite/tMunxM5R"
+						href="https://discord.gg/ZYsbjpDaM5"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="terminal-block-hover block rounded border border-border bg-background transition-colors hover:bg-accent/10"
