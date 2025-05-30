@@ -35,6 +35,8 @@ interface AnalyticsData {
 	platform: string;
 	backend: string;
 	database: string;
+	orm: string;
+	dbSetup: string;
 	auth: string;
 	api: string;
 	packageManager: string;
@@ -115,11 +117,11 @@ const backendConfig = {
 	},
 	convex: {
 		label: "Convex",
-		color: "hsl(var(--chart-1))",
+		color: "hsl(var(--chart-6))",
 	},
 	none: {
 		label: "None",
-		color: "hsl(var(--chart-6))",
+		color: "hsl(var(--chart-7))",
 	},
 } satisfies ChartConfig;
 
@@ -139,6 +141,52 @@ const databaseConfig = {
 	mongodb: {
 		label: "MongoDB",
 		color: "hsl(var(--chart-4))",
+	},
+	none: {
+		label: "None",
+		color: "hsl(var(--chart-6))",
+	},
+} satisfies ChartConfig;
+
+const ormConfig = {
+	drizzle: {
+		label: "Drizzle",
+		color: "hsl(var(--chart-1))",
+	},
+	prisma: {
+		label: "Prisma",
+		color: "hsl(var(--chart-2))",
+	},
+	mongoose: {
+		label: "Mongoose",
+		color: "hsl(var(--chart-3))",
+	},
+	none: {
+		label: "None",
+		color: "hsl(var(--chart-6))",
+	},
+} satisfies ChartConfig;
+
+const dbSetupConfig = {
+	turso: {
+		label: "Turso",
+		color: "hsl(var(--chart-1))",
+	},
+	"prisma-postgres": {
+		label: "Prisma + PostgreSQL",
+		color: "hsl(var(--chart-2))",
+	},
+	"mongodb-atlas": {
+		label: "MongoDB Atlas",
+		color: "hsl(var(--chart-3))",
+	},
+	neon: {
+		label: "Neon",
+		color: "hsl(var(--chart-4))",
+	},
+	supabase: {
+		label: "Supabase",
+		color: "hsl(var(--chart-5))",
 	},
 	none: {
 		label: "None",
@@ -295,20 +343,20 @@ const addonsConfig = {
 		label: "Biome",
 		color: "hsl(var(--chart-2))",
 	},
-	husky: {
-		label: "Husky",
-		color: "hsl(var(--chart-3))",
-	},
-	turborepo: {
-		label: "Turborepo",
-		color: "hsl(var(--chart-4))",
-	},
 	tauri: {
 		label: "Tauri",
-		color: "hsl(var(--chart-5))",
+		color: "hsl(var(--chart-3))",
+	},
+	husky: {
+		label: "Husky",
+		color: "hsl(var(--chart-4))",
 	},
 	starlight: {
 		label: "Starlight",
+		color: "hsl(var(--chart-5))",
+	},
+	turborepo: {
+		label: "Turborepo",
 		color: "hsl(var(--chart-6))",
 	},
 	none: {
@@ -355,6 +403,8 @@ export default function AnalyticsPage() {
 									platform: row["*.properties.platform"] || "unknown",
 									backend: row["*.properties.backend"] || "none",
 									database: row["*.properties.database"] || "none",
+									orm: row["*.properties.orm"] || "none",
+									dbSetup: row["*.properties.dbSetup"] || "none",
 									auth:
 										row["*.properties.auth"] === "True"
 											? "enabled"
@@ -511,6 +561,42 @@ export default function AnalyticsPage() {
 		);
 
 		return Object.entries(databaseCounts)
+			.map(([name, value]) => ({
+				name,
+				value,
+			}))
+			.sort((a, b) => b.value - a.value);
+	};
+
+	const getORMData = () => {
+		const ormCounts = data.reduce(
+			(acc, item) => {
+				const orm = item.orm || "none";
+				acc[orm] = (acc[orm] || 0) + 1;
+				return acc;
+			},
+			{} as Record<string, number>,
+		);
+
+		return Object.entries(ormCounts)
+			.map(([name, value]) => ({
+				name,
+				value,
+			}))
+			.sort((a, b) => b.value - a.value);
+	};
+
+	const getDBSetupData = () => {
+		const dbSetupCounts = data.reduce(
+			(acc, item) => {
+				const dbSetup = item.dbSetup || "none";
+				acc[dbSetup] = (acc[dbSetup] || 0) + 1;
+				return acc;
+			},
+			{} as Record<string, number>,
+		);
+
+		return Object.entries(dbSetupCounts)
 			.map(([name, value]) => ({
 				name,
 				value,
@@ -823,11 +909,7 @@ export default function AnalyticsPage() {
 							<span className="text-primary">$</span>
 							<span className="font-mono text-muted-foreground">
 								# Last updated:{" "}
-								{loadingLastUpdated
-									? "CHECKING..."
-									: lastUpdated
-										? `${lastUpdated} UTC`
-										: "UNKNOWN"}
+								{loadingLastUpdated ? "CHECKING..." : lastUpdated || "UNKNOWN"}
 							</span>
 						</div>
 					</div>
@@ -930,19 +1012,17 @@ export default function AnalyticsPage() {
 							<div className="border-border border-b bg-muted/20 px-4 py-3">
 								<div className="flex items-center justify-between">
 									<span className="font-mono font-semibold text-sm">
-										TOP_DATABASE
+										TOP_ORM
 									</span>
 									<Download className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
 								<div className="truncate font-bold font-mono text-accent text-lg">
-									{getDatabaseData().length > 0
-										? getDatabaseData()[0].name
-										: "None"}
+									{getORMData().length > 0 ? getORMData()[0].name : "None"}
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									$ most_selected_database.sh
+									$ most_selected_orm.sh
 								</p>
 							</div>
 						</div>
@@ -1035,7 +1115,7 @@ export default function AnalyticsPage() {
 						<div className="h-px flex-1 bg-border" />
 					</div>
 
-					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+					<div className="grid gap-6 md:grid-cols-2">
 						<div className="terminal-block-hover rounded border border-border bg-background">
 							<div className="border-border border-b bg-muted/20 px-4 py-3">
 								<div className="flex items-center gap-2">
@@ -1178,7 +1258,7 @@ export default function AnalyticsPage() {
 						</div>
 					</div>
 
-					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+					<div className="grid gap-6 md:grid-cols-2">
 						<div className="terminal-block-hover rounded border border-border bg-background">
 							<div className="border-border border-b bg-muted/20 px-4 py-3">
 								<div className="flex items-center gap-2">
@@ -1264,11 +1344,88 @@ export default function AnalyticsPage() {
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
 									<span className="font-mono font-semibold text-sm">
+										ORM_DISTRIBUTION.BAR
+									</span>
+								</div>
+								<p className="mt-1 font-mono text-muted-foreground text-xs">
+									# ORM/Database layer distribution (Step 5)
+								</p>
+							</div>
+							<div className="p-4">
+								<ChartContainer config={ormConfig} className="h-[300px] w-full">
+									<BarChart data={getORMData()}>
+										<CartesianGrid vertical={false} />
+										<XAxis
+											dataKey="name"
+											tickLine={false}
+											tickMargin={10}
+											axisLine={false}
+										/>
+										<YAxis hide />
+										<ChartTooltip content={<ChartTooltipContent />} />
+										<Bar dataKey="value" radius={4}>
+											{getORMData().map((entry) => (
+												<Cell
+													key={`orm-${entry.name}`}
+													fill={`var(--color-${entry.name})`}
+												/>
+											))}
+										</Bar>
+									</BarChart>
+								</ChartContainer>
+							</div>
+						</div>
+
+						<div className="terminal-block-hover rounded border border-border bg-background">
+							<div className="border-border border-b bg-muted/20 px-4 py-3">
+								<div className="flex items-center gap-2">
+									<span className="text-primary text-xs">▶</span>
+									<span className="font-mono font-semibold text-sm">
+										DATABASE_HOSTING.BAR
+									</span>
+								</div>
+								<p className="mt-1 font-mono text-muted-foreground text-xs">
+									# Database hosting service preferences (Step 6)
+								</p>
+							</div>
+							<div className="p-4">
+								<ChartContainer
+									config={dbSetupConfig}
+									className="h-[300px] w-full"
+								>
+									<BarChart data={getDBSetupData()}>
+										<CartesianGrid vertical={false} />
+										<XAxis
+											dataKey="name"
+											tickLine={false}
+											tickMargin={10}
+											axisLine={false}
+										/>
+										<YAxis hide />
+										<ChartTooltip content={<ChartTooltipContent />} />
+										<Bar dataKey="value" radius={4}>
+											{getDBSetupData().map((entry) => (
+												<Cell
+													key={`dbsetup-${entry.name}`}
+													fill={`var(--color-${entry.name})`}
+												/>
+											))}
+										</Bar>
+									</BarChart>
+								</ChartContainer>
+							</div>
+						</div>
+
+						<div className="terminal-block-hover rounded border border-border bg-background">
+							<div className="border-border border-b bg-muted/20 px-4 py-3">
+								<div className="flex items-center gap-2">
+									<span className="text-primary text-xs">▶</span>
+									<span className="font-mono font-semibold text-sm">
 										API_LAYER.PIE
 									</span>
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# API layer technology distribution (Step 6)
+									# API layer technology distribution (Step 7)
 								</p>
 							</div>
 							<div className="p-4">
@@ -1307,7 +1464,7 @@ export default function AnalyticsPage() {
 									</span>
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Authentication implementation rate (Step 7)
+									# Authentication implementation rate (Step 8)
 								</p>
 							</div>
 							<div className="p-4">
@@ -1353,7 +1510,7 @@ export default function AnalyticsPage() {
 								</span>
 							</div>
 							<p className="mt-1 font-mono text-muted-foreground text-xs">
-								# Additional features and tooling adoption (Step 8)
+								# Additional features and tooling adoption (Step 9)
 							</p>
 						</div>
 						<div className="p-4">
@@ -1394,7 +1551,7 @@ export default function AnalyticsPage() {
 								</span>
 							</div>
 							<p className="mt-1 font-mono text-muted-foreground text-xs">
-								# Example applications included in projects (Step 9)
+								# Example applications included in projects (Step 10)
 							</p>
 						</div>
 						<div className="p-4">
@@ -1438,7 +1595,7 @@ export default function AnalyticsPage() {
 						</span>
 					</div>
 
-					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+					<div className="grid gap-6 md:grid-cols-2">
 						<div className="terminal-block-hover rounded border border-border bg-background">
 							<div className="border-border border-b bg-muted/20 px-4 py-3">
 								<div className="flex items-center gap-2">
