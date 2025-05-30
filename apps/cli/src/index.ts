@@ -198,8 +198,6 @@ async function main() {
 
 		await createProject(config);
 
-		await trackProjectCreation(config);
-
 		const reproducibleCommand = generateReproducibleCommand(config);
 
 		log.success(
@@ -207,6 +205,8 @@ async function main() {
 				`You can reproduce this setup with the following command:\n${reproducibleCommand}`,
 			),
 		);
+
+		await trackProjectCreation(config);
 
 		const elapsedTimeInSeconds = ((Date.now() - startTime) / 1000).toFixed(2);
 		outro(
