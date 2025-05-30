@@ -857,13 +857,15 @@ export default function AnalyticsPage() {
 			<Navbar />
 			<div className="terminal-matrix-bg container mx-auto max-w-7xl space-y-8 px-4 py-8 pt-28">
 				<div className="mb-8">
-					<div className="mb-6 flex items-center gap-2">
-						<Terminal className="h-5 w-5 text-primary" />
-						<span className="font-bold font-mono text-xl">
-							ANALYTICS_DASHBOARD.EXE
-						</span>
-						<div className="h-px flex-1 bg-border" />
-						<span className="font-mono text-muted-foreground text-xs">
+					<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
+						<div className="flex items-center gap-2">
+							<Terminal className="h-5 w-5 text-primary" />
+							<span className="font-bold font-mono text-lg sm:text-xl">
+								ANALYTICS_DASHBOARD.EXE
+							</span>
+						</div>
+						<div className="hidden h-px flex-1 bg-border sm:block" />
+						<span className="w-full text-right font-mono text-muted-foreground text-xs sm:w-auto sm:text-left">
 							[{totalProjects} PROJECTS_ANALYZED]
 						</span>
 					</div>
@@ -872,20 +874,20 @@ export default function AnalyticsPage() {
 						<div className="flex items-center gap-2 text-sm">
 							<span className="text-primary">$</span>
 							<span className="font-mono text-foreground">
-								# Analytics from Better-T-Stack CLI usage data
+								Analytics from Better-T-Stack CLI usage data
 							</span>
 						</div>
 						<div className="mt-2 flex items-center gap-2 text-sm">
 							<span className="text-primary">$</span>
 							<span className="font-mono text-muted-foreground">
-								# Uses PostHog - no personal info tracked, runs on each project
+								Uses PostHog - no personal info tracked, runs on each project
 								creation
 							</span>
 						</div>
 						<div className="mt-2 flex items-center gap-2 text-sm">
 							<span className="text-primary">$</span>
 							<span className="font-mono text-muted-foreground">
-								# Source:{" "}
+								Source:{" "}
 								<Link
 									href="https://github.com/amanvarshney01/create-better-t-stack/blob/main/apps/cli/src/utils/analytics.ts"
 									target="_blank"
@@ -908,7 +910,7 @@ export default function AnalyticsPage() {
 						<div className="mt-2 flex items-center gap-2 text-sm">
 							<span className="text-primary">$</span>
 							<span className="font-mono text-muted-foreground">
-								# Last updated:{" "}
+								Last updated:{" "}
 								{loadingLastUpdated
 									? "CHECKING..."
 									: lastUpdated
@@ -1119,7 +1121,7 @@ export default function AnalyticsPage() {
 						<div className="h-px flex-1 bg-border" />
 					</div>
 
-					<div className="grid gap-6 md:grid-cols-2">
+					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 						<div className="terminal-block-hover rounded border border-border bg-background">
 							<div className="border-border border-b bg-muted/20 px-4 py-3">
 								<div className="flex items-center gap-2">
@@ -1211,12 +1213,14 @@ export default function AnalyticsPage() {
 				</div>
 
 				<div className="space-y-6">
-					<div className="mb-4 flex items-center gap-2">
-						<span className="font-bold font-mono text-lg">
-							STACK_CONFIGURATION.DB
-						</span>
-						<div className="h-px flex-1 bg-border" />
-						<span className="font-mono text-muted-foreground text-xs">
+					<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
+						<div className="flex items-center gap-2">
+							<span className="font-bold font-mono text-lg sm:text-xl">
+								STACK_CONFIGURATION.DB
+							</span>
+						</div>
+						<div className="hidden h-px flex-1 bg-border sm:block" />
+						<span className="w-full text-right font-mono text-muted-foreground text-xs sm:w-auto sm:text-left">
 							[CORE_COMPONENTS]
 						</span>
 					</div>
@@ -1262,7 +1266,7 @@ export default function AnalyticsPage() {
 						</div>
 					</div>
 
-					<div className="grid gap-6 md:grid-cols-2">
+					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 						<div className="terminal-block-hover rounded border border-border bg-background">
 							<div className="border-border border-b bg-muted/20 px-4 py-3">
 								<div className="flex items-center gap-2">
@@ -1589,17 +1593,19 @@ export default function AnalyticsPage() {
 				</div>
 
 				<div className="space-y-6">
-					<div className="mb-4 flex items-center gap-2">
-						<span className="font-bold font-mono text-lg">
-							DEV_ENVIRONMENT.CONFIG
-						</span>
-						<div className="h-px flex-1 bg-border" />
-						<span className="font-mono text-muted-foreground text-xs">
+					<div className="mb-4 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
+						<div className="flex items-center gap-2">
+							<span className="font-bold font-mono text-lg sm:text-xl">
+								DEV_ENVIRONMENT.CONFIG
+							</span>
+						</div>
+						<div className="hidden h-px flex-1 bg-border sm:block" />
+						<span className="w-full text-right font-mono text-muted-foreground text-xs sm:w-auto sm:text-left">
 							[TOOLING_PREFERENCES]
 						</span>
 					</div>
 
-					<div className="grid gap-6 md:grid-cols-2">
+					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 						<div className="terminal-block-hover rounded border border-border bg-background">
 							<div className="border-border border-b bg-muted/20 px-4 py-3">
 								<div className="flex items-center gap-2">

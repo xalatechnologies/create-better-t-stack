@@ -26,13 +26,15 @@ export default function SponsorsSection() {
 
 	return (
 		<div className="mb-12">
-			<div className="mb-6 flex items-center gap-2">
-				<Terminal className="h-4 w-4 text-primary" />
-				<span className="font-bold font-mono text-lg">
-					SPONSORS_DATABASE.JSON
-				</span>
-				<div className="h-px flex-1 bg-border" />
-				<span className="font-mono text-muted-foreground text-xs">
+			<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
+				<div className="flex items-center gap-2">
+					<Terminal className="h-5 w-5 text-primary" />
+					<span className="font-bold font-mono text-lg sm:text-xl">
+						SPONSORS_DATABASE.JSON
+					</span>
+				</div>
+				<div className="hidden h-px flex-1 bg-border sm:block" />
+				<span className="w-full text-right font-mono text-muted-foreground text-xs sm:w-auto sm:text-left">
 					[{loadingSponsors ? "LOADING..." : sponsors.length} RECORDS]
 				</span>
 			</div>
