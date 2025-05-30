@@ -12,15 +12,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    {{#unless (or (eq backend "convex") (eq backend "none"))}}
+	  "composite": true,
+	{{/unless}}
     "incremental": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
-    {#unless (or (eq backend "convex") (eq backend "none"))}}
-	  "composite": true,
-		{{/unless}}
     "paths": {
       "@/*": ["./src/*"]
     }
