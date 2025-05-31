@@ -1234,7 +1234,7 @@ export default function AnalyticsPage() {
 								</span>
 							</div>
 							<p className="mt-1 font-mono text-muted-foreground text-xs">
-								# Frontend framework and meta-framework usage (Step 1)
+								# Frontend framework and meta-framework usage
 							</p>
 						</div>
 						<div className="p-4">
@@ -1276,7 +1276,7 @@ export default function AnalyticsPage() {
 									</span>
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Backend framework distribution (Step 2)
+									# Backend framework distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -1316,7 +1316,7 @@ export default function AnalyticsPage() {
 									</span>
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Database technology distribution (Step 4)
+									# Database technology distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -1356,7 +1356,7 @@ export default function AnalyticsPage() {
 									</span>
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# ORM/Database layer distribution (Step 5)
+									# ORM/Database layer distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -1393,7 +1393,7 @@ export default function AnalyticsPage() {
 									</span>
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Database hosting service preferences (Step 6)
+									# Database hosting service preferences
 								</p>
 							</div>
 							<div className="p-4">
@@ -1433,7 +1433,7 @@ export default function AnalyticsPage() {
 									</span>
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# API layer technology distribution (Step 7)
+									# API layer technology distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -1472,7 +1472,7 @@ export default function AnalyticsPage() {
 									</span>
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Authentication implementation rate (Step 8)
+									# Authentication implementation rate
 								</p>
 							</div>
 							<div className="p-4">
@@ -1518,7 +1518,7 @@ export default function AnalyticsPage() {
 								</span>
 							</div>
 							<p className="mt-1 font-mono text-muted-foreground text-xs">
-								# Additional features and tooling adoption (Step 9)
+								# Additional features and tooling adoption
 							</p>
 						</div>
 						<div className="p-4">
@@ -1559,7 +1559,7 @@ export default function AnalyticsPage() {
 								</span>
 							</div>
 							<p className="mt-1 font-mono text-muted-foreground text-xs">
-								# Example applications included in projects (Step 10)
+								# Example applications included in projects
 							</p>
 						</div>
 						<div className="p-4">
@@ -1615,7 +1615,7 @@ export default function AnalyticsPage() {
 									</span>
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Git repository initialization rate (Step 11)
+									# Git repository initialization rate
 								</p>
 							</div>
 							<div className="p-4">
@@ -1657,7 +1657,7 @@ export default function AnalyticsPage() {
 									</span>
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Package manager usage distribution (Step 12)
+									# Package manager usage distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -1697,7 +1697,7 @@ export default function AnalyticsPage() {
 									</span>
 								</div>
 								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Automatic dependency installation preference (Step 13)
+									# Automatic dependency installation preference
 								</p>
 							</div>
 							<div className="p-4">
