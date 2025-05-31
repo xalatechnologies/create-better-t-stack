@@ -30,6 +30,7 @@ import Navbar from "../_components/navbar";
 
 interface AnalyticsData {
 	date: string;
+	hour: number;
 	cli_version: string;
 	node_version: string;
 	platform: string;
@@ -47,6 +48,7 @@ interface AnalyticsData {
 	addons: string[];
 	git: string;
 	install: string;
+	runtime: string;
 }
 
 const timeSeriesConfig = {
@@ -365,6 +367,43 @@ const addonsConfig = {
 	},
 } satisfies ChartConfig;
 
+const runtimeConfig = {
+	node: {
+		label: "Node.js",
+		color: "hsl(var(--chart-1))",
+	},
+	bun: {
+		label: "Bun",
+		color: "hsl(var(--chart-2))",
+	},
+	none: {
+		label: "None",
+		color: "hsl(var(--chart-6))",
+	},
+} satisfies ChartConfig;
+
+const projectTypeConfig = {
+	fullstack: {
+		label: "Full-stack",
+		color: "hsl(var(--chart-1))",
+	},
+	"frontend-only": {
+		label: "Frontend-only",
+		color: "hsl(var(--chart-2))",
+	},
+	"backend-only": {
+		label: "Backend-only",
+		color: "hsl(var(--chart-3))",
+	},
+} satisfies ChartConfig;
+
+const hourlyDistributionConfig = {
+	count: {
+		label: "Projects Created",
+		color: "hsl(var(--chart-1))",
+	},
+} satisfies ChartConfig;
+
 export default function AnalyticsPage() {
 	const [data, setData] = useState<AnalyticsData[]>([]);
 	const [lastUpdated, setLastUpdated] = useState<string | null>(null);
@@ -387,6 +426,16 @@ export default function AnalyticsPage() {
 									? timestamp.split("T")[0]
 									: timestamp.split(" ")[0];
 
+								let hour = 0;
+								try {
+									const timestampDate = new Date(timestamp);
+									if (!Number.isNaN(timestampDate.getTime())) {
+										hour = timestampDate.getUTCHours();
+									}
+								} catch {
+									hour = 0;
+								}
+
 								const addons = [
 									row["*.properties.addons.0"],
 									row["*.properties.addons.1"],
@@ -398,6 +447,7 @@ export default function AnalyticsPage() {
 
 								return {
 									date,
+									hour,
 									cli_version: row["*.properties.cli_version"] || "unknown",
 									node_version: row["*.properties.node_version"] || "unknown",
 									platform: row["*.properties.platform"] || "unknown",
@@ -423,6 +473,7 @@ export default function AnalyticsPage() {
 										row["*.properties.install"] === "True"
 											? "enabled"
 											: "disabled",
+									runtime: row["*.properties.runtime"] || "unknown",
 								};
 							})
 							.filter((item): item is AnalyticsData =>
@@ -825,6 +876,140 @@ export default function AnalyticsPage() {
 			.sort((a, b) => b.value - a.value);
 	};
 
+	const getRuntimeData = () => {
+		const runtimeCounts = data.reduce(
+			(acc, item) => {
+				const runtime = item.runtime || "none";
+				acc[runtime] = (acc[runtime] || 0) + 1;
+				return acc;
+			},
+			{} as Record<string, number>,
+		);
+
+		return Object.entries(runtimeCounts)
+			.map(([name, value]) => ({
+				name,
+				value,
+			}))
+			.sort((a, b) => b.value - a.value);
+	};
+
+	const getProjectTypeData = () => {
+		const typeCounts = data.reduce(
+			(acc, item) => {
+				const hasFrontend =
+					(item.frontend0 && item.frontend0 !== "none") ||
+					(item.frontend1 && item.frontend1 !== "none");
+				const hasBackend = item.backend && item.backend !== "none";
+
+				let type: string;
+				if (hasFrontend && hasBackend) {
+					type = "fullstack";
+				} else if (hasFrontend && !hasBackend) {
+					type = "frontend-only";
+				} else if (!hasFrontend && hasBackend) {
+					type = "backend-only";
+				} else {
+					type = "frontend-only";
+				}
+
+				acc[type] = (acc[type] || 0) + 1;
+				return acc;
+			},
+			{} as Record<string, number>,
+		);
+
+		return Object.entries(typeCounts).map(([name, value]) => ({
+			name,
+			value,
+		}));
+	};
+
+	const getMonthlyTimeSeriesData = () => {
+		if (data.length === 0) return [];
+
+		const monthlyCounts = data.reduce(
+			(acc, item) => {
+				const date = new Date(item.date);
+				const monthKey = format(date, "yyyy-MM");
+				acc[monthKey] = (acc[monthKey] || 0) + 1;
+				return acc;
+			},
+			{} as Record<string, number>,
+		);
+
+		return Object.entries(monthlyCounts)
+			.map(([month, count]) => ({
+				month,
+				displayMonth: format(parseISO(`${month}-01`), "MMM yyyy"),
+				count,
+			}))
+			.sort((a, b) => a.month.localeCompare(b.month));
+	};
+
+	const getPopularStackCombinations = () => {
+		const comboCounts = data.reduce(
+			(acc, item) => {
+				const frontend = item.frontend0 || item.frontend1 || "none";
+				const backend = item.backend || "none";
+				const combo = `${frontend} + ${backend}`;
+				acc[combo] = (acc[combo] || 0) + 1;
+				return acc;
+			},
+			{} as Record<string, number>,
+		);
+
+		return Object.entries(comboCounts)
+			.map(([name, value]) => ({
+				name,
+				value,
+			}))
+			.sort((a, b) => b.value - a.value)
+			.slice(0, 8);
+	};
+
+	const getDatabaseORMCombinations = () => {
+		const comboCounts = data.reduce(
+			(acc, item) => {
+				const database = item.database || "none";
+				const orm = item.orm || "none";
+				if (database !== "none" && orm !== "none") {
+					const combo = `${database} + ${orm}`;
+					acc[combo] = (acc[combo] || 0) + 1;
+				}
+				return acc;
+			},
+			{} as Record<string, number>,
+		);
+
+		return Object.entries(comboCounts)
+			.map(([name, value]) => ({
+				name,
+				value,
+			}))
+			.sort((a, b) => b.value - a.value)
+			.slice(0, 6);
+	};
+
+	const getHourlyDistributionData = () => {
+		if (data.length === 0) return [];
+
+		const hourlyCounts = data.reduce(
+			(acc, item) => {
+				const hour = item.hour;
+				acc[hour] = (acc[hour] || 0) + 1;
+				return acc;
+			},
+			{} as Record<number, number>,
+		);
+
+		return Array.from({ length: 24 }, (_, hour) => ({
+			hour: hour.toString().padStart(2, "0"),
+			displayHour: `${hour.toString().padStart(2, "0")}:00`,
+			count: hourlyCounts[hour] || 0,
+		}));
+	};
+
 	const totalProjects = data.length;
 	const getAvgProjectsPerDay = () => {
 		if (data.length === 0) return 0;
@@ -847,10 +1032,17 @@ export default function AnalyticsPage() {
 
 	const frontendData = getFrontendData();
 	const backendData = getBackendData();
+	const runtimeData = getRuntimeData();
 	const mostPopularFrontend =
 		frontendData.length > 0 ? frontendData[0].name : "None";
 	const mostPopularBackend =
 		backendData.length > 0 ? backendData[0].name : "None";
+
+	const projectTypeData = getProjectTypeData();
+	const monthlyTimeSeriesData = getMonthlyTimeSeriesData();
+	const popularStackCombinations = getPopularStackCombinations();
+	const databaseORMCombinations = getDatabaseORMCombinations();
+	const hourlyDistributionData = getHourlyDistributionData();
 
 	return (
 		<div className="terminal-scanlines min-h-screen bg-background font-mono">
@@ -1169,6 +1361,44 @@ export default function AnalyticsPage() {
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
 									<span className="font-mono font-semibold text-sm">
+										MONTHLY_TRENDS.CHART
+									</span>
+								</div>
+								<p className="mt-1 font-mono text-muted-foreground text-xs">
+									# Monthly project creation trends
+								</p>
+							</div>
+							<div className="p-4">
+								<ChartContainer
+									config={timeSeriesConfig}
+									className="h-[300px] w-full"
+								>
+									<BarChart data={monthlyTimeSeriesData}>
+										<CartesianGrid vertical={false} />
+										<XAxis
+											dataKey="displayMonth"
+											tickLine={false}
+											tickMargin={10}
+											axisLine={false}
+											className="font-mono text-xs"
+										/>
+										<YAxis hide />
+										<ChartTooltip content={<ChartTooltipContent />} />
+										<Bar
+											dataKey="count"
+											radius={4}
+											fill="var(--color-projects)"
+										/>
+									</BarChart>
+								</ChartContainer>
+							</div>
+						</div>
+
+						<div className="terminal-block-hover rounded border border-border bg-background">
+							<div className="border-border border-b bg-muted/20 px-4 py-3">
+								<div className="flex items-center gap-2">
+									<span className="text-primary text-xs">▶</span>
+									<span className="font-mono font-semibold text-sm">
 										PLATFORM_DISTRIBUTION.PIE
 									</span>
 								</div>
@@ -1209,6 +1439,46 @@ export default function AnalyticsPage() {
 								</ChartContainer>
 							</div>
 						</div>
+
+						<div className="terminal-block-hover rounded border border-border bg-background">
+							<div className="border-border border-b bg-muted/20 px-4 py-3">
+								<div className="flex items-center gap-2">
+									<span className="text-primary text-xs">▶</span>
+									<span className="font-mono font-semibold text-sm">
+										HOURLY_DISTRIBUTION.BAR
+									</span>
+								</div>
+								<p className="mt-1 font-mono text-muted-foreground text-xs">
+									# Projects created by hour of day (UTC)
+								</p>
+							</div>
+							<div className="p-4">
+								<ChartContainer
+									config={hourlyDistributionConfig}
+									className="h-[350px] w-full"
+								>
+									<BarChart data={hourlyDistributionData}>
+										<CartesianGrid vertical={false} />
+										<XAxis
+											dataKey="displayHour"
+											tickLine={false}
+											tickMargin={10}
+											axisLine={false}
+											className="font-mono text-xs"
+										/>
+										<YAxis hide />
+										<ChartTooltip
+											content={<ChartTooltipContent />}
+											labelFormatter={(value, payload) => {
+												const hour = payload?.[0]?.payload?.displayHour;
+												return hour ? `${hour} UTC` : value;
+											}}
+										/>
+										<Bar dataKey="count" radius={4} fill="var(--color-count)" />
+									</BarChart>
+								</ChartContainer>
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -1230,6 +1500,44 @@ export default function AnalyticsPage() {
 							<div className="flex items-center gap-2">
 								<span className="text-primary text-xs">▶</span>
 								<span className="font-mono font-semibold text-sm">
+									POPULAR_STACK_COMBINATIONS.BAR
+								</span>
+							</div>
+							<p className="mt-1 font-mono text-muted-foreground text-xs">
+								# Most popular frontend + backend combinations
+							</p>
+						</div>
+						<div className="p-4">
+							<ChartContainer
+								config={frontendConfig}
+								className="h-[400px] w-full"
+							>
+								<BarChart data={popularStackCombinations}>
+									<CartesianGrid vertical={false} />
+									<XAxis
+										dataKey="name"
+										tickLine={false}
+										tickMargin={10}
+										axisLine={false}
+										className="font-mono text-xs"
+									/>
+									<YAxis hide />
+									<ChartTooltip content={<ChartTooltipContent />} />
+									<Bar
+										dataKey="value"
+										radius={4}
+										fill="var(--color-react-router)"
+									/>
+								</BarChart>
+							</ChartContainer>
+						</div>
+					</div>
+
+					<div className="terminal-block-hover rounded border border-border bg-background">
+						<div className="border-border border-b bg-muted/20 px-4 py-3">
+							<div className="flex items-center gap-2">
+								<span className="text-primary text-xs">▶</span>
+								<span className="font-mono font-semibold text-sm">
 									FRONTEND_FRAMEWORKS.BAR
 								</span>
 							</div>
@@ -1240,7 +1548,7 @@ export default function AnalyticsPage() {
 						<div className="p-4">
 							<ChartContainer
 								config={frontendConfig}
-								className="h-[300px] w-full"
+								className="h-[350px] w-full"
 							>
 								<BarChart data={getFrontendData()}>
 									<CartesianGrid vertical={false} />
@@ -1507,6 +1815,130 @@ export default function AnalyticsPage() {
 								</ChartContainer>
 							</div>
 						</div>
+
+						<div className="terminal-block-hover rounded border border-border bg-background">
+							<div className="border-border border-b bg-muted/20 px-4 py-3">
+								<div className="flex items-center gap-2">
+									<span className="text-primary text-xs">▶</span>
+									<span className="font-mono font-semibold text-sm">
+										RUNTIME_DISTRIBUTION.PIE
+									</span>
+								</div>
+								<p className="mt-1 font-mono text-muted-foreground text-xs">
+									# JavaScript runtime preference distribution
+								</p>
+							</div>
+							<div className="p-4">
+								<ChartContainer
+									config={runtimeConfig}
+									className="h-[300px] w-full"
+								>
+									<PieChart>
+										<ChartTooltip
+											content={<ChartTooltipContent nameKey="name" />}
+										/>
+										<Pie
+											data={runtimeData}
+											dataKey="value"
+											nameKey="name"
+											cx="50%"
+											cy="50%"
+											outerRadius={80}
+											label={({ name, percent }) =>
+												`${name} ${(percent * 100).toFixed(0)}%`
+											}
+										>
+											{runtimeData.map((entry) => (
+												<Cell
+													key={`runtime-${entry.name}`}
+													fill={`var(--color-${entry.name})`}
+												/>
+											))}
+										</Pie>
+										<ChartLegend content={<ChartLegendContent />} />
+									</PieChart>
+								</ChartContainer>
+							</div>
+						</div>
+
+						<div className="terminal-block-hover rounded border border-border bg-background">
+							<div className="border-border border-b bg-muted/20 px-4 py-3">
+								<div className="flex items-center gap-2">
+									<span className="text-primary text-xs">▶</span>
+									<span className="font-mono font-semibold text-sm">
+										PROJECT_TYPES.PIE
+									</span>
+								</div>
+								<p className="mt-1 font-mono text-muted-foreground text-xs">
+									# Full-stack vs Frontend-only vs Backend-only projects
+								</p>
+							</div>
+							<div className="p-4">
+								<ChartContainer
+									config={projectTypeConfig}
+									className="h-[300px] w-full"
+								>
+									<PieChart>
+										<ChartTooltip
+											content={<ChartTooltipContent nameKey="name" />}
+										/>
+										<Pie
+											data={projectTypeData}
+											dataKey="value"
+											nameKey="name"
+											cx="50%"
+											cy="50%"
+											outerRadius={80}
+											label={({ name, percent }) =>
+												`${name} ${(percent * 100).toFixed(0)}%`
+											}
+										>
+											{projectTypeData.map((entry) => (
+												<Cell
+													key={`project-type-${entry.name}`}
+													fill={`var(--color-${entry.name})`}
+												/>
+											))}
+										</Pie>
+										<ChartLegend content={<ChartLegendContent />} />
+									</PieChart>
+								</ChartContainer>
+							</div>
+						</div>
+					</div>
+
+					<div className="terminal-block-hover rounded border border-border bg-background">
+						<div className="border-border border-b bg-muted/20 px-4 py-3">
+							<div className="flex items-center gap-2">
+								<span className="text-primary text-xs">▶</span>
+								<span className="font-mono font-semibold text-sm">
+									DATABASE_ORM_COMBINATIONS.BAR
+								</span>
+							</div>
+							<p className="mt-1 font-mono text-muted-foreground text-xs">
+								# Popular database + ORM combinations
+							</p>
+						</div>
+						<div className="p-4">
+							<ChartContainer
+								config={databaseConfig}
+								className="h-[350px] w-full"
+							>
+								<BarChart data={databaseORMCombinations}>
+									<CartesianGrid vertical={false} />
+									<XAxis
+										dataKey="name"
+										tickLine={false}
+										tickMargin={10}
+										axisLine={false}
+										className="font-mono text-xs"
+									/>
+									<YAxis hide />
+									<ChartTooltip content={<ChartTooltipContent />} />
+									<Bar dataKey="value" radius={4} fill="var(--color-sqlite)" />
+								</BarChart>
+							</ChartContainer>
+						</div>
 					</div>
 
 					<div className="terminal-block-hover rounded border border-border bg-background">
@@ -1524,7 +1956,7 @@ export default function AnalyticsPage() {
 						<div className="p-4">
 							<ChartContainer
 								config={addonsConfig}
-								className="h-[300px] w-full"
+								className="h-[350px] w-full"
 							>
 								<BarChart data={getAddonsData()}>
 									<CartesianGrid vertical={false} />
@@ -1593,16 +2025,11 @@ export default function AnalyticsPage() {
 				</div>
 
 				<div className="space-y-6">
-					<div className="mb-4 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
-						<div className="flex items-center gap-2">
-							<span className="font-bold font-mono text-lg sm:text-xl">
-								DEV_ENVIRONMENT.CONFIG
-							</span>
-						</div>
-						<div className="hidden h-px flex-1 bg-border sm:block" />
-						<span className="w-full text-right font-mono text-muted-foreground text-xs sm:w-auto sm:text-left">
-							[TOOLING_PREFERENCES]
+					<div className="mb-4 flex items-center gap-2">
+						<span className="font-bold font-mono text-lg">
+							DEV_ENVIRONMENT.CONFIG
 						</span>
+						<div className="h-px flex-1 bg-border" />
 					</div>
 
 					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -1783,7 +2210,7 @@ export default function AnalyticsPage() {
 						<div className="p-4">
 							<ChartContainer
 								config={cliVersionConfig}
-								className="h-[300px] w-full"
+								className="h-[350px] w-full"
 							>
 								<BarChart data={getCLIVersionData()}>
 									<CartesianGrid vertical={false} />
