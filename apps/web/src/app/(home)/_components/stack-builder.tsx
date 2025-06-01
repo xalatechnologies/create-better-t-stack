@@ -968,8 +968,56 @@ const StackBuilder = () => {
 	};
 
 	const shareToTwitter = () => {
+		const getStackSummary = (): string => {
+			const selectedTechs: string[] = [];
+
+			for (const category of CATEGORY_ORDER) {
+				const categoryKey = category as keyof StackState;
+				const options = TECH_OPTIONS[category as keyof typeof TECH_OPTIONS];
+				const selectedValue = stack[categoryKey];
+
+				if (!options) continue;
+
+				if (Array.isArray(selectedValue)) {
+					if (
+						selectedValue.length === 0 ||
+						(selectedValue.length === 1 && selectedValue[0] === "none")
+					) {
+						continue;
+					}
+
+					for (const id of selectedValue) {
+						if (id === "none") continue;
+						const tech = options.find((opt) => opt.id === id);
+						if (tech) {
+							selectedTechs.push(tech.name);
+						}
+					}
+				} else {
+					const tech = options.find((opt) => opt.id === selectedValue);
+					if (
+						!tech ||
+						tech.id === "none" ||
+						tech.id === "false" ||
+						((category === "git" ||
+							category === "install" ||
+							category === "auth") &&
+							tech.id === "true")
+					) {
+						continue;
+					}
+					selectedTechs.push(tech.name);
+				}
+			}
+
+			return selectedTechs.length > 0
+				? selectedTechs.join(" • ")
+				: "Custom stack";
+		};
+
+		const stackSummary = getStackSummary();
 		const text = encodeURIComponent(
-			"Check out this cool tech stack I configured with Create Better T Stack!\n\n",
+			`Check out this cool tech stack I configured with Create Better T Stack!\n\n🚀 ${stackSummary}\n\n`,
 		);
 		if (typeof window !== "undefined") {
 			const url = encodeURIComponent(window.location.href);
