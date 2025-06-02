@@ -81,7 +81,7 @@ export async function getFrontendChoice(
 		});
 
 		const webFramework = await select<Frontend>({
-			message: "Choose frontend",
+			message: "Choose web",
 			options: webOptions,
 			initialValue: DEFAULT_CONFIG.frontend[0],
 		});
@@ -96,7 +96,7 @@ export async function getFrontendChoice(
 
 	if (frontendTypes.includes("native")) {
 		const nativeFramework = await select<Frontend>({
-			message: "Choose native framework",
+			message: "Choose native",
 			options: [
 				{
 					value: "native-nativewind" as const,
