@@ -10,26 +10,26 @@ const DrawerLayout = () => {
 
   return (
     <Drawer
-      screenOptions={{
+      screenOptions=\{{
         headerStyle: {
           backgroundColor: theme.colors.background,
         },
         headerTitleStyle: {
-          color: theme.colors.typography,
+          color: theme.colors.foreground,
         },
-        headerTintColor: theme.colors.typography,
+        headerTintColor: theme.colors.foreground,
         drawerStyle: {
           backgroundColor: theme.colors.background,
         },
         drawerLabelStyle: {
-          color: theme.colors.typography,
+          color: theme.colors.foreground,
         },
-        drawerInactiveTintColor: theme.colors.typography,
+        drawerInactiveTintColor: theme.colors.mutedForeground,
       }}
     >
       <Drawer.Screen
         name="index"
-        options={{
+        options=\{{
           headerTitle: "Home",
           drawerLabel: "Home",
           drawerIcon: ({ size, color }) => (
@@ -39,7 +39,7 @@ const DrawerLayout = () => {
       />
       <Drawer.Screen
         name="(tabs)"
-        options={{
+        options=\{{
           headerTitle: "Tabs",
           drawerLabel: "Tabs",
           drawerIcon: ({ size, color }) => (
@@ -52,6 +52,34 @@ const DrawerLayout = () => {
           ),
         }}
       />
+      {{#if (includes examples "todo")}}
+      <Drawer.Screen
+        name="todos"
+        options=\{{
+          headerTitle: "Todos",
+          drawerLabel: "Todos",
+          drawerIcon: ({ size, color }) => (
+            <Ionicons name="checkbox-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      {{/if}}
+      {{#if (includes examples "ai")}}
+      <Drawer.Screen
+        name="ai"
+        options=\{{
+          headerTitle: "AI",
+          drawerLabel: "AI",
+          drawerIcon: ({ size, color }) => (
+            <Ionicons
+              name="chatbubble-ellipses-outline"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      {{/if}}
     </Drawer>
   );
 };
