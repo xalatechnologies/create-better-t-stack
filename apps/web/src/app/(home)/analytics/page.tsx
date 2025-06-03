@@ -12,7 +12,6 @@ import { format, parseISO } from "date-fns";
 import { Cpu, Download, Terminal, TrendingUp, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import Papa from "papaparse";
 import { useCallback, useEffect, useState } from "react";
 import {
 	Area,
@@ -409,147 +408,28 @@ export default function AnalyticsPage() {
 	const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 	const [loadingLastUpdated, setLoadingLastUpdated] = useState(true);
 
-	const loadCSVData = useCallback(async () => {
+	const loadAnalyticsData = useCallback(async () => {
 		try {
-			const response = await fetch("https://r2.amanv.dev/export.csv");
-			const csvText = await response.text();
+			const response = await fetch("/analytics-data.json");
+			const analyticsData = await response.json();
 
-			Papa.parse(csvText, {
-				header: true,
-				complete: (results) => {
-					try {
-						const parsedData = (results.data as Record<string, string>[])
-							.map((row) => {
-								const timestamp =
-									row["*.timestamp"] || new Date().toISOString();
-								const date = timestamp.includes("T")
-									? timestamp.split("T")[0]
-									: timestamp.split(" ")[0];
+			setData(analyticsData.data || []);
+			setLastUpdated(analyticsData.lastUpdated || null);
 
-								let hour = 0;
-								try {
-									const timestampDate = new Date(timestamp);
-									if (!Number.isNaN(timestampDate.getTime())) {
-										hour = timestampDate.getUTCHours();
-									}
-								} catch {
-									hour = 0;
-								}
-
-								const addons = [
-									row["*.properties.addons.0"],
-									row["*.properties.addons.1"],
-									row["*.properties.addons.2"],
-									row["*.properties.addons.3"],
-									row["*.properties.addons.4"],
-									row["*.properties.addons.5"],
-								].filter(Boolean);
-
-								return {
-									date,
-									hour,
-									cli_version: row["*.properties.cli_version"] || "unknown",
-									node_version: row["*.properties.node_version"] || "unknown",
-									platform: row["*.properties.platform"] || "unknown",
-									backend: row["*.properties.backend"] || "none",
-									database: row["*.properties.database"] || "none",
-									orm: row["*.properties.orm"] || "none",
-									dbSetup: row["*.properties.dbSetup"] || "none",
-									auth:
-										row["*.properties.auth"] === "True"
-											? "enabled"
-											: "disabled",
-									api: row["*.properties.api"] || "none",
-									packageManager:
-										row["*.properties.packageManager"] || "unknown",
-									frontend0: row["*.properties.frontend.0"] || "",
-									frontend1: row["*.properties.frontend.1"] || "",
-									examples0: row["*.properties.examples.0"] || "",
-									examples1: row["*.properties.examples.1"] || "",
-									addons,
-									git:
-										row["*.properties.git"] === "True" ? "enabled" : "disabled",
-									install:
-										row["*.properties.install"] === "True"
-											? "enabled"
-											: "disabled",
-									runtime: row["*.properties.runtime"] || "unknown",
-								};
-							})
-							.filter((item): item is AnalyticsData =>
-								Boolean(item.date && item.platform !== "unknown"),
-							);
-
-						if (parsedData.length > 0) {
-							setData(parsedData);
-							console.log(`Loaded ${parsedData.length} records from CSV`);
-						}
-					} catch (error: unknown) {
-						console.error("Error parsing CSV:", error);
-					}
-				},
-				error: (error: unknown) => {
-					console.error("Papa Parse error:", error);
-				},
-			});
+			console.log(
+				`Loaded ${analyticsData.data?.length || 0} records from static JSON`,
+			);
+			console.log(`Data generated at: ${analyticsData.generatedAt}`);
 		} catch (error: unknown) {
-			console.error("Error loading CSV:", error);
-		}
-	}, []);
-
-	const fetchLastUpdated = useCallback(async () => {
-		try {
-			const response = await fetch("https://r2.amanv.dev/export.csv");
-			const csvText = await response.text();
-			const lines = csvText.split("\n");
-			const timestampColumn = lines[0]
-				.split(",")
-				.findIndex((header) => header.includes("timestamp"));
-
-			if (timestampColumn !== -1) {
-				const timestamps = lines
-					.slice(1)
-					.filter((line) => line.trim())
-					.map((line) => {
-						const columns = line.split(",");
-						return columns[timestampColumn]?.replace(/"/g, "");
-					})
-					.filter(Boolean)
-					.map((timestamp) => new Date(timestamp))
-					.filter((date) => !Number.isNaN(date.getTime()));
-
-				if (timestamps.length > 0) {
-					const mostRecentDate = new Date(
-						Math.max(...timestamps.map((d) => d.getTime())),
-					);
-					setLastUpdated(
-						mostRecentDate.toLocaleDateString("en-US", {
-							year: "numeric",
-							month: "short",
-							day: "numeric",
-							hour: "2-digit",
-							minute: "2-digit",
-							timeZone: "UTC",
-						}),
-					);
-				} else {
-					setLastUpdated("NO_DATA_FOUND");
-				}
-			} else {
-				setLastUpdated("TIMESTAMP_COLUMN_NOT_FOUND");
-			}
-		} catch (error) {
-			console.error("Error fetching last updated date:", error);
-			setLastUpdated("ERROR_PARSING_CSV");
+			console.error("Error loading analytics data:", error);
 		} finally {
 			setLoadingLastUpdated(false);
 		}
 	}, []);
 
 	useEffect(() => {
-		loadCSVData();
-		fetchLastUpdated();
-	}, [loadCSVData, fetchLastUpdated]);
+		loadAnalyticsData();
+	}, [loadAnalyticsData]);
 
 	const getPlatformData = () => {
 		const platformCounts = data.reduce(
@@ -676,7 +556,6 @@ export default function AnalyticsPage() {
 	const getFrontendData = () => {
 		const frontendCounts = data.reduce(
 			(acc, item) => {
-				// Count frontend0 if it exists and is not empty
 				if (
 					item.frontend0 &&
 					item.frontend0 !== "none" &&
@@ -684,7 +563,6 @@ export default function AnalyticsPage() {
 				) {
 					acc[item.frontend0] = (acc[item.frontend0] || 0) + 1;
 				}
-				// Count frontend1 if it exists and is not empty
 				if (
 					item.frontend1 &&
 					item.frontend1 !== "none" &&
@@ -967,7 +845,6 @@ export default function AnalyticsPage() {
 				);
 				const backend = item.backend || "none";
 
-				// Build the combo string with all frontends + backend
 				const parts = [...frontends];
 				if (backend !== "none") {
 					parts.push(backend);

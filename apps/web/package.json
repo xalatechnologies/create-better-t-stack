@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "bun scripts/generate-analytics.ts && next build",
     "dev": "next dev --turbopack",
     "start": "next start",
     "check": "biome check --write .",
-    "postinstall": "fumadocs-mdx"
+    "postinstall": "fumadocs-mdx",
+    "generate-analytics": "bun scripts/generate-analytics.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
