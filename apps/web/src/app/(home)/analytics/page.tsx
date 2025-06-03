@@ -175,7 +175,7 @@ const dbSetupConfig = {
 		color: "hsl(var(--chart-1))",
 	},
 	"prisma-postgres": {
-		label: "Prisma + PostgreSQL",
+		label: "Prisma Postgres",
 		color: "hsl(var(--chart-2))",
 	},
 	"mongodb-atlas": {
@@ -225,7 +225,7 @@ const frontendConfig = {
 		color: "hsl(var(--chart-3))",
 	},
 	next: {
-		label: "Next.js",
+		label: "Next",
 		color: "hsl(var(--chart-4))",
 	},
 	nuxt: {
@@ -233,11 +233,11 @@ const frontendConfig = {
 		color: "hsl(var(--chart-5))",
 	},
 	"native-nativewind": {
-		label: "Native NativeWind",
+		label: "Expo NativeWind",
 		color: "hsl(var(--chart-6))",
 	},
 	"native-unistyles": {
-		label: "Native Unistyles",
+		label: "Expo Unistyles",
 		color: "hsl(var(--chart-7))",
 	},
 	svelte: {
@@ -301,7 +301,7 @@ const authConfig = {
 
 const gitConfig = {
 	enabled: {
-		label: "Git Initialized",
+		label: "Git Init",
 		color: "hsl(var(--chart-1))",
 	},
 	disabled: {
@@ -676,9 +676,21 @@ export default function AnalyticsPage() {
 	const getFrontendData = () => {
 		const frontendCounts = data.reduce(
 			(acc, item) => {
-				const frontend = item.frontend0 || item.frontend1 || "none";
-				if (frontend && frontend !== "none") {
-					acc[frontend] = (acc[frontend] || 0) + 1;
+				// Count frontend0 if it exists and is not empty
+				if (
+					item.frontend0 &&
+					item.frontend0 !== "none" &&
+					item.frontend0 !== ""
+				) {
+					acc[item.frontend0] = (acc[item.frontend0] || 0) + 1;
+				}
+				// Count frontend1 if it exists and is not empty
+				if (
+					item.frontend1 &&
+					item.frontend1 !== "none" &&
+					item.frontend1 !== ""
+				) {
+					acc[item.frontend1] = (acc[item.frontend1] || 0) + 1;
 				}
 				return acc;
 			},
@@ -950,9 +962,18 @@ export default function AnalyticsPage() {
 	const getPopularStackCombinations = () => {
 		const comboCounts = data.reduce(
 			(acc, item) => {
-				const frontend = item.frontend0 || item.frontend1 || "none";
+				const frontends = [item.frontend0, item.frontend1].filter(
+					(f) => f && f !== "none" && f !== "",
+				);
 				const backend = item.backend || "none";
-				const combo = `${frontend} + ${backend}`;
+
+				// Build the combo string with all frontends + backend
+				const parts = [...frontends];
+				if (backend !== "none") {
+					parts.push(backend);
+				}
+
+				const combo = parts.length > 0 ? parts.join(" + ") : "none";
 				acc[combo] = (acc[combo] || 0) + 1;
 				return acc;
 			},
