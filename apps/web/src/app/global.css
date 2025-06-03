@@ -321,7 +321,6 @@
 
 .terminal-block-hover {
 	transition: all 0.2s ease;
-	border: 1px solid var(--border);
 }
 
 .terminal-block-hover:hover {

@@ -1062,7 +1062,7 @@ export default function AnalyticsPage() {
 						</span>
 					</div>
 
-					<div className="terminal-block-hover rounded border border-border bg-muted/20 p-4">
+					<div className="terminal-block-hover rounded rounded-b-none border border-border bg-muted/20 p-4">
 						<div className="flex items-center gap-2 text-sm">
 							<span className="text-primary">$</span>
 							<span className="font-mono text-foreground">
@@ -1116,7 +1116,7 @@ export default function AnalyticsPage() {
 						href="https://discord.gg/ZYsbjpDaM5"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="terminal-block-hover block rounded border border-border bg-background transition-colors hover:bg-accent/10"
+						className="terminal-block-hover block rounded rounded-t-none border border-border border-t-0 bg-background"
 					>
 						<div className="flex items-center justify-between p-3">
 							<div className="flex items-center gap-3">
