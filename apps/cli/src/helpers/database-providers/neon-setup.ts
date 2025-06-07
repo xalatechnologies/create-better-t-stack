@@ -58,32 +58,6 @@ async function executeNeonCommand(
 	}
 }
 
-async function isNeonAuthenticated(packageManager: PackageManager) {
-	try {
-		const commandArgsString = "neonctl projects list";
-		const result = await executeNeonCommand(packageManager, commandArgsString);
-		return (
-			!result.stdout.includes("not authenticated") &&
-			!result.stdout.includes("error")
-		);
-	} catch {
-		return false;
-	}
-}
-
-async function authenticateWithNeon(packageManager: PackageManager) {
-	try {
-		await executeNeonCommand(
-			packageManager,
-			"neonctl auth",
-			"Authenticating with Neon...",
-		);
-		return true;
-	} catch (_error) {
-		consola.error(pc.red("Failed to authenticate with Neon"));
-	}
-}
-
 async function createNeonProject(
 	projectName: string,
 	regionId: string,
@@ -153,19 +127,8 @@ DATABASE_URL="your_connection_string"`);
 
 export async function setupNeonPostgres(config: ProjectConfig): Promise<void> {
 	const { packageManager, projectDir } = config;
-	const setupSpinner = spinner();
-	setupSpinner.start("Checking Neon authentication...");
 
 	try {
-		const isAuthenticated = await isNeonAuthenticated(packageManager);
-
-		setupSpinner.stop("Neon authentication checked");
-
-		if (!isAuthenticated) {
-			log.info("Please authenticate with Neon to continue:");
-			await authenticateWithNeon(packageManager);
-		}
-
 		const suggestedProjectName = path.basename(projectDir);
 		const projectName = await text({
 			message: "Enter a name for your Neon project:",
@@ -204,8 +167,6 @@ export async function setupNeonPostgres(config: ProjectConfig): Promise<void> {
 
 		finalSpinner.stop("Neon database configured!");
 	} catch (error) {
-		setupSpinner.stop(pc.red("Neon authentication check failed"));
-
 		if (error instanceof Error) {
 			consola.error(pc.red(error.message));
 		}
