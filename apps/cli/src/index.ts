@@ -306,10 +306,10 @@ const router = t.router({
 		.mutation(async ({ input }) => {
 			const [projectName, options] = input;
 			const combinedInput = {
-				projectName: projectName || undefined,
+				projectName,
 				...options,
 			};
-			return await createProjectHandler(combinedInput);
+			await createProjectHandler(combinedInput);
 		}),
 });
 
