@@ -66,6 +66,29 @@ export type DatabaseSetup = z.infer<typeof DatabaseSetupSchema>;
 export const APISchema = z.enum(["trpc", "orpc", "none"]).describe("API type");
 export type API = z.infer<typeof APISchema>;
 
+export const ProjectNameSchema = z
+	.string()
+	.min(1, "Project name cannot be empty")
+	.max(255, "Project name must be less than 255 characters")
+	.refine(
+		(name) => name === "." || !name.startsWith("."),
+		"Project name cannot start with a dot (except for '.')",
+	)
+	.refine(
+		(name) => name === "." || !name.startsWith("-"),
+		"Project name cannot start with a dash",
+	)
+	.refine((name) => {
+		const invalidChars = ["<", ">", ":", '"', "|", "?", "*"];
+		return !invalidChars.some((char) => name.includes(char));
+	}, "Project name contains invalid characters")
+	.refine(
+		(name) => name.toLowerCase() !== "node_modules",
+		"Project name is reserved",
+	)
+	.describe("Project name or path");
+export type ProjectName = z.infer<typeof ProjectNameSchema>;
+
 export type CreateInput = {
 	projectName?: string;
 	yes?: boolean;

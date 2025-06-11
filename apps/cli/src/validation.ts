@@ -1,18 +1,19 @@
 import path from "node:path";
 import { consola } from "consola";
-import type {
-	API,
-	Addons,
-	Backend,
-	CLIInput,
-	Database,
-	DatabaseSetup,
-	Examples,
-	Frontend,
-	ORM,
-	PackageManager,
-	ProjectConfig,
-	Runtime,
+import {
+	type API,
+	type Addons,
+	type Backend,
+	type CLIInput,
+	type Database,
+	type DatabaseSetup,
+	type Examples,
+	type Frontend,
+	type ORM,
+	type PackageManager,
+	type ProjectConfig,
+	ProjectNameSchema,
+	type Runtime,
 } from "./types";
 
 export function processAndValidateFlags(
@@ -82,11 +83,30 @@ export function processAndValidateFlags(
 	}
 
 	if (projectName) {
+		const result = ProjectNameSchema.safeParse(path.basename(projectName));
+		if (!result.success) {
+			consola.fatal(
+				`Invalid project name: ${
+					result.error.issues[0]?.message || "Invalid project name"
+				}`,
+			);
+			process.exit(1);
+		}
 		config.projectName = projectName;
 	} else if (options.projectDirectory) {
-		config.projectName = path.basename(
+		const baseName = path.basename(
 			path.resolve(process.cwd(), options.projectDirectory),
 		);
+		const result = ProjectNameSchema.safeParse(baseName);
+		if (!result.success) {
+			consola.fatal(
+				`Invalid project name: ${
+					result.error.issues[0]?.message || "Invalid project name"
+				}`,
+			);
+			process.exit(1);
+		}
+		config.projectName = baseName;
 	}
 
 	if (options.frontend && options.frontend.length > 0) {

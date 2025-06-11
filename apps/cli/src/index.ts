@@ -27,6 +27,7 @@ import {
 	FrontendSchema,
 	ORMSchema,
 	PackageManagerSchema,
+	ProjectNameSchema,
 	RuntimeSchema,
 } from "./types";
 import { trackProjectCreation } from "./utils/analytics";
@@ -35,10 +36,6 @@ import { generateReproducibleCommand } from "./utils/generate-reproducible-comma
 import { getLatestCLIVersion } from "./utils/get-latest-cli-version";
 import { renderTitle } from "./utils/render-title";
 import { getProvidedFlags, processAndValidateFlags } from "./validation";
-
-const exit = () => process.exit(0);
-process.on("SIGINT", exit);
-process.on("SIGTERM", exit);
 
 const t = trpcServer.initTRPC.create();
 
@@ -268,32 +265,23 @@ const router = t.router({
 		})
 		.input(
 			z.tuple([
-				z.string().optional().describe("project-name"),
+				ProjectNameSchema.optional(),
 				z
 					.object({
 						yes: z
 							.boolean()
 							.optional()
 							.default(false)
-							.describe("Use default configuration and skip prompts"),
+							.describe("Use default configuration"),
 						database: DatabaseSchema.optional(),
 						orm: ORMSchema.optional(),
-						auth: z.boolean().optional().describe("Include authentication"),
-						frontend: z
-							.array(FrontendSchema)
-							.optional()
-							.describe("Frontend frameworks"),
-						addons: z
-							.array(AddonsSchema)
-							.optional()
-							.describe("Additional addons"),
-						examples: z
-							.array(ExamplesSchema)
-							.optional()
-							.describe("Examples to include"),
-						git: z.boolean().optional().describe("Initialize git repository"),
+						auth: z.boolean().optional(),
+						frontend: z.array(FrontendSchema).optional(),
+						addons: z.array(AddonsSchema).optional(),
+						examples: z.array(ExamplesSchema).optional(),
+						git: z.boolean().optional(),
 						packageManager: PackageManagerSchema.optional(),
-						install: z.boolean().optional().describe("Install dependencies"),
+						install: z.boolean().optional(),
 						dbSetup: DatabaseSetupSchema.optional(),
 						backend: BackendSchema.optional(),
 						runtime: RuntimeSchema.optional(),

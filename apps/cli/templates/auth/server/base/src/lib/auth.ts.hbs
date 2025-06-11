@@ -21,10 +21,10 @@ export const auth = betterAuth({
     enabled: true,
   }
 
-  {{~#if (includes frontend "native")}}
+  {{#if (includes frontend "native")}}
   ,
   plugins: [expo()]
-  {{/if~}}
+  {{/if}}
 });
 {{/if}}
 
@@ -52,10 +52,10 @@ export const auth = betterAuth({
     enabled: true,
   }
 
-  {{~#if (includes frontend "native")}}
+  {{#if (includes frontend "native")}}
   ,
   plugins: [expo()]
-  {{/if~}}
+  {{/if}}
 });
 {{/if}}
 
@@ -68,19 +68,19 @@ import { expo } from "@better-auth/expo";
 import { client } from "../db";
 
 export const auth = betterAuth({
-    database: mongodbAdapter(client),
-    trustedOrigins: [
-        process.env.CORS_ORIGIN || "",{{#if (includes frontend "native")}}
-        "my-better-t-app://",{{/if}}
-    ],
-    emailAndPassword: {
-        enabled: true,
-    }
+  database: mongodbAdapter(client),
+  trustedOrigins: [
+    process.env.CORS_ORIGIN || "",{{#if (includes frontend "native")}}
+    "my-better-t-app://",{{/if}}
+  ],
+  emailAndPassword: {
+    enabled: true,
+  }
 
-    {{~#if (includes frontend "native")}}
-        ,
-        plugins: [expo()]
-    {{/if~}}
+  {{#if (includes frontend "native")}}
+  ,
+  plugins: [expo()]
+  {{/if}}
 });
 {{/if}}
 
@@ -100,9 +100,9 @@ export const auth = betterAuth({
     enabled: true,
   }
 
-  {{~#if (includes frontend "native")}}
+  {{#if (includes frontend "native")}}
   ,
   plugins: [expo()]
-  {{/if~}}
+  {{/if}}
 });
 {{/if}}
