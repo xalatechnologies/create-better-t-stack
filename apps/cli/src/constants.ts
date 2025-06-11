@@ -27,8 +27,8 @@ export const DEFAULT_CONFIG: ProjectConfig = {
 };
 
 export const dependencyVersionMap = {
-	"better-auth": "^1.2.8",
-	"@better-auth/expo": "^1.2.8",
+	"better-auth": "^1.2.9",
+	"@better-auth/expo": "^1.2.9",
 
 	"drizzle-orm": "^0.38.4",
 	"drizzle-kit": "^0.30.5",
@@ -87,9 +87,9 @@ export const dependencyVersionMap = {
 
 	"@prisma/extension-accelerate": "^1.3.0",
 
-	"@orpc/server": "^1.4.1",
-	"@orpc/client": "^1.4.1",
-	"@orpc/tanstack-query": "^1.4.1",
+	"@orpc/server": "^1.5.0",
+	"@orpc/client": "^1.5.0",
+	"@orpc/tanstack-query": "^1.5.0",
 
 	"@trpc/tanstack-react-query": "^11.0.0",
 	"@trpc/server": "^11.0.0",

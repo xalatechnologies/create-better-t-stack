@@ -42,7 +42,7 @@ export const TECH_OPTIONS = {
 		},
 		{
 			id: "tanstack-start",
-			name: "TanStack Start (beta)",
+			name: "TanStack Start (devinxi)",
 			description:
 				"Full-stack React and Solid framework powered by TanStack Router",
 			icon: "/icon/tanstack.svg",
