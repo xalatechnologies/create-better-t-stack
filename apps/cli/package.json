@@ -43,7 +43,7 @@
     "url": "git+https://github.com/AmanVarshney01/create-better-t-stack.git",
     "directory": "apps/cli"
   },
-  "homepage": "https://better-t-stack.amanv.dev/",
+  "homepage": "https://better-t-stack.dev/",
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",

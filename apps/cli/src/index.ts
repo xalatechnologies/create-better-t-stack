@@ -317,7 +317,7 @@ const router = t.router({
 	docs: t.procedure
 		.meta({ description: "Open Better-T Stack documentation" })
 		.mutation(async () => {
-			const DOCS_URL = "https://better-t-stack.amanv.dev/docs";
+			const DOCS_URL = "https://better-t-stack.dev/docs";
 			try {
 				await openUrl(DOCS_URL);
 				log.success(pc.blue("Opened docs in your default browser."));
@@ -328,7 +328,7 @@ const router = t.router({
 	builder: t.procedure
 		.meta({ description: "Open the web-based stack builder" })
 		.mutation(async () => {
-			const BUILDER_URL = "https://better-t-stack.amanv.dev/new";
+			const BUILDER_URL = "https://better-t-stack.dev/new";
 			try {
 				await openUrl(BUILDER_URL);
 				log.success(pc.blue("Opened builder in your default browser."));
