@@ -34,7 +34,9 @@ import { trackProjectCreation } from "./utils/analytics";
 import { displayConfig } from "./utils/display-config";
 import { generateReproducibleCommand } from "./utils/generate-reproducible-command";
 import { getLatestCLIVersion } from "./utils/get-latest-cli-version";
+import { openUrl } from "./utils/open-url";
 import { renderTitle } from "./utils/render-title";
+import { displaySponsors, fetchSponsors } from "./utils/sponsors";
 import { getProvidedFlags, processAndValidateFlags } from "./validation";
 
 const t = trpcServer.initTRPC.create();
@@ -298,6 +300,41 @@ const router = t.router({
 				...options,
 			};
 			await createProjectHandler(combinedInput);
+		}),
+	sponsors: t.procedure
+		.meta({ description: "Show Better-T Stack sponsors" })
+		.mutation(async () => {
+			try {
+				renderTitle();
+				intro(pc.magenta("Better-T Stack Sponsors"));
+				const sponsors = await fetchSponsors();
+				displaySponsors(sponsors);
+			} catch (error) {
+				consola.error(error);
+				process.exit(1);
+			}
+		}),
+	docs: t.procedure
+		.meta({ description: "Open Better-T Stack documentation" })
+		.mutation(async () => {
+			const DOCS_URL = "https://better-t-stack.amanv.dev/docs";
+			try {
+				await openUrl(DOCS_URL);
+				log.success(pc.blue("Opened docs in your default browser."));
+			} catch {
+				log.message(`Please visit ${DOCS_URL}`);
+			}
+		}),
+	builder: t.procedure
+		.meta({ description: "Open the web-based stack builder" })
+		.mutation(async () => {
+			const BUILDER_URL = "https://better-t-stack.amanv.dev/new";
+			try {
+				await openUrl(BUILDER_URL);
+				log.success(pc.blue("Opened builder in your default browser."));
+			} catch {
+				log.message(`Please visit ${BUILDER_URL}`);
+			}
 		}),
 });
 
