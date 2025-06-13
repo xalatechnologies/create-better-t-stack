@@ -8,7 +8,10 @@
 		"skipLibCheck": true,
 		"baseUrl": "./",
 		"paths": {
-		  "@/*": ["./src/*"]
+			"@/*": ["./src/*"]
+			{{#if (eq orm 'prisma')}},
+			"prisma": ["node_modules/prisma"]
+			{{/if}}
 		},
 		"outDir": "./dist",
 		"types": [
