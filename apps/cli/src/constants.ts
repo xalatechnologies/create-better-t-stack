@@ -39,8 +39,8 @@ export const dependencyVersionMap = {
 
 	mysql2: "^3.14.0",
 
-	"@prisma/client": "^6.7.0",
-	prisma: "^6.7.0",
+	"@prisma/client": "^6.9.0",
+	prisma: "^6.9.0",
 
 	mongoose: "^8.14.0",
 
