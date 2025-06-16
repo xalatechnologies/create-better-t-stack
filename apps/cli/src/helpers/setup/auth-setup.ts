@@ -35,6 +35,7 @@ export async function setupAuth(config: ProjectConfig): Promise<void> {
 				"next",
 				"nuxt",
 				"svelte",
+				"solid",
 			].includes(f),
 		);
 
