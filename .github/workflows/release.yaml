@@ -1,4 +1,4 @@
-name: Publish
+name: Release
 
 on:
   push:
@@ -6,16 +6,15 @@ on:
       - main
       - beta
     paths:
-      - 'apps/cli/**'
-      - '.changeset/**'
-      - 'package.json'
-      - 'bun.lock'
-  pull_request:
+      - "apps/cli/**"
+      - ".changeset/**"
+      - "package.json"
+      - "bun.lock"
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -31,14 +30,12 @@ jobs:
       - name: Install Dependencies
         run: bun install --frozen-lockfile
 
-      - run: bunx pkg-pr-new publish './apps/cli' --bin
-
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
         with:
           publish: bun run publish-packages
         env:
-          MODE: 'prod'
+          MODE: "prod"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
