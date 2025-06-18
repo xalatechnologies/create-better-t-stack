@@ -375,6 +375,10 @@ const runtimeConfig = {
 		label: "Bun",
 		color: "hsl(var(--chart-2))",
 	},
+	workers: {
+		label: "Cloudflare Workers",
+		color: "hsl(var(--chart-3))",
+	},
 	none: {
 		label: "None",
 		color: "hsl(var(--chart-6))",
