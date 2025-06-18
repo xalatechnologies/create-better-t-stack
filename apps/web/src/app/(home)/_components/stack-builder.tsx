@@ -1237,6 +1237,63 @@ const StackBuilder = () => {
 		}
 	};
 
+	const isOptionCompatible = (
+		currentStack: StackState,
+		category: keyof typeof TECH_OPTIONS,
+		optionId: string,
+	): boolean => {
+		const simulatedStack: StackState = JSON.parse(JSON.stringify(currentStack));
+
+		const updateArrayCategory = (arr: string[], cat: string): string[] => {
+			const isAlreadySelected = arr.includes(optionId);
+
+			if (cat === "webFrontend" || cat === "nativeFrontend") {
+				if (isAlreadySelected) {
+					return optionId === "none" ? arr : ["none"];
+				}
+				if (optionId === "none") return ["none"];
+				return [optionId];
+			}
+
+			const next: string[] = isAlreadySelected
+				? arr.filter((id) => id !== optionId)
+				: [...arr.filter((id) => id !== "none"), optionId];
+
+			if (next.length === 0) return ["none"];
+			return [...new Set(next)];
+		};
+
+		if (
+			category === "webFrontend" ||
+			category === "nativeFrontend" ||
+			category === "addons" ||
+			category === "examples"
+		) {
+			const currentArr = Array.isArray(simulatedStack[category])
+				? [...(simulatedStack[category] as string[])]
+				: [];
+			(simulatedStack[category] as string[]) = updateArrayCategory(
+				currentArr,
+				category,
+			);
+		} else {
+			(simulatedStack[category] as string) = optionId;
+		}
+
+		const { adjustedStack } = analyzeStackCompatibility(simulatedStack);
+		const finalStack = adjustedStack ?? simulatedStack;
+
+		if (
+			category === "webFrontend" ||
+			category === "nativeFrontend" ||
+			category === "addons" ||
+			category === "examples"
+		) {
+			return (finalStack[category] as string[]).includes(optionId);
+		}
+		return finalStack[category] === optionId;
+	};
+
 	return (
 		<TooltipProvider>
 			<div
@@ -1493,6 +1550,12 @@ const StackBuilder = () => {
 													isSelected = currentValue === tech.id;
 												}
 
+												const isDisabled = !isOptionCompatible(
+													stack,
+													categoryKey as keyof typeof TECH_OPTIONS,
+													tech.id,
+												);
+
 												return (
 													<Tooltip key={tech.id} delayDuration={100}>
 														<TooltipTrigger asChild>
@@ -1501,7 +1564,9 @@ const StackBuilder = () => {
 																	"relative cursor-pointer rounded border p-2 transition-all",
 																	isSelected
 																		? "border-primary bg-primary/10"
-																		: "border-border hover:border-muted hover:bg-muted",
+																		: isDisabled
+																			? "border-destructive/30 bg-destructive/5 opacity-50 hover:opacity-75"
+																			: "border-border hover:border-muted hover:bg-muted",
 																)}
 																whileHover={{ scale: 1.02 }}
 																whileTap={{ scale: 0.98 }}
