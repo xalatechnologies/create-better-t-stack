@@ -1,10 +1,11 @@
 export const dynamic = "force-static";
-import { Toaster } from "@/components/ui/sonner";
+
 import { RootProvider } from "fumadocs-ui/provider";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
+import { Toaster } from "@/components/ui/sonner";
 import "./global.css";
 
 const poppins = Poppins({

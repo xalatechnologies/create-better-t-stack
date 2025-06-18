@@ -1,11 +1,9 @@
 import path from "node:path";
 import fs from "fs-extra";
-import type { Frontend } from "../../types";
+import type { Frontend, ProjectConfig } from "../../types";
 import { addPackageDependency } from "../../utils/add-package-deps";
 import { setupStarlight } from "./starlight-setup";
 import { setupTauri } from "./tauri-setup";
-
-import type { ProjectConfig } from "../../types";
 
 export async function setupAddons(config: ProjectConfig) {
 	const { addons, frontend, projectDir } = config;

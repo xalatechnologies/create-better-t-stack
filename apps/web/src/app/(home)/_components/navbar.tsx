@@ -1,11 +1,11 @@
 "use client";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { cn } from "@/lib/utils";
 import { Github, Maximize2, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { cn } from "@/lib/utils";
 import PackageIcon from "./icons";
 
 export default function Navbar() {

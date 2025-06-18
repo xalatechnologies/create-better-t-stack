@@ -8,8 +8,8 @@ import type { PackageManager } from "../../types";
 import { addPackageDependency } from "../../utils/add-package-deps";
 import { getPackageExecutionCommand } from "../../utils/get-package-execution-command";
 import {
-	type EnvVariable,
 	addEnvVariablesToFile,
+	type EnvVariable,
 } from "../project-generation/env-setup";
 
 type PrismaConfig = {

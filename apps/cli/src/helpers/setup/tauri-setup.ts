@@ -4,10 +4,9 @@ import { consola } from "consola";
 import { execa } from "execa";
 import fs from "fs-extra";
 import pc from "picocolors";
+import type { ProjectConfig } from "../../types";
 import { addPackageDependency } from "../../utils/add-package-deps";
 import { getPackageExecutionCommand } from "../../utils/get-package-execution-command";
-
-import type { ProjectConfig } from "../../types";
 
 export async function setupTauri(config: ProjectConfig): Promise<void> {
 	const { packageManager, frontend, projectDir } = config;

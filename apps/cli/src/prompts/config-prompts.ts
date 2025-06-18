@@ -1,8 +1,8 @@
 import { cancel, group } from "@clack/prompts";
 import pc from "picocolors";
 import type {
-	API,
 	Addons,
+	API,
 	Backend,
 	Database,
 	DatabaseSetup,

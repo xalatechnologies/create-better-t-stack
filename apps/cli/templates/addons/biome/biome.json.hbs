@@ -11,24 +11,27 @@
 			"**",
 			"!**/.next",
 			"!**/dist",
-			"!**/.source",
-			"!**/out",
-			"!**/templates/**",
 			"!**/.turbo",
-			"!**/package.json",
-			"!**/analytics-data.json"
+			"!**/dev-dist",
+			"!**/.zed",
+			"!**/.vscode",
+			"!**/routeTree.gen.ts",
+			"!**/src-tauri",
+			"!**/.nuxt"
 		]
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab",
-		"includes": ["**", "!**/templates"]
+		"indentStyle": "tab"
 	},
 	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"linter": {
 		"enabled": true,
 		"rules": {
 			"recommended": true,
+			"correctness": {
+				"useExhaustiveDependencies": "info"
+			},
 			"nursery": {
 				"useSortedClasses": {
 					"level": "warn",
@@ -37,11 +40,6 @@
 						"functions": ["clsx", "cva", "cn"]
 					}
 				}
-			},
-			"correctness": {
-				"noUnusedImports": "error",
-				"noUnusedLabels": "error",
-				"noUnusedVariables": "error"
 			},
 			"style": {
 				"noParameterAssign": "error",
@@ -55,12 +53,31 @@
 				"noInferrableTypes": "error",
 				"noUselessElse": "error"
 			}
-		},
-		"includes": ["**", "!**/template"]
+		}
 	},
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double"
 		}
 	}
+	{{#if (or (eq frontend "svelte") (eq frontend "nuxt"))}}
+	,
+	"overrides": [
+		{
+			"includes": ["**/*.svelte", "**/*.vue"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useConst": "off",
+						"useImportType": "off"
+					},
+					"correctness": {
+						"noUnusedVariables": "off",
+						"noUnusedImports": "off"
+					}
+				}
+			}
+		}
+	]
+	{{/if}}
 }

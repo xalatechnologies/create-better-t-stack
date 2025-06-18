@@ -16,7 +16,7 @@
 		"deploy:web": "bun run build:web:cloudflare && bunx wrangler pages deploy ./apps/web/out"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
+		"@biomejs/biome": "^2.0.0",
 		"@changesets/cli": "^2.29.3",
 		"husky": "^9.1.7",
 		"lint-staged": "^15.5.2",

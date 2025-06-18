@@ -2,8 +2,8 @@ import path from "node:path";
 import consola from "consola";
 import fs from "fs-extra";
 import type {
-	API,
 	Addons,
+	API,
 	Database,
 	Frontend,
 	ORM,

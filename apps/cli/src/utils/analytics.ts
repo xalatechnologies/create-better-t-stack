@@ -20,6 +20,7 @@ export async function trackProjectCreation(
 	try {
 		const sessionId = `cli_${crypto.randomUUID().replace(/-/g, "")}`;
 
+		// biome-ignore lint/correctness/noUnusedVariables: `projectName`, `projectDir`, and `relativePath` are not used in the event properties
 		const { projectName, projectDir, relativePath, ...safeConfig } = config;
 
 		posthog.capture({

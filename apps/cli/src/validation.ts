@@ -1,8 +1,8 @@
 import path from "node:path";
 import { consola } from "consola";
 import {
-	type API,
 	type Addons,
+	type API,
 	type Backend,
 	type CLIInput,
 	type Database,

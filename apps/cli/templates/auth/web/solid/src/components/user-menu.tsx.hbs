@@ -32,6 +32,7 @@ export default function UserMenu() {
           <div class="absolute right-0 mt-2 w-56 rounded p-1 shadow-sm">
             <div class="px-4  text-sm">{session().data?.user.email}</div>
             <button
+              type="button"
               class="mt-1 w-full border rounded px-4  text-center text-sm"
               onClick={() => {
                 setIsMenuOpen(false);

@@ -1,10 +1,10 @@
-import { DEFAULT_STACK, type StackState, TECH_OPTIONS } from "@/lib/constant";
 import {
-	type UrlKeys,
 	parseAsArrayOf,
 	parseAsString,
 	parseAsStringEnum,
+	type UrlKeys,
 } from "nuqs";
+import { DEFAULT_STACK, type StackState, TECH_OPTIONS } from "@/lib/constant";
 
 const getValidIds = (category: keyof typeof TECH_OPTIONS): string[] => {
 	return TECH_OPTIONS[category]?.map((opt) => opt.id) ?? [];

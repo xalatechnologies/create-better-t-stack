@@ -7,8 +7,8 @@ import pc from "picocolors";
 import type { PackageManager, ProjectConfig } from "../../types";
 import { getPackageExecutionCommand } from "../../utils/get-package-execution-command";
 import {
-	type EnvVariable,
 	addEnvVariablesToFile,
+	type EnvVariable,
 } from "../project-generation/env-setup";
 
 type NeonConfig = {

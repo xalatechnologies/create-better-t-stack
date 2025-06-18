@@ -1,13 +1,4 @@
 "use client";
-import {
-	type ChartConfig,
-	ChartContainer,
-	ChartLegend,
-	ChartLegendContent,
-	ChartTooltip,
-	ChartTooltipContent,
-} from "@/components/ui/chart";
-import discordLogo from "@/public/icon/discord.svg";
 import { format, parseISO } from "date-fns";
 import { Cpu, Download, Terminal, TrendingUp, Users } from "lucide-react";
 import Image from "next/image";
@@ -25,6 +16,15 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
+import {
+	type ChartConfig,
+	ChartContainer,
+	ChartLegend,
+	ChartLegendContent,
+	ChartTooltip,
+	ChartTooltipContent,
+} from "@/components/ui/chart";
+import discordLogo from "@/public/icon/discord.svg";
 import Navbar from "../_components/navbar";
 
 interface AnalyticsData {

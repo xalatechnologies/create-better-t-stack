@@ -1,7 +1,4 @@
 "use client";
-import { TECH_OPTIONS } from "@/lib/constant";
-import { cn } from "@/lib/utils";
-import discordLogo from "@/public/icon/discord.svg";
 import {
 	Check,
 	ChevronRight,
@@ -13,6 +10,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { TECH_OPTIONS } from "@/lib/constant";
+import { cn } from "@/lib/utils";
+import discordLogo from "@/public/icon/discord.svg";
 import Footer from "./_components/footer";
 import PackageIcon from "./_components/icons";
 import Navbar from "./_components/navbar";

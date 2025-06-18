@@ -1,23 +1,5 @@
 "use client";
 
-import { ThemeToggle } from "@/components/theme-toggle";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-	DEFAULT_STACK,
-	PRESET_TEMPLATES,
-	type StackState,
-	TECH_OPTIONS,
-	isStackDefault,
-} from "@/lib/constant";
-import { stackParsers, stackQueryStatesOptions } from "@/lib/stack-url-state";
-import { cn } from "@/lib/utils";
-import discordLogo from "@/public/icon/discord.svg";
 import {
 	Check,
 	ClipboardCopy,
@@ -31,13 +13,31 @@ import {
 	Terminal,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { useQueryStates } from "nuqs";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+	DEFAULT_STACK,
+	isStackDefault,
+	PRESET_TEMPLATES,
+	type StackState,
+	TECH_OPTIONS,
+} from "@/lib/constant";
+import { stackParsers, stackQueryStatesOptions } from "@/lib/stack-url-state";
+import { cn } from "@/lib/utils";
+import discordLogo from "@/public/icon/discord.svg";
 
 const validateProjectName = (name: string): string | undefined => {
 	const INVALID_CHARS = ["<", ">", ":", '"', "|", "?", "*"];

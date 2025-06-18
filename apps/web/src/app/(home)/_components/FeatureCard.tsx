@@ -1,11 +1,11 @@
 "use client";
 
+import { motion } from "motion/react";
+import Image from "next/image";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
-import { useTheme } from "next-themes";
-import Image from "next/image";
-import { useEffect, useState } from "react";
 
 type TechOption = {
 	id: string;

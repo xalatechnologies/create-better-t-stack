@@ -1,7 +1,7 @@
-import type { Sponsor } from "@/lib/types";
 import { Github, Globe, Heart, Terminal } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import type { Sponsor } from "@/lib/types";
 
 export default function SponsorsSection() {
 	const [sponsors, setSponsors] = useState<Sponsor[]>([]);

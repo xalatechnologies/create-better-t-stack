@@ -18,8 +18,8 @@ import { gatherConfig } from "./prompts/config-prompts";
 import { getProjectName } from "./prompts/project-name";
 import type { CreateInput, ProjectConfig } from "./types";
 import {
-	APISchema,
 	AddonsSchema,
+	APISchema,
 	BackendSchema,
 	DatabaseSchema,
 	DatabaseSetupSchema,

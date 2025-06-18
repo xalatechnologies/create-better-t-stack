@@ -49,7 +49,7 @@ export const dependencyVersionMap = {
 
 	"@tauri-apps/cli": "^2.4.0",
 
-	"@biomejs/biome": "1.9.4",
+	"@biomejs/biome": "^2.0.0",
 
 	husky: "^9.1.7",
 	"lint-staged": "^15.5.0",
