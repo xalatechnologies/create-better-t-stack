@@ -277,6 +277,13 @@ export const TECH_OPTIONS = {
 			color: "from-pink-400 to-pink-600",
 		},
 		{
+			id: "d1",
+			name: "Cloudflare D1",
+			description: "Serverless SQLite database on Cloudflare Workers",
+			icon: "/icon/workers.svg",
+			color: "from-orange-400 to-orange-600",
+		},
+		{
 			id: "neon",
 			name: "Neon Postgres",
 			description: "Serverless PostgreSQL with Neon",

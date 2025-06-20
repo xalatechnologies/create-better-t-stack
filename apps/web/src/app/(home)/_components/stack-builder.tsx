@@ -533,6 +533,71 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 							"Database set to 'PostgreSQL' (required by Supabase setup)",
 					});
 				}
+			} else if (nextStack.dbSetup === "d1") {
+				if (nextStack.database !== "sqlite") {
+					notes.dbSetup.notes.push(
+						"Cloudflare D1 requires SQLite. It will be selected.",
+					);
+					notes.database.notes.push(
+						"Cloudflare D1 DB setup requires SQLite. It will be selected.",
+					);
+					notes.dbSetup.hasIssue = true;
+					notes.database.hasIssue = true;
+					nextStack.database = "sqlite";
+					changed = true;
+					changes.push({
+						category: "dbSetup",
+						message: "Database set to 'SQLite' (required by Cloudflare D1)",
+					});
+				}
+				if (nextStack.runtime !== "workers") {
+					notes.dbSetup.notes.push(
+						"Cloudflare D1 requires Cloudflare Workers runtime. It will be selected.",
+					);
+					notes.runtime.notes.push(
+						"Cloudflare D1 DB setup requires Cloudflare Workers runtime. It will be selected.",
+					);
+					notes.dbSetup.hasIssue = true;
+					notes.runtime.hasIssue = true;
+					nextStack.runtime = "workers";
+					changed = true;
+					changes.push({
+						category: "dbSetup",
+						message: "Runtime set to 'Cloudflare Workers' (required by D1)",
+					});
+				}
+				if (nextStack.orm !== "drizzle") {
+					notes.dbSetup.notes.push(
+						"Cloudflare D1 requires Drizzle ORM. It will be selected.",
+					);
+					notes.orm.notes.push(
+						"Cloudflare D1 DB setup requires Drizzle ORM. It will be selected.",
+					);
+					notes.dbSetup.hasIssue = true;
+					notes.orm.hasIssue = true;
+					nextStack.orm = "drizzle";
+					changed = true;
+					changes.push({
+						category: "dbSetup",
+						message: "ORM set to 'Drizzle' (required by Cloudflare D1)",
+					});
+				}
+				if (nextStack.backend !== "hono") {
+					notes.dbSetup.notes.push(
+						"Cloudflare D1 requires Hono backend. It will be selected.",
+					);
+					notes.backend.notes.push(
+						"Cloudflare D1 DB setup requires Hono backend. It will be selected.",
+					);
+					notes.dbSetup.hasIssue = true;
+					notes.backend.hasIssue = true;
+					nextStack.backend = "hono";
+					changed = true;
+					changes.push({
+						category: "dbSetup",
+						message: "Backend set to 'Hono' (required by Cloudflare D1)",
+					});
+				}
 			}
 
 			if (nextStack.runtime === "workers") {
