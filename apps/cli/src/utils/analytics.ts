@@ -14,7 +14,7 @@ export async function trackProjectCreation(
 		flushInterval: 0,
 		privacyMode: true,
 		disableGeoip: true,
-		disabled: process.env.MODE !== "prod",
+		disabled: process.env.TELEMETRY !== "true",
 	});
 
 	try {

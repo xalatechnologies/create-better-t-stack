@@ -7,7 +7,7 @@ import type {
 	ProjectConfig,
 	Runtime,
 } from "../../types";
-import { getPackageExecutionCommand } from "../../utils/get-package-execution-command";
+import { getPackageExecutionCommand } from "../../utils/package-runner";
 
 export function displayPostInstallInstructions(
 	config: ProjectConfig & { depsInstalled: boolean },

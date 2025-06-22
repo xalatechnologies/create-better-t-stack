@@ -4,7 +4,7 @@ import consola from "consola";
 import { execa } from "execa";
 import pc from "picocolors";
 import type { ProjectConfig } from "../../types";
-import { getPackageExecutionCommand } from "../../utils/get-package-execution-command";
+import { getPackageExecutionCommand } from "../../utils/package-runner";
 
 export async function setupStarlight(config: ProjectConfig): Promise<void> {
 	const { packageManager, projectDir } = config;

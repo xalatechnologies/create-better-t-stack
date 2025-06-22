@@ -6,7 +6,7 @@ import fs from "fs-extra";
 import pc from "picocolors";
 import type { PackageManager } from "../../types";
 import { addPackageDependency } from "../../utils/add-package-deps";
-import { getPackageExecutionCommand } from "../../utils/get-package-execution-command";
+import { getPackageExecutionCommand } from "../../utils/package-runner";
 import {
 	addEnvVariablesToFile,
 	type EnvVariable,
