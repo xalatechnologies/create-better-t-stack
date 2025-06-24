@@ -13,6 +13,24 @@ const showcaseProjects = [
 		liveUrl: "https://gl1.chat/?ref=better-t-stack",
 		tags: ["tRPC", "Drizzle", "Elysia", "Vite", "TanStack Router"],
 	},
+	{
+		title: "Look Crafted",
+		description: "✨ Transform Your Selfies into Stunning Headshots with AI",
+		imageUrl: "https://www.lookcrafted.com/opengraph-image.png",
+		liveUrl: "http://lookcrafted.com",
+		tags: [
+			"oRPC",
+			"Next.js",
+			"Hono",
+			"Bun",
+			"Neon",
+			"Drizzle",
+			"Better Auth",
+			"Biome",
+			"Husky",
+			"Turborepo",
+		],
+	},
 ];
 
 export default function ShowcasePage() {
