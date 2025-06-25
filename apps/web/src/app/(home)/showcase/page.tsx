@@ -31,6 +31,24 @@ const showcaseProjects = [
 			"Turborepo",
 		],
 	},
+	{
+		title: "Screenshothis",
+		description: "Your All-in-One Screenshot Solution",
+		imageUrl: "https://api.screenshothis.com/v1/screenshots/take?api_key=ss_live_NQJgRXqHcKPwnoMTuQmgiwLIGbVfihjpMyQhgsaMyNBHTyesvrxpYNXmdgcnxipc&url=https%3A%2F%2Fscreenshothis.com%2F&width=1200&height=630&device_scale_factor=0.75&block_ads=true&block_cookie_banners=true&block_trackers=true&prefers_color_scheme=light&prefers_reduced_motion=reduce&is_cached=true&cache_key=cfb06bf3616b1d03bdf455628a3830120e2080dd",
+		liveUrl: "https://screenshothis.com?utm_source=better-t-stack&utm_medium=showcase&utm_campaign=referer",
+		tags: [
+			"oRPC",
+			"TanStack Start (devinxi)",
+			"Hono",
+			"pnpm",
+			"PostgreSQL",
+			"Drizzle",
+			"Better Auth",
+			"Biome",
+			"Husky",
+			"Turborepo",
+		],
+	},
 ];
 
 export default function ShowcasePage() {
