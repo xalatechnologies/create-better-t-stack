@@ -27,12 +27,12 @@ Follow the prompts to configure your project or use the `--yes` flag for default
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **TypeScript**           | End-to-end type safety across all parts of your application                                                                                                                                                                                                |
 | **Frontend**             | • React with TanStack Router<br>• React with React Router<br>• React with TanStack Start (SSR)<br>• Next.js<br>• SvelteKit<br>• Nuxt (Vue)<br>• SolidJS<br>• React Native with NativeWind (via Expo)<br>• React Native with Unistyles (via Expo)<br>• None |
-| **Backend**              | • Hono<br>• Express<br>• Elysia<br>• Next.js API routes<br>• Convex<br>• Fastify<br>• None                                                                                                                                                                              |
+| **Backend**              | • Hono<br>• Express<br>• Elysia<br>• Next.js API routes<br>• Convex<br>• Fastify<br>• None                                                                                                                                                                 |
 | **API Layer**            | • tRPC (type-safe APIs)<br>• oRPC (OpenAPI-compatible type-safe APIs)<br>• None                                                                                                                                                                            |
-| **Runtime**              | • Bun<br>• Node.js                                                                                                                                                                                                                                         |
+| **Runtime**              | • Bun<br>• Node.js<br>• Cloudflare Workers<br>• None                                                                                                                                                                                                       |
 | **Database**             | • SQLite<br>• PostgreSQL<br>• MySQL<br>• MongoDB<br>• None                                                                                                                                                                                                 |
 | **ORM**                  | • Drizzle (TypeScript-first)<br>• Prisma (feature-rich)<br>• Mongoose (for MongoDB)<br>• None                                                                                                                                                              |
-| **Database Setup**       | • Turso (SQLite)<br>• Neon (PostgreSQL)<br>• Prisma Postgres (via Prisma Accelerate)<br>• MongoDB Atlas<br>• None (manual setup)                                                                                                                           |
+| **Database Setup**       | • Turso (SQLite)<br>• Cloudflare D1 (SQLite)<br>• Neon (PostgreSQL)<br>• Supabase (PostgreSQL)<br>• Prisma Postgres (via Prisma Accelerate)<br>• MongoDB Atlas<br>• None (manual setup)                                                                    |
 | **Authentication**       | Better-Auth (email/password, with more options coming soon)                                                                                                                                                                                                |
 | **Styling**              | Tailwind CSS with shadcn/ui components                                                                                                                                                                                                                     |
 | **Addons**               | • PWA support<br>• Tauri (desktop applications)<br>• Starlight (documentation site)<br>• Biome (linting and formatting)<br>• Husky (Git hooks)<br>• Turborepo (optimized builds)                                                                           |
@@ -59,9 +59,9 @@ Options:
   --package-manager <pm>          Package manager (npm, pnpm, bun)
   --install                       Install dependencies
   --no-install                    Skip installing dependencies
-  --db-setup <setup>              Database setup (turso, neon, prisma-postgres, mongodb-atlas, none)
+  --db-setup <setup>              Database setup (turso, d1, neon, supabase, prisma-postgres, mongodb-atlas, none)
   --backend <framework>           Backend framework (hono, express, elysia, next, convex, fastify, none)
-  --runtime <runtime>             Runtime (bun, node, none)
+  --runtime <runtime>             Runtime (bun, node, workers, none)
   --api <type>                    API type (trpc, orpc, none)
   -h, --help                      Display help
 ```
@@ -104,6 +104,12 @@ Create a project with Turso database setup:
 npx create-better-t-stack my-app --database sqlite --orm drizzle --db-setup turso
 ```
 
+Create a project with Supabase PostgreSQL setup:
+
+```bash
+npx create-better-t-stack my-app --database postgres --orm drizzle --db-setup supabase --auth
+```
+
 Create a project with Convex backend:
 
 ```bash
@@ -116,10 +122,48 @@ Create a project with documentation site:
 npx create-better-t-stack my-app --addons starlight
 ```
 
+Create a minimal TypeScript project with no backend:
+
+```bash
+npx create-better-t-stack my-app --backend none --frontend tanstack-router
+```
+
+Create a backend-only project with no frontend:
+
+```bash
+npx create-better-t-stack my-app --frontend none --backend hono --database postgres --orm drizzle
+```
+
+Create a simple frontend-only project:
+
+```bash
+npx create-better-t-stack my-app --backend none --frontend next --addons none --examples none
+```
+
+Create a Cloudflare Workers project:
+
+```bash
+npx create-better-t-stack my-app --backend hono --runtime workers --database sqlite --orm drizzle --db-setup d1
+```
+
+Create a minimal API-only project:
+
+```bash
+npx create-better-t-stack my-app --frontend none --backend hono --api trpc --database none --addons none
+```
+
 ## Compatibility Notes
 
 - **Convex backend**: Automatically disables authentication, database, ORM, and API options
 - **Backend 'none'**: If selected, this option will force related options like API, ORM, database, authentication, and runtime to 'none'. Examples will also be disabled (set to none/empty).
+- **Frontend 'none'**: Creates a backend-only project. When selected, PWA, Tauri, and certain examples may be disabled.
+- **API 'none'**: Disables tRPC/oRPC setup. Can be used with backend frameworks for REST APIs or custom API implementations.
+- **Database 'none'**: Disables database setup. Automatically sets ORM to 'none' and disables authentication.
+- **ORM 'none'**: Can be used when you want to handle database operations manually or use a different ORM.
+- **Runtime 'none'**: Only available with Convex backend or when backend is 'none'.
+- **Cloudflare Workers runtime**: Only compatible with Hono backend, Drizzle ORM (or no ORM), and SQLite database (with D1 setup). Not compatible with MongoDB.
+- **Addons 'none'**: Skips all addons (PWA, Tauri, Starlight, Biome, Husky, Turborepo).
+- **Examples 'none'**: Skips all example implementations (todo, AI chat).
 - **SvelteKit, Nuxt, and SolidJS** frontends are only compatible with oRPC API layer
 - **PWA support** requires React with TanStack Router, React Router, or SolidJS
 - **Tauri desktop app** requires React (TanStack Router/React Router), Nuxt, SvelteKit, or SolidJS

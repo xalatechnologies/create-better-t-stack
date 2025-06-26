@@ -68,7 +68,7 @@ async function updateRootPackageJson(
 		scripts["dev:web"] = "turbo -F web dev";
 		scripts["dev:server"] = serverDevScript;
 		if (options.backend === "convex") {
-			scripts["dev:setup"] = `turbo -F ${backendPackageName} setup`;
+			scripts["dev:setup"] = `turbo -F ${backendPackageName} dev:setup`;
 		}
 		if (needsDbScripts) {
 			scripts["db:push"] = `turbo -F ${backendPackageName} db:push`;
@@ -89,7 +89,7 @@ async function updateRootPackageJson(
 		scripts["dev:web"] = "pnpm --filter web dev";
 		scripts["dev:server"] = serverDevScript;
 		if (options.backend === "convex") {
-			scripts["dev:setup"] = `pnpm --filter ${backendPackageName} setup`;
+			scripts["dev:setup"] = `pnpm --filter ${backendPackageName} dev:setup`;
 		}
 		if (needsDbScripts) {
 			scripts["db:push"] = `pnpm --filter ${backendPackageName} db:push`;
@@ -114,7 +114,8 @@ async function updateRootPackageJson(
 		scripts["dev:web"] = "npm run dev --workspace web";
 		scripts["dev:server"] = serverDevScript;
 		if (options.backend === "convex") {
-			scripts["dev:setup"] = `npm run setup --workspace ${backendPackageName}`;
+			scripts["dev:setup"] =
+				`npm run dev:setup --workspace ${backendPackageName}`;
 		}
 		if (needsDbScripts) {
 			scripts["db:push"] = `npm run db:push --workspace ${backendPackageName}`;
@@ -140,7 +141,7 @@ async function updateRootPackageJson(
 		scripts["dev:web"] = "bun run --filter web dev";
 		scripts["dev:server"] = serverDevScript;
 		if (options.backend === "convex") {
-			scripts["dev:setup"] = `bun run --filter ${backendPackageName} setup`;
+			scripts["dev:setup"] = `bun run --filter ${backendPackageName} dev:setup`;
 		}
 		if (needsDbScripts) {
 			scripts["db:push"] = `bun run --filter ${backendPackageName} db:push`;

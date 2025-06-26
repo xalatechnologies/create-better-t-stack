@@ -96,7 +96,7 @@ export const dependencyVersionMap = {
 	"@trpc/server": "^11.4.2",
 	"@trpc/client": "^11.4.2",
 
-	convex: "^1.23.0",
+	convex: "^1.25.0",
 	"@convex-dev/react-query": "^0.0.0-alpha.8",
 	"convex-svelte": "^0.0.11",
 

@@ -38,15 +38,10 @@ function generateReadmeContent(options: ProjectConfig): string {
 
 	const isConvex = backend === "convex";
 	const hasReactRouter = frontend.includes("react-router");
-	const hasTanstackRouter = frontend.includes("tanstack-router");
 	const hasNative =
 		frontend.includes("native-nativewind") ||
 		frontend.includes("native-unistyles");
-	const hasNext = frontend.includes("next");
-	const hasTanstackStart = frontend.includes("tanstack-start");
 	const hasSvelte = frontend.includes("svelte");
-	const hasSolid = frontend.includes("solid");
-	const hasNuxt = frontend.includes("nuxt");
 
 	const packageManagerRunCmd =
 		packageManager === "npm" ? "npm run" : packageManager;
@@ -56,27 +51,18 @@ function generateReadmeContent(options: ProjectConfig): string {
 		webPort = "5173";
 	}
 
+	const stackDescription = generateStackDescription(
+		frontend,
+		backend,
+		api,
+		isConvex,
+	);
+
 	return `# ${projectName}
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines ${
-		hasTanstackRouter
-			? "React, TanStack Router"
-			: hasReactRouter
-				? "React, React Router"
-				: hasNext
-					? "Next.js"
-					: hasTanstackStart
-						? "React, TanStack Start"
-						: hasSvelte
-							? "SvelteKit"
-							: hasNuxt
-								? "Nuxt"
-								: hasSolid
-									? "SolidJS"
-									: ""
-	}, ${backend[0].toUpperCase() + backend.slice(1)}${
-		isConvex ? "" : `, ${api.toUpperCase()}`
-	}, and more.
+This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack${
+		stackDescription ? ` that combines ${stackDescription}` : ""
+	}.
 
 ## Features
 
@@ -119,23 +105,7 @@ Then, run the development server:
 ${packageManagerRunCmd} dev
 \`\`\`
 
-${
-	hasTanstackRouter ||
-	hasReactRouter ||
-	hasNext ||
-	hasTanstackStart ||
-	hasSvelte ||
-	hasNuxt ||
-	hasSolid
-		? `Open [http://localhost:${webPort}](http://localhost:${webPort}) in your browser to see the web application.`
-		: ""
-}
-${hasNative ? "Use the Expo Go app to run the mobile application.\n" : ""}
-${
-	isConvex
-		? "Your app will connect to the Convex cloud backend automatically."
-		: "The API is running at [http://localhost:3000](http://localhost:3000)."
-}
+${generateRunningInstructions(frontend, backend, webPort, hasNative, isConvex)}
 
 ${
 	addons.includes("pwa") && hasReactRouter
@@ -146,49 +116,14 @@ ${
 ## Project Structure
 
 \`\`\`
-${projectName}/
-├── apps/
-${
-	hasTanstackRouter ||
-	hasReactRouter ||
-	hasNext ||
-	hasTanstackStart ||
-	hasSvelte ||
-	hasNuxt ||
-	hasSolid
-		? `│   ├── web/         # Frontend application (${
-				hasTanstackRouter
-					? "React + TanStack Router"
-					: hasReactRouter
-						? "React + React Router"
-						: hasNext
-							? "Next.js"
-							: hasTanstackStart
-								? "React + TanStack Start"
-								: hasSvelte
-									? "SvelteKit"
-									: hasNuxt
-										? "Nuxt"
-										: hasSolid
-											? "SolidJS"
-											: ""
-			})\n`
-		: ""
-}${
-	hasNative
-		? "│   ├── native/      # Mobile application (React Native, Expo)\n"
-		: ""
-}${
-	addons.includes("starlight")
-		? "│   ├── docs/        # Documentation site (Astro Starlight)\n"
-		: ""
-}${
-	isConvex
-		? "├── packages/\n│   └── backend/     # Convex backend functions and schema\n"
-		: `│   └── server/      # Backend API (${
-				backend[0].toUpperCase() + backend.slice(1)
-			}, ${api.toUpperCase()})`
-}
+${generateProjectStructure(
+	projectName,
+	frontend,
+	backend,
+	addons,
+	isConvex,
+	api,
+)}
 \`\`\`
 
 ## Available Scripts
@@ -205,6 +140,181 @@ ${generateScriptsList(
 `;
 }
 
+function generateStackDescription(
+	frontend: Frontend[],
+	backend: string,
+	api: API,
+	isConvex: boolean,
+): string {
+	const parts: string[] = [];
+
+	const hasTanstackRouter = frontend.includes("tanstack-router");
+	const hasReactRouter = frontend.includes("react-router");
+	const hasNext = frontend.includes("next");
+	const hasTanstackStart = frontend.includes("tanstack-start");
+	const hasSvelte = frontend.includes("svelte");
+	const hasNuxt = frontend.includes("nuxt");
+	const hasSolid = frontend.includes("solid");
+	const hasFrontendNone = frontend.length === 0 || frontend.includes("none");
+
+	if (!hasFrontendNone) {
+		if (hasTanstackRouter) {
+			parts.push("React, TanStack Router");
+		} else if (hasReactRouter) {
+			parts.push("React, React Router");
+		} else if (hasNext) {
+			parts.push("Next.js");
+		} else if (hasTanstackStart) {
+			parts.push("React, TanStack Start");
+		} else if (hasSvelte) {
+			parts.push("SvelteKit");
+		} else if (hasNuxt) {
+			parts.push("Nuxt");
+		} else if (hasSolid) {
+			parts.push("SolidJS");
+		}
+	}
+
+	if (backend !== "none") {
+		parts.push(backend[0].toUpperCase() + backend.slice(1));
+	}
+
+	if (!isConvex && api !== "none") {
+		parts.push(api.toUpperCase());
+	}
+
+	return parts.length > 0 ? `${parts.join(", ")}, and more` : "";
+}
+
+function generateRunningInstructions(
+	frontend: Frontend[],
+	backend: string,
+	webPort: string,
+	hasNative: boolean,
+	isConvex: boolean,
+): string {
+	const instructions: string[] = [];
+
+	const hasFrontendNone = frontend.length === 0 || frontend.includes("none");
+	const isBackendNone = backend === "none";
+
+	if (!hasFrontendNone) {
+		const hasTanstackRouter = frontend.includes("tanstack-router");
+		const hasReactRouter = frontend.includes("react-router");
+		const hasNext = frontend.includes("next");
+		const hasTanstackStart = frontend.includes("tanstack-start");
+		const hasSvelte = frontend.includes("svelte");
+		const hasNuxt = frontend.includes("nuxt");
+		const hasSolid = frontend.includes("solid");
+
+		if (
+			hasTanstackRouter ||
+			hasReactRouter ||
+			hasNext ||
+			hasTanstackStart ||
+			hasSvelte ||
+			hasNuxt ||
+			hasSolid
+		) {
+			instructions.push(
+				`Open [http://localhost:${webPort}](http://localhost:${webPort}) in your browser to see the web application.`,
+			);
+		}
+	}
+
+	if (hasNative) {
+		instructions.push("Use the Expo Go app to run the mobile application.");
+	}
+
+	if (isConvex) {
+		instructions.push(
+			"Your app will connect to the Convex cloud backend automatically.",
+		);
+	} else if (!isBackendNone) {
+		instructions.push(
+			"The API is running at [http://localhost:3000](http://localhost:3000).",
+		);
+	}
+
+	return instructions.join("\n");
+}
+
+function generateProjectStructure(
+	projectName: string,
+	frontend: Frontend[],
+	backend: string,
+	addons: Addons[],
+	isConvex: boolean,
+	api: API,
+): string {
+	const structure: string[] = [`${projectName}/`, "├── apps/"];
+
+	const hasFrontendNone = frontend.length === 0 || frontend.includes("none");
+	const isBackendNone = backend === "none";
+
+	if (!hasFrontendNone) {
+		const hasTanstackRouter = frontend.includes("tanstack-router");
+		const hasReactRouter = frontend.includes("react-router");
+		const hasNext = frontend.includes("next");
+		const hasTanstackStart = frontend.includes("tanstack-start");
+		const hasSvelte = frontend.includes("svelte");
+		const hasNuxt = frontend.includes("nuxt");
+		const hasSolid = frontend.includes("solid");
+
+		if (
+			hasTanstackRouter ||
+			hasReactRouter ||
+			hasNext ||
+			hasTanstackStart ||
+			hasSvelte ||
+			hasNuxt ||
+			hasSolid
+		) {
+			let frontendType = "";
+			if (hasTanstackRouter) frontendType = "React + TanStack Router";
+			else if (hasReactRouter) frontendType = "React + React Router";
+			else if (hasNext) frontendType = "Next.js";
+			else if (hasTanstackStart) frontendType = "React + TanStack Start";
+			else if (hasSvelte) frontendType = "SvelteKit";
+			else if (hasNuxt) frontendType = "Nuxt";
+			else if (hasSolid) frontendType = "SolidJS";
+
+			structure.push(
+				`│   ├── web/         # Frontend application (${frontendType})`,
+			);
+		}
+	}
+
+	const hasNative =
+		frontend.includes("native-nativewind") ||
+		frontend.includes("native-unistyles");
+	if (hasNative) {
+		structure.push(
+			"│   ├── native/      # Mobile application (React Native, Expo)",
+		);
+	}
+
+	if (addons.includes("starlight")) {
+		structure.push(
+			"│   ├── docs/        # Documentation site (Astro Starlight)",
+		);
+	}
+
+	if (isConvex) {
+		structure.push("├── packages/");
+		structure.push(
+			"│   └── backend/     # Convex backend functions and schema",
+		);
+	} else if (!isBackendNone) {
+		const backendName = backend[0].toUpperCase() + backend.slice(1);
+		const apiName = api !== "none" ? api.toUpperCase() : "";
+		const backendDesc = apiName ? `${backendName}, ${apiName}` : backendName;
+		structure.push(`│   └── server/      # Backend API (${backendDesc})`);
+	}
+
+	return structure.join("\n");
+}
+
 function generateFeaturesList(
 	database: Database,
 	auth: boolean,
@@ -216,6 +326,7 @@ function generateFeaturesList(
 	api: API,
 ): string {
 	const isConvex = backend === "convex";
+	const isBackendNone = backend === "none";
 	const hasTanstackRouter = frontend.includes("tanstack-router");
 	const hasReactRouter = frontend.includes("react-router");
 	const hasNative =
@@ -226,29 +337,34 @@ function generateFeaturesList(
 	const hasSvelte = frontend.includes("svelte");
 	const hasNuxt = frontend.includes("nuxt");
 	const hasSolid = frontend.includes("solid");
+	const hasFrontendNone = frontend.length === 0 || frontend.includes("none");
 
 	const addonsList = [
 		"- **TypeScript** - For type safety and improved developer experience",
 	];
 
-	if (hasTanstackRouter) {
-		addonsList.push(
-			"- **TanStack Router** - File-based routing with full type safety",
-		);
-	} else if (hasReactRouter) {
-		addonsList.push("- **React Router** - Declarative routing for React");
-	} else if (hasNext) {
-		addonsList.push("- **Next.js** - Full-stack React framework");
-	} else if (hasTanstackStart) {
-		addonsList.push(
-			"- **TanStack Start** - SSR framework with TanStack Router",
-		);
-	} else if (hasSvelte) {
-		addonsList.push("- **SvelteKit** - Web framework for building Svelte apps");
-	} else if (hasNuxt) {
-		addonsList.push("- **Nuxt** - The Intuitive Vue Framework");
-	} else if (hasSolid) {
-		addonsList.push("- **SolidJS** - Simple and performant reactivity");
+	if (!hasFrontendNone) {
+		if (hasTanstackRouter) {
+			addonsList.push(
+				"- **TanStack Router** - File-based routing with full type safety",
+			);
+		} else if (hasReactRouter) {
+			addonsList.push("- **React Router** - Declarative routing for React");
+		} else if (hasNext) {
+			addonsList.push("- **Next.js** - Full-stack React framework");
+		} else if (hasTanstackStart) {
+			addonsList.push(
+				"- **TanStack Start** - SSR framework with TanStack Router",
+			);
+		} else if (hasSvelte) {
+			addonsList.push(
+				"- **SvelteKit** - Web framework for building Svelte apps",
+			);
+		} else if (hasNuxt) {
+			addonsList.push("- **Nuxt** - The Intuitive Vue Framework");
+		} else if (hasSolid) {
+			addonsList.push("- **SolidJS** - Simple and performant reactivity");
+		}
 	}
 
 	if (hasNative) {
@@ -256,14 +372,16 @@ function generateFeaturesList(
 		addonsList.push("- **Expo** - Tools for React Native development");
 	}
 
-	addonsList.push(
-		"- **TailwindCSS** - Utility-first CSS for rapid UI development",
-		"- **shadcn/ui** - Reusable UI components",
-	);
+	if (!hasFrontendNone) {
+		addonsList.push(
+			"- **TailwindCSS** - Utility-first CSS for rapid UI development",
+			"- **shadcn/ui** - Reusable UI components",
+		);
+	}
 
 	if (isConvex) {
 		addonsList.push("- **Convex** - Reactive backend-as-a-service platform");
-	} else {
+	} else if (!isBackendNone) {
 		if (backend === "hono") {
 			addonsList.push("- **Hono** - Lightweight, performant server framework");
 		} else if (backend === "express") {
@@ -284,25 +402,38 @@ function generateFeaturesList(
 			);
 		}
 
-		addonsList.push(
-			`- **${runtime === "bun" ? "Bun" : "Node.js"}** - Runtime environment`,
-		);
+		if (runtime !== "none") {
+			addonsList.push(
+				`- **${
+					runtime === "bun" ? "Bun" : runtime === "node" ? "Node.js" : runtime
+				}** - Runtime environment`,
+			);
+		}
 	}
 
 	if (database !== "none" && !isConvex) {
+		const ormName =
+			orm === "drizzle"
+				? "Drizzle"
+				: orm === "prisma"
+					? "Prisma"
+					: orm === "mongoose"
+						? "Mongoose"
+						: "ORM";
+		const dbName =
+			database === "sqlite"
+				? "SQLite/Turso"
+				: database === "postgres"
+					? "PostgreSQL"
+					: database === "mysql"
+						? "MySQL"
+						: database === "mongodb"
+							? "MongoDB"
+							: "Database";
+
 		addonsList.push(
-			`- **${
-				orm === "drizzle" ? "Drizzle" : orm === "prisma" ? "Prisma" : "Mongoose"
-			}** - TypeScript-first ORM`,
-			`- **${
-				database === "sqlite"
-					? "SQLite/Turso"
-					: database === "postgres"
-						? "PostgreSQL"
-						: database === "mysql"
-							? "MySQL"
-							: "MongoDB"
-			}** - Database engine`,
+			`- **${ormName}** - TypeScript-first ORM`,
+			`- **${dbName}** - Database engine`,
 		);
 	}
 
@@ -333,7 +464,7 @@ function generateFeaturesList(
 
 function generateDatabaseSetup(
 	database: Database,
-	auth: boolean,
+	_auth: boolean,
 	packageManagerRunCmd: string,
 	orm: ORM,
 ): string {
@@ -345,7 +476,11 @@ function generateDatabaseSetup(
 
 	if (database === "sqlite") {
 		setup += `This project uses SQLite${
-			orm === "drizzle" ? " with Drizzle ORM" : " with Prisma"
+			orm === "drizzle"
+				? " with Drizzle ORM"
+				: orm === "prisma"
+					? " with Prisma"
+					: ` with ${orm}`
 		}.
 
 1. Start the local SQLite database:
@@ -357,7 +492,11 @@ cd apps/server && ${packageManagerRunCmd} db:local
 `;
 	} else if (database === "postgres") {
 		setup += `This project uses PostgreSQL${
-			orm === "drizzle" ? " with Drizzle ORM" : " with Prisma"
+			orm === "drizzle"
+				? " with Drizzle ORM"
+				: orm === "prisma"
+					? " with Prisma"
+					: ` with ${orm}`
 		}.
 
 1. Make sure you have a PostgreSQL database set up.
@@ -365,7 +504,11 @@ cd apps/server && ${packageManagerRunCmd} db:local
 `;
 	} else if (database === "mysql") {
 		setup += `This project uses MySQL${
-			orm === "drizzle" ? " with Drizzle ORM" : " with Prisma"
+			orm === "drizzle"
+				? " with Drizzle ORM"
+				: orm === "prisma"
+					? " with Prisma"
+					: ` with ${orm}`
 		}.
 
 1. Make sure you have a MySQL database set up.
@@ -373,7 +516,11 @@ cd apps/server && ${packageManagerRunCmd} db:local
 `;
 	} else if (database === "mongodb") {
 		setup += `This project uses MongoDB ${
-			orm === "mongoose" ? "with Mongoose" : "with Prisma ORM"
+			orm === "mongoose"
+				? "with Mongoose"
+				: orm === "prisma"
+					? "with Prisma ORM"
+					: `with ${orm}`
 		}.
 
 1. Make sure you have MongoDB set up.
@@ -382,7 +529,7 @@ cd apps/server && ${packageManagerRunCmd} db:local
 	}
 
 	setup += `
-${auth ? "3" : "3"}. ${
+3. ${
 		orm === "prisma"
 			? `Generate the Prisma client and push the schema:
 \`\`\`bash
@@ -413,15 +560,18 @@ function generateScriptsList(
 	backend: string,
 ): string {
 	const isConvex = backend === "convex";
+	const isBackendNone = backend === "none";
 
 	let scripts = `- \`${packageManagerRunCmd} dev\`: Start all applications in development mode
-- \`${packageManagerRunCmd} build\`: Build all applications
+- \`${packageManagerRunCmd} build\`: Build all applications`;
+
+	scripts += `
 - \`${packageManagerRunCmd} dev:web\`: Start only the web application`;
 
 	if (isConvex) {
 		scripts += `
 - \`${packageManagerRunCmd} dev:setup\`: Setup and configure your Convex project`;
-	} else {
+	} else if (!isBackendNone) {
 		scripts += `
 - \`${packageManagerRunCmd} dev:server\`: Start only the server`;
 	}

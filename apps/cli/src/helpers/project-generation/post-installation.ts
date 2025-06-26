@@ -96,6 +96,11 @@ export function displayPostInstallInstructions(
 		output += `${pc.cyan(`${stepCounter++}.`)} ${runCmd} dev:setup ${pc.dim(
 			"(this will guide you through Convex project setup)",
 		)}\n`;
+		output += `${pc.cyan(
+			`${stepCounter++}.`,
+		)} Copy environment variables from ${pc.white(
+			"packages/backend/.env.local",
+		)} \nto ${pc.white("apps/*/.env")}\n`;
 		output += `${pc.cyan(`${stepCounter++}.`)} ${runCmd} dev\n\n`;
 	} else {
 		if (runtime !== "workers") {
