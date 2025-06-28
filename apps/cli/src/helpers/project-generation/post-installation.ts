@@ -48,9 +48,7 @@ export function displayPostInstallInstructions(
 			? getNativeInstructions(isConvex)
 			: "";
 	const pwaInstructions =
-		addons?.includes("pwa") &&
-		(frontend?.includes("react-router") ||
-			frontend?.includes("tanstack-router"))
+		addons?.includes("pwa") && frontend?.includes("react-router")
 			? getPwaInstructions()
 			: "";
 	const starlightInstructions = addons?.includes("starlight")

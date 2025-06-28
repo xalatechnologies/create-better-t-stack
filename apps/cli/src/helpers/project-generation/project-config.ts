@@ -1,8 +1,7 @@
 import path from "node:path";
 import { log } from "@clack/prompts";
-import { $, execa } from "execa";
+import { execa } from "execa";
 import fs from "fs-extra";
-import pc from "picocolors";
 import type { ProjectConfig } from "../../types";
 
 export async function updatePackageConfigurations(
@@ -267,32 +266,4 @@ async function updateConvexPackageJson(
 	}
 
 	await fs.writeJson(convexPackageJsonPath, convexPackageJson, { spaces: 2 });
-}
-
-export async function initializeGit(
-	projectDir: string,
-	useGit: boolean,
-): Promise<void> {
-	if (!useGit) return;
-
-	const gitVersionResult = await $({
-		cwd: projectDir,
-		reject: false,
-		stderr: "pipe",
-	})`git --version`;
-
-	if (gitVersionResult.exitCode !== 0) {
-		log.warn(pc.yellow("Git is not installed"));
-		return;
-	}
-
-	const result = await $({
-		cwd: projectDir,
-		reject: false,
-		stderr: "pipe",
-	})`git init`;
-
-	if (result.exitCode !== 0) {
-		throw new Error(`Git initialization failed: ${result.stderr}`);
-	}
 }

@@ -15,9 +15,10 @@ import {
 } from "../setup/runtime-setup";
 import { createReadme } from "./create-readme";
 import { setupEnvironmentVariables } from "./env-setup";
+import { initializeGit } from "./git";
 import { installDependencies } from "./install-dependencies";
 import { displayPostInstallInstructions } from "./post-installation";
-import { initializeGit, updatePackageConfigurations } from "./project-config";
+import { updatePackageConfigurations } from "./project-config";
 import {
 	copyBaseTemplate,
 	handleExtras,
@@ -75,8 +76,6 @@ export async function createProject(options: ProjectConfig) {
 
 		await writeBtsConfig(options);
 
-		await initializeGit(projectDir, options.git);
-
 		log.success("Project template successfully scaffolded!");
 
 		if (options.install) {
@@ -86,6 +85,8 @@ export async function createProject(options: ProjectConfig) {
 			});
 			await generateCloudflareWorkerTypes(options);
 		}
+
+		await initializeGit(projectDir, options.git);
 
 		displayPostInstallInstructions({
 			...options,
