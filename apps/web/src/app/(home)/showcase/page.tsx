@@ -40,7 +40,7 @@ const showcaseProjects = [
 			"https://screenshothis.com?utm_source=better-t-stack&utm_medium=showcase&utm_campaign=referer",
 		tags: [
 			"oRPC",
-			"TanStack Start (devinxi)",
+			"TanStack Start (vite)",
 			"Hono",
 			"pnpm",
 			"PostgreSQL",

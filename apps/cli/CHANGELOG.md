@@ -118,7 +118,7 @@
 
 ### Minor Changes
 
-- 0ffaedd: Upgrade to Tanstack start devinxi
+- 0ffaedd: Upgrade to Tanstack start vite
 
 ### Patch Changes
 
