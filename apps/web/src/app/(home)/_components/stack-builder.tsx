@@ -859,7 +859,20 @@ const generateCommand = (stackState: StackState): string => {
 		if (!checkDefault("api", stackState.api)) {
 			flags.push(`--api ${stackState.api}`);
 		}
-		if (!checkDefault("database", stackState.database)) {
+
+		const requiresExplicitDatabase = [
+			"d1",
+			"turso",
+			"neon",
+			"supabase",
+			"prisma-postgres",
+			"mongodb-atlas",
+		].includes(stackState.dbSetup);
+
+		if (
+			!checkDefault("database", stackState.database) ||
+			requiresExplicitDatabase
+		) {
 			flags.push(`--database ${stackState.database}`);
 		}
 		if (!checkDefault("orm", stackState.orm)) {
