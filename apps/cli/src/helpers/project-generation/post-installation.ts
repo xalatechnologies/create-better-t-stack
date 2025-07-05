@@ -23,6 +23,7 @@ export function displayPostInstallInstructions(
 		frontend,
 		backend,
 		dbSetup,
+		webDeploy,
 	} = config;
 
 	const isConvex = backend === "convex";
@@ -54,6 +55,8 @@ export function displayPostInstallInstructions(
 	const starlightInstructions = addons?.includes("starlight")
 		? getStarlightInstructions(runCmd)
 		: "";
+	const workersDeployInstructions =
+		webDeploy === "workers" ? getWorkersDeployInstructions(runCmd) : "";
 
 	const hasWeb = frontend?.some((f) =>
 		[
@@ -143,6 +146,8 @@ export function displayPostInstallInstructions(
 	if (tauriInstructions) output += `\n${tauriInstructions.trim()}\n`;
 	if (lintingInstructions) output += `\n${lintingInstructions.trim()}\n`;
 	if (pwaInstructions) output += `\n${pwaInstructions.trim()}\n`;
+	if (workersDeployInstructions)
+		output += `\n${workersDeployInstructions.trim()}\n`;
 	if (starlightInstructions) output += `\n${starlightInstructions.trim()}\n`;
 
 	if (noOrmWarning) output += `\n${noOrmWarning.trim()}\n`;
@@ -308,4 +313,8 @@ function getBunWebNativeWarning(): string {
 	return `\n${pc.yellow(
 		"WARNING:",
 	)} 'bun' might cause issues with web + native apps in a monorepo. Use 'pnpm' if problems arise.`;
+}
+
+function getWorkersDeployInstructions(runCmd?: string): string {
+	return `\n${pc.bold("Deploy frontend to Cloudflare Workers:")}\n${pc.cyan("•")} Deploy: ${`cd apps/web && ${runCmd || "bun run"} deploy`}`;
 }
