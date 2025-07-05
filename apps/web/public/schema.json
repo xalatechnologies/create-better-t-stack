@@ -144,6 +144,14 @@
         "none"
       ],
       "description": "API type"
+    },
+    "webDeploy": {
+      "type": "string",
+      "enum": [
+        "workers",
+        "none"
+      ],
+      "description": "Web deployment"
     }
   },
   "required": [
@@ -159,7 +167,8 @@
     "auth",
     "packageManager",
     "dbSetup",
-    "api"
+    "api",
+    "webDeploy"
   ],
   "additionalProperties": false
 }
