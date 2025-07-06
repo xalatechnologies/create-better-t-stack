@@ -1,5 +1,5 @@
 "use client";
-import { Github, Maximize2, Menu, X } from "lucide-react";
+import { Github, Heart, Maximize2, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -135,21 +135,21 @@ export default function Navbar() {
 
 						<div className="flex items-center gap-2">
 							<Link
+								href="https://github.com/sponsors/AmanVarshney01"
+								target="_blank"
+								className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/90 px-3 py-1.5 font-mono text-muted-foreground text-xs backdrop-blur-sm transition-colors hover:bg-muted hover:text-foreground"
+								title="Sponsor on GitHub"
+							>
+								<Heart className="size-3.5" />
+								Sponsor
+							</Link>
+							<Link
 								href="/new"
 								className="inline-flex items-center gap-1.5 rounded-md border border-primary/50 bg-primary/10 px-3 py-1.5 font-mono text-primary text-xs transition-colors hover:bg-primary/20"
 								title="Stack Builder"
 							>
 								<Maximize2 className="size-3.5" />
 								Builder
-							</Link>
-							<Link
-								href="https://www.github.com/better-t-stack/create-better-t-stack"
-								target="_blank"
-								className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/90 px-3 py-1.5 font-mono text-muted-foreground text-xs backdrop-blur-sm transition-colors hover:bg-muted hover:text-foreground"
-								title="Star on GitHub"
-							>
-								<Github className="size-3.5" />
-								Star
 							</Link>
 						</div>
 
@@ -242,13 +242,13 @@ export default function Navbar() {
 										Stack Builder
 									</Link>
 									<Link
-										href="https://www.github.com/better-t-stack/create-better-t-stack"
+										href="https://github.com/sponsors/AmanVarshney01"
 										target="_blank"
 										onClick={closeMobileMenu}
 										className="flex w-full items-center justify-center gap-2 rounded-md border border-border bg-muted/90 px-4 py-2.5 font-mono text-muted-foreground text-sm backdrop-blur-sm transition-colors hover:bg-muted hover:text-foreground"
 									>
-										<Github className="size-4" />
-										Star on GitHub
+										<Heart className="size-4" />
+										Sponsor on GitHub
 									</Link>
 								</div>
 							</div>
