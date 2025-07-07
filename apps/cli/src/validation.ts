@@ -16,6 +16,7 @@ import {
 	type Runtime,
 	type WebDeploy,
 } from "./types";
+import { WEB_FRAMEWORKS } from "./constants";
 
 export function processAndValidateFlags(
 	options: CLIInput,
@@ -125,15 +126,8 @@ export function processAndValidateFlags(
 			const validOptions = options.frontend.filter(
 				(f): f is Frontend => f !== "none",
 			);
-			const webFrontends = validOptions.filter(
-				(f) =>
-					f === "tanstack-router" ||
-					f === "react-router" ||
-					f === "tanstack-start" ||
-					f === "next" ||
-					f === "nuxt" ||
-					f === "svelte" ||
-					f === "solid",
+			const webFrontends = validOptions.filter((f) =>
+				WEB_FRAMEWORKS.includes(f),
 			);
 			const nativeFrontends = validOptions.filter(
 				(f) => f === "native-nativewind" || f === "native-unistyles",
@@ -447,6 +441,16 @@ export function processAndValidateFlags(
 	) {
 		consola.fatal(
 			"MongoDB database is not compatible with Cloudflare Workers runtime. MongoDB requires Prisma or Mongoose ORM, but Workers runtime only supports Drizzle ORM. Please use a different database or runtime.",
+		);
+		process.exit(1);
+	}
+
+	const hasWebFrontendFlag = (config.frontend ?? []).some((f) =>
+		WEB_FRAMEWORKS.includes(f),
+	);
+	if (config.webDeploy && config.webDeploy !== "none" && !hasWebFrontendFlag) {
+		consola.fatal(
+			"'--web-deploy' requires a web frontend. Please select a web frontend or set '--web-deploy none'.",
 		);
 		process.exit(1);
 	}

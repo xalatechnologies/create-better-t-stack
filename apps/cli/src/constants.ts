@@ -1,6 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { ProjectConfig } from "./types";
+import type { ProjectConfig, Frontend } from "./types";
 import { getUserPkgManager } from "./utils/get-package-manager";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -126,3 +126,14 @@ export const ADDON_COMPATIBILITY = {
 	starlight: [],
 	none: [],
 } as const;
+
+// TODO: need to refactor this
+export const WEB_FRAMEWORKS: readonly Frontend[] = [
+	"tanstack-router",
+	"react-router",
+	"tanstack-start",
+	"next",
+	"nuxt",
+	"svelte",
+	"solid",
+];

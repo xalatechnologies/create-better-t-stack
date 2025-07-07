@@ -805,6 +805,24 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 		}
 	}
 
+	const webFrontendsSelected = nextStack.webFrontend.some((f) => f !== "none");
+	if (!webFrontendsSelected && nextStack.webDeploy !== "none") {
+		notes.webDeploy.notes.push(
+			"Web deployment requires a web frontend. It will be disabled.",
+		);
+		notes.webFrontend.notes.push(
+			"No web frontend selected: Deployment has been disabled.",
+		);
+		notes.webDeploy.hasIssue = true;
+		notes.webFrontend.hasIssue = true;
+		nextStack.webDeploy = "none";
+		changed = true;
+		changes.push({
+			category: "webDeploy",
+			message: "Web deployment set to 'none' (requires web frontend)",
+		});
+	}
+
 	return {
 		adjustedStack: changed ? nextStack : null,
 		notes,

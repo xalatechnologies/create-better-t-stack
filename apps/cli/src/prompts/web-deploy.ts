@@ -1,7 +1,11 @@
 import { cancel, isCancel, select } from "@clack/prompts";
 import pc from "picocolors";
-import { DEFAULT_CONFIG } from "../constants";
+import { DEFAULT_CONFIG, WEB_FRAMEWORKS } from "../constants";
 import type { Backend, Frontend, Runtime, WebDeploy } from "../types";
+
+function hasWebFrontend(frontends: Frontend[]): boolean {
+	return frontends.some((f) => WEB_FRAMEWORKS.includes(f));
+}
 
 type DeploymentOption = {
 	value: WebDeploy;
@@ -29,15 +33,18 @@ export async function getDeploymentChoice(
 	deployment?: WebDeploy,
 	_runtime?: Runtime,
 	_backend?: Backend,
-	_frontend: Frontend[] = [],
+	frontend: Frontend[] = [],
 ): Promise<WebDeploy> {
 	if (deployment !== undefined) return deployment;
+	if (!hasWebFrontend(frontend)) {
+		return "none";
+	}
 
 	const options: DeploymentOption[] = [
 		{
 			value: "workers",
 			label: "Cloudflare Workers",
-			hint: "Deploy to Cloudflare Workers using Wrangler",
+			hint: "Deploy to Cloudflare Workers using Wrangler", 
 		},
 		{ value: "none", label: "None", hint: "Manual setup" },
 	];
@@ -57,9 +64,13 @@ export async function getDeploymentChoice(
 }
 
 export async function getDeploymentToAdd(
-	_frontend: Frontend[],
+	frontend: Frontend[],
 	existingDeployment?: WebDeploy,
 ): Promise<WebDeploy> {
+	if (!hasWebFrontend(frontend)) {
+		return "none";
+	}
+
 	const options: DeploymentOption[] = [];
 
 	if (existingDeployment !== "workers") {
