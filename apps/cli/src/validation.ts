@@ -448,7 +448,13 @@ export function processAndValidateFlags(
 	const hasWebFrontendFlag = (config.frontend ?? []).some((f) =>
 		WEB_FRAMEWORKS.includes(f),
 	);
-	if (config.webDeploy && config.webDeploy !== "none" && !hasWebFrontendFlag) {
+
+	if (
+		config.webDeploy &&
+		config.webDeploy !== "none" &&
+		!hasWebFrontendFlag &&
+		providedFlags.has("frontend")
+	) {
 		consola.fatal(
 			"'--web-deploy' requires a web frontend. Please select a web frontend or set '--web-deploy none'.",
 		);
