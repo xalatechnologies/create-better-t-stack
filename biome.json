@@ -16,7 +16,8 @@
 			"!**/templates/**",
 			"!**/.turbo",
 			"!**/package.json",
-			"!**/analytics-data.json"
+			"!**/analytics-data.json",
+			"!**/schema.json"
 		]
 	},
 	"formatter": {
