@@ -1,5 +1,6 @@
 import path from "node:path";
 import { consola } from "consola";
+import { WEB_FRAMEWORKS } from "./constants";
 import {
 	type Addons,
 	type API,
@@ -16,7 +17,6 @@ import {
 	type Runtime,
 	type WebDeploy,
 } from "./types";
-import { WEB_FRAMEWORKS } from "./constants";
 
 export function processAndValidateFlags(
 	options: CLIInput,
@@ -373,6 +373,20 @@ export function processAndValidateFlags(
 		}
 	}
 
+	if (config.dbSetup === "docker" && config.database === "sqlite") {
+		consola.fatal(
+			"Docker setup is not compatible with SQLite database. SQLite is file-based and doesn't require Docker. Please use '--database postgres', '--database mysql', '--database mongodb', or choose a different setup.",
+		);
+		process.exit(1);
+	}
+
+	if (config.dbSetup === "docker" && config.runtime === "workers") {
+		consola.fatal(
+			"Docker setup is not compatible with Cloudflare Workers runtime. Workers runtime uses serverless databases (D1) and doesn't support local Docker containers. Please use '--db-setup d1' for SQLite or choose a different runtime.",
+		);
+		process.exit(1);
+	}
+
 	if (
 		providedFlags.has("runtime") &&
 		options.runtime === "workers" &&
@@ -435,12 +449,34 @@ export function processAndValidateFlags(
 	}
 
 	if (
+		providedFlags.has("runtime") &&
+		options.runtime === "workers" &&
+		config.dbSetup === "docker"
+	) {
+		consola.fatal(
+			"Cloudflare Workers runtime (--runtime workers) is not compatible with Docker setup. Workers runtime uses serverless databases (D1) and doesn't support local Docker containers. Please use '--db-setup d1' for SQLite or choose a different runtime.",
+		);
+		process.exit(1);
+	}
+
+	if (
 		providedFlags.has("database") &&
 		config.database === "mongodb" &&
 		config.runtime === "workers"
 	) {
 		consola.fatal(
 			"MongoDB database is not compatible with Cloudflare Workers runtime. MongoDB requires Prisma or Mongoose ORM, but Workers runtime only supports Drizzle ORM. Please use a different database or runtime.",
+		);
+		process.exit(1);
+	}
+
+	if (
+		providedFlags.has("db-setup") &&
+		options.dbSetup === "docker" &&
+		config.runtime === "workers"
+	) {
+		consola.fatal(
+			"Docker setup (--db-setup docker) is not compatible with Cloudflare Workers runtime. Workers runtime uses serverless databases (D1) and doesn't support local Docker containers. Please use '--db-setup d1' for SQLite or choose a different runtime.",
 		);
 		process.exit(1);
 	}
@@ -495,6 +531,13 @@ export function validateConfigCompatibility(
 	if (effectiveRuntime === "workers" && effectiveDatabase === "mongodb") {
 		consola.fatal(
 			"Cloudflare Workers runtime is not compatible with MongoDB database. MongoDB requires Prisma or Mongoose ORM, but Workers runtime only supports Drizzle ORM. Please use a different database or runtime.",
+		);
+		process.exit(1);
+	}
+
+	if (effectiveRuntime === "workers" && config.dbSetup === "docker") {
+		consola.fatal(
+			"Cloudflare Workers runtime is not compatible with Docker setup. Workers runtime uses serverless databases (D1) and doesn't support local Docker containers. Please use a different runtime or change to D1 database setup.",
 		);
 		process.exit(1);
 	}

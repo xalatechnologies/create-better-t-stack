@@ -600,6 +600,39 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 						message: "Backend set to 'Hono' (required by Cloudflare D1)",
 					});
 				}
+			} else if (nextStack.dbSetup === "docker") {
+				if (nextStack.database === "sqlite") {
+					notes.dbSetup.notes.push(
+						"Docker setup is not needed for SQLite. It will be set to 'Basic Setup'.",
+					);
+					notes.dbSetup.hasIssue = true;
+					notes.database.hasIssue = true;
+					nextStack.dbSetup = "none";
+					changed = true;
+					changes.push({
+						category: "dbSetup",
+						message:
+							"DB Setup set to 'Basic Setup' (SQLite doesn't need Docker)",
+					});
+				}
+
+				if (nextStack.runtime === "workers") {
+					notes.dbSetup.notes.push(
+						"Docker setup is not compatible with Cloudflare Workers runtime. Bun runtime will be selected.",
+					);
+					notes.runtime.notes.push(
+						"Cloudflare Workers runtime does not support Docker setup. Bun runtime will be selected.",
+					);
+					notes.dbSetup.hasIssue = true;
+					notes.runtime.hasIssue = true;
+					nextStack.runtime = "bun";
+					changed = true;
+					changes.push({
+						category: "dbSetup",
+						message:
+							"Runtime set to 'Bun' (Workers not compatible with Docker)",
+					});
+				}
 			}
 
 			if (nextStack.runtime === "workers") {
@@ -652,6 +685,24 @@ const analyzeStackCompatibility = (stack: StackState): CompatibilityResult => {
 						category: "runtime",
 						message:
 							"Database set to 'SQLite' (MongoDB not compatible with Workers)",
+					});
+				}
+
+				if (nextStack.dbSetup === "docker") {
+					notes.runtime.notes.push(
+						"Cloudflare Workers runtime does not support Docker setup. D1 will be selected.",
+					);
+					notes.dbSetup.notes.push(
+						"Docker setup is not compatible with Cloudflare Workers runtime. D1 will be selected.",
+					);
+					notes.runtime.hasIssue = true;
+					notes.dbSetup.hasIssue = true;
+					nextStack.dbSetup = "d1";
+					changed = true;
+					changes.push({
+						category: "runtime",
+						message:
+							"DB Setup set to 'D1' (Docker not compatible with Workers)",
 					});
 				}
 			}
@@ -887,6 +938,7 @@ const generateCommand = (stackState: StackState): string => {
 			"supabase",
 			"prisma-postgres",
 			"mongodb-atlas",
+			"docker",
 		].includes(stackState.dbSetup);
 
 		if (

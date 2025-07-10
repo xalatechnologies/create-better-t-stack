@@ -7,9 +7,10 @@ import type {
 	ProjectConfig,
 	Runtime,
 } from "../../types";
+import { getDockerStatus } from "../../utils/docker-utils";
 import { getPackageExecutionCommand } from "../../utils/package-runner";
 
-export function displayPostInstallInstructions(
+export async function displayPostInstallInstructions(
 	config: ProjectConfig & { depsInstalled: boolean },
 ) {
 	const {
@@ -34,7 +35,7 @@ export function displayPostInstallInstructions(
 
 	const databaseInstructions =
 		!isConvex && database !== "none"
-			? getDatabaseInstructions(database, orm, runCmd, runtime, dbSetup)
+			? await getDatabaseInstructions(database, orm, runCmd, runtime, dbSetup)
 			: "";
 
 	const tauriInstructions = addons?.includes("tauri")
@@ -193,14 +194,23 @@ function getLintingInstructions(runCmd?: string): string {
 	)} Format and lint fix: ${`${runCmd} check`}\n`;
 }
 
-function getDatabaseInstructions(
+async function getDatabaseInstructions(
 	database: Database,
 	orm?: ORM,
 	runCmd?: string,
 	runtime?: Runtime,
 	dbSetup?: DatabaseSetup,
-): string {
+): Promise<string> {
 	const instructions = [];
+
+	if (dbSetup === "docker") {
+		const dockerStatus = await getDockerStatus(database);
+
+		if (dockerStatus.message) {
+			instructions.push(dockerStatus.message);
+			instructions.push("");
+		}
+	}
 
 	if (runtime === "workers" && dbSetup === "d1") {
 		const packageManager = runCmd === "npm run" ? "npm" : runCmd || "npm";
@@ -255,10 +265,26 @@ function getDatabaseInstructions(
 				)} Prisma with Bun may require additional configuration. If you encounter errors,\nfollow the guidance provided in the error messages`,
 			);
 		}
-
+		if (database === "mongodb" && dbSetup === "docker") {
+			instructions.push(
+				`${pc.yellow(
+					"WARNING:",
+				)} Prisma + MongoDB + Docker combination may not work.`,
+			);
+		}
+		if (dbSetup === "docker") {
+			instructions.push(
+				`${pc.cyan("•")} Start docker container: ${`${runCmd} db:start`}`,
+			);
+		}
 		instructions.push(`${pc.cyan("•")} Apply schema: ${`${runCmd} db:push`}`);
 		instructions.push(`${pc.cyan("•")} Database UI: ${`${runCmd} db:studio`}`);
 	} else if (orm === "drizzle") {
+		if (dbSetup === "docker") {
+			instructions.push(
+				`${pc.cyan("•")} Start docker container: ${`${runCmd} db:start`}`,
+			);
+		}
 		instructions.push(`${pc.cyan("•")} Apply schema: ${`${runCmd} db:push`}`);
 		instructions.push(`${pc.cyan("•")} Database UI: ${`${runCmd} db:studio`}`);
 		if (database === "sqlite" && dbSetup !== "d1") {
@@ -266,6 +292,12 @@ function getDatabaseInstructions(
 				`${pc.cyan(
 					"•",
 				)} Start local DB (if needed): ${`cd apps/server && ${runCmd} db:local`}`,
+			);
+		}
+	} else if (orm === "mongoose") {
+		if (dbSetup === "docker") {
+			instructions.push(
+				`${pc.cyan("•")} Start docker container: ${`${runCmd} db:start`}`,
 			);
 		}
 	} else if (orm === "none") {
