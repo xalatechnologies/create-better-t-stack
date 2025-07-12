@@ -72,9 +72,7 @@ export async function addAddonsToProject(
 		}
 
 		log.info(
-			pc.green(
-				`Adding ${input.addons.join(", ")} to ${config.frontend.join("/")}`,
-			),
+			`Adding ${input.addons.join(", ")} to ${config.frontend.join("/")}`,
 		);
 
 		await setupAddonsTemplate(projectDir, config);

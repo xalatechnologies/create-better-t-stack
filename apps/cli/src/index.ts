@@ -1,7 +1,8 @@
 import { intro, log } from "@clack/prompts";
 import { consola } from "consola";
 import pc from "picocolors";
-import { createCli, trpcServer, zod as z } from "trpc-cli";
+import { createCli, trpcServer } from "trpc-cli";
+import z from "zod";
 import {
 	addAddonsHandler,
 	createProjectHandler,
@@ -32,34 +33,32 @@ const router = t.router({
 		.meta({
 			description: "Create a new Better-T Stack project",
 			default: true,
+			negateBooleans: true,
 		})
 		.input(
 			z.tuple([
 				ProjectNameSchema.optional(),
-				z
-					.object({
-						yes: z
-							.boolean()
-							.optional()
-							.default(false)
-							.describe("Use default configuration"),
-						database: DatabaseSchema.optional(),
-						orm: ORMSchema.optional(),
-						auth: z.boolean().optional(),
-						frontend: z.array(FrontendSchema).optional(),
-						addons: z.array(AddonsSchema).optional(),
-						examples: z.array(ExamplesSchema).optional(),
-						git: z.boolean().optional(),
-						packageManager: PackageManagerSchema.optional(),
-						install: z.boolean().optional(),
-						dbSetup: DatabaseSetupSchema.optional(),
-						backend: BackendSchema.optional(),
-						runtime: RuntimeSchema.optional(),
-						api: APISchema.optional(),
-						webDeploy: WebDeploySchema.optional(),
-					})
-					.optional()
-					.default({}),
+				z.object({
+					yes: z
+						.boolean()
+						.optional()
+						.default(false)
+						.describe("Use default configuration"),
+					database: DatabaseSchema.optional(),
+					orm: ORMSchema.optional(),
+					auth: z.boolean().optional(),
+					frontend: z.array(FrontendSchema).optional(),
+					addons: z.array(AddonsSchema).optional(),
+					examples: z.array(ExamplesSchema).optional(),
+					git: z.boolean().optional(),
+					packageManager: PackageManagerSchema.optional(),
+					install: z.boolean().optional(),
+					dbSetup: DatabaseSetupSchema.optional(),
+					backend: BackendSchema.optional(),
+					runtime: RuntimeSchema.optional(),
+					api: APISchema.optional(),
+					webDeploy: WebDeploySchema.optional(),
+				}),
 			]),
 		)
 		.mutation(async ({ input }) => {
@@ -77,22 +76,17 @@ const router = t.router({
 		})
 		.input(
 			z.tuple([
-				z
-					.object({
-						addons: z.array(AddonsSchema).optional().default([]),
-						webDeploy: WebDeploySchema.optional(),
-						projectDir: z.string().optional(),
-						install: z
-							.boolean()
-							.optional()
-							.default(false)
-							.describe(
-								"Install dependencies after adding addons or deployment",
-							),
-						packageManager: PackageManagerSchema.optional(),
-					})
-					.optional()
-					.default({}),
+				z.object({
+					addons: z.array(AddonsSchema).optional().default([]),
+					webDeploy: WebDeploySchema.optional(),
+					projectDir: z.string().optional(),
+					install: z
+						.boolean()
+						.optional()
+						.default(false)
+						.describe("Install dependencies after adding addons or deployment"),
+					packageManager: PackageManagerSchema.optional(),
+				}),
 			]),
 		)
 		.mutation(async ({ input }) => {

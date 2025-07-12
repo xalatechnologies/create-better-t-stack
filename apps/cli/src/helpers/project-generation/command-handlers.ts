@@ -209,13 +209,11 @@ export async function addAddonsHandler(input: AddInput): Promise<void> {
 			});
 		} else {
 			log.info(
-				pc.yellow(
-					`Run ${pc.bold(`${packageManager} install`)} to install dependencies`,
-				),
+				`Run ${pc.bold(`${packageManager} install`)} to install dependencies`,
 			);
 		}
 
-		outro(pc.green("Add command completed successfully!"));
+		outro("Add command completed successfully!");
 	} catch (error) {
 		console.error(error);
 		process.exit(1);
