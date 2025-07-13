@@ -82,10 +82,10 @@ You can disable telemetry by setting the `BTS_TELEMETRY` environment variable:
 
 ```bash
 # Disable telemetry for a single run
-BTS_TELEMETRY=0 npx create-better-t-stack my-app
+BTS_TELEMETRY_DISABLED=1 npx create-better-t-stack my-app
 
 # Disable telemetry globally in your shell profile (.bashrc, .zshrc, etc.)
-export BTS_TELEMETRY=0
+export BTS_TELEMETRY_DISABLED=1
 ```
 
 ### Development
