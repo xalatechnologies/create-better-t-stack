@@ -1,34 +1,22 @@
 /**
- * Utility function to determine if telemetry should be enabled.
+ * Returns true if telemetry/analytics should be enabled, false otherwise.
  *
- * Telemetry is enabled by default in production, but can be disabled by:
- * - Setting BTS_TELEMETRY=0 or BTS_TELEMETRY=false
- * - Running in development environment (NODE_ENV=development)
+ * - If BTS_TELEMETRY_DISABLED is present and "1", disables analytics.
+ * - Otherwise, BTS_TELEMETRY: "0" disables, "1" enables (default: enabled).
  */
 export function isTelemetryEnabled(): boolean {
-	// If user explicitly disabled telemetry
-	if (
-		process.env.BTS_TELEMETRY === "0" ||
-		process.env.BTS_TELEMETRY === "false"
-	) {
-		return false;
-	}
+	const BTS_TELEMETRY_DISABLED = process.env.BTS_TELEMETRY_DISABLED;
+	const BTS_TELEMETRY = process.env.BTS_TELEMETRY;
 
-	// If user explicitly enabled telemetry
-	if (
-		process.env.BTS_TELEMETRY === "1" ||
-		process.env.BTS_TELEMETRY === "true"
-	) {
-		return true;
-	}
+	console.log("BTS_TELEMETRY_DISABLED:", BTS_TELEMETRY_DISABLED);
+	console.log("BTS_TELEMETRY:", BTS_TELEMETRY);
 
-	if (
-		process.env.BTS_TELEMETRY_DISABLED === "1" ||
-		process.env.BTS_TELEMETRY_DISABLED === "true"
-	) {
-		return false;
+	if (BTS_TELEMETRY_DISABLED !== undefined) {
+		return BTS_TELEMETRY_DISABLED !== "1";
 	}
-
-	// Default to enabled in production
+	if (BTS_TELEMETRY !== undefined) {
+		return BTS_TELEMETRY === "1";
+	}
+	// Default: enabled
 	return true;
 }
