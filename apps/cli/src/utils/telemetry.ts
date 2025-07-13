@@ -8,9 +8,6 @@ export function isTelemetryEnabled(): boolean {
 	const BTS_TELEMETRY_DISABLED = process.env.BTS_TELEMETRY_DISABLED;
 	const BTS_TELEMETRY = process.env.BTS_TELEMETRY;
 
-	console.log("BTS_TELEMETRY_DISABLED:", BTS_TELEMETRY_DISABLED);
-	console.log("BTS_TELEMETRY:", BTS_TELEMETRY);
-
 	if (BTS_TELEMETRY_DISABLED !== undefined) {
 		return BTS_TELEMETRY_DISABLED !== "1";
 	}
