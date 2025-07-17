@@ -1,6 +1,8 @@
 import { authClient } from "@/lib/auth-client";
+{{#if (eq api "orpc")}}
 import { orpc } from "@/utils/orpc";
 import { useQuery } from "@tanstack/solid-query";
+{{/if}}
 import { createFileRoute } from "@tanstack/solid-router";
 import { createEffect, Show } from "solid-js";
 
@@ -12,7 +14,9 @@ function RouteComponent() {
   const session = authClient.useSession();
   const navigate = Route.useNavigate();
 
+{{#if (eq api "orpc")}}
   const privateData = useQuery(() => orpc.privateData.queryOptions());
+{{/if}}
 
   createEffect(() => {
     if (!session().data && !session().isPending) {
@@ -31,7 +35,9 @@ function RouteComponent() {
       <Show when={!session().isPending && session().data}>
         <h1>Dashboard</h1>
         <p>Welcome {session().data?.user.name}</p>
+        {{#if (eq api "orpc")}}
         <p>privateData: {privateData.data?.message}</p>
+        {{/if}}
       </Show>
     </div>
   );

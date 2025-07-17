@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { authClient } from '$lib/auth-client';
 	import { goto } from '$app/navigation';
-	import { queryClient } from '$lib/orpc';
 
 	const sessionQuery = authClient.useSession();
 
@@ -9,7 +8,6 @@
 		await authClient.signOut({
 		fetchOptions: {
 			onSuccess: () => {
-				queryClient.invalidateQueries();
 				goto('/');
 			},
 			onError: (error) => {

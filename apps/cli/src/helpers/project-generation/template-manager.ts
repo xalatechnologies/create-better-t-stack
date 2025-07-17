@@ -475,33 +475,16 @@ export async function setupAuthTemplate(
 			} else {
 			}
 		} else if (hasSvelteWeb) {
-			if (context.api === "orpc") {
-				const authWebSvelteSrc = path.join(
-					PKG_ROOT,
-					"templates/auth/web/svelte",
-				);
-				if (await fs.pathExists(authWebSvelteSrc)) {
-					await processAndCopyFiles(
-						"**/*",
-						authWebSvelteSrc,
-						webAppDir,
-						context,
-					);
-				} else {
-				}
+			const authWebSvelteSrc = path.join(PKG_ROOT, "templates/auth/web/svelte");
+			if (await fs.pathExists(authWebSvelteSrc)) {
+				await processAndCopyFiles("**/*", authWebSvelteSrc, webAppDir, context);
+			} else {
 			}
 		} else if (hasSolidWeb) {
-			if (context.api === "orpc") {
-				const authWebSolidSrc = path.join(PKG_ROOT, "templates/auth/web/solid");
-				if (await fs.pathExists(authWebSolidSrc)) {
-					await processAndCopyFiles(
-						"**/*",
-						authWebSolidSrc,
-						webAppDir,
-						context,
-					);
-				} else {
-				}
+			const authWebSolidSrc = path.join(PKG_ROOT, "templates/auth/web/solid");
+			if (await fs.pathExists(authWebSolidSrc)) {
+				await processAndCopyFiles("**/*", authWebSolidSrc, webAppDir, context);
+			} else {
 			}
 		}
 	}

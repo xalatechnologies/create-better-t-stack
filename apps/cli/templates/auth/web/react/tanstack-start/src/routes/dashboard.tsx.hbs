@@ -1,11 +1,12 @@
 import { authClient } from "@/lib/auth-client";
 {{#if (eq api "trpc")}}
 import { useTRPC } from "@/utils/trpc";
+import { useQuery } from "@tanstack/react-query";
 {{/if}}
 {{#if (eq api "orpc")}}
 import { orpc } from "@/utils/orpc";
-{{/if}}
 import { useQuery } from "@tanstack/react-query";
+{{/if}}
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 
@@ -45,7 +46,9 @@ function RouteComponent() {
     <div>
       <h1>Dashboard</h1>
       <p>Welcome {session?.user.name}</p>
+    {{#if ( or (eq api "orpc") (eq api "trpc"))}}
       <p>privateData: {privateData.data?.message}</p>
+    {{/if}}
     </div>
   );
 }
