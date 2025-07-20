@@ -45,11 +45,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
     meta: [
       {
-        title: "My App",
+        title: "{{projectName}}",
       },
       {
         name: "description",
-        content: "My App is a web application",
+        content: "{{projectName}} is a web application",
       },
     ],
     links: [
@@ -75,7 +75,12 @@ function RootComponent() {
     <>
       <HeadContent />
       {{#if (eq api "orpc")}}
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          disableTransitionOnChange
+          storageKey="vite-ui-theme"
+        >
           <div className="grid grid-rows-[auto_1fr] h-svh">
             <Header />
             {isFetching ? <Loader /> : <Outlet />}
@@ -83,7 +88,12 @@ function RootComponent() {
           <Toaster richColors />
         </ThemeProvider>
       {{else}}
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        disableTransitionOnChange
+        storageKey="vite-ui-theme"
+      >
         <div className="grid grid-rows-[auto_1fr] h-svh">
           <Header />
           {isFetching ? <Loader /> : <Outlet />}

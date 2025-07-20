@@ -15,31 +15,25 @@ import { Toaster } from "./components/ui/sonner";
 {{#if (eq backend "convex")}}
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 {{else}}
-{{#unless (eq api "none")}}
+  {{#unless (eq api "none")}}
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-{{#if (eq api "orpc")}}
+    {{#if (eq api "orpc")}}
 import { queryClient } from "./utils/orpc";
-{{/if}}
-{{#if (eq api "trpc")}}
+    {{/if}}
+    {{#if (eq api "trpc")}}
 import { queryClient } from "./utils/trpc";
-{{/if}}
-{{/unless}}
+    {{/if}}
+  {{/unless}}
 {{/if}}
 
 export const links: Route.LinksFunction = () => [
-  {
-    rel: "preconnect",
-    href: "https://fonts.googleapis.com",
-  },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href:
+      "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
 
@@ -68,7 +62,12 @@ export default function App() {
   );
   return (
     <ConvexProvider client={convex}>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        disableTransitionOnChange
+        storageKey="vite-ui-theme"
+      >
         <div className="grid grid-rows-[auto_1fr] h-svh">
           <Header />
           <Outlet />
@@ -82,13 +81,18 @@ export default function App() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <div className="grid grid-rows-[auto_1fr] h-svh">
-            <Header />
-            <Outlet />
-          </div>
-          <Toaster richColors />
-        </ThemeProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        disableTransitionOnChange
+        storageKey="vite-ui-theme"
+      >
+        <div className="grid grid-rows-[auto_1fr] h-svh">
+          <Header />
+          <Outlet />
+        </div>
+        <Toaster richColors />
+      </ThemeProvider>
       <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
     </QueryClientProvider>
   );
@@ -97,7 +101,12 @@ export default function App() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        disableTransitionOnChange
+        storageKey="vite-ui-theme"
+      >
         <div className="grid grid-rows-[auto_1fr] h-svh">
           <Header />
           <Outlet />
@@ -111,7 +120,12 @@ export default function App() {
 {{else}}
 export default function App() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="dark"
+      disableTransitionOnChange
+      storageKey="vite-ui-theme"
+    >
       <div className="grid grid-rows-[auto_1fr] h-svh">
         <Header />
         <Outlet />
@@ -126,7 +140,6 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
   let stack: string | undefined;
-
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? "404" : "Error";
     details =
@@ -137,7 +150,6 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     details = error.message;
     stack = error.stack;
   }
-
   return (
     <main className="pt-16 p-4 container mx-auto">
       <h1>{message}</h1>
