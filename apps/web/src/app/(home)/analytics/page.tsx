@@ -946,7 +946,7 @@ export default function AnalyticsPage() {
 	const hourlyDistributionData = getHourlyDistributionData();
 
 	return (
-		<div className="min-h-svh">
+		<div className="mx-auto min-h-svh max-w-[1280px]">
 			<div className="container mx-auto space-y-8 px-4 py-8 pt-16">
 				<div className="mb-8">
 					<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">

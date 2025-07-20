@@ -58,7 +58,7 @@ export default function HomePage() {
 	};
 
 	return (
-		<div className="min-h-svh">
+		<div className="mx-auto min-h-svh max-w-[1280px]">
 			<main className="mx-auto px-4 pt-16">
 				<div className="mb-8 flex items-center justify-center">
 					<div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-6">

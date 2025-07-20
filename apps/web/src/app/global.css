@@ -5,11 +5,6 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-:root {
-	/* --fd-layout-width: 1400px; */
-	/* --max-w-fh-container: 100%; */
-}
-
 .react-tweet-theme {
 	--tweet-container-margin: 0 !important;
 	@apply !bg-fd-background !border-none !h-full !border-transparent !w-full;

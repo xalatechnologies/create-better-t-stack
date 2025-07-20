@@ -17,15 +17,20 @@ export default function Layout({ children }: { children: ReactNode }) {
 
 		if (pathname === "/new") {
 			header.classList.remove("*:mx-auto", "*:max-w-fd-container");
-			main.classList.remove("max-w-[1400px]", "mx-auto", "min-h-svh");
 		} else {
 			header.classList.add("*:mx-auto", "*:max-w-fd-container");
-			main.classList.add("max-w-[1400px]", "mx-auto", "min-h-svh");
 		}
 	}, [pathname]);
 
 	return (
-		<HomeLayout {...baseOptions}>
+		<HomeLayout
+			{...baseOptions}
+			style={
+				{
+					"--spacing-fd-container": "1280px",
+				} as object
+			}
+		>
 			<main className="h-full w-full">{children}</main>
 		</HomeLayout>
 	);
