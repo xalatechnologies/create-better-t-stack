@@ -1,7 +1,6 @@
 "use client";
 
-import { FolderOpen, Terminal } from "lucide-react";
-import Navbar from "../_components/navbar";
+import { Terminal } from "lucide-react";
 import ShowcaseItem from "./_components/ShowcaseItem";
 
 const showcaseProjects = [
@@ -71,79 +70,61 @@ const showcaseProjects = [
 
 export default function ShowcasePage() {
 	return (
-		<>
-			<Navbar />
-			<main className="flex min-h-svh flex-col items-center bg-background px-4 pt-24 pb-10 sm:px-6 md:px-8 md:pt-28 lg:pt-32">
-				<div className="mx-auto w-full max-w-6xl">
-					<div className="mb-8">
-						<div className="mb-6 flex items-center gap-2">
+		<main className="min-h-svh">
+			<div className="container mx-auto space-y-8 px-4 py-8 pt-16">
+				<div className="mb-8">
+					<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
+						<div className="flex items-center gap-2">
 							<Terminal className="h-4 w-4 text-primary" />
-							<span className="font-bold font-mono text-lg">
+							<span className="font-bold text-lg sm:text-xl">
 								PROJECT_SHOWCASE.EXE
 							</span>
-							<div className="h-px flex-1 bg-border" />
-							<span className="font-mono text-muted-foreground text-xs">
-								[{showcaseProjects.length} PROJECTS FOUND]
+						</div>
+						<div className="h-px flex-1 bg-border" />
+						<span className=" text-muted-foreground text-xs">
+							[{showcaseProjects.length} PROJECTS FOUND]
+						</span>
+					</div>
+
+					<div className="mb-8 rounded border border-border p-4">
+						<div className="flex items-center gap-2 text-sm">
+							<span className="text-primary">$</span>
+							<span className=" text-foreground">
+								user@dev-machine:~/showcase$ ls -la
 							</span>
 						</div>
-
-						<div className="terminal-block-hover mb-8 rounded border border-border bg-muted/20 p-4">
-							<div className="flex items-center gap-2 text-sm">
-								<span className="text-primary">$</span>
-								<span className="font-mono text-foreground">
-									user@dev-machine:~/showcase$ ls -la
-								</span>
-							</div>
-							<div className="mt-2 flex items-center gap-2 text-sm">
-								<span className="text-primary">$</span>
-								<span className="font-mono text-muted-foreground">
-									# Discover amazing projects built with Better-T-Stack
-								</span>
-							</div>
-							<div className="mt-2 flex items-center gap-2 text-sm">
-								<span className="text-primary">$</span>
-								<span className="font-mono text-muted-foreground">
-									# Real-world implementations showcasing stack capabilities
-								</span>
-							</div>
+						<div className="mt-2 flex items-center gap-2 text-sm">
+							<span className="text-primary">$</span>
+							<span className=" text-muted-foreground">
+								Discover amazing projects built with Better-T-Stack
+							</span>
 						</div>
-
-						<div className="terminal-block-hover rounded border border-border bg-background p-3">
-							<div className="flex items-center gap-2 font-mono text-sm">
-								<FolderOpen className="h-4 w-4 text-blue-400" />
-								<span className="text-foreground">/showcase/projects/</span>
-								<div className="ml-auto text-muted-foreground text-xs">
-									drwxr-xr-x {showcaseProjects.length} items
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-						{showcaseProjects.map((project, index) => (
-							<ShowcaseItem key={project.title} {...project} index={index} />
-						))}
-					</div>
-
-					<div className="mt-8">
-						<div className="terminal-block-hover rounded border border-border bg-muted/20 p-4">
-							<div className="flex items-center gap-2 text-sm">
-								<span className="text-primary">$</span>
-								<span className="font-mono text-muted-foreground">
-									# Want to showcase your project? Submit via GitHub issues
-								</span>
-							</div>
-							<div className="mt-2 flex items-center gap-2 text-sm">
-								<span className="text-primary">$</span>
-								<span className="font-mono text-foreground">
-									echo &quot;Built something amazing? We&apos;d love to feature
-									it!&quot;
-								</span>
-							</div>
+						<div className="mt-2 flex items-center gap-2 text-sm">
+							<span className="text-primary">$</span>
+							<span className=" text-muted-foreground">
+								Real-world implementations showcasing stack capabilities
+							</span>
 						</div>
 					</div>
 				</div>
-			</main>
-		</>
+
+				<div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+					{showcaseProjects.map((project, index) => (
+						<ShowcaseItem key={project.title} {...project} index={index} />
+					))}
+				</div>
+
+				<div className="mt-8">
+					<div className="rounded border border-border p-4">
+						<div className="flex items-center gap-2 text-sm">
+							<span className="text-primary">$</span>
+							<span className=" text-muted-foreground">
+								Want to showcase your project? Submit via GitHub issues
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
 	);
 }

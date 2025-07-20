@@ -54,73 +54,69 @@ export default function SponsorsSection() {
 			<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
 				<div className="flex items-center gap-2">
 					<Terminal className="h-5 w-5 text-primary" />
-					<span className="font-bold font-mono text-lg sm:text-xl">
+					<span className="font-bold text-lg sm:text-xl">
 						SPONSORS_DATABASE.JSON
 					</span>
 				</div>
 				<div className="hidden h-px flex-1 bg-border sm:block" />
-				<span className="w-full text-right font-mono text-muted-foreground text-xs sm:w-auto sm:text-left">
+				<span className="w-full text-right text-muted-foreground text-xs sm:w-auto sm:text-left">
 					[{loadingSponsors ? "LOADING..." : sponsors.length} RECORDS]
 				</span>
 			</div>
 
-			<div className="terminal-block-hover mb-8 rounded border border-border bg-muted/20 p-4">
+			<div className="mb-8 rounded border border-border p-4">
 				<div className="flex items-center gap-2 text-sm">
 					<span className="text-primary">$</span>
-					<span className="font-mono text-foreground">
-						# Amazing organizations and individuals supporting this project
+					<span className=" text-foreground">
+						Amazing organizations and individuals supporting this project
 					</span>
 				</div>
 				<div className="mt-2 flex items-center gap-2 text-sm">
 					<span className="text-primary">$</span>
-					<span className="font-mono text-muted-foreground">
-						# Your support helps maintain and improve Better-T-Stack
+					<span className=" text-muted-foreground">
+						Your support helps maintain and improve Better-T-Stack
 					</span>
 				</div>
 			</div>
 
 			{loadingSponsors ? (
-				<div className="terminal-block-hover rounded border border-border bg-muted/20 p-8">
+				<div className="rounded border border-border p-8">
 					<div className="flex items-center justify-center gap-2">
 						<div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
-						<span className="font-mono text-muted-foreground">
-							LOADING_SPONSORS.EXE
-						</span>
+						<span className=" text-muted-foreground">LOADING_SPONSORS.EXE</span>
 						<div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
 					</div>
 				</div>
 			) : sponsorError ? (
-				<div className="terminal-block-hover rounded border border-border bg-destructive/10 p-8">
+				<div className="rounded border border-border bg-destructive/10 p-8">
 					<div className="flex items-center justify-center gap-2">
 						<span className="text-destructive">✗</span>
-						<span className="font-mono text-destructive">
-							ERROR: {sponsorError}
-						</span>
+						<span className=" text-destructive">ERROR: {sponsorError}</span>
 					</div>
 				</div>
 			) : sponsors.length === 0 ? (
 				<div className="space-y-4">
-					<div className="terminal-block-hover rounded border border-border bg-muted/20 p-8">
+					<div className="rounded border border-border p-8">
 						<div className="text-center">
 							<div className="mb-4 flex items-center justify-center gap-2">
-								<span className="font-mono text-muted-foreground">
+								<span className=" text-muted-foreground">
 									NO_SPONSORS_FOUND.NULL
 								</span>
 							</div>
 							<div className="flex items-center justify-center gap-2 text-sm">
 								<span className="text-primary">$</span>
-								<span className="font-mono text-muted-foreground">
-									# Be the first to support this project!
+								<span className=" text-muted-foreground">
+									Be the first to support this project!
 								</span>
 							</div>
 						</div>
 					</div>
-					<div className="terminal-block-hover rounded border border-border bg-background p-4">
+					<div className="rounded border border-border p-4">
 						<a
 							href="https://github.com/sponsors/AmanVarshney01"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="flex items-center justify-center gap-2 font-mono text-primary transition-colors hover:text-accent"
+							className="flex items-center justify-center gap-2 text-primary transition-colors hover:text-accent"
 						>
 							<Heart className="h-4 w-4" />
 							<span>BECOME_SPONSOR.EXE</span>
@@ -138,10 +134,10 @@ export default function SponsorsSection() {
 							return (
 								<div
 									key={entry.sponsor.login}
-									className="terminal-block-hover rounded border border-border bg-background"
+									className="rounded border border-border"
 									style={{ animationDelay: `${index * 50}ms` }}
 								>
-									<div className="border-border border-b bg-muted/20 px-3 py-2">
+									<div className="border-border border-b px-3 py-2">
 										<div className="flex items-center gap-2">
 											<span className="text-primary text-xs">▶</span>
 											<div className="ml-auto flex items-center gap-2 text-muted-foreground text-xs">
@@ -159,17 +155,17 @@ export default function SponsorsSection() {
 													alt={entry.sponsor.name || entry.sponsor.login}
 													width={100}
 													height={100}
-													className="rounded border border-border bg-background transition-colors duration-300"
+													className="rounded border border-border transition-colors duration-300"
 													unoptimized
 												/>
 											</div>
 											<div className="min-w-0 flex-1 space-y-2">
 												<div>
-													<h3 className="truncate font-mono font-semibold text-foreground text-sm">
+													<h3 className="truncate font-semibold text-foreground text-sm">
 														{entry.sponsor.name || entry.sponsor.login}
 													</h3>
 													{entry.tierName && (
-														<p className="font-mono text-primary text-xs">
+														<p className=" text-primary text-xs">
 															{entry.tierName}
 														</p>
 													)}
@@ -179,7 +175,7 @@ export default function SponsorsSection() {
 														href={`https://github.com/${entry.sponsor.login}`}
 														target="_blank"
 														rel="noopener noreferrer"
-														className="group flex items-center gap-2 font-mono text-muted-foreground text-xs transition-colors hover:text-primary"
+														className="group flex items-center gap-2 text-muted-foreground text-xs transition-colors hover:text-primary"
 													>
 														<Github className="h-4 w-4" />
 														<span className="truncate">
@@ -195,7 +191,7 @@ export default function SponsorsSection() {
 															}
 															target="_blank"
 															rel="noopener noreferrer"
-															className="group flex items-center gap-2 font-mono text-muted-foreground text-xs transition-colors hover:text-primary"
+															className="group flex items-center gap-2 text-muted-foreground text-xs transition-colors hover:text-primary"
 														>
 															<Globe className="h-4 w-4" />
 															<span className="truncate">
@@ -209,7 +205,7 @@ export default function SponsorsSection() {
 														</a>
 													)}
 
-													{/* <div className="flex items-center gap-2 font-mono text-muted-foreground text-xs">
+													{/* <div className="flex items-center gap-2  text-muted-foreground text-xs">
 														<span className="text-xs">👤</span>
 														<span>{entry.sponsor.type.toUpperCase()}</span>
 													</div> */}
@@ -222,12 +218,12 @@ export default function SponsorsSection() {
 						})}
 					</div>
 
-					<div className="terminal-block-hover rounded border border-border bg-background p-4">
+					<div className="rounded border border-border p-4">
 						<a
 							href="https://github.com/sponsors/AmanVarshney01"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="flex items-center justify-center gap-2 font-mono text-primary transition-colors hover:text-accent"
+							className="flex items-center justify-center gap-2 text-primary transition-colors hover:text-accent"
 						>
 							<Heart className="h-4 w-4" />
 							<span>SUPPORT_PROJECT.EXE</span>

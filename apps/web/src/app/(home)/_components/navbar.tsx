@@ -98,11 +98,11 @@ export default function Navbar() {
 				className={cn(
 					"fixed top-0 z-[100] w-full transition-all duration-300 ease-in-out",
 					scrolled
-						? "border-border border-b bg-background/80 shadow-sm backdrop-blur-md"
+						? " border- border-border shadow-sm backdrop-blur-md"
 						: "border-transparent border-b bg-transparent",
 				)}
 			>
-				<div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+				<div className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
 					<Link href="/" className="flex flex-shrink-0 items-center gap-2">
 						<Image
 							src="/logo.svg"
@@ -123,7 +123,7 @@ export default function Navbar() {
 									key={link.href}
 									href={link.href}
 									target={link.target}
-									className="relative flex items-center gap-1.5 rounded-md px-3 py-1.5 font-mono text-muted-foreground text-sm transition-colors hover:bg-muted hover:text-primary"
+									className="relative flex items-center gap-1.5 rounded-md px-3 py-1.5 text-muted-foreground text-sm transition-colors hover:bg-muted hover:text-primary"
 								>
 									{link.icon}
 									<span>{link.label}</span>
@@ -137,7 +137,7 @@ export default function Navbar() {
 							<Link
 								href="https://github.com/sponsors/AmanVarshney01"
 								target="_blank"
-								className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/90 px-3 py-1.5 font-mono text-muted-foreground text-xs backdrop-blur-sm transition-colors hover:bg-muted hover:text-foreground"
+								className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/90 px-3 py-1.5 text-muted-foreground text-xs backdrop-blur-sm transition-colors hover:bg-muted hover:text-foreground"
 								title="Sponsor on GitHub"
 							>
 								<Heart className="size-3.5" />
@@ -145,7 +145,7 @@ export default function Navbar() {
 							</Link>
 							<Link
 								href="/new"
-								className="inline-flex items-center gap-1.5 rounded-md border border-primary/50 bg-primary/10 px-3 py-1.5 font-mono text-primary text-xs transition-colors hover:bg-primary/20"
+								className="inline-flex items-center gap-1.5 rounded-md border border-primary/50 bg-primary/10 px-3 py-1.5 text-primary text-xs transition-colors hover:bg-primary/20"
 								title="Stack Builder"
 							>
 								<Maximize2 className="size-3.5" />
@@ -183,7 +183,7 @@ export default function Navbar() {
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							transition={{ duration: 0.2, ease: "easeInOut" }}
-							className="fixed inset-0 z-[98] bg-background/50 backdrop-blur-sm lg:hidden"
+							className=" fixed inset-0 z-[98 backdrop-blur-sm lg:hidden"
 							onClick={closeMobileMenu}
 							aria-hidden="true"
 						/>
@@ -193,7 +193,7 @@ export default function Navbar() {
 							animate={{ x: 0 }}
 							exit={{ x: "100%" }}
 							transition={{ type: "spring", stiffness: 300, damping: 30 }}
-							className="fixed top-0 right-0 bottom-0 z-[99] h-full w-full max-w-xs overflow-y-auto border-border border-l bg-background shadow-lg lg:hidden"
+							className="fixed top-0 right-0 bottom-0 z-[99] h-full w-full max-w-xs overflow-y-auto border-border border-l shadow-lg lg:hidden"
 							aria-modal="true"
 						>
 							<div className="flex h-16 items-center justify-between border-border border-b px-4">
@@ -218,7 +218,7 @@ export default function Navbar() {
 											href={link.href}
 											target={link.target}
 											onClick={closeMobileMenu}
-											className="flex items-center gap-3 rounded-md px-3 py-3 font-mono text-base text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
+											className="flex items-center gap-3 rounded-md px-3 py-3 text-base text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
 										>
 											{link.icon ? (
 												<span className="flex w-5 items-center justify-center">
@@ -236,7 +236,7 @@ export default function Navbar() {
 									<Link
 										href="/new"
 										onClick={closeMobileMenu}
-										className="flex w-full items-center justify-center gap-2 rounded-md border border-primary/50 bg-primary/10 px-4 py-2.5 font-mono text-primary text-sm transition-colors hover:bg-primary/20"
+										className="flex w-full items-center justify-center gap-2 rounded-md border border-primary/50 bg-primary/10 px-4 py-2.5 text-primary text-sm transition-colors hover:bg-primary/20"
 									>
 										<Maximize2 className="size-4" />
 										Stack Builder
@@ -245,7 +245,7 @@ export default function Navbar() {
 										href="https://github.com/sponsors/AmanVarshney01"
 										target="_blank"
 										onClick={closeMobileMenu}
-										className="flex w-full items-center justify-center gap-2 rounded-md border border-border bg-muted/90 px-4 py-2.5 font-mono text-muted-foreground text-sm backdrop-blur-sm transition-colors hover:bg-muted hover:text-foreground"
+										className="flex w-full items-center justify-center gap-2 rounded-md border border-border bg-muted/90 px-4 py-2.5 text-muted-foreground text-sm backdrop-blur-sm transition-colors hover:bg-muted hover:text-foreground"
 									>
 										<Heart className="size-4" />
 										Sponsor on GitHub

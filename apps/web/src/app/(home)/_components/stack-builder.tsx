@@ -3,7 +3,6 @@
 import {
 	Check,
 	ClipboardCopy,
-	Github,
 	InfoIcon,
 	RefreshCw,
 	Settings,
@@ -14,13 +13,11 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
-import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useQueryStates } from "nuqs";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
 	Tooltip,
@@ -37,7 +34,6 @@ import {
 } from "@/lib/constant";
 import { stackParsers, stackQueryStatesOptions } from "@/lib/stack-url-state";
 import { cn } from "@/lib/utils";
-import discordLogo from "@/public/icon/discord.svg";
 
 const validateProjectName = (name: string): string | undefined => {
 	const INVALID_CHARS = ["<", ">", ":", '"', "|", "?", "*"];
@@ -1455,49 +1451,9 @@ const StackBuilder = () => {
 		<TooltipProvider>
 			<div
 				className={cn(
-					"flex h-svh flex-col overflow-hidden border-border bg-background text-foreground",
+					"grid grid-cols-1 overflow-hidden border-border text-foreground",
 				)}
 			>
-				<div
-					className={cn(
-						"grid w-full flex-shrink-0 grid-cols-2 items-center justify-center border-border border-b bg-background px-2 py-2 sm:grid-cols-3 sm:px-4",
-					)}
-				>
-					<Link href={"/"}>
-						<div className="mr-auto font-mono text-muted-foreground text-xs">
-							Home
-						</div>
-					</Link>
-					<div className="mx-auto hidden font-mono text-muted-foreground text-xs sm:block">
-						Create Better T Stack
-					</div>
-					<div className="ml-auto flex space-x-2">
-						<Link
-							href={"https://github.com/AmanVarshney01/create-better-t-stack"}
-							target="_blank"
-							rel="noopener noreferrer"
-							className={cn(
-								"text-muted-foreground transition-colors hover:text-foreground",
-							)}
-							title="GitHub Repository"
-						>
-							<Github className="h-4 w-4" />
-						</Link>
-						<Link
-							href={"https://discord.gg/ZYsbjpDaM5"}
-							target="_blank"
-							rel="noopener noreferrer"
-							className={cn(
-								"text-muted-foreground transition-colors hover:text-foreground",
-							)}
-							title="Join Discord"
-						>
-							<Image src={discordLogo} alt="discord" className="size-4" />{" "}
-						</Link>
-						<ThemeToggle />
-					</div>
-				</div>
-
 				<div className="grid grid-cols-1 overflow-hidden sm:grid-cols-[auto_1fr]">
 					<div className="flex h-full max-w-full flex-col justify-between border-border border-r p-4 sm:max-w-3xs md:max-w-xs lg:max-w-sm">
 						<div className="flex flex-col space-y-4">
@@ -1513,7 +1469,7 @@ const StackBuilder = () => {
 										setStack({ projectName: newValue });
 									}}
 									className={cn(
-										"w-full rounded border bg-background px-2 py-1 font-mono text-sm focus:outline-none",
+										"w-full rounded border px-2 py-1 text-sm focus:outline-none",
 										projectNameError
 											? "border-destructive bg-destructive/10 text-destructive-foreground"
 											: "border-border focus:border-primary",
@@ -1530,7 +1486,7 @@ const StackBuilder = () => {
 								<button
 									type="button"
 									onClick={resetStack}
-									className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+									className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
 									title="Reset to defaults"
 								>
 									<RefreshCw className="h-3 w-3" />
@@ -1539,7 +1495,7 @@ const StackBuilder = () => {
 								<button
 									type="button"
 									onClick={getRandomStack}
-									className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+									className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
 									title="Generate a random stack"
 								>
 									<Shuffle className="h-3 w-3" />
@@ -1549,7 +1505,7 @@ const StackBuilder = () => {
 									<button
 										type="button"
 										onClick={loadSavedStack}
-										className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+										className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
 										title="Load saved preferences"
 									>
 										<Settings className="h-3 w-3" />
@@ -1559,7 +1515,7 @@ const StackBuilder = () => {
 								<button
 									type="button"
 									onClick={saveCurrentStack}
-									className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+									className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
 									title="Save current preferences"
 								>
 									<Star className="h-3 w-3" />
@@ -1568,14 +1524,14 @@ const StackBuilder = () => {
 								<button
 									type="button"
 									onClick={shareToTwitter}
-									className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+									className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
 									title="Share to Twitter"
 								>
 									<Share2 className="h-3 w-3" />
 									Share
 								</button>
 							</div>
-							<div className="relative rounded border border-border bg-background p-2">
+							<div className="relative rounded border border-border p-2">
 								<div className="flex">
 									<span className="mr-2 select-none text-chart-4">$</span>
 									<code className="block break-all text-muted-foreground text-xs sm:text-sm">
@@ -1625,7 +1581,7 @@ const StackBuilder = () => {
 										type="button"
 										key={preset.id}
 										onClick={() => applyPreset(preset.id)}
-										className="rounded border border-border bg-background p-2 text-left transition-colors hover:bg-muted"
+										className="rounded border border-border p-2 text-left transition-colors hover:bg-muted"
 										title={preset.description}
 									>
 										<div className="font-medium text-foreground text-sm">
@@ -1687,7 +1643,7 @@ const StackBuilder = () => {
 											)}
 										</div>
 
-										<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
+										<div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
 											{filteredOptions.map((tech) => {
 												let isSelected = false;
 												const category = categoryKey as keyof StackState;

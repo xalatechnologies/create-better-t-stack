@@ -25,7 +25,6 @@ import {
 	ChartTooltipContent,
 } from "@/components/ui/chart";
 import discordLogo from "@/public/icon/discord.svg";
-import Navbar from "../_components/navbar";
 
 interface AnalyticsData {
 	date: string;
@@ -947,40 +946,39 @@ export default function AnalyticsPage() {
 	const hourlyDistributionData = getHourlyDistributionData();
 
 	return (
-		<div className="terminal-scanlines min-h-screen bg-background font-mono">
-			<Navbar />
-			<div className="terminal-matrix-bg container mx-auto max-w-7xl space-y-8 px-4 py-8 pt-28">
+		<div className="min-h-svh">
+			<div className="container mx-auto space-y-8 px-4 py-8 pt-16">
 				<div className="mb-8">
 					<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
 						<div className="flex items-center gap-2">
 							<Terminal className="h-5 w-5 text-primary" />
-							<span className="font-bold font-mono text-lg sm:text-xl">
+							<span className="font-bold text-lg sm:text-xl">
 								ANALYTICS_DASHBOARD.EXE
 							</span>
 						</div>
 						<div className="hidden h-px flex-1 bg-border sm:block" />
-						<span className="w-full text-right font-mono text-muted-foreground text-xs sm:w-auto sm:text-left">
+						<span className="w-full text-right text-muted-foreground text-xs sm:w-auto sm:text-left">
 							[{totalProjects} PROJECTS_ANALYZED]
 						</span>
 					</div>
 
-					<div className="terminal-block-hover rounded rounded-b-none border border-border bg-muted/20 p-4">
+					<div className="rounded rounded-b-none border border-border p-4">
 						<div className="flex items-center gap-2 text-sm">
 							<span className="text-primary">$</span>
-							<span className="font-mono text-foreground">
+							<span className=" text-foreground">
 								Analytics from Better-T-Stack CLI usage data
 							</span>
 						</div>
 						<div className="mt-2 flex items-center gap-2 text-sm">
 							<span className="text-primary">$</span>
-							<span className="font-mono text-muted-foreground">
+							<span className=" text-muted-foreground">
 								Uses PostHog - no personal info tracked, runs on each project
 								creation
 							</span>
 						</div>
 						<div className="mt-2 flex items-center gap-2 text-sm">
 							<span className="text-primary">$</span>
-							<span className="font-mono text-muted-foreground">
+							<span className=" text-muted-foreground">
 								Source:{" "}
 								<Link
 									href="https://github.com/amanvarshney01/create-better-t-stack/blob/main/apps/cli/src/utils/analytics.ts"
@@ -1003,7 +1001,7 @@ export default function AnalyticsPage() {
 						</div>
 						<div className="mt-2 flex items-center gap-2 text-sm">
 							<span className="text-primary">$</span>
-							<span className="font-mono text-muted-foreground">
+							<span className=" text-muted-foreground">
 								Last updated:{" "}
 								{loadingLastUpdated
 									? "CHECKING..."
@@ -1018,23 +1016,27 @@ export default function AnalyticsPage() {
 						href="https://discord.gg/ZYsbjpDaM5"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="terminal-block-hover block rounded rounded-t-none border border-border border-t-0 bg-background"
+						className="block rounded rounded-t-none border border-border border-t-0"
 					>
 						<div className="flex items-center justify-between p-3">
 							<div className="flex items-center gap-3">
-								<Image src={discordLogo} alt="discord" className="h-4 w-4" />
+								<Image
+									src={discordLogo}
+									alt="discord"
+									className="h-4 w-4 invert-0 dark:invert"
+								/>
 								<div>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										DISCORD_NOTIFICATIONS.IRC
 									</span>
-									<p className="font-mono text-muted-foreground text-xs">
+									<p className=" text-muted-foreground text-xs">
 										Join for LIVE project creation alerts
 									</p>
 								</div>
 							</div>
 							<div className="flex items-center gap-1 rounded border border-border bg-primary/10 px-2 py-1">
 								<span className="text-primary text-xs">▶</span>
-								<span className="font-mono font-semibold text-primary text-xs">
+								<span className=" font-semibold text-primary text-xs">
 									JOIN
 								</span>
 							</div>
@@ -1044,162 +1046,144 @@ export default function AnalyticsPage() {
 
 				<div className="space-y-4">
 					<div className="mb-4 flex items-center gap-2">
-						<span className="font-bold font-mono text-lg">
-							SYSTEM_METRICS.LOG
-						</span>
+						<span className="font-bold text-lg">SYSTEM_METRICS.LOG</span>
 						<div className="h-px flex-1 bg-border" />
 					</div>
 
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center justify-between">
-									<span className="font-mono font-semibold text-sm">
-										TOTAL_PROJECTS
-									</span>
+									<span className=" font-semibold text-sm">TOTAL_PROJECTS</span>
 									<Terminal className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="font-bold font-mono text-2xl text-primary">
+								<div className="font-bold text-2xl text-primary">
 									{totalProjects.toLocaleString()}
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
+								<p className="mt-1 text-muted-foreground text-xs">
 									$ ./create-better-t-stack executions
 								</p>
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center justify-between">
-									<span className="font-mono font-semibold text-sm">
-										TOP_FRONTEND
-									</span>
+									<span className=" font-semibold text-sm">TOP_FRONTEND</span>
 									<Cpu className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="truncate font-bold font-mono text-accent text-lg">
+								<div className="truncate font-bold text-accent text-lg">
 									{mostPopularFrontend}
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
+								<p className="mt-1 text-muted-foreground text-xs">
 									$ most_selected_frontend.sh
 								</p>
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center justify-between">
-									<span className="font-mono font-semibold text-sm">
-										TOP_BACKEND
-									</span>
+									<span className=" font-semibold text-sm">TOP_BACKEND</span>
 									<Terminal className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="truncate font-bold font-mono text-accent text-lg">
+								<div className="truncate font-bold text-accent text-lg">
 									{mostPopularBackend}
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
+								<p className="mt-1 text-muted-foreground text-xs">
 									$ most_selected_backend.sh
 								</p>
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center justify-between">
-									<span className="font-mono font-semibold text-sm">
-										TOP_ORM
-									</span>
+									<span className=" font-semibold text-sm">TOP_ORM</span>
 									<Download className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="truncate font-bold font-mono text-accent text-lg">
+								<div className="truncate font-bold text-accent text-lg">
 									{getORMData().length > 0 ? getORMData()[0].name : "None"}
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
+								<p className="mt-1 text-muted-foreground text-xs">
 									$ most_selected_orm.sh
 								</p>
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center justify-between">
-									<span className="font-mono font-semibold text-sm">
-										TOP_API
-									</span>
+									<span className=" font-semibold text-sm">TOP_API</span>
 									<TrendingUp className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="truncate font-bold font-mono text-accent text-lg">
+								<div className="truncate font-bold text-accent text-lg">
 									{getAPIData().length > 0 ? getAPIData()[0].name : "None"}
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
+								<p className="mt-1 text-muted-foreground text-xs">
 									$ most_selected_api.sh
 								</p>
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center justify-between">
-									<span className="font-mono font-semibold text-sm">
-										AUTH_ADOPTION
-									</span>
+									<span className=" font-semibold text-sm">AUTH_ADOPTION</span>
 									<Users className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="font-bold font-mono text-2xl text-primary">
+								<div className="font-bold text-2xl text-primary">
 									{authEnabledPercent}%
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
+								<p className="mt-1 text-muted-foreground text-xs">
 									$ auth_enabled_percentage.sh
 								</p>
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center justify-between">
-									<span className="font-mono font-semibold text-sm">
-										TOP_PKG_MGR
-									</span>
+									<span className=" font-semibold text-sm">TOP_PKG_MGR</span>
 									<Terminal className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="truncate font-bold font-mono text-accent text-lg">
+								<div className="truncate font-bold text-accent text-lg">
 									{getPackageManagerData().length > 0
 										? getPackageManagerData()[0].name
 										: "npm"}
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
+								<p className="mt-1 text-muted-foreground text-xs">
 									$ most_used_package_manager.sh
 								</p>
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center justify-between">
-									<span className="font-mono font-semibold text-sm">
-										AVG_DAILY
-									</span>
+									<span className=" font-semibold text-sm">AVG_DAILY</span>
 									<TrendingUp className="h-4 w-4 text-primary" />
 								</div>
 							</div>
 							<div className="p-4">
-								<div className="font-bold font-mono text-2xl text-primary">
+								<div className="font-bold text-2xl text-primary">
 									{avgProjectsPerDay.toFixed(1)}
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
+								<p className="mt-1 text-muted-foreground text-xs">
 									$ average_projects_per_day.sh
 								</p>
 							</div>
@@ -1209,23 +1193,21 @@ export default function AnalyticsPage() {
 
 				<div className="space-y-6">
 					<div className="mb-4 flex items-center gap-2">
-						<span className="font-bold font-mono text-lg">
-							TIMELINE_ANALYSIS.CHARTS
-						</span>
+						<span className="font-bold text-lg">TIMELINE_ANALYSIS.CHARTS</span>
 						<div className="h-px flex-1 bg-border" />
 					</div>
 
 					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										PROJECT_TIMELINE.CHART
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Daily project creation timeline from actual data
+								<p className="mt-1 text-muted-foreground text-xs">
+									Daily project creation timeline from actual data
 								</p>
 							</div>
 							<div className="p-4">
@@ -1258,16 +1240,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										MONTHLY_TRENDS.CHART
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Monthly project creation trends
+								<p className="mt-1 text-muted-foreground text-xs">
+									Monthly project creation trends
 								</p>
 							</div>
 							<div className="p-4">
@@ -1282,7 +1264,7 @@ export default function AnalyticsPage() {
 											tickLine={false}
 											tickMargin={10}
 											axisLine={false}
-											className="font-mono text-xs"
+											className=" text-xs"
 										/>
 										<YAxis hide />
 										<ChartTooltip content={<ChartTooltipContent />} />
@@ -1296,16 +1278,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										PLATFORM_DISTRIBUTION.PIE
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Operating system distribution
+								<p className="mt-1 text-muted-foreground text-xs">
+									Operating system distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -1342,16 +1324,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										HOURLY_DISTRIBUTION.BAR
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Projects created by hour of day (UTC)
+								<p className="mt-1 text-muted-foreground text-xs">
+									Projects created by hour of day (UTC)
 								</p>
 							</div>
 							<div className="p-4">
@@ -1366,7 +1348,7 @@ export default function AnalyticsPage() {
 											tickLine={false}
 											tickMargin={10}
 											axisLine={false}
-											className="font-mono text-xs"
+											className=" text-xs"
 										/>
 										<YAxis hide />
 										<ChartTooltip
@@ -1387,26 +1369,26 @@ export default function AnalyticsPage() {
 				<div className="space-y-6">
 					<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
 						<div className="flex items-center gap-2">
-							<span className="font-bold font-mono text-lg sm:text-xl">
+							<span className="font-bold text-lg sm:text-xl">
 								STACK_CONFIGURATION.DB
 							</span>
 						</div>
 						<div className="hidden h-px flex-1 bg-border sm:block" />
-						<span className="w-full text-right font-mono text-muted-foreground text-xs sm:w-auto sm:text-left">
+						<span className="w-full text-right text-muted-foreground text-xs sm:w-auto sm:text-left">
 							[CORE_COMPONENTS]
 						</span>
 					</div>
 
-					<div className="terminal-block-hover rounded border border-border bg-background">
-						<div className="border-border border-b bg-muted/20 px-4 py-3">
+					<div className="rounded border border-border">
+						<div className="border-border border-b px-4 py-3">
 							<div className="flex items-center gap-2">
 								<span className="text-primary text-xs">▶</span>
-								<span className="font-mono font-semibold text-sm">
+								<span className=" font-semibold text-sm">
 									POPULAR_STACK_COMBINATIONS.BAR
 								</span>
 							</div>
-							<p className="mt-1 font-mono text-muted-foreground text-xs">
-								# Most popular frontend + backend combinations
+							<p className="mt-1 text-muted-foreground text-xs">
+								Most popular frontend + backend combinations
 							</p>
 						</div>
 						<div className="p-4">
@@ -1421,7 +1403,7 @@ export default function AnalyticsPage() {
 										tickLine={false}
 										tickMargin={10}
 										axisLine={false}
-										className="font-mono text-xs"
+										className=" text-xs"
 									/>
 									<YAxis hide />
 									<ChartTooltip content={<ChartTooltipContent />} />
@@ -1435,16 +1417,16 @@ export default function AnalyticsPage() {
 						</div>
 					</div>
 
-					<div className="terminal-block-hover rounded border border-border bg-background">
-						<div className="border-border border-b bg-muted/20 px-4 py-3">
+					<div className="rounded border border-border">
+						<div className="border-border border-b px-4 py-3">
 							<div className="flex items-center gap-2">
 								<span className="text-primary text-xs">▶</span>
-								<span className="font-mono font-semibold text-sm">
+								<span className=" font-semibold text-sm">
 									FRONTEND_FRAMEWORKS.BAR
 								</span>
 							</div>
-							<p className="mt-1 font-mono text-muted-foreground text-xs">
-								# Frontend framework and meta-framework usage
+							<p className="mt-1 text-muted-foreground text-xs">
+								Frontend framework and meta-framework usage
 							</p>
 						</div>
 						<div className="p-4">
@@ -1459,7 +1441,7 @@ export default function AnalyticsPage() {
 										tickLine={false}
 										tickMargin={10}
 										axisLine={false}
-										className="font-mono text-xs"
+										className=" text-xs"
 									/>
 									<YAxis hide />
 									<ChartTooltip content={<ChartTooltipContent />} />
@@ -1477,16 +1459,16 @@ export default function AnalyticsPage() {
 					</div>
 
 					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										BACKEND_FRAMEWORKS.BAR
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Backend framework distribution
+								<p className="mt-1 text-muted-foreground text-xs">
+									Backend framework distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -1517,16 +1499,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										DATABASE_DISTRIBUTION.BAR
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Database technology distribution
+								<p className="mt-1 text-muted-foreground text-xs">
+									Database technology distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -1557,16 +1539,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										ORM_DISTRIBUTION.BAR
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# ORM/Database layer distribution
+								<p className="mt-1 text-muted-foreground text-xs">
+									ORM/Database layer distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -1594,16 +1576,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										DATABASE_HOSTING.BAR
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Database hosting service preferences
+								<p className="mt-1 text-muted-foreground text-xs">
+									Database hosting service preferences
 								</p>
 							</div>
 							<div className="p-4">
@@ -1634,16 +1616,14 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
-										API_LAYER.PIE
-									</span>
+									<span className=" font-semibold text-sm">API_LAYER.PIE</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# API layer technology distribution
+								<p className="mt-1 text-muted-foreground text-xs">
+									API layer technology distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -1673,16 +1653,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										AUTH_ADOPTION.PIE
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Authentication implementation rate
+								<p className="mt-1 text-muted-foreground text-xs">
+									Authentication implementation rate
 								</p>
 							</div>
 							<div className="p-4">
@@ -1718,16 +1698,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										RUNTIME_DISTRIBUTION.PIE
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# JavaScript runtime preference distribution
+								<p className="mt-1 text-muted-foreground text-xs">
+									JavaScript runtime preference distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -1763,16 +1743,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										PROJECT_TYPES.PIE
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Full-stack vs Frontend-only vs Backend-only projects
+								<p className="mt-1 text-muted-foreground text-xs">
+									Full-stack vs Frontend-only vs Backend-only projects
 								</p>
 							</div>
 							<div className="p-4">
@@ -1809,16 +1789,16 @@ export default function AnalyticsPage() {
 						</div>
 					</div>
 
-					<div className="terminal-block-hover rounded border border-border bg-background">
-						<div className="border-border border-b bg-muted/20 px-4 py-3">
+					<div className="rounded border border-border">
+						<div className="border-border border-b px-4 py-3">
 							<div className="flex items-center gap-2">
 								<span className="text-primary text-xs">▶</span>
-								<span className="font-mono font-semibold text-sm">
+								<span className=" font-semibold text-sm">
 									DATABASE_ORM_COMBINATIONS.BAR
 								</span>
 							</div>
-							<p className="mt-1 font-mono text-muted-foreground text-xs">
-								# Popular database + ORM combinations
+							<p className="mt-1 text-muted-foreground text-xs">
+								Popular database + ORM combinations
 							</p>
 						</div>
 						<div className="p-4">
@@ -1833,7 +1813,7 @@ export default function AnalyticsPage() {
 										tickLine={false}
 										tickMargin={10}
 										axisLine={false}
-										className="font-mono text-xs"
+										className=" text-xs"
 									/>
 									<YAxis hide />
 									<ChartTooltip content={<ChartTooltipContent />} />
@@ -1843,16 +1823,14 @@ export default function AnalyticsPage() {
 						</div>
 					</div>
 
-					<div className="terminal-block-hover rounded border border-border bg-background">
-						<div className="border-border border-b bg-muted/20 px-4 py-3">
+					<div className="rounded border border-border">
+						<div className="border-border border-b px-4 py-3">
 							<div className="flex items-center gap-2">
 								<span className="text-primary text-xs">▶</span>
-								<span className="font-mono font-semibold text-sm">
-									ADDONS_USAGE.BAR
-								</span>
+								<span className=" font-semibold text-sm">ADDONS_USAGE.BAR</span>
 							</div>
-							<p className="mt-1 font-mono text-muted-foreground text-xs">
-								# Additional features and tooling adoption
+							<p className="mt-1 text-muted-foreground text-xs">
+								Additional features and tooling adoption
 							</p>
 						</div>
 						<div className="p-4">
@@ -1867,7 +1845,7 @@ export default function AnalyticsPage() {
 										tickLine={false}
 										tickMargin={10}
 										axisLine={false}
-										className="font-mono text-xs"
+										className=" text-xs"
 									/>
 									<YAxis hide />
 									<ChartTooltip content={<ChartTooltipContent />} />
@@ -1884,16 +1862,16 @@ export default function AnalyticsPage() {
 						</div>
 					</div>
 
-					<div className="terminal-block-hover rounded border border-border bg-background">
-						<div className="border-border border-b bg-muted/20 px-4 py-3">
+					<div className="rounded border border-border">
+						<div className="border-border border-b px-4 py-3">
 							<div className="flex items-center gap-2">
 								<span className="text-primary text-xs">▶</span>
-								<span className="font-mono font-semibold text-sm">
+								<span className=" font-semibold text-sm">
 									EXAMPLES_USAGE.BAR
 								</span>
 							</div>
-							<p className="mt-1 font-mono text-muted-foreground text-xs">
-								# Example applications included in projects
+							<p className="mt-1 text-muted-foreground text-xs">
+								Example applications included in projects
 							</p>
 						</div>
 						<div className="p-4">
@@ -1908,7 +1886,7 @@ export default function AnalyticsPage() {
 										tickLine={false}
 										tickMargin={10}
 										axisLine={false}
-										className="font-mono text-xs"
+										className=" text-xs"
 									/>
 									<YAxis hide />
 									<ChartTooltip content={<ChartTooltipContent />} />
@@ -1928,23 +1906,21 @@ export default function AnalyticsPage() {
 
 				<div className="space-y-6">
 					<div className="mb-4 flex items-center gap-2">
-						<span className="font-bold font-mono text-lg">
-							DEV_ENVIRONMENT.CONFIG
-						</span>
+						<span className="font-bold text-lg">DEV_ENVIRONMENT.CONFIG</span>
 						<div className="h-px flex-1 bg-border" />
 					</div>
 
 					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										GIT_INITIALIZATION.PIE
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Git repository initialization rate
+								<p className="mt-1 text-muted-foreground text-xs">
+									Git repository initialization rate
 								</p>
 							</div>
 							<div className="p-4">
@@ -1977,16 +1953,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										PACKAGE_MANAGER.BAR
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Package manager usage distribution
+								<p className="mt-1 text-muted-foreground text-xs">
+									Package manager usage distribution
 								</p>
 							</div>
 							<div className="p-4">
@@ -2017,16 +1993,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										INSTALL_PREFERENCE.PIE
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Automatic dependency installation preference
+								<p className="mt-1 text-muted-foreground text-xs">
+									Automatic dependency installation preference
 								</p>
 							</div>
 							<div className="p-4">
@@ -2062,16 +2038,16 @@ export default function AnalyticsPage() {
 							</div>
 						</div>
 
-						<div className="terminal-block-hover rounded border border-border bg-background">
-							<div className="border-border border-b bg-muted/20 px-4 py-3">
+						<div className="rounded border border-border">
+							<div className="border-border border-b px-4 py-3">
 								<div className="flex items-center gap-2">
 									<span className="text-primary text-xs">▶</span>
-									<span className="font-mono font-semibold text-sm">
+									<span className=" font-semibold text-sm">
 										NODE_VERSIONS.BAR
 									</span>
 								</div>
-								<p className="mt-1 font-mono text-muted-foreground text-xs">
-									# Node.js version distribution (major versions)
+								<p className="mt-1 text-muted-foreground text-xs">
+									Node.js version distribution (major versions)
 								</p>
 							</div>
 							<div className="p-4">
@@ -2086,7 +2062,7 @@ export default function AnalyticsPage() {
 											tickLine={false}
 											tickMargin={10}
 											axisLine={false}
-											className="font-mono text-xs"
+											className=" text-xs"
 										/>
 										<YAxis hide />
 										<ChartTooltip content={<ChartTooltipContent />} />
@@ -2097,16 +2073,14 @@ export default function AnalyticsPage() {
 						</div>
 					</div>
 
-					<div className="terminal-block-hover rounded border border-border bg-background">
-						<div className="border-border border-b bg-muted/20 px-4 py-3">
+					<div className="rounded border border-border">
+						<div className="border-border border-b px-4 py-3">
 							<div className="flex items-center gap-2">
 								<span className="text-primary text-xs">▶</span>
-								<span className="font-mono font-semibold text-sm">
-									CLI_VERSIONS.BAR
-								</span>
+								<span className=" font-semibold text-sm">CLI_VERSIONS.BAR</span>
 							</div>
-							<p className="mt-1 font-mono text-muted-foreground text-xs">
-								# CLI version distribution across project creations
+							<p className="mt-1 text-muted-foreground text-xs">
+								CLI version distribution across project creations
 							</p>
 						</div>
 						<div className="p-4">
@@ -2121,7 +2095,7 @@ export default function AnalyticsPage() {
 										tickLine={false}
 										tickMargin={10}
 										axisLine={false}
-										className="font-mono text-xs"
+										className=" text-xs"
 									/>
 									<YAxis hide />
 									<ChartTooltip content={<ChartTooltipContent />} />

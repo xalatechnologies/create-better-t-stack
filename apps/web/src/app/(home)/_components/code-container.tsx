@@ -25,13 +25,13 @@ const CodeContainer = () => {
 	const packageManagers: Array<"npm" | "pnpm" | "bun"> = ["bun", "pnpm", "npm"];
 
 	return (
-		<div className="mx-auto mt-6 w-full max-w-3xl px-2 font-mono md:px-0">
+		<div className="mx-auto mt-6 w-full max-w-3xl px-2 md:px-0">
 			<div className="overflow-hidden rounded-lg border border-border bg-muted/30 shadow-sm">
 				<div className="flex items-center justify-between border-border border-b bg-muted/50 px-4 py-2">
 					<span className="text-muted-foreground text-xs">
 						Package manager:
 					</span>
-					<div className="flex items-center rounded-md border border-border bg-background p-0.5">
+					<div className="flex items-center rounded-md border border-border p-0.5">
 						{packageManagers.map((pm) => (
 							<button
 								type="button"
@@ -51,7 +51,7 @@ const CodeContainer = () => {
 					</div>
 				</div>
 
-				<div className="relative bg-background p-4 text-sm">
+				<div className="relative p-4 text-sm">
 					<div className="flex items-center gap-2 overflow-x-auto pb-1">
 						<span className="select-none text-muted-foreground">$</span>
 						<code className="whitespace-pre text-foreground">
@@ -64,7 +64,7 @@ const CodeContainer = () => {
 							type="button"
 							onClick={copyToClipboard}
 							className={cn(
-								"flex h-7 w-7 items-center justify-center rounded border bg-background text-muted-foreground transition-all duration-150 hover:border-border hover:bg-muted hover:text-foreground",
+								"flex h-7 w-7 items-center justify-center rounded border text-muted-foreground transition-all duration-150 hover:border-border hover:bg-muted hover:text-foreground",
 								copied
 									? "border-chart-4/50 bg-chart-4/10 text-chart-4"
 									: "border-border",

@@ -35,7 +35,7 @@ const NpmPackage = () => {
 					versionLoading && "animate-pulse",
 				)}
 			/>
-			<span className="font-mono text-muted-foreground text-xl">
+			<span className=" text-muted-foreground text-xl">
 				{versionLoading ? "[v?.?.?]" : `[v${version}]`}
 			</span>
 		</div>

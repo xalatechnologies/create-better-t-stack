@@ -31,7 +31,7 @@ export function ThemeToggle({ className }: { className?: string }) {
 				disabled
 				aria-label="Toggle theme (loading)"
 			>
-				<span className="block h-3 w-3 rounded-full bg-background shadow-lg ring-0" />
+				<span className="block h-3 w-3 rounded-full shadow-lg ring-0" />
 			</button>
 		);
 	}
@@ -48,7 +48,7 @@ export function ThemeToggle({ className }: { className?: string }) {
 		>
 			<SwitchPrimitives.Thumb
 				className={cn(
-					"pointer-events-none flex h-3 w-3 items-center justify-center rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0",
+					"pointer-events-none flex h-3 w-3 items-center justify-center rounded-full shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0",
 				)}
 			>
 				{isChecked ? (

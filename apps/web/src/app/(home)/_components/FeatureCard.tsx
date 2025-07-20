@@ -84,7 +84,7 @@ export default function FeatureCard({
 			layout
 		>
 			<div>
-				<h4 className="pb-2 text-center font-mono font-semibold text-foreground text-sm">
+				<h4 className="pb-2 text-center font-semibold text-foreground text-sm">
 					{title}
 				</h4>
 			</div>

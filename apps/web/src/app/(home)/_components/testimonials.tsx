@@ -118,11 +118,11 @@ export default function Testimonials() {
 				ease: "easeOut",
 			}}
 		>
-			<div className="terminal-block-hover w-full min-w-0 overflow-hidden rounded border border-border bg-background">
-				<div className="sticky top-0 z-10 border-border border-b bg-muted/20 px-3 py-2">
+			<div className="w-full min-w-0 overflow-hidden rounded border border-border">
+				<div className="sticky top-0 z-10 border-border border-b px-3 py-2">
 					<div className="flex items-center gap-2">
 						<span className="text-primary text-xs">▶</span>
-						<span className="font-mono font-semibold text-xs">
+						<span className=" font-semibold text-xs">
 							[TWEET_{String(index + 1).padStart(3, "0")}]
 						</span>
 					</div>
@@ -141,27 +141,27 @@ export default function Testimonials() {
 			<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
 				<div className="flex items-center gap-2">
 					<Terminal className="h-5 w-5 text-primary" />
-					<span className="font-bold font-mono text-lg sm:text-xl">
+					<span className="font-bold text-lg sm:text-xl">
 						DEVELOPER_TESTIMONIALS.LOG
 					</span>
 				</div>
 				<div className="hidden h-px flex-1 bg-border sm:block" />
-				<span className="w-full text-right font-mono text-muted-foreground text-xs sm:w-auto sm:text-left">
+				<span className="w-full text-right text-muted-foreground text-xs sm:w-auto sm:text-left">
 					[{TWEET_IDS.length} ENTRIES]
 				</span>
 			</div>
 
-			<div className="terminal-block-hover mb-8 rounded border border-border bg-muted/20 p-4">
+			<div className="mb-8 rounded border border-border p-4">
 				<div className="flex items-center gap-2 text-sm">
 					<span className="text-primary">$</span>
-					<span className="font-mono text-foreground">
-						# Community feedback from X (Twitter)
+					<span className=" text-foreground">
+						Community feedback from X (Twitter)
 					</span>
 				</div>
 				<div className="mt-2 flex items-center gap-2 text-sm">
 					<span className="text-primary">$</span>
-					<span className="font-mono text-muted-foreground">
-						# Real developers sharing their experience
+					<span className=" text-muted-foreground">
+						Real developers sharing their experience
 					</span>
 				</div>
 			</div>

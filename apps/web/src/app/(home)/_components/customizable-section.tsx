@@ -3,7 +3,7 @@ import StackBuilder from "./stack-builder";
 
 export default function CustomizableSection() {
 	return (
-		<section className="relative z-10 mx-auto mt-20 w-full max-w-7xl space-y-16 px-4 sm:px-6">
+		<section className="relative z-10 mx-auto mt-20 w-full space-y-16 px-4 sm:px-6">
 			<div className="relative space-y-8 text-center">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
@@ -12,7 +12,7 @@ export default function CustomizableSection() {
 					transition={{ duration: 0.5 }}
 					className="relative"
 				>
-					<h2 className="font-bold font-mono text-2xl tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
+					<h2 className="font-bold text-2xl tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
 						<span className="border-primary border-b-2 pb-1 text-foreground dark:text-primary">
 							Roll Your Own Stack
 						</span>
@@ -26,7 +26,7 @@ export default function CustomizableSection() {
 					transition={{ duration: 0.5, delay: 0.2 }}
 					className="mx-auto max-w-3xl space-y-6"
 				>
-					<p className="font-mono text-lg text-muted-foreground leading-relaxed sm:text-xl">
+					<p className=" text-lg text-muted-foreground leading-relaxed sm:text-xl">
 						Build your perfect TypeScript stack.
 					</p>
 				</motion.div>
