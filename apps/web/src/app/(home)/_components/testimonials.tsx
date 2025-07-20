@@ -1,8 +1,7 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Terminal } from "lucide-react";
-import { motion } from "motion/react";
-import { useMemo } from "react";
 import { Tweet } from "react-tweet";
 
 const TWEET_IDS = [
@@ -13,9 +12,11 @@ const TWEET_IDS = [
 	"1933149770639614324",
 	"1937599252173128103",
 	"1930511724702285885",
+	"1945204056063913989",
 	"1912836377365905496",
 	"1907817662215757853",
 	"1933216760896934060",
+	"1942558041704182158",
 	"1937383786637094958",
 	"1931709370003583004",
 	"1929147326955704662",
@@ -27,29 +28,39 @@ const TWEET_IDS = [
 	"1917640304758514093",
 	"1907831059275735353",
 	"1912924558522524039",
+	"1945054982870282575",
 	"1933150129738981383",
 	"1911490975173607495",
 	"1930104047845158972",
 	"1913773945523953713",
+	"1944937093387706572",
 	"1904241046898556970",
 	"1913834145471672652",
+	"1946245671880966269",
 	"1930514202260635807",
 	"1931589579749892480",
 	"1904144343125860404",
 	"1917610656477348229",
 	"1904215768272654825",
 	"1931830211013718312",
+	"1944895251811893680",
 	"1913833079342522779",
 	"1930449311848087708",
+	"1942680754384953790",
 	"1907723601731530820",
+	"1944553262792810603",
 	"1904233896851521980",
 	"1930294868808515726",
+	"1943290033383047237",
 	"1913801258789491021",
 	"1907841646513005038",
 	"1904301540422070671",
+	"1944208789617471503",
 	"1912837026925195652",
 	"1904338606409531710",
+	"1942965795920679188",
 	"1904318186750652606",
+	"1943656585294643386",
 	"1908568583799484519",
 	"1913018977321693448",
 	"1904179661086556412",
@@ -61,20 +72,18 @@ const TWEET_IDS = [
 ];
 
 export default function Testimonials() {
-	// Split tweets into 3 columns
-	const columns = useMemo(() => {
-		const col1: string[] = [];
-		const col2: string[] = [];
-		const col3: string[] = [];
+	const getResponsiveColumns = (numCols: number) => {
+		const columns: string[][] = Array(numCols)
+			.fill(null)
+			.map(() => []);
 
 		TWEET_IDS.forEach((tweetId, index) => {
-			if (index % 3 === 0) col1.push(tweetId);
-			else if (index % 3 === 1) col2.push(tweetId);
-			else col3.push(tweetId);
+			const colIndex = index % numCols;
+			columns[colIndex].push(tweetId);
 		});
 
-		return [col1, col2, col3];
-	}, []);
+		return columns;
+	};
 
 	const containerVariants = {
 		hidden: { opacity: 0 },
@@ -92,8 +101,43 @@ export default function Testimonials() {
 		},
 	};
 
+	const TweetCard = ({
+		tweetId,
+		index,
+	}: {
+		tweetId: string;
+		index: number;
+	}) => (
+		<motion.div
+			className="w-full min-w-0"
+			initial={{ opacity: 0, y: 20, scale: 0.95 }}
+			animate={{ opacity: 1, y: 0, scale: 1 }}
+			transition={{
+				delay: index * 0.05,
+				duration: 0.4,
+				ease: "easeOut",
+			}}
+		>
+			<div className="terminal-block-hover w-full min-w-0 overflow-hidden rounded border border-border bg-background">
+				<div className="sticky top-0 z-10 border-border border-b bg-muted/20 px-3 py-2">
+					<div className="flex items-center gap-2">
+						<span className="text-primary text-xs">▶</span>
+						<span className="font-mono font-semibold text-xs">
+							[TWEET_{String(index + 1).padStart(3, "0")}]
+						</span>
+					</div>
+				</div>
+				<div className="w-full min-w-0 overflow-hidden">
+					<div style={{ width: "100%", minWidth: 0, maxWidth: "100%" }}>
+						<Tweet id={tweetId} />
+					</div>
+				</div>
+			</div>
+		</motion.div>
+	);
+
 	return (
-		<div className="mb-12">
+		<div className="mb-12 w-full max-w-full overflow-hidden px-4">
 			<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
 				<div className="flex items-center gap-2">
 					<Terminal className="h-5 w-5 text-primary" />
@@ -122,114 +166,74 @@ export default function Testimonials() {
 				</div>
 			</div>
 
-			<motion.div
-				className="flex flex-col gap-4 sm:flex-row"
-				variants={containerVariants}
-				initial="hidden"
-				animate="visible"
-			>
+			<div className="block sm:hidden">
 				<motion.div
-					className="flex flex-1 flex-col gap-4"
-					variants={columnVariants}
+					className="flex flex-col gap-4"
+					variants={containerVariants}
+					initial="hidden"
+					animate="visible"
 				>
-					{columns[0]?.map((tweetId, tweetIndex) => {
-						const globalIndex = 0 + tweetIndex * 3;
-						return (
-							<motion.div
-								key={tweetId}
-								className="terminal-block-hover overflow-hidden rounded border border-border bg-background"
-								initial={{ opacity: 0, y: 20, scale: 0.95 }}
-								animate={{ opacity: 1, y: 0, scale: 1 }}
-								transition={{
-									delay: tweetIndex * 0.05,
-									duration: 0.4,
-									ease: "easeOut",
-								}}
-							>
-								<div className="sticky top-0 z-10 border-border border-b bg-muted/20 px-3 py-2">
-									<div className="flex items-center gap-2">
-										<span className="text-primary text-xs">▶</span>
-										<span className="font-mono font-semibold text-xs">
-											[TWEET_{String(globalIndex + 1).padStart(3, "0")}]
-										</span>
-									</div>
-								</div>
-								<div className="p-0">
-									<Tweet id={tweetId} />
-								</div>
-							</motion.div>
-						);
-					})}
+					{TWEET_IDS.map((tweetId, index) => (
+						<TweetCard key={tweetId} tweetId={tweetId} index={index} />
+					))}
 				</motion.div>
+			</div>
 
+			<div className="hidden sm:block lg:hidden">
 				<motion.div
-					className="flex flex-1 flex-col gap-4"
-					variants={columnVariants}
+					className="grid grid-cols-2 gap-4"
+					variants={containerVariants}
+					initial="hidden"
+					animate="visible"
 				>
-					{columns[1]?.map((tweetId, tweetIndex) => {
-						const globalIndex = 1 + tweetIndex * 3;
-						return (
-							<motion.div
-								key={tweetId}
-								className="terminal-block-hover overflow-hidden rounded border border-border bg-background"
-								initial={{ opacity: 0, y: 20, scale: 0.95 }}
-								animate={{ opacity: 1, y: 0, scale: 1 }}
-								transition={{
-									delay: tweetIndex * 0.05,
-									duration: 0.4,
-									ease: "easeOut",
-								}}
-							>
-								<div className="sticky top-0 z-10 border-border border-b bg-muted/20 px-3 py-2">
-									<div className="flex items-center gap-2">
-										<span className="text-primary text-xs">▶</span>
-										<span className="font-mono font-semibold text-xs">
-											[TWEET_{String(globalIndex + 1).padStart(3, "0")}]
-										</span>
-									</div>
-								</div>
-								<div className="p-0">
-									<Tweet id={tweetId} />
-								</div>
-							</motion.div>
-						);
-					})}
+					{getResponsiveColumns(2).map((column, colIndex) => (
+						<motion.div
+							key={column.join("-")}
+							className="flex min-w-0 flex-col gap-4"
+							variants={columnVariants}
+						>
+							{column.map((tweetId, tweetIndex) => {
+								const globalIndex = colIndex + tweetIndex * 2;
+								return (
+									<TweetCard
+										key={tweetId}
+										tweetId={tweetId}
+										index={globalIndex}
+									/>
+								);
+							})}
+						</motion.div>
+					))}
 				</motion.div>
+			</div>
 
+			<div className="hidden lg:block">
 				<motion.div
-					className="flex flex-1 flex-col gap-4"
-					variants={columnVariants}
+					className="grid grid-cols-3 gap-4"
+					variants={containerVariants}
+					initial="hidden"
+					animate="visible"
 				>
-					{columns[2]?.map((tweetId, tweetIndex) => {
-						const globalIndex = 2 + tweetIndex * 3;
-						return (
-							<motion.div
-								key={tweetId}
-								className="terminal-block-hover overflow-hidden rounded border border-border bg-background"
-								initial={{ opacity: 0, y: 20, scale: 0.95 }}
-								animate={{ opacity: 1, y: 0, scale: 1 }}
-								transition={{
-									delay: tweetIndex * 0.05,
-									duration: 0.4,
-									ease: "easeOut",
-								}}
-							>
-								<div className="sticky top-0 z-10 border-border border-b bg-muted/20 px-3 py-2">
-									<div className="flex items-center gap-2">
-										<span className="text-primary text-xs">▶</span>
-										<span className="font-mono font-semibold text-xs">
-											[TWEET_{String(globalIndex + 1).padStart(3, "0")}]
-										</span>
-									</div>
-								</div>
-								<div className="p-0">
-									<Tweet id={tweetId} />
-								</div>
-							</motion.div>
-						);
-					})}
+					{getResponsiveColumns(3).map((column, colIndex) => (
+						<motion.div
+							key={column.join("-")}
+							className="flex min-w-0 flex-col gap-4"
+							variants={columnVariants}
+						>
+							{column.map((tweetId, tweetIndex) => {
+								const globalIndex = colIndex + tweetIndex * 3;
+								return (
+									<TweetCard
+										key={tweetId}
+										tweetId={tweetId}
+										index={globalIndex}
+									/>
+								);
+							})}
+						</motion.div>
+					))}
 				</motion.div>
-			</motion.div>
+			</div>
 		</div>
 	);
 }
