@@ -1,4 +1,11 @@
-import { Github, Globe, Heart, Terminal } from "lucide-react";
+import {
+	ChevronDown,
+	ChevronUp,
+	Github,
+	Globe,
+	Heart,
+	Terminal,
+} from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { Sponsor } from "@/lib/types";
@@ -7,6 +14,7 @@ export default function SponsorsSection() {
 	const [sponsors, setSponsors] = useState<Sponsor[]>([]);
 	const [loadingSponsors, setLoadingSponsors] = useState(true);
 	const [sponsorError, setSponsorError] = useState<string | null>(null);
+	const [showPastSponsors, setShowPastSponsors] = useState(false);
 
 	useEffect(() => {
 		fetch("https://sponsors.amanv.dev/sponsors.json")
@@ -31,6 +39,15 @@ export default function SponsorsSection() {
 						return 0;
 					};
 
+					if (a.monthlyDollars === -1 && b.monthlyDollars !== -1) return 1;
+					if (a.monthlyDollars !== -1 && b.monthlyDollars === -1) return -1;
+
+					if (a.monthlyDollars === -1 && b.monthlyDollars === -1) {
+						return (
+							new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+						);
+					}
+
 					const aIsMonthly = !a.isOneTime;
 					const bIsMonthly = !b.isOneTime;
 
@@ -48,6 +65,13 @@ export default function SponsorsSection() {
 				setLoadingSponsors(false);
 			});
 	}, []);
+
+	const currentSponsors = sponsors.filter(
+		(sponsor) => sponsor.monthlyDollars !== -1,
+	);
+	const pastSponsors = sponsors.filter(
+		(sponsor) => sponsor.monthlyDollars === -1,
+	);
 
 	return (
 		<div className="mb-12">
@@ -124,99 +148,227 @@ export default function SponsorsSection() {
 					</div>
 				</div>
 			) : (
-				<div className="space-y-6">
-					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-						{sponsors.map((entry, index) => {
-							const since = new Date(entry.createdAt).toLocaleDateString(
-								undefined,
-								{ year: "numeric", month: "short" },
-							);
-							return (
-								<div
-									key={entry.sponsor.login}
-									className="rounded border border-border"
-									style={{ animationDelay: `${index * 50}ms` }}
-								>
-									<div className="border-border border-b px-3 py-2">
-										<div className="flex items-center gap-2">
-											<span className="text-primary text-xs">▶</span>
-											<div className="ml-auto flex items-center gap-2 text-muted-foreground text-xs">
-												<span>{entry.isOneTime ? "ONE-TIME" : "MONTHLY"}</span>
-												<span>•</span>
-												<span>SINCE {since.toUpperCase()}</span>
-											</div>
-										</div>
-									</div>
-									<div className="p-4">
-										<div className="flex items-center gap-4">
-											<div className="flex-shrink-0">
-												<Image
-													src={entry.sponsor.avatarUrl}
-													alt={entry.sponsor.name || entry.sponsor.login}
-													width={100}
-													height={100}
-													className="rounded border border-border transition-colors duration-300"
-													unoptimized
-												/>
-											</div>
-											<div className="min-w-0 flex-1 space-y-2">
-												<div>
-													<h3 className="truncate font-semibold text-foreground text-sm">
-														{entry.sponsor.name || entry.sponsor.login}
-													</h3>
-													{entry.tierName && (
-														<p className=" text-primary text-xs">
-															{entry.tierName}
-														</p>
-													)}
-												</div>
-												<div className="flex flex-col gap-1">
-													<a
-														href={`https://github.com/${entry.sponsor.login}`}
-														target="_blank"
-														rel="noopener noreferrer"
-														className="group flex items-center gap-2 text-muted-foreground text-xs transition-colors hover:text-primary"
-													>
-														<Github className="h-4 w-4" />
-														<span className="truncate">
-															{entry.sponsor.login}
+				<div className="space-y-8">
+					{currentSponsors.length > 0 && (
+						<div className="space-y-4">
+							<div className="flex items-center gap-2">
+								<span className="text-primary text-sm">▶</span>
+								<span className="font-semibold text-foreground text-sm">
+									ACTIVE_SPONSORS.EXE
+								</span>
+								<span className="text-muted-foreground text-xs">
+									({currentSponsors.length})
+								</span>
+							</div>
+							<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+								{currentSponsors.map((entry, index) => {
+									const since = new Date(entry.createdAt).toLocaleDateString(
+										undefined,
+										{ year: "numeric", month: "short" },
+									);
+									return (
+										<div
+											key={entry.sponsor.login}
+											className="rounded border border-border"
+											style={{ animationDelay: `${index * 50}ms` }}
+										>
+											<div className="border-border border-b px-3 py-2">
+												<div className="flex items-center gap-2">
+													<span className="text-primary text-xs">▶</span>
+													<div className="ml-auto flex items-center gap-2 text-muted-foreground text-xs">
+														<span>
+															{entry.isOneTime ? "ONE-TIME" : "MONTHLY"}
 														</span>
-													</a>
-													{(entry.sponsor.websiteUrl ||
-														entry.sponsor.linkUrl) && (
-														<a
-															href={
-																entry.sponsor.websiteUrl ||
-																entry.sponsor.linkUrl
-															}
-															target="_blank"
-															rel="noopener noreferrer"
-															className="group flex items-center gap-2 text-muted-foreground text-xs transition-colors hover:text-primary"
-														>
-															<Globe className="h-4 w-4" />
-															<span className="truncate">
-																{(
-																	entry.sponsor.websiteUrl ||
-																	entry.sponsor.linkUrl
-																)
-																	?.replace(/^https?:\/\//, "")
-																	?.replace(/\/$/, "")}
-															</span>
-														</a>
-													)}
-
-													{/* <div className="flex items-center gap-2  text-muted-foreground text-xs">
-														<span className="text-xs">👤</span>
-														<span>{entry.sponsor.type.toUpperCase()}</span>
-													</div> */}
+														<span>•</span>
+														<span>SINCE {since.toUpperCase()}</span>
+													</div>
+												</div>
+											</div>
+											<div className="p-4">
+												<div className="flex items-center gap-4">
+													<div className="flex-shrink-0">
+														<Image
+															src={entry.sponsor.avatarUrl}
+															alt={entry.sponsor.name || entry.sponsor.login}
+															width={100}
+															height={100}
+															className="rounded border border-border transition-colors duration-300"
+															unoptimized
+														/>
+													</div>
+													<div className="min-w-0 flex-1 space-y-2">
+														<div>
+															<h3 className="truncate font-semibold text-foreground text-sm">
+																{entry.sponsor.name || entry.sponsor.login}
+															</h3>
+															{entry.tierName && (
+																<p className=" text-primary text-xs">
+																	{entry.tierName}
+																</p>
+															)}
+														</div>
+														<div className="flex flex-col gap-1">
+															<a
+																href={`https://github.com/${entry.sponsor.login}`}
+																target="_blank"
+																rel="noopener noreferrer"
+																className="group flex items-center gap-2 text-muted-foreground text-xs transition-colors hover:text-primary"
+															>
+																<Github className="h-4 w-4" />
+																<span className="truncate">
+																	{entry.sponsor.login}
+																</span>
+															</a>
+															{(entry.sponsor.websiteUrl ||
+																entry.sponsor.linkUrl) && (
+																<a
+																	href={
+																		entry.sponsor.websiteUrl ||
+																		entry.sponsor.linkUrl
+																	}
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	className="group flex items-center gap-2 text-muted-foreground text-xs transition-colors hover:text-primary"
+																>
+																	<Globe className="h-4 w-4" />
+																	<span className="truncate">
+																		{(
+																			entry.sponsor.websiteUrl ||
+																			entry.sponsor.linkUrl
+																		)
+																			?.replace(/^https?:\/\//, "")
+																			?.replace(/\/$/, "")}
+																	</span>
+																</a>
+															)}
+														</div>
+													</div>
 												</div>
 											</div>
 										</div>
-									</div>
+									);
+								})}
+							</div>
+						</div>
+					)}
+
+					{pastSponsors.length > 0 && (
+						<div className="space-y-4">
+							<button
+								type="button"
+								onClick={() => setShowPastSponsors(!showPastSponsors)}
+								className="flex w-full items-center gap-2 rounded p-2 text-left transition-colors hover:bg-muted/50"
+							>
+								{showPastSponsors ? (
+									<ChevronUp className="h-4 w-4 text-muted-foreground" />
+								) : (
+									<ChevronDown className="h-4 w-4 text-muted-foreground" />
+								)}
+								<span className="font-semibold text-muted-foreground text-sm">
+									PAST_SPONSORS.ARCHIVE
+								</span>
+								<span className="text-muted-foreground text-xs">
+									({pastSponsors.length})
+								</span>
+								<div className="mx-2 h-px flex-1 bg-border" />
+								<span className="text-muted-foreground text-xs">
+									{showPastSponsors ? "HIDE" : "SHOW"}
+								</span>
+							</button>
+
+							{showPastSponsors && (
+								<div className="slide-in-from-top-2 grid animate-in grid-cols-1 gap-4 duration-300 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+									{pastSponsors.map((entry, index) => {
+										const since = new Date(entry.createdAt).toLocaleDateString(
+											undefined,
+											{ year: "numeric", month: "short" },
+										);
+										return (
+											<div
+												key={entry.sponsor.login}
+												className="rounded border border-border/70 bg-muted/20"
+												style={{ animationDelay: `${index * 50}ms` }}
+											>
+												<div className="border-border/70 border-b px-3 py-2">
+													<div className="flex items-center gap-2">
+														<span className="text-muted-foreground text-xs">
+															◆
+														</span>
+														<div className="ml-auto flex items-center gap-2 text-muted-foreground text-xs">
+															<span>PAST</span>
+															<span>•</span>
+															<span>SINCE {since.toUpperCase()}</span>
+														</div>
+													</div>
+												</div>
+												<div className="p-4">
+													<div className="flex items-center gap-4">
+														<div className="flex-shrink-0">
+															<Image
+																src={entry.sponsor.avatarUrl}
+																alt={entry.sponsor.name || entry.sponsor.login}
+																width={80}
+																height={80}
+																className="rounded border border-border/70 transition-colors duration-300"
+																unoptimized
+															/>
+														</div>
+														<div className="min-w-0 flex-1 space-y-2">
+															<div>
+																<h3 className="truncate font-semibold text-muted-foreground text-sm">
+																	{entry.sponsor.name || entry.sponsor.login}
+																</h3>
+																{entry.tierName && (
+																	<p className="text-muted-foreground/70 text-xs">
+																		{entry.tierName}
+																	</p>
+																)}
+															</div>
+															<div className="flex flex-col gap-1">
+																<a
+																	href={`https://github.com/${entry.sponsor.login}`}
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	className="group flex items-center gap-2 text-muted-foreground/70 text-xs transition-colors hover:text-muted-foreground"
+																>
+																	<Github className="h-4 w-4" />
+																	<span className="truncate">
+																		{entry.sponsor.login}
+																	</span>
+																</a>
+																{(entry.sponsor.websiteUrl ||
+																	entry.sponsor.linkUrl) && (
+																	<a
+																		href={
+																			entry.sponsor.websiteUrl ||
+																			entry.sponsor.linkUrl
+																		}
+																		target="_blank"
+																		rel="noopener noreferrer"
+																		className="group flex items-center gap-2 text-muted-foreground/70 text-xs transition-colors hover:text-muted-foreground"
+																	>
+																		<Globe className="h-4 w-4" />
+																		<span className="truncate">
+																			{(
+																				entry.sponsor.websiteUrl ||
+																				entry.sponsor.linkUrl
+																			)
+																				?.replace(/^https?:\/\//, "")
+																				?.replace(/\/$/, "")}
+																		</span>
+																	</a>
+																)}
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										);
+									})}
 								</div>
-							);
-						})}
-					</div>
+							)}
+						</div>
+					)}
 
 					<div className="rounded border border-border p-4">
 						<a
