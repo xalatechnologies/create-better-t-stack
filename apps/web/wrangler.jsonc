@@ -3,6 +3,7 @@
 	"name": "better-t-stack",
 	"compatibility_date": "2025-07-13",
 	"compatibility_flags": ["nodejs_compat"],
+	"keep_names": false,
 	"assets": {
 		"directory": ".open-next/assets",
 		"binding": "ASSETS"

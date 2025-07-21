@@ -1,7 +1,7 @@
 export const dynamic = "force-static";
 
 import { RootProvider } from "fumadocs-ui/provider";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
@@ -90,6 +90,11 @@ export const metadata: Metadata = {
 	icons: {
 		icon: "/logo.svg",
 	},
+};
+
+export const viewport: Viewport = {
+	width: "device-width",
+	initialScale: 1.0,
 };
 
 export default function Layout({ children }: { children: ReactNode }) {
