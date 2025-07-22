@@ -162,14 +162,16 @@ export default function HomePage() {
 					</div>
 				</div>
 
-				<div className="mb-12 grid grid-cols-1 gap-4 md:grid-cols-3">
+				<div className="mb-8 grid grid-cols-1 gap-4 sm:mb-12 sm:grid-cols-2 lg:grid-cols-3">
 					<Link href="/new">
-						<div className="group cursor-pointer rounded border border-border p-4">
+						<div className="group cursor-pointer rounded border border-border p-4 transition-colors focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:bg-muted/50">
 							<div className="flex items-center gap-2">
-								<ChevronRight className="h-4 w-4 text-primary" />
-								<span className=" font-semibold">STACK_BUILDER.SH</span>
+								<ChevronRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
+								<span className="font-semibold text-sm sm:text-base">
+									STACK_BUILDER.SH
+								</span>
 							</div>
-							<p className="mt-2 text-muted-foreground text-sm">
+							<p className="mt-2 text-muted-foreground text-xs sm:text-sm">
 								[EXEC] Interactive configuration wizard
 							</p>
 						</div>
@@ -180,20 +182,22 @@ export default function HomePage() {
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						<div className="group cursor-pointer rounded border border-border p-4">
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<Github className="h-4 w-4 text-primary" />
-									<span className=" font-semibold">GITHUB_REPO.GIT</span>
+						<div className="group cursor-pointer rounded border border-border p-4 transition-colors focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:bg-muted/50">
+							<div className="flex items-start justify-between gap-3">
+								<div className="flex min-w-0 flex-1 items-center gap-2">
+									<Github className="h-4 w-4 flex-shrink-0 text-primary" />
+									<span className="truncate font-semibold text-sm sm:text-base">
+										GITHUB_REPO.GIT
+									</span>
 								</div>
 								{stars !== null && !isLoadingStars && (
-									<div className="flex items-center gap-1 rounded border border-border bg-muted/30 px-2 py-1 text-xs">
+									<div className="flex flex-shrink-0 items-center gap-1 rounded border border-border bg-muted/30 px-2 py-1 text-xs">
 										<Star className="h-3 w-3 text-accent" />
-										{stars}
+										<span className="tabular-nums">{stars}</span>
 									</div>
 								)}
 							</div>
-							<p className="mt-2 text-muted-foreground text-sm">
+							<p className="mt-2 text-muted-foreground text-xs sm:text-sm">
 								[LINK] Star the repository on GitHub
 							</p>
 						</div>
@@ -203,17 +207,20 @@ export default function HomePage() {
 						href="https://discord.gg/ZYsbjpDaM5"
 						target="_blank"
 						rel="noopener noreferrer"
+						className="sm:col-span-2 lg:col-span-1"
 					>
-						<div className="group cursor-pointer rounded border border-border p-4">
+						<div className="group cursor-pointer rounded border border-border p-4 transition-colors focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:bg-muted/50">
 							<div className="flex items-center gap-2">
 								<Image
 									src={discordLogo}
 									alt="discord"
-									className="h-4 w-4 invert-0 dark:invert"
+									className="h-4 w-4 flex-shrink-0 invert-0 dark:invert"
 								/>
-								<span className=" font-semibold">DISCORD_CHAT.IRC</span>
+								<span className="font-semibold text-sm sm:text-base">
+									DISCORD_CHAT.IRC
+								</span>
 							</div>
-							<p className="mt-2 text-muted-foreground text-sm">
+							<p className="mt-2 text-muted-foreground text-xs sm:text-sm">
 								[JOIN] Connect to developer community
 							</p>
 						</div>

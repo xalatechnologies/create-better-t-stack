@@ -3,37 +3,36 @@ import Link from "next/link";
 
 const Footer = () => {
 	return (
-		<footer className="relative w-full border-border border-t ">
-			<div className="mx-auto px-4 py-12 sm:px-6">
-				<div className="mb-12 grid gap-8 md:grid-cols-3">
-					<div>
-						<h3 className="mb-4 flex items-center gap-2 font-semibold text-base text-foreground">
+		<footer className="relative w-full border-border border-t">
+			<div className="container mx-auto px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+				<div className="mb-8 grid gap-8 sm:mb-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
+					<div className="sm:col-span-2 lg:col-span-1">
+						<h3 className="mb-3 flex items-center gap-2 font-semibold text-base text-foreground sm:mb-4">
 							<span>Better-T Stack</span>
 						</h3>
-						<p className="text-muted-foreground leading-relaxed">
+						<p className="mb-4 text-muted-foreground text-sm leading-relaxed sm:mb-6 sm:text-base lg:pr-4">
 							Type-safe, modern TypeScript scaffolding for full-stack web
 							development
 						</p>
-
-						<div className="mt-4 flex space-x-3">
+						<div className="flex space-x-4">
 							<Link
 								href="https://github.com/better-t-stack/create-better-t-stack"
 								target="_blank"
-								className="text-muted-foreground transition-colors hover:text-foreground"
-								aria-label="GitHub"
+								className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+								aria-label="GitHub Repository"
 							>
-								<Github size={18} />
+								<Github size={20} />
 							</Link>
 							<Link
 								href="https://www.npmjs.com/package/create-better-t-stack"
 								target="_blank"
-								className="text-muted-foreground transition-colors hover:text-foreground"
-								aria-label="NPM"
+								className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+								aria-label="NPM Package"
 							>
 								<svg
 									viewBox="0 0 24 24"
-									width="18"
-									height="18"
+									width="20"
+									height="20"
 									fill="currentColor"
 								>
 									<title>NPM</title>
@@ -44,15 +43,15 @@ const Footer = () => {
 					</div>
 
 					<div>
-						<h3 className="mb-4 font-semibold text-base text-foreground">
+						<h3 className="mb-3 font-semibold text-base text-foreground sm:mb-4">
 							Resources
 						</h3>
-						<ul className="space-y-2.5 text-muted-foreground">
+						<ul className="space-y-2 text-muted-foreground text-sm sm:space-y-3 sm:text-base">
 							<li>
 								<Link
 									target="_blank"
 									href="https://github.com/better-t-stack/create-better-t-stack"
-									className="transition-colors hover:text-primary"
+									className="inline-block transition-colors hover:text-primary focus:text-primary focus:outline-none"
 								>
 									GitHub Repository
 								</Link>
@@ -61,7 +60,7 @@ const Footer = () => {
 								<Link
 									target="_blank"
 									href="https://www.npmjs.com/package/create-better-t-stack"
-									className="transition-colors hover:text-primary"
+									className="inline-block transition-colors hover:text-primary focus:text-primary focus:outline-none"
 								>
 									NPM Package
 								</Link>
@@ -70,37 +69,28 @@ const Footer = () => {
 								<Link
 									target="_blank"
 									href="https://my-better-t-app-client.pages.dev/"
-									className="transition-colors hover:text-primary"
+									className="inline-block transition-colors hover:text-primary focus:text-primary focus:outline-none"
 								>
 									Demo Application
 								</Link>
 							</li>
-							{/*
-							<li>
-								<Link
-									target="_blank"
-									href="https://github.com/better-t-stack/create-better-t-stack#readme"
-									className="hover:text-primary transition-colors"
-								>
-									Documentation
-								</Link>
-							</li>
-							*/}
 						</ul>
 					</div>
 
 					<div>
-						<h3 className="mb-4 font-semibold text-base text-foreground">
+						<h3 className="mb-3 font-semibold text-base text-foreground sm:mb-4">
 							Contact
 						</h3>
-						<div className="space-y-2.5 text-muted-foreground">
-							<p className="flex items-center">
-								<span className="mr-2 rounded bg-muted px-2 py-1 text-sm">
+						<div className="space-y-3 text-muted-foreground text-sm sm:space-y-4 sm:text-base">
+							<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+								<span className="inline-flex w-fit rounded bg-muted px-2 py-1 font-mono text-xs sm:text-sm">
 									$
 								</span>
-								<span>amanvarshney.work@gmail.com</span>
-							</p>
-							<p className="mt-3">
+								<span className="break-all sm:break-normal">
+									amanvarshney.work@gmail.com
+								</span>
+							</div>
+							<p className="text-sm leading-relaxed sm:text-base">
 								Have questions or feedback? Feel free to reach out or open an
 								issue on GitHub.
 							</p>
@@ -108,11 +98,11 @@ const Footer = () => {
 					</div>
 				</div>
 
-				<div className="mt-12 flex flex-col items-center justify-between gap-4 border-border border-t pt-6 sm:flex-row">
-					<p className="text-muted-foreground text-sm">
+				<div className="flex flex-col items-center justify-between gap-4 border-border border-t pt-6 sm:flex-row sm:gap-6 sm:pt-8">
+					<p className="text-center text-muted-foreground text-xs sm:text-left sm:text-sm">
 						© {new Date().getFullYear()} Better-T Stack. All rights reserved.
 					</p>
-					<p className="flex items-center gap-1.5 text-muted-foreground text-sm">
+					<p className="flex items-center gap-1.5 text-muted-foreground text-xs sm:text-sm">
 						Built with
 						<span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text font-medium text-transparent">
 							TypeScript
