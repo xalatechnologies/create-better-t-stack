@@ -167,7 +167,7 @@ export default function HomePage() {
 						<div className="group cursor-pointer rounded border border-border p-4">
 							<div className="flex items-center gap-2">
 								<ChevronRight className="h-4 w-4 text-primary" />
-								<span className=" font-semibold">STACK_BUILDER.EXE</span>
+								<span className=" font-semibold">STACK_BUILDER.SH</span>
 							</div>
 							<p className="mt-2 text-muted-foreground text-sm">
 								[EXEC] Interactive configuration wizard

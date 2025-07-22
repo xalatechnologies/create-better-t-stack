@@ -87,27 +87,11 @@ export default function SponsorsSection() {
 					[{loadingSponsors ? "LOADING..." : sponsors.length} RECORDS]
 				</span>
 			</div>
-
-			<div className="mb-8 rounded border border-border p-4">
-				<div className="flex items-center gap-2 text-sm">
-					<span className="text-primary">$</span>
-					<span className=" text-foreground">
-						Amazing organizations and individuals supporting this project
-					</span>
-				</div>
-				<div className="mt-2 flex items-center gap-2 text-sm">
-					<span className="text-primary">$</span>
-					<span className=" text-muted-foreground">
-						Your support helps maintain and improve Better-T-Stack
-					</span>
-				</div>
-			</div>
-
 			{loadingSponsors ? (
 				<div className="rounded border border-border p-8">
 					<div className="flex items-center justify-center gap-2">
 						<div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
-						<span className=" text-muted-foreground">LOADING_SPONSORS.EXE</span>
+						<span className=" text-muted-foreground">LOADING_SPONSORS.SH</span>
 						<div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
 					</div>
 				</div>
@@ -143,7 +127,7 @@ export default function SponsorsSection() {
 							className="flex items-center justify-center gap-2 text-primary transition-colors hover:text-accent"
 						>
 							<Heart className="h-4 w-4" />
-							<span>BECOME_SPONSOR.EXE</span>
+							<span>BECOME_SPONSOR.SH</span>
 						</a>
 					</div>
 				</div>
@@ -151,15 +135,15 @@ export default function SponsorsSection() {
 				<div className="space-y-8">
 					{currentSponsors.length > 0 && (
 						<div className="space-y-4">
-							<div className="flex items-center gap-2">
+							{/* <div className="flex items-center gap-2">
 								<span className="text-primary text-sm">▶</span>
 								<span className="font-semibold text-foreground text-sm">
-									ACTIVE_SPONSORS.EXE
+									ACTIVE_SPONSORS.SH
 								</span>
 								<span className="text-muted-foreground text-xs">
 									({currentSponsors.length})
 								</span>
-							</div>
+							</div> */}
 							<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 								{currentSponsors.map((entry, index) => {
 									const since = new Date(entry.createdAt).toLocaleDateString(
@@ -378,7 +362,7 @@ export default function SponsorsSection() {
 							className="flex items-center justify-center gap-2 text-primary transition-colors hover:text-accent"
 						>
 							<Heart className="h-4 w-4" />
-							<span>SUPPORT_PROJECT.EXE</span>
+							<span>SUPPORT_PROJECT.SH</span>
 						</a>
 					</div>
 				</div>

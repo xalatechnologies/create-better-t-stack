@@ -86,7 +86,7 @@ export default function ShowcaseItem({
 								className="flex items-center gap-2 rounded border border-border bg-primary/10 px-3 py-2 text-primary text-sm transition-all hover:bg-primary/20 hover:text-primary"
 							>
 								<Monitor className="h-3 w-3" />
-								<span>LAUNCH_DEMO.EXE</span>
+								<span>LAUNCH_DEMO.SH</span>
 								<ExternalLink className="ml-auto h-3 w-3" />
 							</Link>
 						)}

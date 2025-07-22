@@ -150,22 +150,6 @@ export default function Testimonials() {
 					[{TWEET_IDS.length} ENTRIES]
 				</span>
 			</div>
-
-			<div className="mb-8 rounded border border-border p-4">
-				<div className="flex items-center gap-2 text-sm">
-					<span className="text-primary">$</span>
-					<span className=" text-foreground">
-						Community feedback from X (Twitter)
-					</span>
-				</div>
-				<div className="mt-2 flex items-center gap-2 text-sm">
-					<span className="text-primary">$</span>
-					<span className=" text-muted-foreground">
-						Real developers sharing their experience
-					</span>
-				</div>
-			</div>
-
 			<div className="block sm:hidden">
 				<motion.div
 					className="flex flex-col gap-4"

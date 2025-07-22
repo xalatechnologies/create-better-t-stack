@@ -953,7 +953,7 @@ export default function AnalyticsPage() {
 						<div className="flex items-center gap-2">
 							<Terminal className="h-5 w-5 text-primary" />
 							<span className="font-bold text-lg sm:text-xl">
-								ANALYTICS_DASHBOARD.EXE
+								ANALYTICS_DASHBOARD.SH
 							</span>
 						</div>
 						<div className="hidden h-px flex-1 bg-border sm:block" />

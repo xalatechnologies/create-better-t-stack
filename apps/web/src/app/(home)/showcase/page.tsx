@@ -66,6 +66,23 @@ const showcaseProjects = [
 		liveUrl: "https://gl1.chat/?ref=better-t-stack",
 		tags: ["tRPC", "Drizzle", "Elysia", "Vite", "TanStack Router"],
 	},
+	{
+		title: "Transmogged",
+		description:
+			"Turn your video game characters into different styles worth showing off. Create profile pictures that impress you and your friends.",
+		imageUrl: "https://images.transmogged.com/transmogged-home.png",
+		liveUrl: "https://transmogged.com",
+		tags: [
+			"TanStack Router",
+			"Better Auth",
+			"Biome",
+			"bun",
+			"PostgreSQL",
+			"Drizzle",
+			"tRPC",
+			"Hono",
+		],
+	},
 ];
 
 export default function ShowcasePage() {
@@ -77,34 +94,13 @@ export default function ShowcasePage() {
 						<div className="flex items-center gap-2">
 							<Terminal className="h-4 w-4 text-primary" />
 							<span className="font-bold text-lg sm:text-xl">
-								PROJECT_SHOWCASE.EXE
+								PROJECT_SHOWCASE.SH
 							</span>
 						</div>
 						<div className="h-px flex-1 bg-border" />
 						<span className=" text-muted-foreground text-xs">
 							[{showcaseProjects.length} PROJECTS FOUND]
 						</span>
-					</div>
-
-					<div className="mb-8 rounded border border-border p-4">
-						<div className="flex items-center gap-2 text-sm">
-							<span className="text-primary">$</span>
-							<span className=" text-foreground">
-								user@dev-machine:~/showcase$ ls -la
-							</span>
-						</div>
-						<div className="mt-2 flex items-center gap-2 text-sm">
-							<span className="text-primary">$</span>
-							<span className=" text-muted-foreground">
-								Discover amazing projects built with Better-T-Stack
-							</span>
-						</div>
-						<div className="mt-2 flex items-center gap-2 text-sm">
-							<span className="text-primary">$</span>
-							<span className=" text-muted-foreground">
-								Real-world implementations showcasing stack capabilities
-							</span>
-						</div>
 					</div>
 				</div>
 

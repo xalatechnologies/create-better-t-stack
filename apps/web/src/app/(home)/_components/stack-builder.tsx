@@ -1449,157 +1449,162 @@ const StackBuilder = () => {
 
 	return (
 		<TooltipProvider>
-			<div
-				className={cn(
-					"grid grid-cols-1 overflow-hidden border-border text-foreground",
-				)}
-			>
-				<div className="grid grid-cols-1 overflow-hidden sm:grid-cols-[auto_1fr]">
-					<div className="flex h-full max-w-full flex-col justify-between border-border border-r p-4 sm:max-w-3xs md:max-w-xs lg:max-w-sm">
-						<div className="flex flex-col space-y-4">
-							<label className="flex flex-col">
-								<span className="mb-1 text-muted-foreground text-xs">
-									Project Name:
-								</span>
-								<input
-									type="text"
-									value={stack.projectName || ""}
-									onChange={(e) => {
-										const newValue = e.target.value;
-										setStack({ projectName: newValue });
-									}}
-									className={cn(
-										"w-full rounded border px-2 py-1 text-sm focus:outline-none",
-										projectNameError
-											? "border-destructive bg-destructive/10 text-destructive-foreground"
-											: "border-border focus:border-primary",
-									)}
-									placeholder="my-better-t-app"
-								/>
-								{projectNameError && (
-									<p className="mt-1 text-destructive text-xs">
-										{projectNameError}
-									</p>
-								)}
-							</label>
-							<div className="flex flex-wrap gap-2">
-								<button
-									type="button"
-									onClick={resetStack}
-									className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
-									title="Reset to defaults"
-								>
-									<RefreshCw className="h-3 w-3" />
-									Reset
-								</button>
-								<button
-									type="button"
-									onClick={getRandomStack}
-									className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
-									title="Generate a random stack"
-								>
-									<Shuffle className="h-3 w-3" />
-									Random
-								</button>
-								{lastSavedStack && (
-									<button
-										type="button"
-										onClick={loadSavedStack}
-										className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
-										title="Load saved preferences"
-									>
-										<Settings className="h-3 w-3" />
-										Load Saved
-									</button>
-								)}
-								<button
-									type="button"
-									onClick={saveCurrentStack}
-									className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
-									title="Save current preferences"
-								>
-									<Star className="h-3 w-3" />
-									<span>Save</span>
-								</button>
-								<button
-									type="button"
-									onClick={shareToTwitter}
-									className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
-									title="Share to Twitter"
-								>
-									<Share2 className="h-3 w-3" />
-									Share
-								</button>
-							</div>
-							<div className="relative rounded border border-border p-2">
-								<div className="flex">
-									<span className="mr-2 select-none text-chart-4">$</span>
-									<code className="block break-all text-muted-foreground text-xs sm:text-sm">
-										{command}
-									</code>
-								</div>
-								<div className="mt-2 flex justify-end">
-									<button
-										type="button"
-										onClick={copyToClipboard}
+			<div className="grid w-full grid-cols-1 overflow-hidden border-border text-foreground sm:grid-cols-[auto_1fr]">
+				<div className="flex w-full flex-col border-border border-r sm:max-w-3xs md:max-w-xs lg:max-w-sm">
+					<ScrollArea className="flex-1">
+						<div className="grid h-full grid-rows-[auto_1fr] justify-between p-3 sm:p-4 md:h-[calc(100vh-64px)]">
+							<div className="flex flex-col space-y-3 sm:space-y-4">
+								<label className="flex flex-col">
+									<span className="mb-1 text-muted-foreground text-xs">
+										Project Name:
+									</span>
+									<input
+										type="text"
+										value={stack.projectName || ""}
+										onChange={(e) => {
+											const newValue = e.target.value;
+											setStack({ projectName: newValue });
+										}}
 										className={cn(
-											"flex items-center gap-1 rounded px-2 py-1 text-xs transition-colors",
-											copied
-												? "bg-muted text-chart-4"
-												: "text-muted-foreground hover:bg-muted hover:text-foreground",
+											"w-full rounded border px-2 py-1 text-sm focus:outline-none",
+											projectNameError
+												? "border-destructive bg-destructive/10 text-destructive-foreground"
+												: "border-border focus:border-primary",
 										)}
-										title={copied ? "Copied!" : "Copy command"}
-									>
-										{copied ? (
-											<>
-												<Check className="h-3 w-3 flex-shrink-0" />
-												<span>Copied</span>
-											</>
-										) : (
-											<>
-												<ClipboardCopy className="h-3 w-3 flex-shrink-0" />
-												<span>Copy</span>
-											</>
-										)}
-									</button>
-								</div>
-							</div>
-							<div>
-								<h3 className="mb-2 font-medium text-foreground text-sm">
-									Selected Stack
-								</h3>
-								<div className="flex flex-wrap gap-1.5">{selectedBadges}</div>
-							</div>
-						</div>
-						<div className="mt-auto hidden border-border border-t pt-4 md:flex md:flex-col">
-							<h3 className="mb-2 font-medium text-foreground text-sm">
-								Quick Presets
-							</h3>
-							<div className="grid grid-cols-2 gap-2">
-								{PRESET_TEMPLATES.map((preset) => (
+										placeholder="my-better-t-app"
+									/>
+									{projectNameError && (
+										<p className="mt-1 text-destructive text-xs">
+											{projectNameError}
+										</p>
+									)}
+								</label>
+
+								<div className="flex flex-wrap gap-1.5 sm:gap-2">
 									<button
 										type="button"
-										key={preset.id}
-										onClick={() => applyPreset(preset.id)}
-										className="rounded border border-border p-2 text-left transition-colors hover:bg-muted"
-										title={preset.description}
+										onClick={resetStack}
+										className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+										title="Reset to defaults"
 									>
-										<div className="font-medium text-foreground text-sm">
-											{preset.name}
-										</div>
-										<div className="text-muted-foreground text-xs">
-											{preset.description}
-										</div>
+										<RefreshCw className="h-3 w-3" />
+										<span className="">Reset</span>
 									</button>
-								))}
+									<button
+										type="button"
+										onClick={getRandomStack}
+										className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+										title="Generate a random stack"
+									>
+										<Shuffle className="h-3 w-3" />
+										<span className="">Random</span>
+									</button>
+									{lastSavedStack && (
+										<button
+											type="button"
+											onClick={loadSavedStack}
+											className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+											title="Load saved preferences"
+										>
+											<Settings className="h-3 w-3" />
+											<span className="">Load</span>
+										</button>
+									)}
+									<button
+										type="button"
+										onClick={saveCurrentStack}
+										className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+										title="Save current preferences"
+									>
+										<Star className="h-3 w-3" />
+										<span className="">Save</span>
+									</button>
+									<button
+										type="button"
+										onClick={shareToTwitter}
+										className="flex items-center gap-1 rounded border border-border px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-muted"
+										title="Share to Twitter"
+									>
+										<Share2 className="h-3 w-3" />
+										<span className="">Share</span>
+									</button>
+								</div>
+
+								<div className="relative rounded border border-border p-2">
+									<div className="flex">
+										<span className="mr-2 select-none text-chart-4">$</span>
+										<code className="block break-all text-muted-foreground text-xs sm:text-sm">
+											{command}
+										</code>
+									</div>
+									<div className="mt-2 flex justify-end">
+										<button
+											type="button"
+											onClick={copyToClipboard}
+											className={cn(
+												"flex items-center gap-1 rounded px-2 py-1 text-xs transition-colors",
+												copied
+													? "bg-muted text-chart-4"
+													: "text-muted-foreground hover:bg-muted hover:text-foreground",
+											)}
+											title={copied ? "Copied!" : "Copy command"}
+										>
+											{copied ? (
+												<>
+													<Check className="h-3 w-3 flex-shrink-0" />
+													<span className="">Copied</span>
+												</>
+											) : (
+												<>
+													<ClipboardCopy className="h-3 w-3 flex-shrink-0" />
+													<span className="">Copy</span>
+												</>
+											)}
+										</button>
+									</div>
+								</div>
+
+								<div>
+									<h3 className="mb-2 font-medium text-foreground text-sm">
+										Selected Stack
+									</h3>
+									<div className="flex flex-wrap gap-1.5">{selectedBadges}</div>
+								</div>
+							</div>
+
+							<div className="mt-auto hidden border-border border-t pt-4 lg:flex lg:flex-col">
+								<h3 className="mb-2 font-medium text-foreground text-sm">
+									Quick Presets
+								</h3>
+								<div className="grid grid-cols-2 gap-2">
+									{PRESET_TEMPLATES.map((preset) => (
+										<button
+											type="button"
+											key={preset.id}
+											onClick={() => applyPreset(preset.id)}
+											className="rounded border border-border p-2 text-left transition-colors hover:bg-muted"
+											title={preset.description}
+										>
+											<div className="font-medium text-foreground text-sm">
+												{preset.name}
+											</div>
+											<div className="text-muted-foreground text-xs">
+												{preset.description}
+											</div>
+										</button>
+									))}
+								</div>
 							</div>
 						</div>
-					</div>
+					</ScrollArea>
+				</div>
+
+				<div className="flex flex-1 flex-col overflow-hidden">
 					<ScrollArea
 						ref={contentRef}
-						className="overflow-hidden scroll-smooth"
+						className="flex-1 overflow-hidden scroll-smooth"
 					>
-						<main className="p-4">
+						<main className="p-3 sm:p-4">
 							{CATEGORY_ORDER.map((categoryKey) => {
 								const categoryOptions =
 									TECH_OPTIONS[categoryKey as keyof typeof TECH_OPTIONS] || [];
@@ -1618,11 +1623,11 @@ const StackBuilder = () => {
 										}}
 										key={categoryKey}
 										id={`section-${categoryKey}`}
-										className="mb-8 scroll-mt-4"
+										className="mb-6 scroll-mt-4 sm:mb-8"
 									>
 										<div className="mb-3 flex items-center border-border border-b pb-2 text-muted-foreground">
-											<Terminal className="mr-2 h-5 w-5 flex-shrink-0" />
-											<h2 className="font-semibold text-base text-foreground">
+											<Terminal className="mr-2 h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+											<h2 className="font-semibold text-foreground text-sm sm:text-base">
 												{categoryDisplayName}
 											</h2>
 											{compatibilityAnalysis.notes[categoryKey]?.hasIssue && (
@@ -1643,7 +1648,7 @@ const StackBuilder = () => {
 											)}
 										</div>
 
-										<div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
+										<div className="grid grid-cols-1 xs:grid-cols-2 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
 											{filteredOptions.map((tech) => {
 												let isSelected = false;
 												const category = categoryKey as keyof StackState;
@@ -1673,7 +1678,7 @@ const StackBuilder = () => {
 														<TooltipTrigger asChild>
 															<motion.div
 																className={cn(
-																	"relative cursor-pointer rounded border p-2 transition-all",
+																	"relative cursor-pointer rounded border p-2 transition-all sm:p-3",
 																	isSelected
 																		? "border-primary bg-primary/10"
 																		: isDisabled
@@ -1697,12 +1702,12 @@ const StackBuilder = () => {
 																					<TechIcon
 																						icon={tech.icon}
 																						name={tech.name}
-																						className="mr-1.5 h-4 w-4"
+																						className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4"
 																					/>
 																				)}
 																				<span
 																					className={cn(
-																						"font-medium text-sm",
+																						"font-medium text-xs sm:text-sm",
 																						isSelected
 																							? "text-primary"
 																							: "text-foreground",
