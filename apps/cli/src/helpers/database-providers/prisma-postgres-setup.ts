@@ -213,15 +213,15 @@ export async function setupPrismaPostgres(config: ProjectConfig) {
 			{
 				label: "Quick setup with create-db",
 				value: "create-db",
-				hint: "Fastest, automated database creation",
+				hint: "Fastest, automated database creation (no auth)",
 			},
 		];
 
 		if (orm === "prisma") {
 			setupOptions.push({
-				label: "Custom setup with Prisma Console",
+				label: "Custom setup with Prisma Init",
 				value: "custom",
-				hint: "More control - use existing Prisma account",
+				hint: "More control (requires auth)",
 			});
 		}
 
