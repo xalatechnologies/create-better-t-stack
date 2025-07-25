@@ -1,10 +1,23 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Terminal } from "lucide-react";
+import { Play, Terminal } from "lucide-react";
+import { motion } from "motion/react";
 import Image from "next/image";
 import { Suspense } from "react";
 import { Tweet, TweetSkeleton, type TwitterComponents } from "react-tweet";
+
+const YOUTUBE_VIDEOS = [
+	{
+		id: "VIDEO_001",
+		embedId: "g-ynSAdL6Ak",
+		title: "This tool cured my JavaScript fatigue",
+	},
+	{
+		id: "VIDEO_002",
+		embedId: "uHUgw-Hi8HE",
+		title: "I tried React again after 2 years of Svelte",
+	},
+];
 
 const TWEET_IDS = [
 	"1930194170418999437",
@@ -114,6 +127,45 @@ export default function Testimonials() {
 		},
 	};
 
+	const VideoCard = ({
+		video,
+		index,
+	}: {
+		video: (typeof YOUTUBE_VIDEOS)[0];
+		index: number;
+	}) => (
+		<motion.div
+			className="w-full min-w-0"
+			initial={{ opacity: 0, y: 20, scale: 0.95 }}
+			animate={{ opacity: 1, y: 0, scale: 1 }}
+			transition={{
+				delay: index * 0.1,
+				duration: 0.4,
+				ease: "easeOut",
+			}}
+		>
+			<div className="w-full min-w-0 overflow-hidden rounded border border-border">
+				<div className="sticky top-0 z-10 border-border border-b px-3 py-2">
+					<div className="flex items-center gap-2">
+						<Play className="h-3 w-3 text-primary" />
+						<span className="font-semibold text-xs">[{video.id}]</span>
+					</div>
+				</div>
+				<div className="w-full min-w-0 overflow-hidden">
+					<div className="relative aspect-video w-full">
+						<iframe
+							src={`https://www.youtube.com/embed/${video.embedId}`}
+							title={video.title}
+							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+							allowFullScreen
+							className="absolute inset-0 h-full w-full"
+						/>
+					</div>
+				</div>
+			</div>
+		</motion.div>
+	);
+
 	const TweetCard = ({
 		tweetId,
 		index,
@@ -135,7 +187,7 @@ export default function Testimonials() {
 				<div className="sticky top-0 z-10 border-border border-b px-3 py-2">
 					<div className="flex items-center gap-2">
 						<span className="text-primary text-xs">▶</span>
-						<span className=" font-semibold text-xs">
+						<span className="font-semibold text-xs">
 							[TWEET_{String(index + 1).padStart(3, "0")}]
 						</span>
 					</div>
@@ -153,6 +205,47 @@ export default function Testimonials() {
 
 	return (
 		<div className="mb-12 w-full max-w-full overflow-hidden px-4">
+			<div className="mb-8">
+				<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
+					<div className="flex items-center gap-2">
+						<Play className="h-5 w-5 text-primary" />
+						<span className="font-bold text-lg sm:text-xl">
+							VIDEO_TESTIMONIALS.LOG
+						</span>
+					</div>
+					<div className="hidden h-px flex-1 bg-border sm:block" />
+					<span className="w-full text-right text-muted-foreground text-xs sm:w-auto sm:text-left">
+						[{YOUTUBE_VIDEOS.length} ENTRIES]
+					</span>
+				</div>
+
+				<div className="block sm:hidden">
+					<motion.div
+						className="flex flex-col gap-4"
+						variants={containerVariants}
+						initial="hidden"
+						animate="visible"
+					>
+						{YOUTUBE_VIDEOS.map((video, index) => (
+							<VideoCard key={video.id} video={video} index={index} />
+						))}
+					</motion.div>
+				</div>
+
+				<div className="hidden sm:block">
+					<motion.div
+						className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+						variants={containerVariants}
+						initial="hidden"
+						animate="visible"
+					>
+						{YOUTUBE_VIDEOS.map((video, index) => (
+							<VideoCard key={video.id} video={video} index={index} />
+						))}
+					</motion.div>
+				</div>
+			</div>
+
 			<div className="mb-6 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
 				<div className="flex items-center gap-2">
 					<Terminal className="h-5 w-5 text-primary" />
