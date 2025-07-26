@@ -24,7 +24,7 @@ Follow the prompts to configure your project or use the `--yes` flag for default
 ## Sponsors
 
 <p align="center">
-<img src="https://sponsors.amanv.dev/sponsors.png" alt="Sponsors" width="300">
+<img src="https://sponsors.amanv.dev/sponsors.png" alt="Sponsors">
 </p>
 
 ## Features
