@@ -20,7 +20,7 @@ pnpm create better-t-stack@latest
 ## Sponsors
 
 <p align="center">
-<img src="https://sponsors.amanv.dev/sponsors.png" alt="Sponsors" width="300">
+<img src="https://sponsors.amanv.dev/sponsors.png" alt="Sponsors">
 </p>
 
 
