@@ -2,6 +2,7 @@
 
 import { Terminal } from "lucide-react";
 import ShowcaseItem from "./_components/ShowcaseItem";
+import Footer from "../_components/footer";
 
 const showcaseProjects = [
 	{
@@ -121,6 +122,7 @@ export default function ShowcasePage() {
 					</div>
 				</div>
 			</div>
+			<Footer />
 		</main>
 	);
 }

@@ -25,6 +25,7 @@ import {
 	ChartTooltipContent,
 } from "@/components/ui/chart";
 import discordLogo from "@/public/icon/discord.svg";
+import Footer from "../_components/footer";
 
 interface AnalyticsData {
 	date: string;
@@ -2106,6 +2107,7 @@ export default function AnalyticsPage() {
 					</div>
 				</div>
 			</div>
+			<Footer />
 		</div>
 	);
 }
