@@ -9,11 +9,16 @@ import { Tweet, TweetSkeleton, type TwitterComponents } from "react-tweet";
 const YOUTUBE_VIDEOS = [
 	{
 		id: "VIDEO_001",
+		embedId: "MGmPTcgJYIo",
+		title: "This new CLI tool makes scaffolding projects easy",
+	},
+	{
+		id: "VIDEO_002",
 		embedId: "g-ynSAdL6Ak",
 		title: "This tool cured my JavaScript fatigue",
 	},
 	{
-		id: "VIDEO_002",
+		id: "VIDEO_003",
 		embedId: "uHUgw-Hi8HE",
 		title: "I tried React again after 2 years of Svelte",
 	},
