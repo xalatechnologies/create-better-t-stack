@@ -4,6 +4,12 @@ A modern CLI tool for scaffolding end-to-end type-safe TypeScript projects with 
 
 ![demo](https://cdn.jsdelivr.net/gh/amanvarshney01/create-better-t-stack/demo.gif)
 
+## Sponsors
+
+<p align="center">
+<img src="https://sponsors.amanv.dev/sponsors.png" alt="Sponsors">
+</p>
+
 ## Quick Start
 
 ```bash
@@ -16,13 +22,6 @@ bun create better-t-stack@latest
 # Using pnpm
 pnpm create better-t-stack@latest
 ```
-
-## Sponsors
-
-<p align="center">
-<img src="https://sponsors.amanv.dev/sponsors.png" alt="Sponsors">
-</p>
-
 
 ## Features
 
